@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose"; // Use jose for Edge compatibility if needed, or just standard check
 import { JWT_SECRET } from "@/lib/constants";
 
-// We need a text encoder for jose
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 export async function proxy(request) {
@@ -10,7 +9,7 @@ export async function proxy(request) {
     const { pathname } = request.nextUrl;
 
     // Paths that require authentication
-    const protectedPaths = ["/admin", "/profile", "/api/auth/me"]; // Add more as needed
+    const protectedPaths = ["/admin", "/profile", "/api/auth/me"];
     // Paths reserved for admin
     const adminPaths = ["/admin"];
 
@@ -22,7 +21,6 @@ export async function proxy(request) {
         }
 
         try {
-            // Verify token
             const { payload } = await jwtVerify(token, secret);
 
             const isAdminPath = adminPaths.some((path) => pathname.startsWith(path));
@@ -31,7 +29,6 @@ export async function proxy(request) {
             }
 
         } catch (err) {
-            // Token invalid
             return NextResponse.redirect(new URL("/login", request.url));
         }
     }
