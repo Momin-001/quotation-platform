@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Handshake, PenLine, NotebookText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import UserActions from "@/components/UserActions";
@@ -18,6 +18,10 @@ import {
 const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "User Management", icon: Users },
+    { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/categories", label: "Categories", icon: FolderOpen },
+    { href: "/admin/partners", label: "Partners", icon: Handshake },
+    { href: "/admin/cms", label: "CMS Pages", icon: NotebookText },
 ];
 
 function NavLinks({ pathname, onNavigate }) {

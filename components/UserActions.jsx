@@ -49,26 +49,7 @@ export default function UserActions() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Language Switcher */}
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="justify-center border-gray-400 rounded">
-                        <Image src="/de.svg" alt="German" width={20} height={15} />
-                        <ChevronDown className="h-3 w-3 text-gray-400 ml-1" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2">
-                        <Image src="/us.svg" alt="English" width={20} height={15} />
-                        <span className="text-sm">English</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2">
-                        <Image src="/de.svg" alt="German" width={20} height={15} />
-                        <span className="text-sm">German</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+           
         </div>
     );
 }

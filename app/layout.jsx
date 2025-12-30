@@ -1,6 +1,7 @@
 import { Archivo, Geist, Geist_Mono, Open_Sans } from "next/font/google"; // Corrected imports
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -34,7 +35,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} ${openSans.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

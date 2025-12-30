@@ -9,11 +9,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState([]);
@@ -116,32 +114,27 @@ export default function AdminUsersPage() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold font-archivo">
-                User Management
-            </h1>
-            {/*Add search bar */}
-            <div className="relative">
-                <Search className="absolute left-2 top-4 h-4 w-4 text-muted-foreground" />
-                <Input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search Users"
-                    className="pl-8"
-                />
-            </div>
+                <h1 className="text-2xl font-bold font-archivo">
+                    Products Management
+                </h1>
+                {/*Add Button for Add product */}
+                <Button size="lg">
+                    Add New Product
+                </Button>
+
             </div>
 
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
                     <TableHeader className="bg-secondary font-archivo">
                         <TableRow >
-                            <TableHead className="p-4 text-white whitespace-nowrap">Full Name</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Email</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Company</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Phone</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Role</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Joined Date</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Status & Action</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Category</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Pixel Pitch</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Brightness</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Last Updated</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -163,16 +156,8 @@ export default function AdminUsersPage() {
                                             {format(new Date(user.createdAt), "MMM d, yyyy")}
                                         </TableCell>
                                         <TableCell className="p-4 whitespace-nowrap">
-                                            <div className="flex gap-2 items-center">   
-                                                <span className={`text-sm ${user.isActive ? 'text-secondary' : 'text-red-500'}`}>
-                                                    {user.isActive ? 'Active' : 'Inactive'}
-                                                </span>
-                                                <Switch
-                                                    checked={user.isActive}
-                                                    onCheckedChange={() => toggleStatus(user.id, user.isActive)}
-                                                    className="ml-2 data-[state=checked]:bg-secondary"
-                                                />
-                                            </div>
+                                            <Button variant="link">Edit</Button>
+                                            <Button variant="link">Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 );
