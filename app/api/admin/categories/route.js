@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { categories, products } from "@/drizzle/schema";
+import { categories, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, sql } from "drizzle-orm";
 
@@ -17,14 +17,13 @@ export async function GET() {
                 productCount: sql`cast(count(${products.id}) as int)`,
             })
             .from(categories)
-            .leftJoin(products, eq(products.categoryId, categories.id))
+            .leftJoin(products, eq(products.areaOfUseId, categories.id))
             .groupBy(categories.id)
             .orderBy(categories.createdAt);
 
-        return successResponse(categoriesWithCount, "Categories fetched successfully");
+        return successResponse("Categories fetched successfully", categoriesWithCount);
     } catch (error) {
-        console.error("Error fetching categories:", error);
-        return errorResponse("Failed to fetch categories");
+        return errorResponse(error.message || "Failed to fetch categories");
     }
 }
 
@@ -35,7 +34,7 @@ export async function POST(request) {
         const { name, description } = body;
 
         if (!name || !name.trim()) {
-            return errorResponse("Category name is required");
+            return errorResponse("Category name is required", 400);
         }
 
         const newCategory = await db
@@ -46,15 +45,8 @@ export async function POST(request) {
             })
             .returning();
 
-        return successResponse(newCategory[0], "Category created successfully");
+        return successResponse("Category created successfully", newCategory[0]);
     } catch (error) {
-        console.error("Error creating category:", error);
-
-        // Handle unique constraint violation
-        if (error.code === "23505") {
-            return errorResponse("Category with this name already exists");
-        }
-
-        return errorResponse("Failed to create category");
+        return errorResponse(error.message || "Failed to create category");
     }
 }

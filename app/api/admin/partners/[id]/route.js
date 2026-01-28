@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { partners } from "@/drizzle/schema";
+import { partners } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
@@ -67,20 +67,19 @@ export async function PATCH(request, { params }) {
             .returning();
 
         if (updatedPartner.length === 0) {
-            return errorResponse("Partner not found");
+            return errorResponse("Partner not found", 404);
         }
 
-        return successResponse(updatedPartner[0], "Partner updated successfully");
+        return successResponse("Partner updated successfully", updatedPartner[0]);
     } catch (error) {
-        console.error("Error updating partner:", error);
-        return errorResponse("Failed to update partner");
+        return errorResponse(error.message || "Failed to update partner");
     }
 }
 
 // DELETE /api/admin/partners/[id] - Delete a partner
 export async function DELETE(request, { params }) {
     try {
-        const resolvedParams = await params;
+        const resolvedParams = await params;    
         const { id } = resolvedParams;
 
         // Get partner to delete logo from Cloudinary
@@ -91,7 +90,7 @@ export async function DELETE(request, { params }) {
             .limit(1);
 
         if (partner.length === 0) {
-            return errorResponse("Partner not found");
+            return errorResponse("Partner not found", 404);
         }
 
         // Delete logo from Cloudinary
@@ -110,9 +109,8 @@ export async function DELETE(request, { params }) {
         // Delete from database
         await db.delete(partners).where(eq(partners.id, id));
 
-        return successResponse({ message: "Partner deleted successfully" });
+        return successResponse("Partner deleted successfully");
     } catch (error) {
-        console.error("Error deleting partner:", error);
-        return errorResponse("Failed to delete partner");
+        return errorResponse(error.message || "Failed to delete partner");
     }
 }

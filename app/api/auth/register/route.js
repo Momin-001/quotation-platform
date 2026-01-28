@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { users } from "@/drizzle/schema/users";
+import { users } from "@/db/schema";
 import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -10,7 +10,7 @@ export async function POST(req) {
         const { fullName, email, password, companyName, phoneNumber } = body;
 
         if (!fullName || !email || !password) {
-            return errorResponse("Missing required fields", 400);
+            return errorResponse("All fields are required", 400);
         }
 
         const existingUser = await db
@@ -37,9 +37,8 @@ export async function POST(req) {
             })
             .returning();
 
-        return successResponse(newUser[0], "User created successfully");
+        return successResponse("User created successfully", newUser[0]);
     } catch (error) {
-        console.error("Signup error:", error);
-        return errorResponse("Internal Server Error", 500);
+        return errorResponse(error.message || "Failed to create user");
     }
 }

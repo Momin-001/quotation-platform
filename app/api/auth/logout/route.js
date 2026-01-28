@@ -6,8 +6,8 @@ export async function POST() {
     try {
         const cookieStore = await cookies()
         cookieStore.delete("token")
-        return successResponse(null, "Logged out successfully")
+        return successResponse("Logged out successfully")
     } catch (error) {
-        return errorResponse("Failed to logout", error)
+        return errorResponse(error.message || "Failed to logout")
     }
 }

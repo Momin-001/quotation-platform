@@ -6,13 +6,21 @@ import { useRouter } from "next/navigation";
 const AuthContext = createContext({
     user: null,
     loading: true,
+    isAuthenticated: false,
     login: async () => { },
     logout: async () => { },
+    isUser: false,
+    isAdmin: false,
+    isSuperAdmin: false,
 });
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const [isUser, setIsUser] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -22,36 +30,53 @@ export const AuthProvider = ({ children }) => {
     const checkUser = async () => {
         try {
             const res = await fetch("/api/auth/me");
-            const data = await res.json();
-            if (data.success) {
-                setUser(data.data);
-            } else {
-                setUser(null);
+            const response = await res.json();
+            if (!response.success) {
+                throw new Error(response.message || "Something went wrong");
             }
+            setUser(response.data);
+            setIsAuthenticated(true);
+            setIsUser(response.data.role === 'user');
+            setIsAdmin(response.data.role === 'admin');
+            setIsSuperAdmin(response.data.role === 'super_admin');
         } catch (error) {
-            console.error("Auth Check Error", error);
             setUser(null);
-        } finally {
+            setIsAuthenticated(false);
+            setIsUser(false);
+            setIsAdmin(false);
+            setIsSuperAdmin(false);
+        }
+        finally {
             setLoading(false);
         }
     };
 
     const login = async (userData) => {
         setUser(userData);
-        router.push(userData.role === 'admin' ? '/admin' : '/');
+        setIsAuthenticated(true);
+        setIsUser(userData.role === 'user');
+        setIsAdmin(userData.role === 'admin');
+        setIsSuperAdmin(userData.role === 'super_admin');
+        router.push(userData.role === 'admin' || userData.role === 'super_admin' ? '/admin' : '/');
     };
 
     const logout = async () => {
         try {
             await fetch('/api/auth/logout', { method: 'POST' }); 
-        } catch (e) { }
+        } catch (e) { 
+
+        }
 
         setUser(null);
+        setIsAuthenticated(false);
+        setIsUser(false);
+        setIsAdmin(false);
+        setIsSuperAdmin(false);
         router.push("/login");
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, checkUser }}>
+        <AuthContext.Provider value={{ user, loading, isAuthenticated, isUser, isAdmin, isSuperAdmin, login, logout, checkUser }}>
             {children}
         </AuthContext.Provider>
     );

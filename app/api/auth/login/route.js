@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { users } from "@/drizzle/schema/users";
+import { users } from "@/db/schema";
 import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -13,7 +13,7 @@ export async function POST(req) {
         const { email, password } = body;
 
         if (!email || !password) {
-            return errorResponse("Missing email or password", 400);
+            return errorResponse("All fields are required", 400);
         }
 
         const user = await db
@@ -32,7 +32,7 @@ export async function POST(req) {
             return errorResponse("Invalid credentials", 401);
         }
 
-        if (!user.isActive && user.role !== 'admin') {
+        if (!user.isActive && user.role !== 'admin' && user.role !== 'super_admin') {
             return errorResponse("Your account is pending activation by admin.", 403);
         }
 
@@ -53,9 +53,8 @@ export async function POST(req) {
         // Remove password from response
         const { password: _, ...userWithoutPassword } = user;
 
-        return successResponse(userWithoutPassword, "Login successful");
+        return successResponse("Login successful", userWithoutPassword);
     } catch (error) {
-        console.error("Login error:", error);
-        return errorResponse("Internal Server Error", 500);
+        return errorResponse(error.message || "Failed to login");
     }
 }

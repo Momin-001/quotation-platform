@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose"; // Use jose for Edge compatibility if needed, or just standard check
+import { jwtVerify } from "jose";
 import { JWT_SECRET } from "@/lib/constants";
 
 const secret = new TextEncoder().encode(JWT_SECRET);
@@ -8,12 +8,13 @@ export async function proxy(request) {
     const token = request.cookies.get("token")?.value;
     const { pathname } = request.nextUrl;
 
-    // Paths that require authentication
-    const protectedPaths = ["/admin", "/profile", "/api/auth/me"];
-    // Paths reserved for admin
+    const protectedPaths = ["/admin", "/api/auth/me", "/user"];
     const adminPaths = ["/admin"];
+    const userPaths = ["/user"];
 
     const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
+    const isAdminPath = adminPaths.some((path) => pathname.startsWith(path));
+    const isUserPath = userPaths.some((path) => pathname.startsWith(path));
 
     if (isProtected) {
         if (!token) {
@@ -22,12 +23,12 @@ export async function proxy(request) {
 
         try {
             const { payload } = await jwtVerify(token, secret);
-
-            const isAdminPath = adminPaths.some((path) => pathname.startsWith(path));
-            if (isAdminPath && payload.role !== "admin") {
+            if (isAdminPath && payload.role !== "admin" && payload.role !== "super_admin") {
                 return NextResponse.redirect(new URL("/", request.url));
             }
-
+            if (isUserPath && payload.role !== "user") {
+                return NextResponse.redirect(new URL("/", request.url));
+            }
         } catch (err) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
@@ -37,5 +38,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/profile/:path*", "/api/auth/me"],
+    matcher: ["/admin/:path*", "/api/auth/me", "/user/:path*"],
 };

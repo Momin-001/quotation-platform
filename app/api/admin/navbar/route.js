@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { navbar } from "@/drizzle/schema";
+import { navbar } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 
 // GET /api/admin/navbar - Get navbar content
@@ -25,13 +25,12 @@ export async function GET() {
                 })
                 .returning();
 
-            return successResponse(defaultNavbar[0], "Navbar content fetched successfully");
+            return successResponse("Navbar content fetched successfully", defaultNavbar[0]);
         }
 
-        return successResponse(navbarContent, "Navbar content fetched successfully");
+        return successResponse("Navbar content fetched successfully", navbarContent);
     } catch (error) {
-        console.error("Error fetching navbar content:", error);
-        return errorResponse("Failed to fetch navbar content", 500);
+        return errorResponse(error.message || "Failed to fetch navbar content");
     }
 }
 
@@ -93,12 +92,13 @@ export async function PUT(req) {
                 .returning();
         }
 
-        return successResponse(result[0], "Navbar content updated successfully");
+        return successResponse("Navbar content updated successfully", result[0]);
     } catch (error) {
-        console.error("Error updating navbar content:", error);
-        return errorResponse("Failed to update navbar content", 500);
+        return errorResponse(error.message || "Failed to update navbar content");
     }
 }
+
+
 
 
 

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Handshake, PenLine, NotebookText } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import UserActions from "@/components/UserActions";
+import UserAvatar from "@/components/UserAvatar";
 import {
     Sheet,
     SheetContent,
@@ -21,7 +21,11 @@ const navItems = [
     { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/categories", label: "Categories", icon: FolderOpen },
     { href: "/admin/partners", label: "Partners", icon: Handshake },
+    { href: "/admin/enquiries", label: "Customer Enquiries", icon: MessageSquare },
+    { href: "/admin/quotations", label: "Quotations", icon: FileText },
     { href: "/admin/cms", label: "CMS Pages", icon: NotebookText },
+    { href: "/admin/certificates", label: "Certificates", icon: TicketCheck },
+    { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
 ];
 
 function NavLinks({ pathname, onNavigate }) {
@@ -80,7 +84,7 @@ export default function AdminLayout({ children }) {
                     </Sheet>
 
                     <div className="flex-1 md:flex-none" />
-                    <UserActions />
+                    <UserAvatar />
                 </header>
                 <div className="p-4 md:p-8 flex-1 overflow-auto">
                     {children}

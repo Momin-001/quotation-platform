@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { categories } from "@/drizzle/schema";
+import { categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 
@@ -13,7 +13,7 @@ export async function PATCH(request, { params }) {
         const { name, description } = body;
 
         if (!name || !name.trim()) {
-            return errorResponse("Category name is required");
+            return errorResponse("Category name is required", 400);
         }
 
         const updatedCategory = await db
@@ -27,19 +27,12 @@ export async function PATCH(request, { params }) {
             .returning();
 
         if (updatedCategory.length === 0) {
-            return errorResponse("Category not found");
+            return errorResponse("Category not found", 404);
         }
 
-        return successResponse(updatedCategory[0]);
+        return successResponse("Category updated successfully", updatedCategory[0]);
     } catch (error) {
-        console.error("Error updating category:", error);
-
-        // Handle unique constraint violation
-        if (error.code === "23505") {
-            return errorResponse("Category with this name already exists");
-        }
-
-        return errorResponse("Failed to update category");
+        return errorResponse(error.message || "Failed to update category");
     }
 }
 
@@ -55,12 +48,11 @@ export async function DELETE(request, { params }) {
             .returning();
 
         if (deletedCategory.length === 0) {
-            return errorResponse("Category not found");
+            return errorResponse("Category not found", 404);
         }
 
-        return successResponse({ message: "Category deleted successfully" });
+        return successResponse("Category deleted successfully");
     } catch (error) {
-        console.error("Error deleting category:", error);
-        return errorResponse("Failed to delete category");
+        return errorResponse(error.message || "Failed to delete category");
     }
 }

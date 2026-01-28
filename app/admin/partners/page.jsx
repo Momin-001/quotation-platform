@@ -12,14 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, Search, Upload } from "lucide-react";
+import { Search, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -37,7 +39,7 @@ export default function PartnersPage() {
     const [filteredPartners, setFilteredPartners] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [sortBy, setSortBy] = useState("name");
+    const [sortBy, setSortBy] = useState("");
 
     // Form states
     const [name, setName] = useState("");
@@ -54,17 +56,15 @@ export default function PartnersPage() {
         setLoading(true);
         try {
             const res = await fetch("/api/admin/partners");
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                setPartners(data.data);
-                setFilteredPartners(data.data);
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to fetch partners");
             }
+            setPartners(response.data);
+            setFilteredPartners(response.data);
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to fetch partners");
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -143,18 +143,16 @@ export default function PartnersPage() {
                 body: formData,
             });
 
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                toast.success(editingId ? "Partner updated" : "Partner created");
-                fetchPartners();
-                clearForm();
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to update partner");
             }
+            toast.success(response.message || "Partner updated");
+            fetchPartners();
+            clearForm();
         } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong");
+            toast.error(error.message);
         }
     };
 
@@ -179,18 +177,16 @@ export default function PartnersPage() {
                 method: "DELETE",
             });
 
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                toast.success("Partner deleted");
-                fetchPartners();
-                if (editingId === partnerToDelete.id) clearForm();
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to delete partner");
             }
+            toast.success(response.message || "Partner deleted");
+            fetchPartners();
+            if (editingId === partnerToDelete.id) clearForm();
         } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong");
+            toast.error(error.message);
         } finally {
             setDeleteDialogOpen(false);
             setPartnerToDelete(null);
@@ -295,22 +291,15 @@ export default function PartnersPage() {
                         className="pl-8 placeholder:text-gray-800"
                     />
                 </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="lg" className="gap-2 text-gray-800">
-                            Sort By {sortBy === "name" ? "Name" : "Click Count"}
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => setSortBy("name")}>
-                            Name
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setSortBy("clicks")}>
-                            Click Count
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sort By" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="clicks">Click Count</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
             {/* Table */}
@@ -326,7 +315,16 @@ export default function PartnersPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredPartners.length > 0 ? (
+                        {loading && filteredPartners.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Spinner className="h-5 w-5" />
+                                        <span>Loading partners...</span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : filteredPartners.length > 0 ? (
                             filteredPartners.map((partner) => (
                                 <TableRow
                                     key={partner.id}
@@ -366,7 +364,7 @@ export default function PartnersPage() {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-24 text-center">
-                                    {loading ? "Loading..." : "No partners found."}
+                                    No partners found.
                                 </TableCell>
                             </TableRow>
                         )}

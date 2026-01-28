@@ -1,0 +1,1 @@
+ALTER TABLE "quotation_items" ADD COLUMN "item_type" text DEFAULT 'main' NOT NULL;

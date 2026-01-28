@@ -1,16 +1,17 @@
 import { db } from "@/lib/db";
-import { users } from "@/drizzle/schema/users";
+import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 
 export async function PATCH(req, { params }) {
     try {
-        const { id } = await params; // await params in Next.js 15
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
         const body = await req.json();
         const { isActive } = body;
 
         if (typeof isActive !== 'boolean') {
-            return errorResponse("Invalid status", 400);
+            return errorResponse("Invalid status type", 400);
         }
 
         const updatedUser = await db
@@ -25,9 +26,8 @@ export async function PATCH(req, { params }) {
 
         const { password: _, ...userWithoutPassword } = updatedUser[0];
 
-        return successResponse(userWithoutPassword, "User status updated successfully");
+        return successResponse("User status updated successfully", userWithoutPassword);
     } catch (error) {
-        console.error("Error updating user status:", error);
-        return errorResponse("Failed to update user status", 500);
+        return errorResponse(error.message || "Failed to update user status");
     }
 }

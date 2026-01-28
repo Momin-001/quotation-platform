@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { partners } from "@/drizzle/schema";
+import { partners } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
@@ -13,10 +13,9 @@ export async function GET() {
             .from(partners)
             .orderBy(desc(partners.createdAt));
 
-        return successResponse(allPartners, "Partners fetched successfully");
+        return successResponse("Partners fetched successfully", allPartners);
     } catch (error) {
-        console.error("Error fetching partners:", error);
-        return errorResponse("Failed to fetch partners");
+        return errorResponse(error.message || "Failed to fetch partners");
     }
 }
 
@@ -29,7 +28,7 @@ export async function POST(request) {
         const logoFile = formData.get("logo");
 
         if (!name || !websiteUrl || !logoFile) {
-            return errorResponse("Name, website URL, and logo are required");
+            return errorResponse("Name, website URL, and logo are required", 400);
         }
 
         // Convert file to base64 for Cloudinary upload
@@ -53,9 +52,8 @@ export async function POST(request) {
             })
             .returning();
 
-        return successResponse(newPartner[0], "Partner created successfully");
+        return successResponse("Partner created successfully", newPartner[0]);
     } catch (error) {
-        console.error("Error creating partner:", error);
-        return errorResponse("Failed to create partner");
+        return errorResponse(error.message || "Failed to create partner");
     }
 }

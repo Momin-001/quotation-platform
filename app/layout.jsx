@@ -2,6 +2,7 @@ import { Archivo, Geist, Geist_Mono, Open_Sans } from "next/font/google"; // Cor
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -25,8 +26,8 @@ const openSans = Open_Sans({
 });
 
 export const metadata = {
-  title: "LED Quotation Platform",
-  description: "Buy and customize LEDs",
+  title: "ProLedAll",
+  description: "ProLedAll is a platform for buying and selling LEDs",
 };
 
 export default function RootLayout({ children }) {
@@ -37,7 +38,9 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <LanguageProvider>
-            {children}
+            <CartProvider>
+              {children}
+            </CartProvider>
           </LanguageProvider>
         </AuthProvider>
         <Toaster />

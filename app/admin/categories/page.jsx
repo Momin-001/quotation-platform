@@ -12,14 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
     AlertDialog,
@@ -37,7 +39,7 @@ export default function CategoriesPage() {
     const [filteredCategories, setFilteredCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
-    const [sortBy, setSortBy] = useState("name");
+    const [sortBy, setSortBy] = useState("");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     // Form states
@@ -49,17 +51,15 @@ export default function CategoriesPage() {
         setLoading(true);
         try {
             const res = await fetch("/api/admin/categories");
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                setCategories(data.data);
-                setFilteredCategories(data.data);
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to fetch categories");
             }
+            setCategories(response.data);
+            setFilteredCategories(response.data);
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to fetch categories");
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -115,18 +115,16 @@ export default function CategoriesPage() {
                 body: JSON.stringify({ name, description }),
             });
 
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                toast.success(editingId ? "Category updated" : "Category created");
-                fetchCategories();
-                clearForm();
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to update category");
             }
+            toast.success(response.message || "Category updated");
+            fetchCategories();
+            clearForm();
         } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong");
+            toast.error(error.message);
         }
     };
 
@@ -149,18 +147,16 @@ export default function CategoriesPage() {
                 method: "DELETE",
             });
 
-            const data = await res.json();
+            const response = await res.json();
 
-            if (data.success) {
-                toast.success("Category deleted");
-                fetchCategories();
-                if (editingId === categoryToDelete.id) clearForm();
-            } else {
-                toast.error(data.message);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to delete category");
             }
+            toast.success(response.message || "Category deleted");
+            fetchCategories();
+            if (editingId === categoryToDelete.id) clearForm();
         } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong");
+            toast.error(error.message);
         } finally {
             setDeleteDialogOpen(false);
             setCategoryToDelete(null);
@@ -236,22 +232,15 @@ export default function CategoriesPage() {
                         className="pl-8 placeholder:text-gray-800"
                     />
                 </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="lg" className="gap-2 text-gray-800">
-                           Sort By {sortBy === "name" ? "Name" : "Products"}
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => setSortBy("name")}>
-                            Name
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setSortBy("products")}>
-                            Products
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sort By" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="products">Products</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
             {/* Table */}
@@ -266,7 +255,16 @@ export default function CategoriesPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredCategories.length > 0 ? (
+                        {loading && filteredCategories.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Spinner className="h-5 w-5" />
+                                        <span>Loading categories...</span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : filteredCategories.length > 0 ? (
                             filteredCategories.map((category, index) => (
                                 <TableRow
                                     key={category.id}
@@ -298,7 +296,7 @@ export default function CategoriesPage() {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={4} className="h-24 text-center">
-                                    {loading ? "Loading..." : "No categories found."}
+                                    No categories found.
                                 </TableCell>
                             </TableRow>
                         )}

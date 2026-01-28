@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { users } from "@/drizzle/schema/users";
+import { users } from "@/db/schema";
 import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
@@ -34,9 +34,8 @@ export async function GET(req) {
 
         const { password: _, ...userWithoutPassword } = user;
 
-        return successResponse(userWithoutPassword, "User retrieved successfully");
+        return successResponse("User retrieved successfully", userWithoutPassword);
     } catch (error) {
-        console.error("Me API error:", error);
-        return errorResponse("Internal Server Error", 500);
+        return errorResponse(error.message || "Failed to get user");
     }
 }

@@ -1,10 +1,15 @@
 import { db } from "@/lib/db";
-import { users } from "@/drizzle/schema/users";
+import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, ilike, or, ne, and } from "drizzle-orm";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
 export async function GET(req) {
     try {
+        // Get current user to check if they're super_admin
+        const { user: currentUser } = await getCurrentUser();
+        const isSuperAdmin = currentUser?.role === "super_admin";
+
         const { searchParams } = new URL(req.url);
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");
@@ -12,7 +17,18 @@ export async function GET(req) {
 
         const offset = (page - 1) * limit;
 
-        let whereClause = ne(users.role, 'admin');
+        // If super_admin, show all users (including admins). Otherwise, exclude admins and super_admins
+        let whereClause;
+        if (isSuperAdmin) {
+            // Super admin can see all users except other super_admins
+            whereClause = ne(users.role, 'super_admin');
+        } else {
+            // Regular admin can only see regular users
+            whereClause = and(
+                ne(users.role, 'admin'),
+                ne(users.role, 'super_admin')
+            );
+        }
 
         if (search) {
             whereClause = and(
@@ -41,9 +57,8 @@ export async function GET(req) {
             return rest;
         });
 
-        return successResponse(sanitizedData, "Users fetched successfully");
+        return successResponse("Users fetched successfully", sanitizedData);
     } catch (error) {
-        console.error("Error fetching users:", error);
-        return errorResponse("Failed to fetch users", 500);
+        return errorResponse(error.message || "Failed to fetch users");
     }
 }
