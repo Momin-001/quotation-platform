@@ -92,7 +92,7 @@ export default function MyQuotationsPage() {
                                 className="bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                                 onClick={() => {
                                     // Navigate to quotation detail page (to be implemented)
-                                    router.push(`/user/quotation/${quotation.id}`);
+                                    router.push(`/user/my-quotations/${quotation.id}`);
                                 }}
                             >
                                 <CardContent>
