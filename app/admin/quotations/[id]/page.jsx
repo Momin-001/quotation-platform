@@ -60,7 +60,7 @@ function AdminQuotationChat({ quotationId, chatDisabled, chatDisabledReason }) {
         fetchMessages();
         
         // Poll for new messages every 3 seconds
-        // pollIntervalRef.current = setInterval(fetchMessages, 3000);
+        pollIntervalRef.current = setInterval(fetchMessages, 3000);
         
         return () => {
             if (pollIntervalRef.current) {
