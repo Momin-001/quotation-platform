@@ -1,3 +1,4 @@
+import {relations} from "drizzle-orm";
 export * from "./users";
 export * from "./categories";
 export * from "./products";
@@ -12,3 +13,5 @@ export * from "./footer";
 export * from "./partners";
 export * from "./enquiries";
 export * from "./quotations";
+export * from "./controllers";
+export * from "./accessories";

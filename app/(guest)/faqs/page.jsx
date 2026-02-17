@@ -10,7 +10,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Spinner } from "@/components/ui/spinner";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 
 export default function FAQsPage() {

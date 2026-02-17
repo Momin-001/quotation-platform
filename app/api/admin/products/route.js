@@ -14,8 +14,9 @@ export async function GET() {
                 productNumber: products.productNumber,
                 productType: products.productType,
                 pixelPitch: products.pixelPitch,
-                brightness: products.brightnessControl,
+                brightnessValue: products.brightnessValue,
                 areaOfUseId: products.areaOfUseId,
+                isActive: products.isActive,
                 createdAt: products.createdAt,
                 updatedAt: products.updatedAt,
             })
@@ -31,7 +32,9 @@ export async function GET() {
 // POST /api/admin/products - Create a new product
 export async function POST(request) {
     try {
-        const body = await request.json();
+        const formData = await request.formData();
+        const fieldsJson = formData.get("fields");
+        const body = JSON.parse(fieldsJson);
         
         // Extract all product fields
         const productData = {
@@ -48,6 +51,7 @@ export async function POST(request) {
             ledModulesPerCabinet: body.ledModulesPerCabinet?.toString().trim() || null,
             ledChipManufacturer: body.ledChipManufacturer?.toString().trim() || null,
             whitePointCalibration: body.whitePointCalibration?.toString().trim() || null,
+            brightnessValue: body.brightnessValue?.toString().trim() || null,
             inputVoltage: body.inputVoltage?.toString().trim() || null,
             receivingCard: body.receivingCard?.toString().trim() || null,
             heatDissipation: body.heatDissipation?.toString().trim() || null,
@@ -65,15 +69,18 @@ export async function POST(request) {
             productType: body.productType?.toString() || "",
             design: body.design?.toString() || "",
             specialTypes: body.specialTypes?.toString() || "",
+            specialTypesOther: body.specialTypesOther?.toString().trim() || null,
             application: body.application?.toString() || "",
             pixelConfiguration: body.pixelConfiguration?.toString() || "",
             pixelTechnology: body.pixelTechnology?.toString() || "",
             ledTechnology: body.ledTechnology?.toString() || "",
+            ledTechnologyOther: body.ledTechnologyOther?.toString().trim() || null,
             chipBonding: body.chipBonding?.toString() || "",
             colourDepth: body.colourDepth?.toString() || "",
             currentGainControl: body.currentGainControl?.toString() || "",
             videoRate: body.videoRate?.toString() || "",
             calibrationMethod: body.calibrationMethod?.toString() || "",
+            calibrationMethodOther: body.calibrationMethodOther?.toString().trim() || null,
             drivingMethod: body.drivingMethod?.toString() || "",
             controlSystem: body.controlSystem?.toString() || "",
             controlSystemOther: body.controlSystemOther?.toString().trim() || null,
@@ -107,6 +114,9 @@ export async function POST(request) {
             powerConsumptionMax: body.powerConsumptionMax ? parseInt(body.powerConsumptionMax) : null,
             powerConsumptionTypical: body.powerConsumptionTypical ? parseInt(body.powerConsumptionTypical) : null,
             warrantyPeriod: body.warrantyPeriod ? parseInt(body.warrantyPeriod) : null,
+            
+            // Products added via form are active by default (admin adds images manually)
+            isActive: true,
         };
 
         // Validate required fields
@@ -122,9 +132,9 @@ export async function POST(request) {
 
         const productId = newProduct[0].id;
 
-        // Handle product images
-        const imageFiles = body.productImages;
-        if (imageFiles && imageFiles.length > 0 && imageFiles[0] instanceof File) {
+        // Handle product images via FormData
+        const imageFiles = formData.getAll("images");
+        if (imageFiles && imageFiles.length > 0) {
             const imageUploadPromises = imageFiles.map(async (file, index) => {
                 if (file && file.size > 0) {
                     const bytes = await file.arrayBuffer();
@@ -145,6 +155,9 @@ export async function POST(request) {
             });
 
             await Promise.all(imageUploadPromises.filter(Boolean));
+        } else {
+            // No images uploaded from form — set isActive to false
+            await db.update(products).set({ isActive: false }).where(eq(products.id, productId));
         }
 
         // Handle product certificates (selected from existing certificates)
@@ -181,4 +194,3 @@ export async function POST(request) {
         return errorResponse(error.message || "Failed to create product");
     }
 }
-

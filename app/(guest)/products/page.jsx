@@ -20,7 +20,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 import Link from "next/link";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 
 export default function ProductsPage() {
@@ -257,8 +257,8 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="AIO systems">AIO systems</SelectItem>
-                                                    <SelectItem value="LED Display single cabinet">LED Display single cabinet</SelectItem>
+                                                    <SelectItem value="AIO Systems">AIO Systems</SelectItem>
+                                                    <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -269,8 +269,8 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="fix">Fix</SelectItem>
-                                                    <SelectItem value="mobil">Mobil</SelectItem>
+                                                    <SelectItem value="Fix">Fix</SelectItem>
+                                                    <SelectItem value="Mobil">Mobil</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -281,10 +281,10 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="transparent">Transparent</SelectItem>
-                                                    <SelectItem value="curved">Curved</SelectItem>
-                                                    <SelectItem value="floor">Floor</SelectItem>
-                                                    <SelectItem value="N/A">N/A</SelectItem>
+                                                    <SelectItem value="Transparent">Transparent</SelectItem>
+                                                    <SelectItem value="Curved">Curved</SelectItem>
+                                                    <SelectItem value="Floor">Floor</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -296,10 +296,10 @@ export default function ProductsPage() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="DOOH">DOOH</SelectItem>
-                                                    <SelectItem value="Indoor signage">Indoor signage</SelectItem>
-                                                    <SelectItem value="Home theater">Home theater</SelectItem>
-                                                    <SelectItem value="Stadium scoreboard">Stadium scoreboard</SelectItem>
-                                                    <SelectItem value="Video cube">Video cube</SelectItem>
+                                                    <SelectItem value="Indoor Signage">Indoor Signage</SelectItem>
+                                                    <SelectItem value="Home Theater">Home Theater</SelectItem>
+                                                    <SelectItem value="Stadium Scoreboard">Stadium Scoreboard</SelectItem>
+                                                    <SelectItem value="Video Cube">Video Cube</SelectItem>
                                                     <SelectItem value="Conference">Conference</SelectItem>
                                                     <SelectItem value="Stadium Ribbons">Stadium Ribbons</SelectItem>
                                                     <SelectItem value="Corporate Design">Corporate Design</SelectItem>
@@ -349,6 +349,7 @@ export default function ProductsPage() {
                                                     <SelectItem value="COB">COB</SelectItem>
                                                     <SelectItem value="DIP">DIP</SelectItem>
                                                     <SelectItem value="LOB">LOB</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -359,9 +360,9 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="gold wire">Gold Wire</SelectItem>
-                                                    <SelectItem value="cooper wire">Cooper Wire</SelectItem>
-                                                    <SelectItem value="Flip chip">Flip Chip</SelectItem>
+                                                    <SelectItem value="Gold Wire">Gold Wire</SelectItem>
+                                                    <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
+                                                    <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -434,8 +435,8 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
+                                                    <SelectItem value="Yes">Yes</SelectItem>
+                                                    <SelectItem value="No">No</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -446,8 +447,8 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
+                                                    <SelectItem value="Yes">Yes</SelectItem>
+                                                    <SelectItem value="No">No</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -458,8 +459,8 @@ export default function ProductsPage() {
                                                     <SelectValue placeholder="Select" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
+                                                    <SelectItem value="Yes">Yes</SelectItem>
+                                                    <SelectItem value="No">No</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -474,7 +475,7 @@ export default function ProductsPage() {
                                                     <SelectItem value="Novastar">Novastar</SelectItem>
                                                     <SelectItem value="Brompton">Brompton</SelectItem>
                                                     <SelectItem value="LINSN">LINSN</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -548,9 +549,9 @@ export default function ProductsPage() {
                                         >
                                             {/* Product Image with Certificates */}
                                             <div className="relative aspect-8/7 bg-gray-100">
-                                                {product.imageUrl ? (
+                                                {product.images.length > 0 ? (
                                                     <Image
-                                                        src={product.imageUrl}
+                                                        src={product.images[0]}
                                                         alt={product.productName}
                                                         fill
                                                         className="object-cover"
@@ -561,9 +562,9 @@ export default function ProductsPage() {
                                                     </div>
                                                 )}
                                                 {/* Certificates */}
-                                                {product.certificates && product.certificates.length > 0 && (
+                                                {product.productCertificates && product.productCertificates.length > 0 && (
                                                     <div className="absolute top-2 right-2 flex gap-1 flex-col flex-wrap justify-end">
-                                                        {product.certificates.map((cert) => (
+                                                        {product.productCertificates.map((cert) => (
                                                             <div
                                                                 key={cert.id}
                                                                 className="bg-white rounded-full p-2 shadow-sm"
@@ -586,7 +587,7 @@ export default function ProductsPage() {
                                                     {product.productName}
                                                 </h3>
                                                 <p className="text-sm text-gray-600 mb-1">{product.productNumber}</p>
-                                                <p className="text-sm bg-secondary text-white rounded-md px-2 py-1 w-fit">{product.categoryName || "N/A"}</p>
+                                                <p className="text-sm bg-secondary text-white rounded-md px-2 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
                                             </div>
                                         </Link>
                                     );

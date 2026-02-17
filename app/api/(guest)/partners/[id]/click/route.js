@@ -6,34 +6,35 @@ import { eq } from "drizzle-orm";
 // POST /api/partners/[id]/click - Increment partner click count
 export async function POST(req, { params }) {
     try {
-        const { id } = await params;
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
 
         if (!id) {
             return errorResponse("Partner ID is required", 400);
         }
 
         // Get current partner
-        const partner = await db
+        const [partner] = await db
             .select()
             .from(partners)
             .where(eq(partners.id, id))
-            .then((res) => res[0]);
+            .limit(1);
 
         if (!partner) {
             return errorResponse("Partner not found", 404);
         }
 
         // Increment click count
-        const updatedPartner = await db
+        const [updatedPartner] = await db
             .update(partners)
             .set({
                 clickCount: partner.clickCount + 1,
                 updatedAt: new Date(),
             })
             .where(eq(partners.id, id))
-            .returning();
+            .returning()
 
-        return successResponse("Click count updated successfully", updatedPartner[0]);
+        return successResponse("Click count updated successfully", updatedPartner);
     } catch (error) {
         return errorResponse(error.message || "Failed to update click count");
     }

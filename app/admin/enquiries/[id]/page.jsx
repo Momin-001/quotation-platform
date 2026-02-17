@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft, Eye } from "lucide-react";
+import { FileText, ArrowLeft, Eye, Pencil, Monitor } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -208,6 +208,110 @@ export default function EnquiryDetailPage() {
                 )}
             </div>
 
+            {/* Custom LED Configuration (Leditor) */}
+            {items.some((item) => item.isCustom) && (
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Monitor className="h-5 w-5 text-blue-600" />
+                        <h2 className="text-xl font-bold font-archivo">Custom LED Configuration</h2>
+                        <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
+                            Leditor
+                        </span>
+                    </div>
+                    {items.filter((item) => item.isCustom).map((item) => (
+                        <div key={item.id} className="bg-gray-50 border rounded-lg p-5 space-y-5">
+                            <p className="text-sm text-gray-600">
+                                Base Product: <span className="font-semibold text-gray-900">{item.productName}</span>
+                            </p>
+                            {/* Cabinet Specs */}
+                            <div>
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Cabinet Specifications</p>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">LED Technology</p>
+                                        <p className="font-semibold">{item.customLedTechnology || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Brightness</p>
+                                        <p className="font-semibold">{item.customBrightnessValue ? `${item.customBrightnessValue} nits` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Pixel Pitch</p>
+                                        <p className="font-semibold">{item.customPixelPitch ? `${item.customPixelPitch}mm` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Refresh Rate</p>
+                                        <p className="font-semibold">{item.customRefreshRate ? `${item.customRefreshRate} Hz` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Cabinet Size</p>
+                                        <p className="font-semibold">
+                                            {item.customCabinetWidth && item.customCabinetHeight
+                                                ? `${item.customCabinetWidth} × ${item.customCabinetHeight} mm`
+                                                : "N/A"}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Cabinet Resolution</p>
+                                        <p className="font-semibold">
+                                            {item.customResolutionHorizontal && item.customResolutionVertical
+                                                ? `${item.customResolutionHorizontal} × ${item.customResolutionVertical} px`
+                                                : "N/A"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Custom LED Summary */}
+                            <div>
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Custom LED Summary</p>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Cabinets</p>
+                                        <p className="font-semibold">{item.customTotalCabinets || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Dimension</p>
+                                        <p className="font-semibold">{item.customDimension || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Display Area</p>
+                                        <p className="font-semibold">{item.customDisplayArea ? `${item.customDisplayArea} m²` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Resolution</p>
+                                        <p className="font-semibold">
+                                            {item.customTotalResolutionH && item.customTotalResolutionV
+                                                ? `${item.customTotalResolutionH} × ${item.customTotalResolutionV} px`
+                                                : "N/A"}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Total Weight</p>
+                                        <p className="font-semibold">{item.customWeight ? `${item.customWeight} kg` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Power Max</p>
+                                        <p className="font-semibold">{item.customPowerConsumptionMax ? `${item.customPowerConsumptionMax} W` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Power Typical</p>
+                                        <p className="font-semibold">{item.customPowerConsumptionTyp ? `${item.customPowerConsumptionTyp} W` : "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Screen Size</p>
+                                        <p className="font-semibold">
+                                            {item.customScreenWidth && item.customScreenHeight
+                                                ? `${item.customScreenWidth}m × ${item.customScreenHeight}m`
+                                                : "N/A"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {/* Quotations for this Enquiry */}
             <div className="bg-white rounded-lg border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -224,8 +328,6 @@ export default function EnquiryDetailPage() {
                             <TableHeader className="bg-secondary font-archivo">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Quotation Number</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Description</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Total Amount</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Created</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
@@ -239,15 +341,6 @@ export default function EnquiryDetailPage() {
                                     >
                                         <TableCell className="p-4 font-medium">
                                             {quotation.quotationNumber}
-                                        </TableCell>
-                                        <TableCell className="p-4">
-                                            {quotation.description || "-"}
-                                        </TableCell>
-                                        <TableCell className="p-4">
-                                            {quotation.totalAmount 
-                                                ? `€${parseFloat(quotation.totalAmount).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`
-                                                : "-"
-                                            }
                                         </TableCell>
                                         <TableCell className="p-4">
                                             <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -265,12 +358,21 @@ export default function EnquiryDetailPage() {
                                             {format(new Date(quotation.createdAt), "MMM d, yyyy")}
                                         </TableCell>
                                         <TableCell className="p-4">
+                                        {quotation.status === "draft" ? (
+                                            <Link href={`/admin/enquiries/${quotation.enquiryId}/quotation?draft=${quotation.id}`}>
+                                                <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-800">
+                                                    <Pencil className="h-4 w-4 mr-1" />
+                                                    Edit
+                                                </Button>
+                                            </Link>
+                                        ) : (
                                             <Link href={`/admin/quotations/${quotation.id}`}>
                                                 <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
                                                     <Eye className="h-4 w-4 mr-1" />
                                                     View
                                                 </Button>
                                             </Link>
+                                        )}
                                         </TableCell>
                                     </TableRow>
                                 ))}

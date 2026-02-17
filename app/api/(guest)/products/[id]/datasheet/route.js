@@ -13,35 +13,36 @@ export async function GET(req, { params }) {
         }
 
         // Fetch product with related data
-        const product = await db
-            .select()
-            .from(products)
-            .where(eq(products.id, id))
-            .limit(1)
-            .then((res) => res[0]);
+        const product = await db.query.products.findFirst({
+            where: eq(products.id, id),
+            with: {
+                areaOfUse: {
+                    columns: {
+                        name: true,
+                    },
+                },
+                productCertificates: {
+                    columns: {},
+                    with: {
+                        certificate: {
+                            columns: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
 
         if (!product) {
             return errorResponse("Product not found", 404);
         }
 
-        // Fetch category
-        const category = product.areaOfUseId
-            ? await db
-                .select()
-                .from(categories)
-                .where(eq(categories.id, product.areaOfUseId))
-                .limit(1)
-                .then((res) => res[0])
-            : null;
-
-        // Fetch certificates
-        const productCerts = await db
-            .select({
-                name: certificates.name,
-            })
-            .from(productCertificates)
-            .innerJoin(certificates, eq(productCertificates.certificateId, certificates.id))
-            .where(eq(productCertificates.productId, id));
+        const formattedProduct = {
+            ...product,
+            areaOfUse: product.areaOfUse.name,
+            productCertificates: product.productCertificates.map((certificate) => certificate.certificate),
+        };
 
         // Create PDF and set up buffer collection
         const pdfBuffer = await new Promise((resolve, reject) => {
@@ -83,7 +84,7 @@ export async function GET(req, { params }) {
                 ['Design', product.design || 'N/A'],
                 ['Special Types', product.specialTypes || 'N/A'],
                 ['Application', product.application || 'N/A'],
-                ['Category', category?.name || 'N/A'],
+                ['Category', formattedProduct.areaOfUse || 'N/A'],
             ];
 
             basicInfo.forEach(([label, value]) => {
@@ -237,7 +238,7 @@ export async function GET(req, { params }) {
             });
 
             // Certificates
-            if (productCerts.length > 0) {
+            if (formattedProduct.productCertificates.length > 0) {
                 doc.moveDown();
                 doc.font('Helvetica-Bold')
                    .fontSize(14)
@@ -245,7 +246,7 @@ export async function GET(req, { params }) {
                 doc.moveDown(0.5);
                 doc.font('Helvetica')
                    .fontSize(10);
-                productCerts.forEach((cert) => {
+                formattedProduct.productCertificates.forEach((cert) => {
                     doc.text(`• ${cert.name}`);
                 });
             }
@@ -260,7 +261,7 @@ export async function GET(req, { params }) {
         return new Response(pdfBuffer, {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `inline; filename="${product.productNumber}_datasheet.pdf"`,
+                'Content-Disposition': `inline; filename="${formattedProduct.productNumber}_datasheet.pdf"`,
                 'Cache-Control': 'no-cache',
             },
         });

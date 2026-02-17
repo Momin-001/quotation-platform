@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { enquiries, enquiryItems, users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, asc, and, or, ilike, sql } from "drizzle-orm";
+import { eq, desc, asc, and, or, ilike, sql, inArray } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
@@ -107,10 +107,24 @@ export async function GET(req) {
 
         const allEnquiries = await query;
 
+        // Check if enquiries have custom (Leditor) items
+        const enquiryIds = allEnquiries.map((e) => e.id);
+        const customItems = enquiryIds.length > 0
+            ? await db
+                .select({ enquiryId: enquiryItems.enquiryId })
+                .from(enquiryItems)
+                .where(and(
+                    inArray(enquiryItems.enquiryId, enquiryIds),
+                    eq(enquiryItems.isCustom, true)
+                ))
+            : [];
+        const customEnquiryIds = new Set(customItems.map((ci) => ci.enquiryId));
+
         // Format the response with enquiry ID
         const formattedEnquiries = allEnquiries.map((enquiry) => ({
             ...enquiry,
             enquiryId: formatEnquiryId(enquiry.id, enquiry.createdAt),
+            isCustom: customEnquiryIds.has(enquiry.id),
         }));
 
         // Get total count for pagination (if needed in future)

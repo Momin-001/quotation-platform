@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -14,7 +13,7 @@ import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email"),
@@ -31,7 +30,6 @@ export default function LoginPage() {
     const {
         register,
         handleSubmit,
-        setValue,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(formSchema),
@@ -131,18 +129,7 @@ export default function LoginPage() {
                                 </div>
 
                                 <div className="flex items-center justify-between pt-2">
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="remember"
-                                            onCheckedChange={(checked) => setValue("remember", checked)}
-                                        />
-                                        <label
-                                            htmlFor="remember"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            Remember me
-                                        </label>
-                                    </div>
+                                    <div></div>
                                     <Link
                                         href="/forgot-password"
                                         className="text-sm font-medium hover:underline"

@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CartProvider } from "@/context/CartContext";
+import { SocketProvider } from "@/context/SocketContext";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -39,7 +40,9 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <LanguageProvider>
             <CartProvider>
-              {children}
+              <SocketProvider>
+                {children}
+              </SocketProvider>
             </CartProvider>
           </LanguageProvider>
         </AuthProvider>

@@ -5,11 +5,11 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 // GET /api/footer - Get footer content for frontend
 export async function GET() {
     try {
-        const footerContent = await db.select().from(footer).limit(1).then((res) => res[0]);
+        const [footerContent] = await db.select().from(footer).limit(1);
 
         if (!footerContent) {
             // Return empty object if no footer content exists
-            return successResponse("Footer content fetched successfully");
+            return errorResponse("Footer content not found");
         }
 
         return successResponse("Footer content fetched successfully", footerContent);

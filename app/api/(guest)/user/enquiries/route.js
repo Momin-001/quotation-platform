@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { enquiries, enquiryItems, quotations, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
 export async function POST(req) {
@@ -27,11 +27,33 @@ export async function POST(req) {
             })
             .returning();
 
-        // Create enquiry items
+        // Create enquiry items (supports both regular cart and custom Leditor items)
         const itemsToInsert = items.map((item) => ({
             enquiryId: enquiry.id,
             productId: item.productId,
             quantity: item.quantity || 1,
+            isCustom: item.isCustom || false,
+            ...(item.isCustom && {
+                customLedTechnology: item.customLedTechnology || null,
+                customBrightnessValue: item.customBrightnessValue || null,
+                customPixelPitch: item.customPixelPitch || null,
+                customRefreshRate: item.customRefreshRate || null,
+                customResolutionHorizontal: item.customResolutionHorizontal || null,
+                customResolutionVertical: item.customResolutionVertical || null,
+                customCabinetWidth: item.customCabinetWidth || null,
+                customCabinetHeight: item.customCabinetHeight || null,
+                customScreenWidth: item.customScreenWidth || null,
+                customScreenHeight: item.customScreenHeight || null,
+                // Calculated Leditor fields
+                customTotalResolutionH: item.customTotalResolutionH || null,
+                customTotalResolutionV: item.customTotalResolutionV || null,
+                customWeight: item.customWeight || null,
+                customDisplayArea: item.customDisplayArea || null,
+                customDimension: item.customDimension || null,
+                customPowerConsumptionMax: item.customPowerConsumptionMax || null,
+                customPowerConsumptionTyp: item.customPowerConsumptionTyp || null,
+                customTotalCabinets: item.customTotalCabinets || null,
+            }),
         }));
 
         await db.insert(enquiryItems).values(itemsToInsert);
@@ -60,44 +82,33 @@ export async function GET(req) {
             whereConditions = and(whereConditions, eq(enquiries.status, status));
         }
 
-        const userEnquiries = await db
-            .select()
-            .from(enquiries)
-            .where(whereConditions)
-            .orderBy(desc(enquiries.createdAt));
+        const userEnquiries = await db.query.enquiries.findMany({
+            where: whereConditions,
+            orderBy: desc(enquiries.createdAt),
+            with: {
+                quotations: {
+                    columns: {
+                        id: true,
+                        quotationNumber: true,
+                    },
+                },
+                items: {
+                    columns: {
+                        isCustom: true,
+                    },
+                    with: {
+                        product: {
+                            columns: {
+                                productName: true,
+                                productNumber: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
 
-        // Fetch quotations and product info for each enquiry
-        const enquiriesWithQuotations = await Promise.all(
-            userEnquiries.map(async (enquiry) => {
-                // Fetch quotations
-                const enquiryQuotations = await db
-                    .select()
-                    .from(quotations)
-                    .where(eq(quotations.enquiryId, enquiry.id))
-                    .orderBy(desc(quotations.createdAt));
-
-                // Fetch enquiry items with product info
-                const items = await db
-                    .select({
-                        id: enquiryItems.id,
-                        productId: enquiryItems.productId,
-                        quantity: enquiryItems.quantity,
-                        productName: products.productName,
-                        productNumber: products.productNumber,
-                    })
-                    .from(enquiryItems)
-                    .innerJoin(products, eq(enquiryItems.productId, products.id))
-                    .where(eq(enquiryItems.enquiryId, enquiry.id));
-
-                return {
-                    ...enquiry,
-                    quotations: enquiryQuotations,
-                    items: items,
-                };
-            })
-        );
-
-        return successResponse("Enquiries fetched successfully", enquiriesWithQuotations);
+        return successResponse("Enquiries fetched successfully", userEnquiries);
     } catch (error) {
         return errorResponse(error.message || "Failed to fetch enquiries");
     }

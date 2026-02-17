@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { cn } from "@/lib/utils";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 
 const formSchema = z.object({
     name: z.string().min(2, "Name is too short"),

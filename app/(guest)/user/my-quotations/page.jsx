@@ -1,30 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
+import { formatEnquiryNumber, formatDate, getStatusLabel, getQuotationStatusColor } from "@/lib/helpers";
 
 export default function MyQuotationsPage() {
-    const { isAuthenticated, loading: authLoading } = useAuth();
     const router = useRouter();
     const [quotations, setQuotations] = useState([]);
     const [pendingCount, setPendingCount] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!authLoading) {
-            if (!isAuthenticated) {
-                router.push("/login");
-                return;
-            }
-            fetchQuotations();
-        }
-    }, [isAuthenticated, authLoading]);
+        fetchQuotations();
+    }, []);
 
     const fetchQuotations = async () => {
         try {
@@ -42,12 +34,7 @@ export default function MyQuotationsPage() {
         }
     };
 
-    const handleRequestNewQuotation = () => {
-        // Navigate to products page or enquiry form
-        router.push("/");
-    };
-
-    if (authLoading || loading) {
+    if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Spinner className="h-8 w-8" />
@@ -70,13 +57,6 @@ export default function MyQuotationsPage() {
                 <h1 className="text-2xl font-bold text-primary">
                     Active Quotations: {pendingCount}
                 </h1>
-                    <Button
-                        onClick={handleRequestNewQuotation}
-                        variant="default"
-                        size="lg"
-                    >
-                        Request New Quotation
-                    </Button>
                 </div>
 
                 {/* Quotations List */}
@@ -87,29 +67,38 @@ export default function MyQuotationsPage() {
                 ) : (
                     <div className="space-y-4">
                         {quotations.map((quotation) => (
-                            <Card
+                            <div
                                 key={quotation.id}
-                                className="bg-white rounded-lg border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                className="bg-white rounded-lg p-4 shadow-sm px-6 transition-shadow cursor-pointer"
                                 onClick={() => {
                                     // Navigate to quotation detail page (to be implemented)
                                     router.push(`/user/my-quotations/${quotation.id}`);
                                 }}
                             >
-                                <CardContent>
-                                    <h3 className="text-lg font-bold mb-2">
+                                <div className="flex items-center justify-between w-full">
+                                    <div>
+                                    <h3 className="text-lg font-bold mb-1">
                                         Quotation {quotation.quotationNumber}
                                     </h3>
-                                    {quotation.description ? (
+                                    {quotation.enquiryId && (
                                         <p className="text-sm text-gray-600">
-                                            {quotation.description}
-                                        </p>
-                                    ) : (
-                                        <p className="text-sm text-gray-600">
-                                            No description available
+                                            {formatEnquiryNumber(
+                                                quotation.enquiryId,
+                                                quotation.createdAt
+                                            )}
                                         </p>
                                     )}
-                                </CardContent>
-                            </Card>
+                                    </div>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <span className={`text-sm px-2 py-1 rounded-md ${getQuotationStatusColor(quotation.status)}`}>
+                                            {getStatusLabel(quotation.status)}
+                                        </span>
+                                        <span className="text-sm text-gray-600">
+                                            {formatDate(quotation.createdAt)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}

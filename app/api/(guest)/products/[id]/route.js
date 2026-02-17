@@ -12,61 +12,51 @@ export async function GET(req, { params }) {
         }
 
         // Fetch product
-        const product = await db
-            .select()
-            .from(products)
-            .where(eq(products.id, id))
-            .limit(1)
-            .then((res) => res[0]);
+        const product = await db.query.products.findFirst({
+            where: eq(products.id, id),
+            with: {
+                areaOfUse: {
+                    columns: {
+                        name: true,
+                    },
+                },
+                images: {
+                    columns: {
+                        imageUrl: true,
+                    },
+                },
+                features: {
+                    columns: {
+                        feature: true,
+                    },
+                },
+                productCertificates: {
+                    columns: {},
+                    with: {
+                        certificate: {
+                            columns: {
+                                id: true,
+                                name: true,
+                                imageUrl: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
 
         if (!product) {
             return errorResponse("Product not found", 404);
         }
 
-        // Fetch product images
-        const images = await db
-            .select()
-            .from(productImages)
-            .where(eq(productImages.productId, id))
-            .orderBy(productImages.imageOrder);
-
-        // Fetch product features
-        const features = await db
-            .select()
-            .from(productFeatures)
-            .where(eq(productFeatures.productId, id));
-
-        // Fetch product certificates
-        const productCerts = await db
-            .select({
-                id: certificates.id,
-                name: certificates.name,
-                imageUrl: certificates.imageUrl,
-            })
-            .from(productCertificates)
-            .innerJoin(certificates, eq(productCertificates.certificateId, certificates.id))
-            .where(eq(productCertificates.productId, id));
-
-        // Fetch category
-        const category = product.areaOfUseId
-            ? await db
-                .select()
-                .from(categories)
-                .where(eq(categories.id, product.areaOfUseId))
-                .limit(1)
-                .then((res) => res[0])
-            : null;
-
-        return successResponse(
-
-            "Product fetched successfully", {
+        const formattedProduct = {
             ...product,
-            images: images.map((img) => img.imageUrl),
-            features: features.map((f) => f.feature),
-            certificates: productCerts,
-            categoryName: category?.name || null,
-        },
-        );
+            areaOfUse: product.areaOfUse.name,
+            images: product.images.map((image) => image.imageUrl),
+            productCertificates: product.productCertificates.map((certificate) => certificate.certificate),
+            features: product.features.map((feature) => feature.feature),
+        };
+        return successResponse("Product fetched successfully", formattedProduct);
     } catch (error) {
         return errorResponse(error.message || "Failed to fetch product");
     }

@@ -1,9 +1,124 @@
 {
-  "id": "44e8e059-fd4d-48c1-9478-7252ecb75c93",
+  "id": "16ba84c5-9a9e-4f4a-84c8-776adb1e8e59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.accessories": {
+      "name": "accessories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_name": {
+          "name": "product_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_number": {
+          "name": "product_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "short_text": {
+          "name": "short_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "long_text": {
+          "name": "long_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "product_group": {
+          "name": "product_group",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "manufacturer": {
+          "name": "manufacturer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "supplier": {
+          "name": "supplier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "purchase_price": {
+          "name": "purchase_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retail_price": {
+          "name": "retail_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lead_time": {
+          "name": "lead_time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "accessories_product_number_unique": {
+          "name": "accessories_product_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "product_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.categories": {
       "name": "categories",
       "schema": "",
@@ -98,6 +213,604 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.controllers": {
+      "name": "controllers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_name": {
+          "name": "product_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_number": {
+          "name": "product_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand_name": {
+          "name": "brand_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interface_name": {
+          "name": "interface_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pixel_capacity": {
+          "name": "pixel_capacity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_width_height": {
+          "name": "max_width_height",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dp_1_2": {
+          "name": "dp_1_2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "hdmi_2_0": {
+          "name": "hdmi_2_0",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "hdmi_1_3": {
+          "name": "hdmi_1_3",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "dvi_single_link": {
+          "name": "dvi_single_link",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "sdi_12g": {
+          "name": "sdi_12g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "sdi_3g": {
+          "name": "sdi_3g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "optical_fiber_in_10g": {
+          "name": "optical_fiber_in_10g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "usb_3_0_media_playback": {
+          "name": "usb_3_0_media_playback",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "gigabit_ethernet_rj45": {
+          "name": "gigabit_ethernet_rj45",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "optical_fiber_out_10g": {
+          "name": "optical_fiber_out_10g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "output_5g": {
+          "name": "output_5g",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hdmi_1_3_monitoring": {
+          "name": "hdmi_1_3_monitoring",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "connector_3d_mini_din_4": {
+          "name": "connector_3d_mini_din_4",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "hdmi_2_0_loop": {
+          "name": "hdmi_2_0_loop",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "sdi_12g_loop": {
+          "name": "sdi_12g_loop",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "sdi_3g_loop": {
+          "name": "sdi_3g_loop",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "dvi_loop": {
+          "name": "dvi_loop",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "audio_input_3_5mm": {
+          "name": "audio_input_3_5mm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "audio_output_3_5mm": {
+          "name": "audio_output_3_5mm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "ethernet_control_port": {
+          "name": "ethernet_control_port",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "usb_type_b_pc_control": {
+          "name": "usb_type_b_pc_control",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "usb_type_a_cascading": {
+          "name": "usb_type_a_cascading",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "genlock_in_loop": {
+          "name": "genlock_in_loop",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "rs_232": {
+          "name": "rs_232",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "maximum_layers": {
+          "name": "maximum_layers",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "layer_scaling": {
+          "name": "layer_scaling",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hdr_support": {
+          "name": "hdr_support",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "color_depth_bit": {
+          "name": "color_depth_bit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "low_latency": {
+          "name": "low_latency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fibre_converter_mode": {
+          "name": "fibre_converter_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "v_can_support": {
+          "name": "v_can_support",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "backup_mode": {
+          "name": "backup_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "genlock_sync": {
+          "name": "genlock_sync",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "multi_viewer_mvr": {
+          "name": "multi_viewer_mvr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usb_playback": {
+          "name": "usb_playback",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_3d": {
+          "name": "support_3d",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "purchase_price": {
+          "name": "purchase_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retail_price": {
+          "name": "retail_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "controllers_product_number_unique": {
+          "name": "controllers_product_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "product_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.enquiries": {
+      "name": "enquiries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "enquiries_user_id_users_id_fk": {
+          "name": "enquiries_user_id_users_id_fk",
+          "tableFrom": "enquiries",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.enquiry_items": {
+      "name": "enquiry_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "enquiry_id": {
+          "name": "enquiry_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "is_custom": {
+          "name": "is_custom",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "custom_led_technology": {
+          "name": "custom_led_technology",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_brightness_value": {
+          "name": "custom_brightness_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_pixel_pitch": {
+          "name": "custom_pixel_pitch",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_refresh_rate": {
+          "name": "custom_refresh_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_resolution_horizontal": {
+          "name": "custom_resolution_horizontal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_resolution_vertical": {
+          "name": "custom_resolution_vertical",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_cabinet_width": {
+          "name": "custom_cabinet_width",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_cabinet_height": {
+          "name": "custom_cabinet_height",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_screen_width": {
+          "name": "custom_screen_width",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_screen_height": {
+          "name": "custom_screen_height",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_total_resolution_h": {
+          "name": "custom_total_resolution_h",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_total_resolution_v": {
+          "name": "custom_total_resolution_v",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_weight": {
+          "name": "custom_weight",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_display_area": {
+          "name": "custom_display_area",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_dimension": {
+          "name": "custom_dimension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_power_consumption_max": {
+          "name": "custom_power_consumption_max",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_power_consumption_typ": {
+          "name": "custom_power_consumption_typ",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_total_cabinets": {
+          "name": "custom_total_cabinets",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "enquiry_items_enquiry_id_enquiries_id_fk": {
+          "name": "enquiry_items_enquiry_id_enquiries_id_fk",
+          "tableFrom": "enquiry_items",
+          "tableTo": "enquiries",
+          "columnsFrom": [
+            "enquiry_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "enquiry_items_product_id_products_id_fk": {
+          "name": "enquiry_items_product_id_products_id_fk",
+          "tableFrom": "enquiry_items",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -986,6 +1699,777 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone_number": {
+          "name": "phone_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.products": {
+      "name": "products",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_name": {
+          "name": "product_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_number": {
+          "name": "product_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "viewing_angle_horizontal": {
+          "name": "viewing_angle_horizontal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "viewing_angle_vertical": {
+          "name": "viewing_angle_vertical",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "brightness_control": {
+          "name": "brightness_control",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dci_p3_coverage": {
+          "name": "dci_p3_coverage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "operating_temperature": {
+          "name": "operating_temperature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "operating_humidity": {
+          "name": "operating_humidity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_rating": {
+          "name": "ip_rating",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_modules_per_cabinet": {
+          "name": "led_modules_per_cabinet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_chip_manufacturer": {
+          "name": "led_chip_manufacturer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "white_point_calibration": {
+          "name": "white_point_calibration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "input_voltage": {
+          "name": "input_voltage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiving_card": {
+          "name": "receiving_card",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heat_dissipation": {
+          "name": "heat_dissipation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monitoring_function_en": {
+          "name": "monitoring_function_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monitoring_function_de": {
+          "name": "monitoring_function_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additional_certification": {
+          "name": "additional_certification",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emc": {
+          "name": "emc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "safety": {
+          "name": "safety",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_during_warranty_en": {
+          "name": "support_during_warranty_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_during_warranty_de": {
+          "name": "support_during_warranty_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_after_warranty_en": {
+          "name": "support_after_warranty_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_after_warranty_de": {
+          "name": "support_after_warranty_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "product_type": {
+          "name": "product_type",
+          "type": "product_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "design": {
+          "name": "design",
+          "type": "design",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "special_types": {
+          "name": "special_types",
+          "type": "special_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "special_types_other": {
+          "name": "special_types_other",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "application": {
+          "name": "application",
+          "type": "application",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pixel_pitch": {
+          "name": "pixel_pitch",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pixel_configuration": {
+          "name": "pixel_configuration",
+          "type": "pixel_configuration",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pixel_technology": {
+          "name": "pixel_technology",
+          "type": "pixel_technology",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "led_technology": {
+          "name": "led_technology",
+          "type": "led_technology",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "led_technology_other": {
+          "name": "led_technology_other",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chip_bonding": {
+          "name": "chip_bonding",
+          "type": "chip_bonding",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colour_depth": {
+          "name": "colour_depth",
+          "type": "colour_depth",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_gain_control": {
+          "name": "current_gain_control",
+          "type": "current_gain_control",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "video_rate": {
+          "name": "video_rate",
+          "type": "video_rate",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brightness_value": {
+          "name": "brightness_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calibration_method": {
+          "name": "calibration_method",
+          "type": "calibration_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calibration_method_other": {
+          "name": "calibration_method_other",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "driving_method": {
+          "name": "driving_method",
+          "type": "driving_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_system": {
+          "name": "control_system",
+          "type": "control_system",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "control_system_other": {
+          "name": "control_system_other",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cooling": {
+          "name": "cooling",
+          "type": "cooling",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "power_redundancy": {
+          "name": "power_redundancy",
+          "type": "yes_no",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "memory_on_module": {
+          "name": "memory_on_module",
+          "type": "yes_no",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "smart_module": {
+          "name": "smart_module",
+          "type": "yes_no",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "support": {
+          "name": "support",
+          "type": "support",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area_of_use_id": {
+          "name": "area_of_use_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cabinet_width": {
+          "name": "cabinet_width",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cabinet_height": {
+          "name": "cabinet_height",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight_without_packaging": {
+          "name": "weight_without_packaging",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_rate": {
+          "name": "refresh_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scan_rate_numerator": {
+          "name": "scan_rate_numerator",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "scan_rate_denominator": {
+          "name": "scan_rate_denominator",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contrast_ratio_numerator": {
+          "name": "contrast_ratio_numerator",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contrast_ratio_denominator": {
+          "name": "contrast_ratio_denominator",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "cabinet_resolution_horizontal": {
+          "name": "cabinet_resolution_horizontal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cabinet_resolution_vertical": {
+          "name": "cabinet_resolution_vertical",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pixel_density": {
+          "name": "pixel_density",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_lifespan": {
+          "name": "led_lifespan",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "greyscale_processing": {
+          "name": "greyscale_processing",
+          "type": "greyscale_processing",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "greyscale_processing_other": {
+          "name": "greyscale_processing_other",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "number_of_colours": {
+          "name": "number_of_colours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mtbf_power_supply": {
+          "name": "mtbf_power_supply",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "power_consumption_max": {
+          "name": "power_consumption_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "power_consumption_typical": {
+          "name": "power_consumption_typical",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "warranty_period": {
+          "name": "warranty_period",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_area_of_use_id_categories_id_fk": {
+          "name": "products_area_of_use_id_categories_id_fk",
+          "tableFrom": "products",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "area_of_use_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_images": {
+      "name": "product_images",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_order": {
+          "name": "image_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_images_product_id_products_id_fk": {
+          "name": "product_images_product_id_products_id_fk",
+          "tableFrom": "product_images",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_certificates": {
+      "name": "product_certificates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "certificate_id": {
+          "name": "certificate_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_certificates_product_id_products_id_fk": {
+          "name": "product_certificates_product_id_products_id_fk",
+          "tableFrom": "product_certificates",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "product_certificates_certificate_id_certificates_id_fk": {
+          "name": "product_certificates_certificate_id_certificates_id_fk",
+          "tableFrom": "product_certificates",
+          "tableTo": "certificates",
+          "columnsFrom": [
+            "certificate_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_features": {
+      "name": "product_features",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "feature": {
+          "name": "feature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_features_product_id_products_id_fk": {
+          "name": "product_features_product_id_products_id_fk",
+          "tableFrom": "product_features",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.navbar": {
       "name": "navbar",
       "schema": "",
@@ -1149,8 +2633,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.product_certificates": {
-      "name": "product_certificates",
+    "public.quotation_items": {
+      "name": "quotation_items",
       "schema": "",
       "columns": {
         "id": {
@@ -1160,78 +2644,11 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "product_id": {
-          "name": "product_id",
+        "quotation_id": {
+          "name": "quotation_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "certificate_id": {
-          "name": "certificate_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "product_certificates_product_id_products_id_fk": {
-          "name": "product_certificates_product_id_products_id_fk",
-          "tableFrom": "product_certificates",
-          "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "product_certificates_certificate_id_certificates_id_fk": {
-          "name": "product_certificates_certificate_id_certificates_id_fk",
-          "tableFrom": "product_certificates",
-          "tableTo": "certificates",
-          "columnsFrom": [
-            "certificate_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.product_images": {
-      "name": "product_images",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
         },
         "product_id": {
           "name": "product_id",
@@ -1239,17 +2656,51 @@
           "primaryKey": false,
           "notNull": true
         },
-        "image_url": {
-          "name": "image_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "image_order": {
-          "name": "image_order",
+        "quantity": {
+          "name": "quantity",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
+          "default": 1
+        },
+        "unit_price": {
+          "name": "unit_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tax_percentage": {
+          "name": "tax_percentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "discount_percentage": {
+          "name": "discount_percentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "item_type": {
+          "name": "item_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'main'"
+        },
+        "item_order": {
+          "name": "item_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "default": 0
         },
         "created_at": {
@@ -1269,9 +2720,22 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "product_images_product_id_products_id_fk": {
-          "name": "product_images_product_id_products_id_fk",
-          "tableFrom": "product_images",
+        "quotation_items_quotation_id_quotations_id_fk": {
+          "name": "quotation_items_quotation_id_quotations_id_fk",
+          "tableFrom": "quotation_items",
+          "tableTo": "quotations",
+          "columnsFrom": [
+            "quotation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "quotation_items_product_id_products_id_fk": {
+          "name": "quotation_items_product_id_products_id_fk",
+          "tableFrom": "quotation_items",
           "tableTo": "products",
           "columnsFrom": [
             "product_id"
@@ -1289,8 +2753,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.products": {
-      "name": "products",
+    "public.quotation_messages": {
+      "name": "quotation_messages",
       "schema": "",
       "columns": {
         "id": {
@@ -1300,254 +2764,148 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "product_name": {
-          "name": "product_name",
+        "quotation_id": {
+          "name": "quotation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_role": {
+          "name": "sender_role",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "product_number": {
-          "name": "product_number",
+        "message": {
+          "name": "message",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "viewing_angle_horizontal": {
-          "name": "viewing_angle_horizontal",
-          "type": "text",
+        "is_read": {
+          "name": "is_read",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
-        "viewing_angle_vertical": {
-          "name": "viewing_angle_vertical",
-          "type": "text",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "quotation_messages_quotation_id_quotations_id_fk": {
+          "name": "quotation_messages_quotation_id_quotations_id_fk",
+          "tableFrom": "quotation_messages",
+          "tableTo": "quotations",
+          "columnsFrom": [
+            "quotation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.quotation_optional_items": {
+      "name": "quotation_optional_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "brightness_control": {
-          "name": "brightness_control",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "dci_p3_coverage": {
-          "name": "dci_p3_coverage",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "operating_temperature": {
-          "name": "operating_temperature",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "operating_humidity": {
-          "name": "operating_humidity",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ip_rating": {
-          "name": "ip_rating",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "led_modules_per_cabinet": {
-          "name": "led_modules_per_cabinet",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "product_type": {
-          "name": "product_type",
-          "type": "product_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "design": {
-          "name": "design",
-          "type": "design",
-          "typeSchema": "public",
+        "quotation_item_id": {
+          "name": "quotation_item_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "special_types": {
-          "name": "special_types",
-          "type": "special_types",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "application": {
-          "name": "application",
-          "type": "application",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pixel_configuration": {
-          "name": "pixel_configuration",
-          "type": "pixel_configuration",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pixel_technology": {
-          "name": "pixel_technology",
-          "type": "pixel_technology",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "led_technology": {
-          "name": "led_technology",
-          "type": "led_technology",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "chip_bonding": {
-          "name": "chip_bonding",
-          "type": "chip_bonding",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "colour_depth": {
-          "name": "colour_depth",
-          "type": "colour_depth",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "current_gain_control": {
-          "name": "current_gain_control",
-          "type": "current_gain_control",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "video_rate": {
-          "name": "video_rate",
-          "type": "video_rate",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "calibration_method": {
-          "name": "calibration_method",
-          "type": "calibration_method",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "driving_method": {
-          "name": "driving_method",
-          "type": "driving_method",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "control_system": {
-          "name": "control_system",
-          "type": "control_system",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "cooling": {
-          "name": "cooling",
-          "type": "cooling",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "power_redundancy": {
-          "name": "power_redundancy",
-          "type": "yes_no",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "memory_on_module": {
-          "name": "memory_on_module",
-          "type": "yes_no",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "smart_module": {
-          "name": "smart_module",
-          "type": "yes_no",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "support": {
-          "name": "support",
-          "type": "support",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "area_of_use_id": {
-          "name": "area_of_use_id",
+        "product_id": {
+          "name": "product_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "refresh_rate": {
-          "name": "refresh_rate",
-          "type": "integer",
+        "controller_id": {
+          "name": "controller_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "scan_rate_numerator": {
-          "name": "scan_rate_numerator",
+        "accessory_id": {
+          "name": "accessory_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "item_source_type": {
+          "name": "item_source_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'product'"
+        },
+        "quantity": {
+          "name": "quantity",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 1
         },
-        "scan_rate_denominator": {
-          "name": "scan_rate_denominator",
-          "type": "integer",
+        "unit_price": {
+          "name": "unit_price",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "contrast_ratio_numerator": {
-          "name": "contrast_ratio_numerator",
-          "type": "integer",
+        "tax_percentage": {
+          "name": "tax_percentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "discount_percentage": {
+          "name": "discount_percentage",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "contrast_ratio_denominator": {
-          "name": "contrast_ratio_denominator",
+        "item_order": {
+          "name": "item_order",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "default": 1
-        },
-        "power_consumption_max": {
-          "name": "power_consumption_max",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "power_consumption_typical": {
-          "name": "power_consumption_typical",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "warranty_period": {
-          "name": "warranty_period",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
+          "default": 0
         },
         "created_at": {
           "name": "created_at",
@@ -1566,12 +2924,51 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "products_area_of_use_id_categories_id_fk": {
-          "name": "products_area_of_use_id_categories_id_fk",
-          "tableFrom": "products",
-          "tableTo": "categories",
+        "quotation_optional_items_quotation_item_id_quotation_items_id_fk": {
+          "name": "quotation_optional_items_quotation_item_id_quotation_items_id_fk",
+          "tableFrom": "quotation_optional_items",
+          "tableTo": "quotation_items",
           "columnsFrom": [
-            "area_of_use_id"
+            "quotation_item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "quotation_optional_items_product_id_products_id_fk": {
+          "name": "quotation_optional_items_product_id_products_id_fk",
+          "tableFrom": "quotation_optional_items",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "quotation_optional_items_controller_id_controllers_id_fk": {
+          "name": "quotation_optional_items_controller_id_controllers_id_fk",
+          "tableFrom": "quotation_optional_items",
+          "tableTo": "controllers",
+          "columnsFrom": [
+            "controller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "quotation_optional_items_accessory_id_accessories_id_fk": {
+          "name": "quotation_optional_items_accessory_id_accessories_id_fk",
+          "tableFrom": "quotation_optional_items",
+          "tableTo": "accessories",
+          "columnsFrom": [
+            "accessory_id"
           ],
           "columnsTo": [
             "id"
@@ -1586,8 +2983,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
-      "name": "users",
+    "public.quotations": {
+      "name": "quotations",
       "schema": "",
       "columns": {
         "id": {
@@ -1597,50 +2994,24 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "full_name": {
-          "name": "full_name",
+        "enquiry_id": {
+          "name": "enquiry_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quotation_number": {
+          "name": "quotation_number",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "company_name": {
-          "name": "company_name",
+        "status": {
+          "name": "status",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone_number": {
-          "name": "phone_number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "role",
-          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'user'"
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
+          "default": "'draft'"
         },
         "created_at": {
           "name": "created_at",
@@ -1648,35 +3019,57 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+      "foreignKeys": {
+        "quotations_enquiry_id_enquiries_id_fk": {
+          "name": "quotations_enquiry_id_enquiries_id_fk",
+          "tableFrom": "quotations",
+          "tableTo": "enquiries",
+          "columnsFrom": [
+            "enquiry_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
   "enums": {
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "user",
+        "super_admin",
+        "admin"
+      ]
+    },
     "public.application": {
       "name": "application",
       "schema": "public",
       "values": [
         "DOOH",
-        "Indoor signage",
-        "Home theater",
-        "Stadium scoreboard",
-        "Video cube",
+        "Indoor Signage",
+        "Home Theater",
+        "Stadium Scoreboard",
+        "Video Cube",
         "Conference",
         "Stadium Ribbons",
         "Corporate Design",
@@ -1688,20 +3081,21 @@
       "name": "calibration_method",
       "schema": "public",
       "values": [
-        "no calibration",
-        "multiple layers chroma",
-        "multiple layers brightness",
+        "No Calibration",
+        "Multiple Layers Chroma",
+        "Multiple Layers Brightness",
         "Brightness",
-        "chroma"
+        "Chroma",
+        "Other"
       ]
     },
     "public.chip_bonding": {
       "name": "chip_bonding",
       "schema": "public",
       "values": [
-        "gold wire",
-        "cooper wire",
-        "Flip chip"
+        "Gold Wire",
+        "Copper Wire",
+        "Flip-Chip"
       ]
     },
     "public.colour_depth": {
@@ -1720,15 +3114,16 @@
         "Colorlight",
         "Novastar",
         "Brompton",
-        "LINSN"
+        "LINSN",
+        "Other"
       ]
     },
     "public.cooling": {
       "name": "cooling",
       "schema": "public",
       "values": [
-        "convection",
-        "fan"
+        "Convection",
+        "Fan"
       ]
     },
     "public.current_gain_control": {
@@ -1743,16 +3138,27 @@
       "name": "design",
       "schema": "public",
       "values": [
-        "fix",
-        "mobil"
+        "Fix",
+        "Mobil"
       ]
     },
     "public.driving_method": {
       "name": "driving_method",
       "schema": "public",
       "values": [
-        "common anode",
-        "common cathode"
+        "Common Anode",
+        "Common Cathode"
+      ]
+    },
+    "public.greyscale_processing": {
+      "name": "greyscale_processing",
+      "schema": "public",
+      "values": [
+        "<16",
+        "16",
+        "18+",
+        "22+",
+        "Other"
       ]
     },
     "public.led_technology": {
@@ -1764,7 +3170,8 @@
         "IMD",
         "COB",
         "DIP",
-        "LOB"
+        "LOB",
+        "Other"
       ]
     },
     "public.pixel_configuration": {
@@ -1779,35 +3186,35 @@
       "name": "pixel_technology",
       "schema": "public",
       "values": [
-        "real",
-        "virtual"
+        "Real",
+        "Virtual"
       ]
     },
     "public.product_type": {
       "name": "product_type",
       "schema": "public",
       "values": [
-        "AIO systems",
-        "LED Display single cabinet"
+        "AIO Systems",
+        "LED Display Single Cabinet"
       ]
     },
     "public.special_types": {
       "name": "special_types",
       "schema": "public",
       "values": [
-        "transparent",
-        "curved",
-        "floor",
-        "N/A"
+        "Transparent",
+        "Curved",
+        "Floor",
+        "Other"
       ]
     },
     "public.support": {
       "name": "support",
       "schema": "public",
       "values": [
-        "frontendside",
-        "backside",
-        "frontside and backside"
+        "Frontendside",
+        "Backside",
+        "Frontside and Backside"
       ]
     },
     "public.video_rate": {
@@ -1823,17 +3230,8 @@
       "name": "yes_no",
       "schema": "public",
       "values": [
-        "yes",
-        "no"
-      ]
-    },
-    "public.role": {
-      "name": "role",
-      "schema": "public",
-      "values": [
-        "user",
-        "super_admin",
-        "admin"
+        "Yes",
+        "No"
       ]
     }
   },

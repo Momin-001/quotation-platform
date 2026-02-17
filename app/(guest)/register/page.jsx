@@ -15,7 +15,7 @@ import { useState } from "react";
 import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),

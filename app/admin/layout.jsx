@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import UserAvatar from "@/components/UserAvatar";
+import UserAvatar from "@/components/common/UserAvatar";
 import {
     Sheet,
     SheetContent,
@@ -19,6 +19,7 @@ const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "User Management", icon: Users },
     { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/products/import", label: "Bulk Product Import", icon: Upload },
     { href: "/admin/categories", label: "Categories", icon: FolderOpen },
     { href: "/admin/partners", label: "Partners", icon: Handshake },
     { href: "/admin/enquiries", label: "Customer Enquiries", icon: MessageSquare },

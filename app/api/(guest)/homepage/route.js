@@ -5,11 +5,11 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 // GET /api/homepage - Get homepage content (public)
 export async function GET() {
     try {
-        const homepageContent = await db.select().from(homepage).limit(1).then((res) => res[0]);
+        const [homepageContent] = await db.select().from(homepage).limit(1);
 
         // If no homepage content exists, return empty data
         if (!homepageContent) {
-            return successResponse({}, "Homepage content fetched successfully");
+            return errorResponse("Homepage content not found");
         }
 
         return successResponse("Homepage content fetched successfully", homepageContent);

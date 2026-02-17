@@ -7,21 +7,12 @@ import {
     users
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, asc, ilike, or, sql } from "drizzle-orm";
-
+import { eq, desc, asc, ilike, or, and, sql } from "drizzle-orm";
 // Helper function to generate quotation number
 function generateQuotationNumber() {
     const year = new Date().getFullYear();
     const randomNum = Math.floor(Math.random() * 900000) + 100000;
     return `Q-${year}-${randomNum}`;
-}
-
-// Helper function to calculate item total
-function calculateItemTotal(unitPrice, quantity, taxPercentage, discountPercentage) {
-    const basePrice = parseFloat(unitPrice) * parseInt(quantity);
-    const taxAmount = basePrice * (parseFloat(taxPercentage) / 100);
-    const discountAmount = basePrice * (parseFloat(discountPercentage) / 100);
-    return basePrice + taxAmount - discountAmount;
 }
 
 // GET /api/admin/quotations - Get all quotations with search, filter, and pagination
@@ -40,9 +31,7 @@ export async function GET(request) {
             .select({
                 id: quotations.id,
                 quotationNumber: quotations.quotationNumber,
-                description: quotations.description,
                 status: quotations.status,
-                totalAmount: quotations.totalAmount,
                 createdAt: quotations.createdAt,
                 updatedAt: quotations.updatedAt,
                 enquiryId: quotations.enquiryId,
@@ -62,7 +51,6 @@ export async function GET(request) {
                     ilike(quotations.quotationNumber, `%${search}%`),
                     ilike(users.fullName, `%${search}%`),
                     ilike(users.email, `%${search}%`),
-                    ilike(quotations.description, `%${search}%`)
                 )
             );
         }
@@ -122,11 +110,14 @@ export async function GET(request) {
     }
 }
 
+// Enquiry statuses that allow quotation creation
+const allowedEnquiryStatuses = ["pending", "in_progress", "expired"];
+
 // POST /api/admin/quotations - Create/Save a quotation (new simplified structure)
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { enquiryId, description, status, items } = body;
+        const { enquiryId, status, items } = body;
 
         // Validate required fields
         if (!enquiryId) {
@@ -148,37 +139,44 @@ export async function POST(request) {
             return errorResponse("Enquiry not found", 404);
         }
 
-        // Calculate total amount
-        let totalAmount = 0;
+        const enquiry = existingEnquiry[0];
+
+        // Check if enquiry status allows quotation creation
+        if (!allowedEnquiryStatuses.includes(enquiry.status)) {
+            return errorResponse(
+                `Cannot create quotation for ${enquiry.status} enquiry.`, 
+                400
+            );
+        }
 
         // Validate items and calculate totals
         for (const item of items) {
             if (!item.productId || !item.unitPrice) {
                 return errorResponse("Each item must have a product and unit price", 400);
             }
+        }
 
-            const itemTotal = calculateItemTotal(
-                item.unitPrice,
-                item.quantity || 1,
-                item.taxPercentage || 0,
-                item.discountPercentage || 0
-            );
-            totalAmount += itemTotal;
+        // Determine the quotation status
+        const quotationStatus = status || "draft";
+        const isSendingToUser = quotationStatus === "pending";
 
-            // Add optional items to total
-            if (item.optionalItems && Array.isArray(item.optionalItems)) {
-                for (const optItem of item.optionalItems) {
-                    if (optItem.productId && optItem.unitPrice) {
-                        const optTotal = calculateItemTotal(
-                            optItem.unitPrice,
-                            optItem.quantity || 1,
-                            optItem.taxPercentage || 0,
-                            optItem.discountPercentage || 0
-                        );
-                        totalAmount += optTotal;
-                    }
-                }
-            }
+        // If sending to user (not draft), close all previous active quotations
+        if (isSendingToUser) {
+            await db
+                .update(quotations)
+                .set({ 
+                    status: "closed",
+                    updatedAt: new Date(),
+                })
+                .where(
+                    and(
+                        eq(quotations.enquiryId, enquiryId),
+                        or(
+                            eq(quotations.status, "pending"),
+                            eq(quotations.status, "revision_requested")
+                        )
+                    )
+                );
         }
 
         // Create quotation
@@ -188,9 +186,7 @@ export async function POST(request) {
             .values({
                 enquiryId,
                 quotationNumber,
-                description: description || null,
-                status: status || "draft",
-                totalAmount: totalAmount.toFixed(2),
+                status: quotationStatus,
             })
             .returning();
 
@@ -217,39 +213,49 @@ export async function POST(request) {
 
             const quotationItemId = newItem[0].id;
 
-            // Create optional items for this quotation item
+            // Create optional items for this quotation item (polymorphic: product, controller, or accessory)
             if (item.optionalItems && Array.isArray(item.optionalItems)) {
                 for (let j = 0; j < item.optionalItems.length; j++) {
                     const optItem = item.optionalItems[j];
-                    if (optItem.productId && optItem.unitPrice) {
-                        await db.insert(quotationOptionalItems).values({
+                    const sourceId = optItem.sourceId || optItem.productId;
+                    const sourceType = optItem.sourceType || "product";
+                    
+                    if (sourceId && optItem.unitPrice) {
+                        const optionalData = {
                             quotationItemId,
-                            productId: optItem.productId,
+                            itemSourceType: sourceType,
+                            productId: sourceType === "product" ? sourceId : null,
+                            controllerId: sourceType === "controller" ? sourceId : null,
+                            accessoryId: sourceType === "accessory" ? sourceId : null,
                             quantity: optItem.quantity || 1,
                             unitPrice: optItem.unitPrice.toString(),
                             taxPercentage: (optItem.taxPercentage || 0).toString(),
                             discountPercentage: (optItem.discountPercentage || 0).toString(),
                             description: optItem.description || null,
                             itemOrder: j,
-                        });
+                        };
+                        await db.insert(quotationOptionalItems).values(optionalData);
                     }
                 }
             }
         }
 
-        // Update enquiry status to in_progress if it's pending
-        if (existingEnquiry[0].status === "pending") {
+        // Update enquiry status to in_progress if it's pending or expired (only when sending to user)
+        if (isSendingToUser && (enquiry.status === "pending" || enquiry.status === "expired")) {
             await db
                 .update(enquiries)
                 .set({ status: "in_progress", updatedAt: new Date() })
                 .where(eq(enquiries.id, enquiryId));
         }
 
-        return successResponse("Quotation saved successfully", {
-            id: quotationId,
-            quotationNumber,
-            totalAmount: totalAmount.toFixed(2),
-        });
+        return successResponse(
+            isSendingToUser ? "Quotation sent to customer successfully" : "Quotation draft saved successfully", 
+            {
+                id: quotationId,
+                quotationNumber,
+                status: quotationStatus,
+            }
+        );
     } catch (error) {
         console.error("Error saving quotation:", error);
         return errorResponse(error.message || "Failed to save quotation");

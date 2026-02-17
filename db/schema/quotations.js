@@ -1,6 +1,8 @@
 import { pgTable, uuid, text, timestamp, decimal, integer } from "drizzle-orm/pg-core";
 import { enquiries } from "./enquiries";
 import { products } from "./products";
+import { controllers } from "./controllers";
+import { accessories } from "./accessories";
 import { relations } from "drizzle-orm";
 
 export const quotations = pgTable("quotations", {
@@ -9,9 +11,7 @@ export const quotations = pgTable("quotations", {
         .notNull()
         .references(() => enquiries.id, { onDelete: "cascade" }),
     quotationNumber: text("quotation_number").notNull(), // e.g., "Q-2025-347"
-    description: text("description"), // e.g., "Indoor Lobby Wall (4x3m)"
-    status: text("status").default("draft").notNull(), // draft, pending, accepted, rejected, expired
-    totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+    status: text("status").default("draft").notNull(), // draft, pending, accepted, requested revision, rejected, closed, expired
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -36,52 +36,21 @@ export const quotationItems = pgTable("quotation_items", {
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Optional products for each quotation item
+// Optional products for each quotation item (polymorphic: product, controller, or accessory)
 export const quotationOptionalItems = pgTable("quotation_optional_items", {
     id: uuid("id").defaultRandom().primaryKey(),
     quotationItemId: uuid("quotation_item_id")
         .notNull()
         .references(() => quotationItems.id, { onDelete: "cascade" }),
+    // Polymorphic: exactly one of these three should be set
     productId: uuid("product_id")
-        .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
-    quantity: integer("quantity").notNull().default(1),
-    unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
-    discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
-    description: text("description"),
-    itemOrder: integer("item_order").default(0),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Alternative product for each quotation item (only one per item)
-export const quotationAlternativeItems = pgTable("quotation_alternative_items", {
-    id: uuid("id").defaultRandom().primaryKey(),
-    quotationItemId: uuid("quotation_item_id")
-        .notNull()
-        .references(() => quotationItems.id, { onDelete: "cascade" }),
-    productId: uuid("product_id")
-        .notNull()
-        .references(() => products.id, { onDelete: "cascade" }),
-    quantity: integer("quantity").notNull().default(1),
-    unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
-    discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
-    description: text("description"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Optional products for alternative items
-export const quotationAlternativeOptionalItems = pgTable("quotation_alternative_optional_items", {
-    id: uuid("id").defaultRandom().primaryKey(),
-    alternativeItemId: uuid("alternative_item_id")
-        .notNull()
-        .references(() => quotationAlternativeItems.id, { onDelete: "cascade" }),
-    productId: uuid("product_id")
-        .notNull()
-        .references(() => products.id, { onDelete: "cascade" }),
+    controllerId: uuid("controller_id")
+        .references(() => controllers.id, { onDelete: "cascade" }),
+    accessoryId: uuid("accessory_id")
+        .references(() => accessories.id, { onDelete: "cascade" }),
+    // Track which type of item this is: "product", "controller", or "accessory"
+    itemSourceType: text("item_source_type").default("product").notNull(),
     quantity: integer("quantity").notNull().default(1),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
     taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
@@ -93,8 +62,12 @@ export const quotationAlternativeOptionalItems = pgTable("quotation_alternative_
 });
 
 // Relations
-export const quotationsRelations = relations(quotations, ({ many }) => ({
+export const quotationsRelations = relations(quotations, ({ many, one }) => ({
     items: many(quotationItems),
+    enquiry: one(enquiries, {
+        fields: [quotations.enquiryId],
+        references: [enquiries.id],
+    }),
 }));
 
 export const quotationItemsRelations = relations(quotationItems, ({ one, many }) => ({
@@ -107,7 +80,6 @@ export const quotationItemsRelations = relations(quotationItems, ({ one, many })
         references: [products.id],
     }),
     optionalItems: many(quotationOptionalItems),
-    alternativeItem: one(quotationAlternativeItems),
 }));
 
 export const quotationOptionalItemsRelations = relations(quotationOptionalItems, ({ one }) => ({
@@ -119,28 +91,13 @@ export const quotationOptionalItemsRelations = relations(quotationOptionalItems,
         fields: [quotationOptionalItems.productId],
         references: [products.id],
     }),
-}));
-
-export const quotationAlternativeItemsRelations = relations(quotationAlternativeItems, ({ one, many }) => ({
-    quotationItem: one(quotationItems, {
-        fields: [quotationAlternativeItems.quotationItemId],
-        references: [quotationItems.id],
+    controller: one(controllers, {
+        fields: [quotationOptionalItems.controllerId],
+        references: [controllers.id],
     }),
-    product: one(products, {
-        fields: [quotationAlternativeItems.productId],
-        references: [products.id],
-    }),
-    optionalItems: many(quotationAlternativeOptionalItems),
-}));
-
-export const quotationAlternativeOptionalItemsRelations = relations(quotationAlternativeOptionalItems, ({ one }) => ({
-    alternativeItem: one(quotationAlternativeItems, {
-        fields: [quotationAlternativeOptionalItems.alternativeItemId],
-        references: [quotationAlternativeItems.id],
-    }),
-    product: one(products, {
-        fields: [quotationAlternativeOptionalItems.productId],
-        references: [products.id],
+    accessory: one(accessories, {
+        fields: [quotationOptionalItems.accessoryId],
+        references: [accessories.id],
     }),
 }));
 

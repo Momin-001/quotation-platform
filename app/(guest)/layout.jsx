@@ -1,6 +1,6 @@
 
 import Navbar from "@/components/guest/Navbar";
-import UserHeader from "@/components/guest/UserHeader";
+import UserHeader from "@/components/user/UserHeader";
 import Footer from "@/components/guest/Footer";
 import { BASE_URL } from "@/lib/constants";
 

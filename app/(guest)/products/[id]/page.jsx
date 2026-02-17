@@ -14,8 +14,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { Download, ShoppingCart, FileText, Wrench } from "lucide-react";
-import Header from "@/components/BreadCrumb";
-import BreadCrumb from "@/components/BreadCrumb";
+import Header from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -110,8 +110,7 @@ export default function ProductDetailPage() {
         );
     }
 
-    const images = product.images || [];
-    const selectedImage = images[selectedImageIndex] || images[0] || null;
+    const selectedImage = product.images[selectedImageIndex] || product.images[0] || null;
 
     // Helper function to get localized field
     const getLocalizedField = (enField, deField) => {
@@ -158,7 +157,7 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Image Carousel */}
-                            {images.length > 0 && (
+                            {product.images.length > 0 && (
                                 <Carousel
                                     opts={{
                                         align: "center",
@@ -167,7 +166,7 @@ export default function ProductDetailPage() {
                                     className="w-full relative"
                                 >
                                     <CarouselContent>
-                                        {images.map((image, index) => (
+                                        {product.images.map((image, index) => (
                                             <CarouselItem 
                                                 key={index} 
                                                 className=" py-2 basis-1/3 md:basis-1/4"
@@ -186,7 +185,7 @@ export default function ProductDetailPage() {
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>
-                                    {images.length > 3 && (
+                                    {product.images.length > 3 && (
                                         <>
                                             <CarouselPrevious className="left-2" />
                                             <CarouselNext className="right-2" />
@@ -689,18 +688,18 @@ export default function ProductDetailPage() {
                             </Accordion>
 
                             {/* Certifications & Standards */}
-                            {(product.certificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
+                            {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
                                 <Accordion type="single" collapsible className="rounded-lg">
                                     <AccordionItem value="certifications">
                                         <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                             Certifications & Standards
                                         </AccordionTrigger>
                                         <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                            {product.certificates && product.certificates.length > 0 && (
+                                            {product.productCertificates && product.productCertificates.length > 0 && (
                                                 <div className="mb-4">
                                                     <p className="text-sm text-gray-600 mb-2">Certificates</p>
                                                     <div className="flex flex-wrap gap-2">
-                                                        {product.certificates.map((cert) => (
+                                                        {product.productCertificates.map((cert) => (
                                                             <div key={cert.id} className="flex items-center gap-2 bg-white p-2 px-4 rounded-md">
                                                                 <Image
                                                                     src={cert.imageUrl}

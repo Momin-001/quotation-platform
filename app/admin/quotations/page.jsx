@@ -19,10 +19,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Eye } from "lucide-react";
+import { Search, Filter, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
+import { getStatusLabel, getQuotationStatusColor, formatDate } from "@/lib/helpers";
 
 export default function AdminQuotationsPage() {
     const [quotations, setQuotations] = useState([]);
@@ -90,34 +90,6 @@ export default function AdminQuotationsPage() {
         fetchQuotations(nextPage, search, statusFilter, sortBy);
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "draft":
-                return "bg-gray-100 text-gray-700";
-            case "pending":
-                return "bg-yellow-100 text-yellow-700";
-            case "accepted":
-                return "bg-green-100 text-green-700";
-            case "rejected":
-                return "bg-red-100 text-red-700";
-            case "revision_requested":
-                return "bg-blue-100 text-blue-700";
-            case "expired":
-                return "bg-orange-100 text-orange-700";
-            default:
-                return "bg-gray-100 text-gray-700";
-        }
-    };
-
-    const getStatusLabel = (status) => {
-        return status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ");
-    };
-
-    const formatCurrency = (amount) => {
-        if (!amount) return "-";
-        return `€${parseFloat(amount).toLocaleString('de-DE', { minimumFractionDigits: 2 })}`;
-    };
-
     return (
         <div className="space-y-6">
             <div className="space-y-2">
@@ -150,6 +122,7 @@ export default function AdminQuotationsPage() {
                             <SelectItem value="accepted">Accepted</SelectItem>
                             <SelectItem value="rejected">Rejected</SelectItem>
                             <SelectItem value="revision_requested">Revision Requested</SelectItem>
+                            <SelectItem value="closed">Closed</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -174,8 +147,6 @@ export default function AdminQuotationsPage() {
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Quotation #</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Customer</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Description</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Total Amount</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Created</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
@@ -206,27 +177,30 @@ export default function AdminQuotationsPage() {
                                             <p className="text-xs text-gray-500">{quotation.customerEmail}</p>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="p-4 max-w-[200px] truncate">
-                                        {quotation.description || "-"}
-                                    </TableCell>
-                                    <TableCell className="p-4 whitespace-nowrap font-medium">
-                                        {formatCurrency(quotation.totalAmount)}
-                                    </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(quotation.status)}`}>
+                                        <span className={`text-sm px-2 py-1 rounded-md ${getQuotationStatusColor(quotation.status)}`}>
                                             {getStatusLabel(quotation.status)}
                                         </span>
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        {format(new Date(quotation.createdAt), "MMM d, yyyy")}
+                                        {formatDate(quotation.createdAt)}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        <Link href={`/admin/quotations/${quotation.id}`}>
-                                            <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
-                                                <Eye className="h-4 w-4 mr-1" />
-                                                View
-                                            </Button>
-                                        </Link>
+                                        {quotation.status === "draft" ? (
+                                            <Link href={`/admin/enquiries/${quotation.enquiryId}/quotation?draft=${quotation.id}`}>
+                                                <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-800">
+                                                    <Pencil className="h-4 w-4 mr-1" />
+                                                    Edit
+                                                </Button>
+                                            </Link>
+                                        ) : (
+                                            <Link href={`/admin/quotations/${quotation.id}`}>
+                                                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+                                                    <Eye className="h-4 w-4 mr-1" />
+                                                    View
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))

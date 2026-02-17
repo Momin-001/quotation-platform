@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { quotations, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, and, inArray } from "drizzle-orm";
+import { eq, desc, and, inArray, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
 export async function GET(req) {
@@ -10,38 +10,32 @@ export async function GET(req) {
         if (error) {
             return errorResponse(error, 401);
         }
-
+        
         // Fetch all enquiries for this user
-        const userEnquiries = await db
-            .select({ id: enquiries.id })
-            .from(enquiries)
-            .where(eq(enquiries.userId, user.id));
-
-        if (userEnquiries.length === 0) {
-            return successResponse("Quotations fetched successfully", {
-                quotations: [],
-                pendingCount: 0,
-            });
-        }
-
-        const enquiryIds = userEnquiries.map((e) => e.id);
-
-        // Fetch all quotations for user's enquiries
-        const allQuotations = await db
-            .select()
-            .from(quotations)
-            .where(inArray(quotations.enquiryId, enquiryIds))
-            .orderBy(desc(quotations.createdAt));
-
-        // Count pending quotations (status: pending)
-        const pendingCount = allQuotations.filter(
-            (q) => q.status === "pending"
-        ).length;
-
-        return successResponse("Quotations fetched successfully", {
-            quotations: allQuotations,
-            pendingCount,
+        const userEnquiries = await db.query.enquiries.findMany({
+            where: eq(enquiries.userId, user.id),
+            columns: {},
+            with: {
+                quotations: {
+                    columns: {
+                        id: true,
+                        enquiryId: true,
+                        createdAt: true,
+                        status: true,
+                        quotationNumber: true,
+                    },
+                },
+            },
         });
+
+        const allQuotations = userEnquiries.flatMap((enquiry) => enquiry.quotations);
+        
+        const formattedData = {
+            quotations: allQuotations,
+            pendingCount : allQuotations.filter((quotation) => quotation.status === "pending").length,
+        };
+        
+        return successResponse("Quotations fetched successfully", formattedData);
     } catch (error) {
         console.error("Error fetching quotations:", error);
         return errorResponse(error.message || "Failed to fetch quotations");

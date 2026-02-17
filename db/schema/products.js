@@ -1,20 +1,22 @@
-import { pgTable, uuid, text, timestamp, integer, decimal, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer, decimal, pgEnum, boolean, jsonb } from "drizzle-orm/pg-core";
 import { categories } from "./categories";
 import { productImages } from "./productImages";
 import { productCertificates } from "./productCertificates";
 import { productFeatures } from "./productFeatures";
 import { relations } from "drizzle-orm";
+import { enquiryItems } from "./enquiries";
+import { quotationItems, quotationOptionalItems } from "./quotations";
 
 // ENUM definitions
-export const productTypeEnum = pgEnum("product_type", ["AIO systems", "LED Display single cabinet"]);
-export const designEnum = pgEnum("design", ["fix", "mobil"]);
-export const specialTypesEnum = pgEnum("special_types", ["transparent", "curved", "floor", "N/A"]);
+export const productTypeEnum = pgEnum("product_type", ["AIO Systems", "LED Display Single Cabinet"]);
+export const designEnum = pgEnum("design", ["Fix", "Mobil"]);
+export const specialTypesEnum = pgEnum("special_types", ["Transparent", "Curved", "Floor", "Other"]);
 export const applicationEnum = pgEnum("application", [
     "DOOH",
-    "Indoor signage",
-    "Home theater",
-    "Stadium scoreboard",
-    "Video cube",
+    "Indoor Signage",
+    "Home Theater",
+    "Stadium Scoreboard",
+    "Video Cube",
     "Conference",
     "Stadium Ribbons",
     "Corporate Design",
@@ -22,25 +24,26 @@ export const applicationEnum = pgEnum("application", [
     "Virtual Production"
 ]);
 export const pixelConfigurationEnum = pgEnum("pixel_configuration", ["1R1G1B", "2R1G1B"]);
-export const pixelTechnologyEnum = pgEnum("pixel_technology", ["real", "virtual"]);
-export const ledTechnologyEnum = pgEnum("led_technology", ["SMD", "SMD+GOB", "IMD", "COB", "DIP", "LOB"]);
-export const chipBondingEnum = pgEnum("chip_bonding", ["gold wire", "cooper wire", "Flip chip"]);
+export const pixelTechnologyEnum = pgEnum("pixel_technology", ["Real", "Virtual"]);
+export const ledTechnologyEnum = pgEnum("led_technology", ["SMD", "SMD+GOB", "IMD", "COB", "DIP", "LOB", "Other"]);
+export const chipBondingEnum = pgEnum("chip_bonding", ["Gold Wire", "Copper Wire", "Flip-Chip"]);
 export const colourDepthEnum = pgEnum("colour_depth", ["8", "10", "12"]);
 export const currentGainControlEnum = pgEnum("current_gain_control", ["4", "8"]);
 export const videoRateEnum = pgEnum("video_rate", ["50/60", "120", "240"]);
 export const calibrationMethodEnum = pgEnum("calibration_method", [
-    "no calibration",
-    "multiple layers chroma",
-    "multiple layers brightness",
+    "No Calibration",
+    "Multiple Layers Chroma",
+    "Multiple Layers Brightness",
     "Brightness",
-    "chroma"
+    "Chroma",
+    "Other"
 ]);
-export const drivingMethodEnum = pgEnum("driving_method", ["common anode", "common cathode"]);
-export const controlSystemEnum = pgEnum("control_system", ["Colorlight", "Novastar", "Brompton", "LINSN", "other"]);
-export const greyscaleProcessingEnum = pgEnum("greyscale_processing", ["<16", "16", "18+", "22+", "other"]);
-export const coolingEnum = pgEnum("cooling", ["convection", "fan"]);
-export const yesNoEnum = pgEnum("yes_no", ["yes", "no"]);
-export const supportEnum = pgEnum("support", ["frontendside", "backside", "frontside and backside"]);
+export const drivingMethodEnum = pgEnum("driving_method", ["Common Anode", "Common Cathode"]);
+export const controlSystemEnum = pgEnum("control_system", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"]);
+export const greyscaleProcessingEnum = pgEnum("greyscale_processing", ["<16", "16", "18+", "22+", "Other"]);
+export const coolingEnum = pgEnum("cooling", ["Convection", "Fan"]);
+export const yesNoEnum = pgEnum("yes_no", ["Yes", "No"]);
+export const supportEnum = pgEnum("support", ["Frontendside", "Backside", "Frontside and Backside"]);
 
 export const products = pgTable("products", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -75,16 +78,20 @@ export const products = pgTable("products", {
     productType: productTypeEnum("product_type").notNull(),
     design: designEnum("design").notNull(),
     specialTypes: specialTypesEnum("special_types").notNull(),
+    specialTypesOther: text("special_types_other"),
     application: applicationEnum("application").notNull(),
     pixelPitch: decimal("pixel_pitch", { precision: 10, scale: 2 }).notNull(),
     pixelConfiguration: pixelConfigurationEnum("pixel_configuration").notNull(),
     pixelTechnology: pixelTechnologyEnum("pixel_technology").notNull(),
     ledTechnology: ledTechnologyEnum("led_technology").notNull(),
+    ledTechnologyOther: text("led_technology_other"),
     chipBonding: chipBondingEnum("chip_bonding").notNull(),
     colourDepth: colourDepthEnum("colour_depth").notNull(),
     currentGainControl: currentGainControlEnum("current_gain_control").notNull(),
     videoRate: videoRateEnum("video_rate").notNull(),
+    brightnessValue: text("brightness_value"),
     calibrationMethod: calibrationMethodEnum("calibration_method").notNull(),
+    calibrationMethodOther: text("calibration_method_other"),
     drivingMethod: drivingMethodEnum("driving_method").notNull(),
     controlSystem: controlSystemEnum("control_system").notNull(),
     controlSystemOther: text("control_system_other"),
@@ -122,6 +129,8 @@ export const products = pgTable("products", {
     powerConsumptionTypical: integer("power_consumption_typical"),
     warrantyPeriod: integer("warranty_period"),
     
+    // Active status – products imported via Excel are inactive until admin adds images
+    isActive: boolean("is_active").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -134,4 +143,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     images: many(productImages),
     productCertificates: many(productCertificates),
     features: many(productFeatures),
+    enquiryItems: many(enquiryItems),
+    quotationItems: many(quotationItems),
+    quotationOptionalItems: many(quotationOptionalItems),
 }));

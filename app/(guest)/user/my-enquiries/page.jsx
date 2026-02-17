@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import {
     Accordion,
@@ -10,25 +8,18 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
-import BreadCrumb from "@/components/BreadCrumb";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
+import { formatEnquiryNumber, formatDate, getStatusLabel, getEnquiryStatusColor } from "@/lib/helpers";
+import { useRouter } from "next/navigation";
 
 export default function MyEnquiriesPage() {
-    const { isAuthenticated, loading: authLoading } = useAuth();
-    const router = useRouter();
     const [enquiries, setEnquiries] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const router = useRouter();
     useEffect(() => {
-        if (!authLoading) {
-            if (!isAuthenticated) {
-                router.push("/login");
-                return;
-            }
             fetchEnquiries();
-        }
-    }, [isAuthenticated, authLoading]);
+    }, []);
 
     const fetchEnquiries = async () => {
         try {
@@ -50,15 +41,7 @@ export default function MyEnquiriesPage() {
         (enquiry) => enquiry.status === "pending" || enquiry.status === "in_progress"
     );
 
-    // Format enquiry number
-    const formatEnquiryNumber = (enquiryId, createdAt) => {
-        const year = new Date(createdAt).getFullYear();
-        // Use last 4 characters of UUID as number
-        const number = enquiryId.slice(-4);
-        return `Enquiry #${year}-${number}`;
-    };
-
-    if (authLoading || loading) {
+    if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Spinner className="h-8 w-8" />
@@ -94,12 +77,19 @@ export default function MyEnquiriesPage() {
                                     <AccordionTrigger className="hover:no-underline px-6 py-4">
                                         <div className="flex items-center justify-between w-full">
                                             <div className="flex-1 text-left">
-                                                <h3 className="text-lg font-bold mb-1">
-                                                    {enquiry.items && enquiry.items.length > 0
-                                                        ? enquiry.items[0]?.productName ||
-                                                          "Product Enquiry"
-                                                        : "Product Enquiry"}
-                                                </h3>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h3 className="text-lg font-bold">
+                                                        {enquiry.items && enquiry.items.length > 0
+                                                            ? enquiry.items[0]?.product?.productName ||
+                                                              "Product Enquiry"
+                                                            : "Product Enquiry"}
+                                                    </h3>
+                                                    {enquiry.items?.some((item) => item.isCustom) && (
+                                                        <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">
+                                                            Custom Solution
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <p className="text-sm text-gray-600">
                                                     {formatEnquiryNumber(
                                                         enquiry.id,
@@ -107,27 +97,37 @@ export default function MyEnquiriesPage() {
                                                     )}
                                                 </p>
                                             </div>
+                                            <div className="flex flex-col items-center gap-2">
+                                                <span className={`text-sm px-2 py-1 rounded-md ${getEnquiryStatusColor(enquiry.status)}`}>
+                                                    {getStatusLabel(enquiry.status)}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-600">
+                                                    {formatDate(enquiry.createdAt)}
+                                                </span>
+                                            </div>
+                                            </div>
+                                           
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-6 pb-4">
                                         {enquiry.quotations && enquiry.quotations.length > 0 ? (
                                             <div className="space-y-3">
                                                 {enquiry.quotations.map((quotation) => (
-                                                    <Card
+                                                    <div
                                                         key={quotation.id}
-                                                        className="bg-white border rounded-lg shadow-sm"
-                                                    >
-                                                        <CardContent>
+                                                        className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm px-6 cursor-pointer"
+                                                        onClick={() => {
+                                                            router.push(`/user/my-quotations/${quotation.id}`);
+                                                        }}
+                                                  >
+                                                        <div>
+                                                            <p className="text-sm text-gray-600">Quotation</p>
                                                             <h4 className="font-bold text-base mb-1">
                                                                 {quotation.quotationNumber}
                                                             </h4>
-                                                            {quotation.description && (
-                                                                <p className="text-sm text-gray-600">
-                                                                    {quotation.description}
-                                                                </p>
-                                                            )}
-                                                        </CardContent>
-                                                    </Card>
+                                                        </div>
+                                                    </div>
                                                 ))}
                                             </div>
                                         ) : (

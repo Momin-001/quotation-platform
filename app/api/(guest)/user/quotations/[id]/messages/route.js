@@ -4,6 +4,20 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, and, desc, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
+// Helper function to check if chat is disabled
+// Chat is disabled when:
+// - rejected → disabled
+// - closed AND enquiry is NOT expired (closed due to new quotation) → disabled
+function isChatDisabled(quotationStatus, enquiryStatus) {
+    if (quotationStatus === "rejected") {
+        return true;
+    }
+    if (quotationStatus === "closed" && enquiryStatus !== "expired") {
+        return true;
+    }
+    return false;
+}
+
 // GET - Fetch messages for a quotation
 export async function GET(req, { params }) {
     try {
@@ -19,19 +33,18 @@ export async function GET(req, { params }) {
         }
 
         // Fetch quotation and verify ownership
-        const quotation = await db
+        const [quotation] = await db
             .select()
             .from(quotations)
             .where(eq(quotations.id, id))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!quotation) {
             return errorResponse("Quotation not found", 404);
         }
 
         // Verify the quotation belongs to user's enquiry
-        const enquiry = await db
+        const [enquiry] = await db
             .select()
             .from(enquiries)
             .where(and(
@@ -39,7 +52,6 @@ export async function GET(req, { params }) {
                 eq(enquiries.userId, user.id)
             ))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!enquiry) {
             return errorResponse("Unauthorized", 403);
@@ -53,21 +65,7 @@ export async function GET(req, { params }) {
             .orderBy(quotationMessages.createdAt);
 
         // Check if chat is disabled
-        const newerQuotation = await db
-            .select({ id: quotations.id, createdAt: quotations.createdAt })
-            .from(quotations)
-            .where(and(
-                eq(quotations.enquiryId, quotation.enquiryId),
-                ne(quotations.id, quotation.id)
-            ))
-            .orderBy(desc(quotations.createdAt))
-            .limit(1);
-
-        const hasNewerQuotation = newerQuotation.length > 0 && 
-            new Date(newerQuotation[0].createdAt) > new Date(quotation.createdAt);
-
-        const chatDisabled = hasNewerQuotation || 
-            ["accepted", "rejected", "revision_requested"].includes(quotation.status);
+        const chatDisabled = isChatDisabled(quotation.status, enquiry.status);
 
         return successResponse("Messages fetched successfully", {
             messages,
@@ -100,19 +98,18 @@ export async function POST(req, { params }) {
         }
 
         // Fetch quotation
-        const quotation = await db
+        const [quotation] = await db
             .select()
             .from(quotations)
             .where(eq(quotations.id, id))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!quotation) {
             return errorResponse("Quotation not found", 404);
         }
 
         // Verify the quotation belongs to user's enquiry
-        const enquiry = await db
+        const [enquiry] = await db
             .select()
             .from(enquiries)
             .where(and(
@@ -120,28 +117,13 @@ export async function POST(req, { params }) {
                 eq(enquiries.userId, user.id)
             ))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!enquiry) {
             return errorResponse("Unauthorized", 403);
         }
 
         // Check if chat is disabled
-        const newerQuotation = await db
-            .select({ id: quotations.id, createdAt: quotations.createdAt })
-            .from(quotations)
-            .where(and(
-                eq(quotations.enquiryId, quotation.enquiryId),
-                ne(quotations.id, quotation.id)
-            ))
-            .orderBy(desc(quotations.createdAt))
-            .limit(1);
-
-        const hasNewerQuotation = newerQuotation.length > 0 && 
-            new Date(newerQuotation[0].createdAt) > new Date(quotation.createdAt);
-
-        const chatDisabled = hasNewerQuotation || 
-            ["accepted", "rejected", "revision_requested"].includes(quotation.status);
+        const chatDisabled = isChatDisabled(quotation.status, enquiry.status);
 
         if (chatDisabled) {
             return errorResponse("Chat is disabled for this quotation", 400);

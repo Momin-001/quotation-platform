@@ -5,6 +5,8 @@ import {
     quotationOptionalItems,
     products, 
     productImages,
+    controllers,
+    accessories,
     enquiries 
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
@@ -22,7 +24,7 @@ async function getProductImage(productId) {
     return images[0]?.imageUrl || null;
 }
 
-// Helper to get product details
+// Helper to get product details (LED)
 async function getProductDetails(productId) {
     const product = await db
         .select({
@@ -37,17 +39,62 @@ async function getProductDetails(productId) {
     
     if (product[0]) {
         const imageUrl = await getProductImage(productId);
-        return { ...product[0], imageUrl };
+        return { ...product[0], imageUrl, sourceType: "product" };
     }
     return null;
 }
 
-// Calculate item total
-function calculateItemTotal(unitPrice, quantity, taxPercentage, discountPercentage) {
-    const basePrice = parseFloat(unitPrice || 0) * parseInt(quantity || 1);
-    const taxAmount = basePrice * (parseFloat(taxPercentage || 0) / 100);
-    const discountAmount = basePrice * (parseFloat(discountPercentage || 0) / 100);
-    return basePrice + taxAmount - discountAmount;
+// Helper to get controller details
+async function getControllerDetails(controllerId) {
+    const controller = await db
+        .select({
+            id: controllers.id,
+            productName: controllers.productName,
+            productNumber: controllers.productNumber,
+            brandName: controllers.brandName,
+        })
+        .from(controllers)
+        .where(eq(controllers.id, controllerId))
+        .limit(1);
+    
+    if (controller[0]) {
+        return { ...controller[0], imageUrl: null, sourceType: "controller" };
+    }
+    return null;
+}
+
+// Helper to get accessory details
+async function getAccessoryDetails(accessoryId) {
+    const accessory = await db
+        .select({
+            id: accessories.id,
+            productName: accessories.productName,
+            productNumber: accessories.productNumber,
+            productGroup: accessories.productGroup,
+        })
+        .from(accessories)
+        .where(eq(accessories.id, accessoryId))
+        .limit(1);
+    
+    if (accessory[0]) {
+        return { ...accessory[0], imageUrl: null, sourceType: "accessory" };
+    }
+    return null;
+}
+
+// Resolve polymorphic optional item product
+async function getOptionalItemProduct(opt) {
+    const sourceType = opt.itemSourceType || "product";
+    if (sourceType === "controller" && opt.controllerId) {
+        return await getControllerDetails(opt.controllerId);
+    }
+    if (sourceType === "accessory" && opt.accessoryId) {
+        return await getAccessoryDetails(opt.accessoryId);
+    }
+    if (opt.productId) {
+        return await getProductDetails(opt.productId);
+    }
+    return null;
 }
 
 export async function GET(req, { params }) {
@@ -90,13 +137,14 @@ export async function GET(req, { params }) {
             return errorResponse("Unauthorized", 403);
         }
 
-        // Check if there's a newer quotation for the same enquiry (chat disabled)
+        // Check if there's a newer non-draft quotation for the same enquiry
         const newerQuotation = await db
             .select({ id: quotations.id, createdAt: quotations.createdAt })
             .from(quotations)
             .where(and(
                 eq(quotations.enquiryId, quotation.enquiryId),
-                ne(quotations.id, quotation.id)
+                ne(quotations.id, quotation.id),
+                ne(quotations.status, "draft")
             ))
             .orderBy(desc(quotations.createdAt))
             .limit(1);
@@ -104,9 +152,33 @@ export async function GET(req, { params }) {
         const hasNewerQuotation = newerQuotation.length > 0 && 
             new Date(newerQuotation[0].createdAt) > new Date(quotation.createdAt);
 
-        // Chat is disabled if: there's a newer quotation OR status is accepted/rejected/revision_requested
-        const chatDisabled = hasNewerQuotation || 
-            ["accepted", "rejected", "revision_requested"].includes(quotation.status);
+        // Chat disabled logic:
+        // - rejected → disabled
+        // - closed AND enquiry is NOT expired (closed due to new quotation) → disabled
+        // - Everything else → enabled
+        let chatDisabled = false;
+        let chatDisabledReason = null;
+
+        if (quotation.status === "rejected") {
+            chatDisabled = true;
+            chatDisabledReason = "Chat is closed because the quotation was rejected";
+        } else if (quotation.status === "closed" && enquiry.status !== "expired") {
+            chatDisabled = true;
+            chatDisabledReason = "Chat is closed because a newer quotation exists";
+        }
+
+        // Buttons disabled logic:
+        // Buttons are enabled only when status is "pending" or "revision_requested"
+        // AND there's no newer quotation
+        const actionableStatuses = ["pending", "revision_requested"];
+        const buttonsDisabled = !actionableStatuses.includes(quotation.status) || hasNewerQuotation;
+        
+        let buttonsDisabledReason = null;
+        if (hasNewerQuotation) {
+            buttonsDisabledReason = "A newer quotation exists for this enquiry";
+        } else if (!actionableStatuses.includes(quotation.status)) {
+            buttonsDisabledReason = `Quotation has been ${quotation.status.replace("_", " ")}`;
+        }
 
         // Fetch quotation items with product details and optional items
         const items = await db
@@ -130,7 +202,7 @@ export async function GET(req, { params }) {
                 const optionalItems = await Promise.all(
                     optionalItemsData.map(async (opt) => ({
                         ...opt,
-                        product: await getProductDetails(opt.productId),
+                        product: await getOptionalItemProduct(opt),
                     }))
                 );
 
@@ -146,16 +218,6 @@ export async function GET(req, { params }) {
         const mainProduct = itemsWithDetails.find(item => item.itemType === "main") || itemsWithDetails[0];
         const alternativeProduct = itemsWithDetails.find(item => item.itemType === "alternative") || itemsWithDetails[1] || null;
 
-        // Calculate total
-        let grandTotal = 0;
-        itemsWithDetails.forEach((item) => {
-            grandTotal += calculateItemTotal(item.unitPrice, item.quantity, item.taxPercentage, item.discountPercentage);
-            
-            item.optionalItems?.forEach((opt) => {
-                grandTotal += calculateItemTotal(opt.unitPrice, opt.quantity, opt.taxPercentage, opt.discountPercentage);
-            });
-        });
-
         return successResponse("Quotation fetched successfully", {
             ...quotation,
             enquiry: {
@@ -163,16 +225,12 @@ export async function GET(req, { params }) {
                 message: enquiry.message,
                 status: enquiry.status,
             },
-            items: itemsWithDetails,
             mainProduct,
             alternativeProduct,
-            calculatedTotal: grandTotal.toFixed(2),
             chatDisabled,
-            chatDisabledReason: hasNewerQuotation 
-                ? "A newer quotation exists for this enquiry" 
-                : chatDisabled 
-                    ? `Quotation has been ${quotation.status.replace("_", " ")}`
-                    : null,
+            chatDisabledReason,
+            buttonsDisabled,
+            buttonsDisabledReason,
         });
     } catch (error) {
         console.error("Error fetching quotation:", error);

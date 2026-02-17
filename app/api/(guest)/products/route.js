@@ -37,6 +37,9 @@ export async function GET(req) {
         // Build where clause
         let conditions = [];
 
+        // Only show active products on guest side
+        conditions.push(eq(products.isActive, true));
+
         // Search filter
         if (search) {
             conditions.push(
@@ -179,53 +182,51 @@ export async function GET(req) {
         const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
         // Fetch products with images, certificates, and category
-        const allProducts = await db
-            .select({
-                id: products.id,
-                productName: products.productName,
-                productNumber: products.productNumber,
-                areaOfUseId: products.areaOfUseId,
-                categoryName: categories.name,
-            })
-            .from(products)
-            .leftJoin(categories, eq(products.areaOfUseId, categories.id))
-            .where(whereClause)
-            .orderBy(desc(products.createdAt))
-            .limit(limit)
-            .offset(offset);
+        const allProducts = await db.query.products.findMany({
+            where: whereClause,
+            orderBy: desc(products.createdAt),
+            limit: limit,
+            offset: offset,
+            columns: {
+                id: true,
+                productName: true,
+                productNumber: true,
+            },
+            with: {
+                areaOfUse: {
+                    columns: {
+                        name: true,
+                    },
+                },
+                images: {
+                    columns: {
+                        imageUrl: true,
+                    },
+                },
+                productCertificates: {
+                    columns: {},
+                    with: {
+                        certificate: {
+                            columns: {
+                                id: true,
+                                name: true,
+                                imageUrl: true,
+                            },
+                        },
+                    },
+                },
+                
+            },
+        });
+        
 
-        // Fetch images and certificates for each product
-        const productsWithDetails = await Promise.all(
-            allProducts.map(async (product) => {
-                // Get first product image
-                const image = await db
-                    .select()
-                    .from(productImages)
-                    .where(eq(productImages.productId, product.id))
-                    .orderBy(productImages.imageOrder)
-                    .limit(1)
-                    .then((res) => res[0]);
-
-                // Get product certificates
-                const productCerts = await db
-                    .select({
-                        id: certificates.id,
-                        name: certificates.name,
-                        imageUrl: certificates.imageUrl,
-                    })
-                    .from(productCertificates)
-                    .innerJoin(certificates, eq(productCertificates.certificateId, certificates.id))
-                    .where(eq(productCertificates.productId, product.id));
-
-                return {
-                    ...product,
-                    imageUrl: image?.imageUrl || null,
-                    certificates: productCerts,
-                };
-            })
-        );
-
-        return successResponse("Products fetched successfully", productsWithDetails);
+        const formattedProducts = allProducts.flatMap((product) => ({
+            ...product,
+            areaOfUse: product.areaOfUse.name,
+            images: product.images.flatMap((image) => image.imageUrl),
+            productCertificates: product.productCertificates.flatMap((certificate) => certificate.certificate),
+        }));
+        return successResponse("Products fetched successfully", formattedProducts);
     } catch (error) {
         return errorResponse(error.message || "Failed to fetch products");
     }

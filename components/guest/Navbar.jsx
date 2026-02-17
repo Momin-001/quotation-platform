@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { PenLine } from "lucide-react";
-import UserAvatar from "@/components/UserAvatar";
+import UserAvatar from "@/components/common/UserAvatar";
 import {
     DropdownMenu,
     DropdownMenuContent,

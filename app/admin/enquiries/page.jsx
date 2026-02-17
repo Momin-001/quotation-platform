@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
+import { formatDate } from "@/lib/helpers";
 
 export default function AdminEnquiriesPage() {
     const [enquiries, setEnquiries] = useState([]);
@@ -81,13 +81,13 @@ export default function AdminEnquiriesPage() {
     const getStatusColor = (status) => {
         switch (status) {
             case "pending":
-                return "text-red-500";
-            case "in_progress":
                 return "text-yellow-500";
+            case "in_progress":
+                return "text-blue-500";
             case "completed":
                 return "text-green-500";
             case "cancelled":
-                return "text-gray-500";
+                return "text-red-500";
             default:
                 return "text-gray-500";
         }
@@ -160,13 +160,20 @@ export default function AdminEnquiriesPage() {
                                     className={`font-open-sans ${index % 2 === 0 ? "bg-white" : "bg-[#EAF6FF]"}`}
                                 >
                                     <TableCell className="p-4 whitespace-nowrap font-medium">
-                                        {enquiry.enquiryId}
+                                        <div className="flex items-center gap-2">
+                                            {enquiry.enquiryId}
+                                            {enquiry.isCustom && (
+                                                <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 rounded">
+                                                    Custom
+                                                </span>
+                                            )}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
                                         {enquiry.customerName}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        {format(new Date(enquiry.createdAt), "MMM d, yyyy")}
+                                        {formatDate(enquiry.createdAt)}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
                                         <span className={getStatusColor(enquiry.status)}>

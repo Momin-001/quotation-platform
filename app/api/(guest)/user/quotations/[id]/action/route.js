@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { quotations, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
 // Valid status transitions for user actions
@@ -10,6 +10,9 @@ const validActions = {
     reject: "rejected",
     request_revision: "revision_requested",
 };
+
+// Statuses that allow user actions
+const actionableStatuses = ["pending", "revision_requested"];
 
 export async function POST(req, { params }) {
     try {
@@ -57,8 +60,28 @@ export async function POST(req, { params }) {
             return errorResponse("Unauthorized", 403);
         }
 
+        // Check if there's a newer quotation (this one might be closed)
+        const newerQuotation = await db
+            .select({ id: quotations.id })
+            .from(quotations)
+            .where(and(
+                eq(quotations.enquiryId, quotation.enquiryId),
+                ne(quotations.id, quotation.id),
+                ne(quotations.status, "draft")
+            ))
+            .orderBy(desc(quotations.createdAt))
+            .limit(1);
+
+        const hasNewerQuotation = newerQuotation.length > 0 && 
+            new Date(newerQuotation[0].createdAt) > new Date(quotation.createdAt);
+
+        if (hasNewerQuotation) {
+            return errorResponse("A newer quotation exists. Please use the latest quotation.", 400);
+        }
+
         // Check if action is allowed based on current status
-        if (quotation.status !== "pending") {
+        // Allow actions from both "pending" and "revision_requested" statuses
+        if (!actionableStatuses.includes(quotation.status)) {
             return errorResponse(`Cannot ${action.replace("_", " ")} a quotation that is ${quotation.status.replace("_", " ")}`, 400);
         }
 
@@ -79,21 +102,23 @@ export async function POST(req, { params }) {
             enquiryStatus = "completed";
         } else if (action === "reject") {
             enquiryStatus = "cancelled";
-        } else if (action === "request_revision") {
-            enquiryStatus = "in_progress";
         }
+        // For request_revision, enquiry stays in_progress (no change needed)
 
-        await db
-            .update(enquiries)
-            .set({ 
-                status: enquiryStatus,
-                updatedAt: new Date(),
-            })
-            .where(eq(enquiries.id, quotation.enquiryId));
+        if (enquiryStatus !== enquiry.status) {
+            await db
+                .update(enquiries)
+                .set({ 
+                    status: enquiryStatus,
+                    updatedAt: new Date(),
+                })
+                .where(eq(enquiries.id, quotation.enquiryId));
+        }
 
         return successResponse(`Quotation ${action.replace("_", " ")}ed successfully`, {
             quotationId: id,
             newStatus,
+            enquiryStatus,
         });
     } catch (error) {
         console.error("Error updating quotation:", error);
