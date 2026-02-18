@@ -4,7 +4,7 @@ import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET, NODE_ENV } from "@/lib/constants";
+import { JWT_SECRET } from "@/lib/constants";
 import { cookies } from "next/headers";
 
 export async function POST(req) {
@@ -45,8 +45,9 @@ export async function POST(req) {
         const cookieStore = await cookies();
         cookieStore.set("token", token, {
             httpOnly: true,
-            secure: NODE_ENV === "production",
+            secure: false,
             maxAge: 60 * 60 * 24 * 7, // 7 days
+            sameSite: "lax",
             path: "/",
 
         });
