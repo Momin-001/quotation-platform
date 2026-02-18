@@ -48,6 +48,7 @@ export async function POST(req) {
             secure: NODE_ENV === "production",
             maxAge: 60 * 60 * 24 * 7, // 7 days
             path: "/",
+
         });
 
         // Remove password from response
