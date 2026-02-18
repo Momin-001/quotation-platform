@@ -7,7 +7,7 @@
     "dev": "node server.js",
     "dev:next": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "start": "node server.js",
     "start:next": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
