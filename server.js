@@ -3,7 +3,7 @@ import { parse } from "url";
 import next from "next";
 import { Server } from "socket.io";
 
-const dev = process.env.NODE_ENV !== "production";
+const dev = process.env.NODE_ENV === "production";
 const hostname = "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
 
