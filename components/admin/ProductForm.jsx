@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,6 +20,90 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+
+// Build form default values from API product (handles decimals/numbers as string or number)
+function getDefaultValuesFromInitial(initialData) {
+    if (!initialData) return {};
+    const str = (v) => (v !== undefined && v !== null ? String(v) : "");
+    const optStr = (v) => (v !== undefined && v !== null && v !== "" ? String(v) : undefined);
+    return {
+        productName: str(initialData.productName),
+        productNumber: str(initialData.productNumber),
+        viewingAngleHorizontal: str(initialData.viewingAngleHorizontal),
+        viewingAngleVertical: str(initialData.viewingAngleVertical),
+        brightnessControl: str(initialData.brightnessControl),
+        dciP3Coverage: str(initialData.dciP3Coverage),
+        operatingTemperature: str(initialData.operatingTemperature),
+        operatingHumidity: str(initialData.operatingHumidity),
+        ipRating: str(initialData.ipRating),
+        ledModulesPerCabinet: str(initialData.ledModulesPerCabinet),
+        ledChipManufacturer: str(initialData.ledChipManufacturer),
+        whitePointCalibration: str(initialData.whitePointCalibration),
+        brightnessValue: initialData.brightnessValue !== undefined && initialData.brightnessValue !== null && initialData.brightnessValue !== "" ? initialData.brightnessValue : "",
+        inputVoltage: str(initialData.inputVoltage),
+        receivingCard: str(initialData.receivingCard),
+        heatDissipation: str(initialData.heatDissipation),
+        monitoringFunctionEn: str(initialData.monitoringFunctionEn),
+        monitoringFunctionDe: str(initialData.monitoringFunctionDe),
+        additionalCertification: str(initialData.additionalCertification),
+        emc: str(initialData.emc),
+        safety: str(initialData.safety),
+        supportDuringWarrantyEn: str(initialData.supportDuringWarrantyEn),
+        supportDuringWarrantyDe: str(initialData.supportDuringWarrantyDe),
+        supportAfterWarrantyEn: str(initialData.supportAfterWarrantyEn),
+        supportAfterWarrantyDe: str(initialData.supportAfterWarrantyDe),
+        productType: optStr(initialData.productType),
+        design: optStr(initialData.design),
+        specialTypes: optStr(initialData.specialTypes),
+        specialTypesOther: str(initialData.specialTypesOther),
+        application: optStr(initialData.application),
+        pixelPitch: initialData.pixelPitch !== undefined && initialData.pixelPitch !== null && initialData.pixelPitch !== "" ? initialData.pixelPitch : "",
+        pixelConfiguration: optStr(initialData.pixelConfiguration),
+        pixelTechnology: optStr(initialData.pixelTechnology),
+        ledTechnology: optStr(initialData.ledTechnology),
+        ledTechnologyOther: str(initialData.ledTechnologyOther),
+        chipBonding: optStr(initialData.chipBonding),
+        colourDepth: optStr(initialData.colourDepth),
+        currentGainControl: optStr(initialData.currentGainControl),
+        videoRate: optStr(initialData.videoRate),
+        calibrationMethod: optStr(initialData.calibrationMethod),
+        calibrationMethodOther: str(initialData.calibrationMethodOther),
+        drivingMethod: optStr(initialData.drivingMethod),
+        controlSystem: optStr(initialData.controlSystem),
+        controlSystemOther: str(initialData.controlSystemOther),
+        cooling: optStr(initialData.cooling),
+        powerRedundancy: optStr(initialData.powerRedundancy),
+        memoryOnModule: optStr(initialData.memoryOnModule),
+        smartModule: optStr(initialData.smartModule),
+        support: optStr(initialData.support),
+        areaOfUseId: str(initialData.areaOfUseId),
+        cabinetWidth: initialData.cabinetWidth !== undefined && initialData.cabinetWidth !== null && initialData.cabinetWidth !== "" ? initialData.cabinetWidth : "",
+        cabinetHeight: initialData.cabinetHeight !== undefined && initialData.cabinetHeight !== null && initialData.cabinetHeight !== "" ? initialData.cabinetHeight : "",
+        weightWithoutPackaging: initialData.weightWithoutPackaging !== undefined && initialData.weightWithoutPackaging !== null && initialData.weightWithoutPackaging !== "" ? initialData.weightWithoutPackaging : "",
+        refreshRate: initialData.refreshRate !== undefined && initialData.refreshRate !== null && initialData.refreshRate !== "" ? initialData.refreshRate : "",
+        scanRateDenominator: initialData.scanRateDenominator !== undefined && initialData.scanRateDenominator !== null && initialData.scanRateDenominator !== "" ? initialData.scanRateDenominator : "",
+        contrastRatioNumerator: initialData.contrastRatioNumerator !== undefined && initialData.contrastRatioNumerator !== null && initialData.contrastRatioNumerator !== "" ? initialData.contrastRatioNumerator : "",
+        cabinetResolutionHorizontal: initialData.cabinetResolutionHorizontal !== undefined && initialData.cabinetResolutionHorizontal !== null && initialData.cabinetResolutionHorizontal !== "" ? initialData.cabinetResolutionHorizontal : "",
+        cabinetResolutionVertical: initialData.cabinetResolutionVertical !== undefined && initialData.cabinetResolutionVertical !== null && initialData.cabinetResolutionVertical !== "" ? initialData.cabinetResolutionVertical : "",
+        pixelDensity: initialData.pixelDensity !== undefined && initialData.pixelDensity !== null && initialData.pixelDensity !== "" ? initialData.pixelDensity : "",
+        ledLifespan: initialData.ledLifespan !== undefined && initialData.ledLifespan !== null && initialData.ledLifespan !== "" ? initialData.ledLifespan : "",
+        greyscaleProcessing: optStr(initialData.greyscaleProcessing),
+        greyscaleProcessingOther: str(initialData.greyscaleProcessingOther),
+        numberOfColours: initialData.numberOfColours !== undefined && initialData.numberOfColours !== null && initialData.numberOfColours !== "" ? initialData.numberOfColours : "",
+        mtbfPowerSupply: initialData.mtbfPowerSupply !== undefined && initialData.mtbfPowerSupply !== null && initialData.mtbfPowerSupply !== "" ? initialData.mtbfPowerSupply : "",
+        powerConsumptionMax: initialData.powerConsumptionMax !== undefined && initialData.powerConsumptionMax !== null && initialData.powerConsumptionMax !== "" ? initialData.powerConsumptionMax : "",
+        powerConsumptionTypical: initialData.powerConsumptionTypical !== undefined && initialData.powerConsumptionTypical !== null && initialData.powerConsumptionTypical !== "" ? initialData.powerConsumptionTypical : "",
+        warrantyPeriod: initialData.warrantyPeriod !== undefined && initialData.warrantyPeriod !== null && initialData.warrantyPeriod !== "" ? initialData.warrantyPeriod : "",
+        oemBrand: str(initialData.oemBrand),
+        ledDriver: str(initialData.ledDriver),
+        powerSupply: str(initialData.powerSupply),
+        pricePerCabinetUsd: initialData.pricePerCabinetUsd !== undefined && initialData.pricePerCabinetUsd !== null && initialData.pricePerCabinetUsd !== "" ? initialData.pricePerCabinetUsd : "",
+        pricePerMetreSquareUsd: initialData.pricePerMetreSquareUsd !== undefined && initialData.pricePerMetreSquareUsd !== null && initialData.pricePerMetreSquareUsd !== "" ? initialData.pricePerMetreSquareUsd : "",
+        stockPieces: initialData.stockPieces !== undefined && initialData.stockPieces !== null && initialData.stockPieces !== "" ? initialData.stockPieces : "",
+        leadtimeDays: initialData.leadtimeDays !== undefined && initialData.leadtimeDays !== null && initialData.leadtimeDays !== "" ? initialData.leadtimeDays : "",
+        notes: str(initialData.notes),
+    };
+}
 
 // Zod schema for product validation
 const productSchema = z.object({
@@ -157,6 +241,15 @@ const productSchema = z.object({
     powerConsumptionMax: z.coerce.number().int().optional(),
     powerConsumptionTypical: z.coerce.number().int().optional(),
     warrantyPeriod: z.coerce.number().int().optional(),
+    // OEM, components, pricing & stock
+    oemBrand: z.string().optional(),
+    ledDriver: z.string().optional(),
+    powerSupply: z.string().optional(),
+    pricePerCabinetUsd: z.coerce.number().optional(),
+    pricePerMetreSquareUsd: z.coerce.number().optional(),
+    stockPieces: z.coerce.number().int().optional(),
+    leadtimeDays: z.coerce.number().int().optional(),
+    notes: z.string().optional(),
 }).refine((data) => {
     if (data.greyscaleProcessing === "Other" && !data.greyscaleProcessingOther?.trim()) {
         return false;
@@ -213,97 +306,54 @@ export default function ProductForm({
     
     // File states
     const [productImages, setProductImages] = useState([]); // new File objects
-    const [existingImages, setExistingImages] = useState(initialImages); // from DB
+    const [existingImages, setExistingImages] = useState(() => {
+        const imgs = Array.isArray(initialImages) ? initialImages : [];
+        return [...imgs].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0));
+    });
     const [removedImageIds, setRemovedImageIds] = useState([]); // IDs to remove
-    const [selectedCertificates, setSelectedCertificates] = useState(initialCertificateIds);
+    const [selectedCertificates, setSelectedCertificates] = useState(() => Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
     
     // Features state
-    const [features, setFeatures] = useState(initialFeatures.map(f => typeof f === "string" ? f : f.feature));
+    const [features, setFeatures] = useState(() =>
+        (Array.isArray(initialFeatures) ? initialFeatures : []).map((f) =>
+            typeof f === "string" ? f : (f?.feature ?? f)
+        )
+    );
     const [featureInput, setFeatureInput] = useState("");
 
     const isEdit = mode === "edit";
 
-    // Build default values for react-hook-form
-    const defaultValues = initialData ? {
-        productName: initialData.productName || "",
-        productNumber: initialData.productNumber || "",
-        viewingAngleHorizontal: initialData.viewingAngleHorizontal || "",
-        viewingAngleVertical: initialData.viewingAngleVertical || "",
-        brightnessControl: initialData.brightnessControl || "",
-        dciP3Coverage: initialData.dciP3Coverage || "",
-        operatingTemperature: initialData.operatingTemperature || "",
-        operatingHumidity: initialData.operatingHumidity || "",
-        ipRating: initialData.ipRating || "",
-        ledModulesPerCabinet: initialData.ledModulesPerCabinet || "",
-        ledChipManufacturer: initialData.ledChipManufacturer || "",
-        whitePointCalibration: initialData.whitePointCalibration || "",
-        brightnessValue: initialData.brightnessValue || "",
-        inputVoltage: initialData.inputVoltage || "",
-        receivingCard: initialData.receivingCard || "",
-        heatDissipation: initialData.heatDissipation || "",
-        monitoringFunctionEn: initialData.monitoringFunctionEn || "",
-        monitoringFunctionDe: initialData.monitoringFunctionDe || "",
-        additionalCertification: initialData.additionalCertification || "",
-        emc: initialData.emc || "",
-        safety: initialData.safety || "",
-        supportDuringWarrantyEn: initialData.supportDuringWarrantyEn || "",
-        supportDuringWarrantyDe: initialData.supportDuringWarrantyDe || "",
-        supportAfterWarrantyEn: initialData.supportAfterWarrantyEn || "",
-        supportAfterWarrantyDe: initialData.supportAfterWarrantyDe || "",
-        productType: initialData.productType || undefined,
-        design: initialData.design || undefined,
-        specialTypes: initialData.specialTypes || undefined,
-        specialTypesOther: initialData.specialTypesOther || "",
-        application: initialData.application || undefined,
-        pixelPitch: initialData.pixelPitch || "",
-        pixelConfiguration: initialData.pixelConfiguration || undefined,
-        pixelTechnology: initialData.pixelTechnology || undefined,
-        ledTechnology: initialData.ledTechnology || undefined,
-        ledTechnologyOther: initialData.ledTechnologyOther || "",
-        chipBonding: initialData.chipBonding || undefined,
-        colourDepth: initialData.colourDepth || undefined,
-        currentGainControl: initialData.currentGainControl || undefined,
-        videoRate: initialData.videoRate || undefined,
-        calibrationMethod: initialData.calibrationMethod || undefined,
-        calibrationMethodOther: initialData.calibrationMethodOther || "",
-        drivingMethod: initialData.drivingMethod || undefined,
-        controlSystem: initialData.controlSystem || undefined,
-        controlSystemOther: initialData.controlSystemOther || "",
-        cooling: initialData.cooling || undefined,
-        powerRedundancy: initialData.powerRedundancy || undefined,
-        memoryOnModule: initialData.memoryOnModule || undefined,
-        smartModule: initialData.smartModule || undefined,
-        support: initialData.support || undefined,
-        areaOfUseId: initialData.areaOfUseId || "",
-        cabinetWidth: initialData.cabinetWidth || "",
-        cabinetHeight: initialData.cabinetHeight || "",
-        weightWithoutPackaging: initialData.weightWithoutPackaging || "",
-        refreshRate: initialData.refreshRate || "",
-        scanRateDenominator: initialData.scanRateDenominator || "",
-        contrastRatioNumerator: initialData.contrastRatioNumerator || "",
-        cabinetResolutionHorizontal: initialData.cabinetResolutionHorizontal || "",
-        cabinetResolutionVertical: initialData.cabinetResolutionVertical || "",
-        pixelDensity: initialData.pixelDensity || "",
-        ledLifespan: initialData.ledLifespan || "",
-        greyscaleProcessing: initialData.greyscaleProcessing || undefined,
-        greyscaleProcessingOther: initialData.greyscaleProcessingOther || "",
-        numberOfColours: initialData.numberOfColours || "",
-        mtbfPowerSupply: initialData.mtbfPowerSupply || "",
-        powerConsumptionMax: initialData.powerConsumptionMax || "",
-        powerConsumptionTypical: initialData.powerConsumptionTypical || "",
-        warrantyPeriod: initialData.warrantyPeriod || "",
-    } : {};
+    // Default values for react-hook-form (stable for add, from initialData for edit)
+    const defaultValues = useMemo(
+        () => getDefaultValuesFromInitial(initialData),
+        [initialData]
+    );
 
     const {
         register,
         handleSubmit,
         control,
         watch,
+        reset,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(productSchema),
         defaultValues,
     });
+
+    // When initialData is available (edit mode), reset form and sync images/features/certificates
+    useEffect(() => {
+        if (!isEdit || !initialData) return;
+        reset(getDefaultValuesFromInitial(initialData));
+        const imgs = Array.isArray(initialImages) ? initialImages : [];
+        setExistingImages([...imgs].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0)));
+        setSelectedCertificates(Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
+        setFeatures(
+            (Array.isArray(initialFeatures) ? initialFeatures : []).map((f) =>
+                typeof f === "string" ? f : (f?.feature ?? f)
+            )
+        );
+    }, [isEdit, initialData, initialImages, initialCertificateIds, initialFeatures, reset]);
 
     // Watch for conditional fields
     const greyscaleProcessing = watch("greyscaleProcessing");
@@ -479,13 +529,13 @@ export default function ProductForm({
             <Controller
                 name={field}
                 control={control}
-                render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
+                render={({ field: f }) => (
+                    <Select onValueChange={f.onChange} value={f.value ?? ""}>
                         <SelectTrigger>
                             <SelectValue placeholder={`Select ${label}`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {options.map((opt) => (
+                            {(options || []).map((opt) => (
                                 <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                             ))}
                         </SelectContent>
@@ -494,6 +544,34 @@ export default function ProductForm({
             />
             {errors[field] && (
                 <p className="text-sm text-red-500">{errors[field].message}</p>
+            )}
+        </div>
+    );
+
+    // Area of Use uses category id as value; options are { id, name }
+    const renderAreaOfUseSelect = () => (
+        <div className="space-y-2">
+            <Label htmlFor="areaOfUseId">Area of Use (Category) *</Label>
+            <Controller
+                name="areaOfUseId"
+                control={control}
+                render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {(categories || []).map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
+            />
+            {errors.areaOfUseId && (
+                <p className="text-sm text-red-500">{errors.areaOfUseId.message}</p>
             )}
         </div>
     );
@@ -513,8 +591,8 @@ export default function ProductForm({
                     {/* Product Type */}
                     {renderSelect("Product Type *", "productType", ["AIO Systems", "LED Display Single Cabinet"])}
 
-                    {/* Area of Use */}
-                    {renderSelect("Area of Use (Category) *", "areaOfUseId", categories.map((cat) => cat.name))}
+                    {/* Area of Use - value is category id */}
+                    {renderAreaOfUseSelect()}
 
                     {/* Design */}
                     {renderSelect("Design *", "design", ["Fix", "Mobil"])}
@@ -567,11 +645,11 @@ export default function ProductForm({
             <div className="space-y-4 py-4">
                 <h2 className="text-lg font-semibold font-archivo">Display Properties</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {renderInput("Viewing Angle Horizontal", "viewingAngleHorizontal", "number", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
-                    {renderInput("Viewing Angle Vertical", "viewingAngleVertical", "number", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
+                    {renderInput("Viewing Angle Horizontal", "viewingAngleHorizontal", "text", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
+                    {renderInput("Viewing Angle Vertical", "viewingAngleVertical", "text", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
                     {renderInput("Brightness Value", "brightnessValue", "number", { required: true, step: "0.01", placeholder: "e.g., 1000" })}
                     {renderInput("Brightness Control", "brightnessControl", "text", { required: true, placeholder: "Enter brightness control" })}
-                    {renderInput("DCI-P3 Coverage", "dciP3Coverage", "number", { required: true, step: "0.01", placeholder: "e.g., 100" })}
+                    {renderInput("DCI-P3 Coverage", "dciP3Coverage", "text", { required: true, placeholder: "e.g., 100%" })}
                     {renderInput("Contrast Ratio (Numerator)", "contrastRatioNumerator", "number", { required: true, step: "0.01", placeholder: "e.g., 7000" })}
                     {renderSelect("Colour Depth (bit) *", "colourDepth", ["8", "10", "12"])}
                     {renderSelect("Greyscale Processing *", "greyscaleProcessing", ["<16", "16", "18+", "22+", "Other"])}
@@ -625,12 +703,27 @@ export default function ProductForm({
                 </div>
             </div>
 
+            {/* OEM, Pricing & Stock Section */}
+            <div className="space-y-4 py-4">
+                <h2 className="text-lg font-semibold font-archivo">OEM, Pricing & Stock</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {renderInput("OEM/Brand", "oemBrand", "text", { placeholder: "e.g., LEDALL" })}
+                    {renderInput("LED Driver", "ledDriver", "text", { placeholder: "e.g., MBI5252" })}
+                    {renderInput("Power Supply", "powerSupply", "text", { placeholder: "e.g., Meanwell UHP200-5v" })}
+                    {renderInput("Price Per Cabinet (USD)", "pricePerCabinetUsd", "number", { step: "0.01", placeholder: "e.g., 1500.00" })}
+                    {renderInput("Price Per Metre Square (USD)", "pricePerMetreSquareUsd", "number", { step: "0.01", placeholder: "e.g., 2500.00" })}
+                    {renderInput("Stock (pieces)", "stockPieces", "number", { step: "1", placeholder: "e.g., 10" })}
+                    {renderInput("Leadtime (days)", "leadtimeDays", "number", { step: "1", placeholder: "e.g., 14" })}
+                    {renderTextarea("Notes", "notes", { placeholder: "Optional notes" })}
+                </div>
+            </div>
+
             {/* Support & Warranty Section */}
             <div className="space-y-4 py-4">
                 <h2 className="text-lg font-semibold font-archivo">Support & Warranty</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderSelect("Support *", "support", ["Frontendside", "Backside", "Frontside and Backside"]) }
-                    {renderInput("Warranty Period (months)", "warrantyPeriod", "number", { required: true, step: "0.01", placeholder: "e.g., 24" }, {type: "description"})}
+                    {renderInput("Warranty Period (months)", "warrantyPeriod", "number", { step: "1", placeholder: "e.g., 24" })}
                     {renderTextarea("Monitoring Function (EN)", "monitoringFunctionEn", { required: true, placeholder: "Enter monitoring function in English" })}
                     {renderTextarea("Monitoring Function (DE)", "monitoringFunctionDe", { required: true, placeholder: "Enter monitoring function in German" })}
                     {renderTextarea("Additional Certification", "additionalCertification", { required: true, placeholder: "Enter additional certification" })}

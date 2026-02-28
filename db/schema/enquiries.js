@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, integer, decimal, boolean } from "drizzle-orm/pg-core";
-import { users, products } from "./index";
+import { users, products, controllers } from "./index";
 import { relations } from "drizzle-orm";
 import { quotations } from "./quotations";
 
@@ -23,6 +23,10 @@ export const enquiryItems = pgTable("enquiry_items", {
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
     quantity: integer("quantity").notNull().default(1),
+    itemType: text("item_type").default("main").notNull(),
+    itemOrder: integer("item_order").default(0),
+    controllerId: uuid("controller_id")
+        .references(() => controllers.id, { onDelete: "set null" }),
 
     // Leditor custom fields
     isCustom: boolean("is_custom").default(false).notNull(),
@@ -68,5 +72,9 @@ export const enquiryItemsRelations = relations(enquiryItems, ({ one }) => ({
     product: one(products, {
         fields: [enquiryItems.productId],
         references: [products.id],
+    }),
+    controller: one(controllers, {
+        fields: [enquiryItems.controllerId],
+        references: [controllers.id],
     }),
 }));

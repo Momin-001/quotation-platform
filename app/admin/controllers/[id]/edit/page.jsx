@@ -38,7 +38,7 @@ export default async function EditControllerPage({ params }) {
                     Update the controller details below.
                 </p>
             </div>
-            <ControllerForm mode="edit" initialData={controller} />
+            <ControllerForm mode="edit" initialData={controller} initialImages={controller.images || []} />
         </div>
     );
 }

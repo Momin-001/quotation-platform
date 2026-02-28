@@ -142,8 +142,7 @@ export default function ProductsPage() {
         if (searchControllers) {
             filtered = filtered.filter(
                 (c) =>
-                    c.productName?.toLowerCase().includes(searchControllers.toLowerCase()) ||
-                    c.productNumber?.toLowerCase().includes(searchControllers.toLowerCase()) ||
+                    c.interfaceName?.toLowerCase().includes(searchControllers.toLowerCase()) ||
                     c.brandName?.toLowerCase().includes(searchControllers.toLowerCase())
             );
         }
@@ -162,6 +161,33 @@ export default function ProductsPage() {
             toast.error(error.message);
         } finally {
             setLoadingControllers(false);
+        }
+    };
+
+    const toggleControllerStatus = async (id, currentStatus) => {
+        setControllersList((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, isActive: !currentStatus } : c))
+        );
+        try {
+            const res = await fetch(`/api/admin/controllers/${id}/toggle-status`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ isActive: !currentStatus }),
+            });
+            const response = await res.json();
+            if (!response.success) {
+                setControllersList((prev) =>
+                    prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
+                );
+                toast.error(response.message || "Failed to update controller status");
+                return;
+            }
+            toast.success(response.message || "Controller status updated");
+        } catch (error) {
+            setControllersList((prev) =>
+                prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
+            );
+            toast.error(error.message);
         }
     };
 
@@ -243,9 +269,9 @@ export default function ProductsPage() {
 
             <Tabs defaultValue="led" className="w-full">
                 <TabsList className="mb-4">
-                    <TabsTrigger value="led">LED Products ({products.length})</TabsTrigger>
-                    <TabsTrigger value="controllers">Controllers ({controllersList.length})</TabsTrigger>
-                    <TabsTrigger value="accessories">Accessories ({accessoriesList.length})</TabsTrigger>
+                    <TabsTrigger value="led" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">LED Products ({products.length})</TabsTrigger>
+                    <TabsTrigger value="controllers" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">Controllers ({controllersList.length})</TabsTrigger>
+                    <TabsTrigger value="accessories" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">Accessories ({accessoriesList.length})</TabsTrigger>
                 </TabsList>
 
                 {/* LED Products Tab */}
@@ -366,21 +392,18 @@ export default function ProductsPage() {
                         <Table className="min-w-full">
                             <TableHeader className="bg-secondary font-archivo">
                                 <TableRow>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Brand</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Interface</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Pixel Capacity</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Purchase Price</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Retail Price</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Last Updated</TableHead>
+                                    <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loadingControllers && filteredControllers.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
+                                        <TableCell colSpan={6} className="h-24 text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Spinner className="h-5 w-5" />
                                                 <span>Loading controllers...</span>
@@ -390,21 +413,25 @@ export default function ProductsPage() {
                                 ) : filteredControllers.length > 0 ? (
                                     filteredControllers.map((controller) => (
                                         <TableRow key={controller.id} className="even:bg-[#EAF6FF] font-open-sans">
-                                            <TableCell className="p-4 whitespace-nowrap">{controller.productName}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{controller.productNumber}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{controller.brandName || "N/A"}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{controller.interfaceName || "N/A"}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">
                                                 {controller.pixelCapacity ? controller.pixelCapacity.toLocaleString() : "N/A"}
                                             </TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">
-                                                {controller.purchasePrice ? `€${controller.purchasePrice}` : "N/A"}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {controller.retailPrice ? `€${controller.retailPrice}` : "N/A"}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
                                                 {new Date(controller.updatedAt).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className="p-4 whitespace-nowrap">
+                                                <div className="flex gap-2 items-center">
+                                                    <span className={`text-sm ${controller.isActive ? "text-secondary" : "text-red-500"}`}>
+                                                        {controller.isActive ? "Active" : "Inactive"}
+                                                    </span>
+                                                    <Switch
+                                                        checked={controller.isActive}
+                                                        onCheckedChange={() => toggleControllerStatus(controller.id, controller.isActive)}
+                                                        className="ml-2 data-[state=checked]:bg-secondary"
+                                                    />
+                                                </div>
                                             </TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">
                                                 <div className="flex gap-2">
@@ -428,7 +455,7 @@ export default function ProductsPage() {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
+                                        <TableCell colSpan={6} className="h-24 text-center">
                                             No controllers found.
                                         </TableCell>
                                     </TableRow>

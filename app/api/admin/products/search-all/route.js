@@ -8,11 +8,12 @@ export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
         const search = searchParams.get("search") || "";
+        const typeFilter = searchParams.get("type") || ""; // "product" | "controller" | "accessory" — when set, return only that type
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "20");
         const offset = (page - 1) * limit;
 
-        // Search LED products
+        // Search LED products (skip if typeFilter is controller or accessory only)
         let productConditions = [];
         if (search.trim()) {
             productConditions = [
@@ -23,77 +24,80 @@ export async function GET(request) {
             ];
         }
 
-        const productsQuery = db
-            .select({
-                id: products.id,
-                productName: products.productName,
-                productNumber: products.productNumber,
-                productType: products.productType,
-                pixelPitch: products.pixelPitch,
-            })
-            .from(products)
-            .orderBy(desc(products.createdAt));
+        let productsWithMeta = [];
+        if (typeFilter === "" || typeFilter === "product") {
+            const productsQuery = db
+                .select({
+                    id: products.id,
+                    productName: products.productName,
+                    productNumber: products.productNumber,
+                    productType: products.productType,
+                    pixelPitch: products.pixelPitch,
+                })
+                .from(products)
+                .orderBy(desc(products.createdAt));
 
-        const productsList = productConditions.length > 0
-            ? await productsQuery.where(productConditions[0])
-            : await productsQuery;
+            const productsList = productConditions.length > 0
+                ? await productsQuery.where(productConditions[0])
+                : await productsQuery;
 
-        // Fetch first image for each product
-        const productsWithMeta = await Promise.all(
-            productsList.map(async (product) => {
-                const images = await db
-                    .select({ imageUrl: productImages.imageUrl })
-                    .from(productImages)
-                    .where(eq(productImages.productId, product.id))
-                    .orderBy(productImages.imageOrder)
-                    .limit(1);
+            productsWithMeta = await Promise.all(
+                productsList.map(async (product) => {
+                    const images = await db
+                        .select({ imageUrl: productImages.imageUrl })
+                        .from(productImages)
+                        .where(eq(productImages.productId, product.id))
+                        .orderBy(productImages.imageOrder)
+                        .limit(1);
 
-                return {
-                    ...product,
-                    imageUrl: images[0]?.imageUrl || null,
-                    sourceType: "product",
-                    displayLabel: `[LED] ${product.productName}`,
-                    subtitle: `${product.productNumber} • ${product.pixelPitch}mm`,
-                };
-            })
-        );
+                    return {
+                        ...product,
+                        imageUrl: images[0]?.imageUrl || null,
+                        sourceType: "product",
+                        displayLabel: `[LED] ${product.productName}`,
+                        subtitle: `${product.productNumber} • ${product.pixelPitch}mm`,
+                    };
+                })
+            );
+        }
 
-        // Search controllers
+        // Search controllers (skip if typeFilter is product or accessory only)
         let controllerConditions = [];
         if (search.trim()) {
             controllerConditions = [
                 or(
-                    ilike(controllers.productName, `%${search}%`),
-                    ilike(controllers.productNumber, `%${search}%`),
+                    ilike(controllers.interfaceName, `%${search}%`),
                     ilike(controllers.brandName, `%${search}%`)
                 )
             ];
         }
 
-        const controllersQuery = db
-            .select({
-                id: controllers.id,
-                productName: controllers.productName,
-                productNumber: controllers.productNumber,
-                brandName: controllers.brandName,
-                interfaceName: controllers.interfaceName,
-            })
-            .from(controllers)
-            .orderBy(desc(controllers.createdAt));
+        let controllersWithMeta = [];
+        if (typeFilter === "" || typeFilter === "controller") {
+            const controllersQuery = db
+                .select({
+                    id: controllers.id,
+                    productName: controllers.interfaceName,
+                    brandName: controllers.brandName,
+                })
+                .from(controllers)
+                .orderBy(desc(controllers.createdAt));
 
-        const controllersList = controllerConditions.length > 0
-            ? await controllersQuery.where(controllerConditions[0])
-            : await controllersQuery;
+            const controllersList = controllerConditions.length > 0
+                ? await controllersQuery.where(controllerConditions[0])
+                : await controllersQuery;
 
-        const controllersWithMeta = controllersList.map((c) => ({
-            ...c,
-            imageUrl: null,
-            sourceType: "controller",
-            displayLabel: `[Controller] ${c.productName}`,
-            subtitle: `${c.productNumber}${c.brandName ? ` • ${c.brandName}` : ""}`,
-        }));
+            controllersWithMeta = controllersList.map((c) => ({
+                ...c,
+                productNumber: c.brandName || c.id?.slice(0, 8),
+                imageUrl: null,
+                sourceType: "controller",
+                displayLabel: `[Controller] ${c.productName}`,
+                subtitle: `${c.brandName ? c.brandName : "N/A"}`,
+            }));
+        }
 
-        // Search accessories
+        // Search accessories (skip if typeFilter is product or controller only)
         let accessoryConditions = [];
         if (search.trim()) {
             accessoryConditions = [
@@ -104,27 +108,30 @@ export async function GET(request) {
             ];
         }
 
-        const accessoriesQuery = db
-            .select({
-                id: accessories.id,
-                productName: accessories.productName,
-                productNumber: accessories.productNumber,
-                productGroup: accessories.productGroup,
-            })
-            .from(accessories)
-            .orderBy(desc(accessories.createdAt));
+        let accessoriesWithMeta = [];
+        if (typeFilter === "" || typeFilter === "accessory") {
+            const accessoriesQuery = db
+                .select({
+                    id: accessories.id,
+                    productName: accessories.productName,
+                    productNumber: accessories.productNumber,
+                    productGroup: accessories.productGroup,
+                })
+                .from(accessories)
+                .orderBy(desc(accessories.createdAt));
 
-        const accessoriesList = accessoryConditions.length > 0
-            ? await accessoriesQuery.where(accessoryConditions[0])
-            : await accessoriesQuery;
+            const accessoriesList = accessoryConditions.length > 0
+                ? await accessoriesQuery.where(accessoryConditions[0])
+                : await accessoriesQuery;
 
-        const accessoriesWithMeta = accessoriesList.map((a) => ({
-            ...a,
-            imageUrl: null,
-            sourceType: "accessory",
-            displayLabel: `[${a.productGroup}] ${a.productName}`,
-            subtitle: a.productNumber,
-        }));
+            accessoriesWithMeta = accessoriesList.map((a) => ({
+                ...a,
+                imageUrl: null,
+                sourceType: "accessory",
+                displayLabel: `[${a.productGroup}] ${a.productName}`,
+                subtitle: a.productNumber,
+            }));
+        }
 
         // Combine all results
         const allItems = [

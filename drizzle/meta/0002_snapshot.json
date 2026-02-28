@@ -1,6 +1,6 @@
 {
-  "id": "c4c4f5b2-cc9d-40e7-a573-3b83eee06aa9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "6a04534c-bb1d-4fab-8b8a-4a18caa688c2",
+  "prevId": "4feed88d-d167-479e-81f0-38faf688b8cc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -627,6 +627,26 @@
           "notNull": true,
           "default": 1
         },
+        "item_type": {
+          "name": "item_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'main'"
+        },
+        "item_order": {
+          "name": "item_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "controller_id": {
+          "name": "controller_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "is_custom": {
           "name": "is_custom",
           "type": "boolean",
@@ -783,6 +803,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "enquiry_items_controller_id_controllers_id_fk": {
+          "name": "enquiry_items_controller_id_controllers_id_fk",
+          "tableFrom": "enquiry_items",
+          "tableTo": "controllers",
+          "columnsFrom": [
+            "controller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1861,12 +1894,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "monitoring_function_de": {
-          "name": "monitoring_function_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "additional_certification": {
           "name": "additional_certification",
           "type": "text",
@@ -1891,20 +1918,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "support_during_warranty_de": {
-          "name": "support_during_warranty_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "support_after_warranty_en": {
           "name": "support_after_warranty_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "support_after_warranty_de": {
-          "name": "support_after_warranty_de",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -2198,6 +2213,54 @@
         "warranty_period": {
           "name": "warranty_period",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "oem_brand": {
+          "name": "oem_brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_driver": {
+          "name": "led_driver",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "power_supply": {
+          "name": "power_supply",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_cabinet_usd": {
+          "name": "price_per_cabinet_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_metre_square_usd": {
+          "name": "price_per_metre_square_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_pieces": {
+          "name": "stock_pieces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leadtime_days": {
+          "name": "leadtime_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

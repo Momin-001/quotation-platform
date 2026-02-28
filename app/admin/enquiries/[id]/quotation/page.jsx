@@ -30,6 +30,7 @@ export default function QuotationBuilderPage() {
         discountPercentage: "",
         description: "",
         optionalItems: [],
+        additionalItems: [],
     });
 
     const [alternativeProduct, setAlternativeProduct] = useState(null);
@@ -61,6 +62,16 @@ export default function QuotationBuilderPage() {
             
             // First item is always the main product
             if (items[0]) {
+                const mainAdditionalItems = items[0].controller
+                    ? [{
+                        product: items[0].controller,
+                        quantity: 1,
+                        unitPrice: "",
+                        taxPercentage: "",
+                        discountPercentage: "",
+                        description: "",
+                    }]
+                    : [];
                 setMainProduct({
                     product: {
                         id: items[0].productId,
@@ -75,11 +86,22 @@ export default function QuotationBuilderPage() {
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
+                    additionalItems: mainAdditionalItems,
                 });
             }
 
             // Second item (if exists) is the alternative product
             if (items[1]) {
+                const altAdditionalItems = items[1].controller
+                    ? [{
+                        product: items[1].controller,
+                        quantity: 1,
+                        unitPrice: "",
+                        taxPercentage: "",
+                        discountPercentage: "",
+                        description: "",
+                    }]
+                    : [];
                 setAlternativeProduct({
                     product: {
                         id: items[1].productId,
@@ -94,6 +116,7 @@ export default function QuotationBuilderPage() {
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
+                    additionalItems: altAdditionalItems,
                 });
                 setAlternativeFromEnquiry(true);
             }
@@ -145,6 +168,14 @@ export default function QuotationBuilderPage() {
                         discountPercentage: opt.discountPercentage || "",
                         description: opt.description || "",
                     })),
+                    additionalItems: (draft.mainProduct.additionalItems || []).map(add => ({
+                        product: add.product,
+                        quantity: add.quantity || 1,
+                        unitPrice: add.unitPrice || "",
+                        taxPercentage: add.taxPercentage || "",
+                        discountPercentage: add.discountPercentage || "",
+                        description: add.description || "",
+                    })),
                 });
             }
 
@@ -164,6 +195,14 @@ export default function QuotationBuilderPage() {
                         taxPercentage: opt.taxPercentage || "",
                         discountPercentage: opt.discountPercentage || "",
                         description: opt.description || "",
+                    })),
+                    additionalItems: (draft.alternativeProduct.additionalItems || []).map(add => ({
+                        product: add.product,
+                        quantity: add.quantity || 1,
+                        unitPrice: add.unitPrice || "",
+                        taxPercentage: add.taxPercentage || "",
+                        discountPercentage: add.discountPercentage || "",
+                        description: add.description || "",
                     })),
                 });
                 setAlternativeFromEnquiry(true);
@@ -218,6 +257,34 @@ export default function QuotationBuilderPage() {
         }));
     };
 
+    const handleAddMainAdditional = () => {
+        setMainProduct(prev => ({
+            ...prev,
+            additionalItems: [...(prev.additionalItems || []), {
+                product: null,
+                quantity: 1,
+                unitPrice: "",
+                taxPercentage: "",
+                discountPercentage: "",
+                description: "",
+            }]
+        }));
+    };
+
+    const handleUpdateMainAdditional = (index, updated) => {
+        setMainProduct(prev => ({
+            ...prev,
+            additionalItems: (prev.additionalItems || []).map((add, i) => i === index ? updated : add)
+        }));
+    };
+
+    const handleRemoveMainAdditional = (index) => {
+        setMainProduct(prev => ({
+            ...prev,
+            additionalItems: (prev.additionalItems || []).filter((_, i) => i !== index)
+        }));
+    };
+
     // Alternative Product Handlers
     const handleAddAlternative = () => {
         setAlternativeProduct({
@@ -228,6 +295,7 @@ export default function QuotationBuilderPage() {
             discountPercentage: "",
             description: "",
             optionalItems: [],
+            additionalItems: [],
         });
     };
 
@@ -265,6 +333,34 @@ export default function QuotationBuilderPage() {
         }));
     };
 
+    const handleAddAlternativeAdditional = () => {
+        setAlternativeProduct(prev => ({
+            ...prev,
+            additionalItems: [...(prev.additionalItems || []), {
+                product: null,
+                quantity: 1,
+                unitPrice: "",
+                taxPercentage: "",
+                discountPercentage: "",
+                description: "",
+            }]
+        }));
+    };
+
+    const handleUpdateAlternativeAdditional = (index, updated) => {
+        setAlternativeProduct(prev => ({
+            ...prev,
+            additionalItems: (prev.additionalItems || []).map((add, i) => i === index ? updated : add)
+        }));
+    };
+
+    const handleRemoveAlternativeAdditional = (index) => {
+        setAlternativeProduct(prev => ({
+            ...prev,
+            additionalItems: (prev.additionalItems || []).filter((_, i) => i !== index)
+        }));
+    };
+
     // Validate form
     const validateForm = () => {
         // Validate main product
@@ -279,6 +375,17 @@ export default function QuotationBuilderPage() {
                 return false;
             }
         }
+        const mainAdditionalIds = (mainProduct.additionalItems || []).map(a => a.product?.id).filter(Boolean);
+        if (new Set(mainAdditionalIds).size !== mainAdditionalIds.length) {
+            toast.error("The same controller cannot be added more than once in Main Product additional items");
+            return false;
+        }
+        for (const addItem of mainProduct.additionalItems || []) {
+            if (!addItem.product || !addItem.unitPrice) {
+                toast.error("Each additional product must have a controller selected and a unit price");
+                return false;
+            }
+        }
 
         // Validate alternative product (if exists)
         if (alternativeProduct) {
@@ -290,6 +397,17 @@ export default function QuotationBuilderPage() {
             for (const optItem of alternativeProduct.optionalItems || []) {
                 if (!optItem.product || !optItem.unitPrice) {
                     toast.error("Each optional product for alternative must have a product selected and a unit price");
+                    return false;
+                }
+            }
+            const altAdditionalIds = (alternativeProduct.additionalItems || []).map(a => a.product?.id).filter(Boolean);
+            if (new Set(altAdditionalIds).size !== altAdditionalIds.length) {
+                toast.error("The same controller cannot be added more than once in Alternative Product additional items");
+                return false;
+            }
+            for (const addItem of alternativeProduct.additionalItems || []) {
+                if (!addItem.product || !addItem.unitPrice) {
+                    toast.error("Each additional product for alternative must have a controller selected and a unit price");
                     return false;
                 }
             }
@@ -316,14 +434,22 @@ export default function QuotationBuilderPage() {
                 discountPercentage: parseFloat(mainProduct.discountPercentage) || 0,
                 description: mainProduct.description || null,
                 itemType: "main",
-                optionalItems: mainProduct.optionalItems.map((opt) => ({
-                    sourceType: opt.product.sourceType || "product",
+                optionalItems: (mainProduct.optionalItems || []).map((opt) => ({
+                    sourceType: opt.product.sourceType || "accessory",
                     sourceId: opt.product.id,
                     quantity: opt.quantity,
                     unitPrice: parseFloat(opt.unitPrice),
                     taxPercentage: parseFloat(opt.taxPercentage) || 0,
                     discountPercentage: parseFloat(opt.discountPercentage) || 0,
                     description: opt.description || null,
+                })),
+                additionalItems: (mainProduct.additionalItems || []).map((add) => ({
+                    controllerId: add.product?.id,
+                    quantity: add.quantity || 1,
+                    unitPrice: parseFloat(add.unitPrice),
+                    taxPercentage: parseFloat(add.taxPercentage) || 0,
+                    discountPercentage: parseFloat(add.discountPercentage) || 0,
+                    description: add.description || null,
                 })),
             });
 
@@ -338,13 +464,21 @@ export default function QuotationBuilderPage() {
                     description: alternativeProduct.description || null,
                     itemType: "alternative",
                     optionalItems: (alternativeProduct.optionalItems || []).map((opt) => ({
-                        sourceType: opt.product.sourceType || "product",
+                        sourceType: opt.product.sourceType || "accessory",
                         sourceId: opt.product.id,
                         quantity: opt.quantity,
                         unitPrice: parseFloat(opt.unitPrice),
                         taxPercentage: parseFloat(opt.taxPercentage) || 0,
                         discountPercentage: parseFloat(opt.discountPercentage) || 0,
                         description: opt.description || null,
+                    })),
+                    additionalItems: (alternativeProduct.additionalItems || []).map((add) => ({
+                        controllerId: add.product?.id,
+                        quantity: add.quantity || 1,
+                        unitPrice: parseFloat(add.unitPrice),
+                        taxPercentage: parseFloat(add.taxPercentage) || 0,
+                        discountPercentage: parseFloat(add.discountPercentage) || 0,
+                        description: add.description || null,
                     })),
                 });
             }
@@ -462,10 +596,14 @@ export default function QuotationBuilderPage() {
                 bgColor="bg-blue-50/30"
                 productData={mainProduct}
                 onUpdateProduct={handleUpdateMainProduct}
-                optionalItems={mainProduct.optionalItems}
+                optionalItems={mainProduct.optionalItems || []}
                 onAddOptional={handleAddMainOptional}
                 onUpdateOptional={handleUpdateMainOptional}
                 onRemoveOptional={handleRemoveMainOptional}
+                additionalItems={mainProduct.additionalItems || []}
+                onAddAdditional={handleAddMainAdditional}
+                onUpdateAdditional={handleUpdateMainAdditional}
+                onRemoveAdditional={handleRemoveMainAdditional}
                 isMainProduct={true}
                 productFromEnquiry={true}
             />
@@ -482,6 +620,10 @@ export default function QuotationBuilderPage() {
                 onAddOptional={handleAddAlternativeOptional}
                 onUpdateOptional={handleUpdateAlternativeOptional}
                 onRemoveOptional={handleRemoveAlternativeOptional}
+                additionalItems={alternativeProduct?.additionalItems || []}
+                onAddAdditional={handleAddAlternativeAdditional}
+                onUpdateAdditional={handleUpdateAlternativeAdditional}
+                onRemoveAdditional={handleRemoveAlternativeAdditional}
                 isMainProduct={false}
                 productFromEnquiry={alternativeFromEnquiry}
                 onAddAlternative={handleAddAlternative}

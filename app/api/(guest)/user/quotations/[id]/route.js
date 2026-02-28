@@ -3,6 +3,7 @@ import {
     quotations, 
     quotationItems, 
     quotationOptionalItems,
+    quotationAdditionalItems,
     products, 
     productImages,
     controllers,
@@ -24,9 +25,20 @@ async function getProductImage(productId) {
     return images[0]?.imageUrl || null;
 }
 
+// Helper to get first controller image
+async function getControllerImage(controllerId) {
+    const images = await db
+        .select({ imageUrl: productImages.imageUrl })
+        .from(productImages)
+        .where(eq(productImages.controllerId, controllerId))
+        .orderBy(productImages.imageOrder)
+        .limit(1);
+    return images[0]?.imageUrl || null;
+}
+
 // Helper to get product details (LED)
 async function getProductDetails(productId) {
-    const product = await db
+    const [product] = await db
         .select({
             id: products.id,
             productName: products.productName,
@@ -37,35 +49,40 @@ async function getProductDetails(productId) {
         .where(eq(products.id, productId))
         .limit(1);
     
-    if (product[0]) {
+    if (product) {
         const imageUrl = await getProductImage(productId);
-        return { ...product[0], imageUrl, sourceType: "product" };
+        return { ...product, imageUrl, sourceType: "product" };
     }
     return null;
 }
 
 // Helper to get controller details
 async function getControllerDetails(controllerId) {
-    const controller = await db
+    const [controller] = await db
         .select({
             id: controllers.id,
-            productName: controllers.productName,
-            productNumber: controllers.productNumber,
+            productName: controllers.interfaceName,
             brandName: controllers.brandName,
         })
         .from(controllers)
         .where(eq(controllers.id, controllerId))
         .limit(1);
     
-    if (controller[0]) {
-        return { ...controller[0], imageUrl: null, sourceType: "controller" };
+    if (controller) {
+        const imageUrl = await getControllerImage(controllerId);
+        return {
+            ...controller,
+            productNumber: controller.brandName || controller.id?.slice(0, 8) || "N/A",
+            imageUrl: imageUrl || null,
+            sourceType: "controller",
+        };
     }
     return null;
 }
 
 // Helper to get accessory details
 async function getAccessoryDetails(accessoryId) {
-    const accessory = await db
+    const [accessory] = await db
         .select({
             id: accessories.id,
             productName: accessories.productName,
@@ -76,8 +93,8 @@ async function getAccessoryDetails(accessoryId) {
         .where(eq(accessories.id, accessoryId))
         .limit(1);
     
-    if (accessory[0]) {
-        return { ...accessory[0], imageUrl: null, sourceType: "accessory" };
+    if (accessory) {
+        return { ...accessory, imageUrl: null, sourceType: "accessory" };
     }
     return null;
 }
@@ -187,7 +204,7 @@ export async function GET(req, { params }) {
             .where(eq(quotationItems.quotationId, id))
             .orderBy(quotationItems.itemOrder);
 
-        // Build items with product details and optional items
+        // Build items with product details, optional items, and additional items
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
                 const product = await getProductDetails(item.productId);
@@ -198,7 +215,6 @@ export async function GET(req, { params }) {
                     .from(quotationOptionalItems)
                     .where(eq(quotationOptionalItems.quotationItemId, item.id))
                     .orderBy(quotationOptionalItems.itemOrder);
-
                 const optionalItems = await Promise.all(
                     optionalItemsData.map(async (opt) => ({
                         ...opt,
@@ -206,10 +222,32 @@ export async function GET(req, { params }) {
                     }))
                 );
 
+                // Fetch additional items (controllers)
+                const additionalItemsData = await db
+                    .select()
+                    .from(quotationAdditionalItems)
+                    .where(eq(quotationAdditionalItems.quotationItemId, item.id))
+                    .orderBy(quotationAdditionalItems.itemOrder);
+                const additionalItems = await Promise.all(
+                    additionalItemsData.map(async (add) => {
+                        const product = await getControllerDetails(add.controllerId);
+                        return {
+                            ...add,
+                            product,
+                            quantity: add.quantity,
+                            unitPrice: add.unitPrice,
+                            taxPercentage: add.taxPercentage,
+                            discountPercentage: add.discountPercentage,
+                            description: add.description,
+                        };
+                    })
+                );
+
                 return {
                     ...item,
                     product,
                     optionalItems,
+                    additionalItems,
                 };
             })
         );

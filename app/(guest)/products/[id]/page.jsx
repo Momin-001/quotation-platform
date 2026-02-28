@@ -476,6 +476,33 @@ export default function ProductDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
+                            {/* LED Driver & Power Supply */}
+                            {(product.ledDriver || product.powerSupply) && (
+                                <Accordion type="single" collapsible className="rounded-lg">
+                                    <AccordionItem value="led-driver-power-supply">
+                                        <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                            LED Driver & Power Supply
+                                        </AccordionTrigger>
+                                        <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {product.ledDriver && (
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">LED Driver</p>
+                                                        <p className="font-medium">{product.ledDriver}</p>
+                                                    </div>
+                                                )}
+                                                {product.powerSupply && (
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Power Supply</p>
+                                                        <p className="font-medium">{product.powerSupply}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            )}
+
                             {/* Operating Conditions */}
                             <Accordion type="single" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">

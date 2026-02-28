@@ -29,22 +29,25 @@ export default function Navbar({ navbarData }) {
     return (
         <nav className="w-full border-b bg-background font-archivo">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                <Image className="lg:mr-20" src="/logo.png" alt="Logo" width={40} height={40} />
-                <div className="hidden md:flex items-center gap-8 text-sm font-bold text-[#0F2E4A]">
+                <Image className="" src="/logo.png" alt="Logo" width={40} height={40} />
+                <div className="hidden lg:flex px-8 items-center gap-8 text-sm font-bold text-[#0F2E4A]">
                     <Link href="/" className="hover:text-primary transition-colors">
                         {getNavText(1)}
                     </Link>
                     <Link href="/products" className="hover:text-primary transition-colors">
                         {getNavText(2)}
                     </Link>
-                    <Link href="/leditor" className="hover:text-primary transition-colors">
+                    <Link href="/controllers" className="hover:text-primary transition-colors">
                         {getNavText(3)}
                     </Link>
-                    <Link href="/case-studies" className="hover:text-primary transition-colors">
+                    <Link href="/leditor" className="hover:text-primary transition-colors">
                         {getNavText(4)}
                     </Link>
-                    <Link href="/become-partner" className="hover:text-primary transition-colors">
+                    <Link href="/case-studies" className="hover:text-primary transition-colors">
                         {getNavText(5)}
+                    </Link>
+                    <Link href="/become-partner" className="hover:text-primary transition-colors">
+                        {getNavText(6)}
                     </Link>
                 </div>
                 <div className="flex items-center gap-3">

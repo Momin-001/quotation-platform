@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -18,7 +20,24 @@ import { toast } from "sonner";
 
 const productGroups = ["Mechanics", "Service", "Software", "Maintenance"];
 
-const defaultFormData = {
+const accessorySchema = z.object({
+    productName: z.string().min(1, "Product name is required"),
+    productNumber: z.string().min(1, "Product number is required"),
+    shortText: z.string().optional(),
+    longText: z.string().optional(),
+    productGroup: z.string().min(1, "Product group is required").refine(
+        (val) => productGroups.includes(val),
+        { message: "Invalid product group" }
+    ),
+    unit: z.string().optional(),
+    manufacturer: z.string().optional(),
+    supplier: z.string().optional(),
+    purchasePrice: z.union([z.string(), z.number()]).optional(),
+    retailPrice: z.union([z.string(), z.number()]).optional(),
+    leadTime: z.string().optional(),
+});
+
+const defaultValues = {
     productName: "",
     productNumber: "",
     shortText: "",
@@ -34,45 +53,43 @@ const defaultFormData = {
 
 export default function AccessoryForm({ mode = "add", initialData = null }) {
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    const isEdit = mode === "edit";
 
-    const [formData, setFormData] = useState(() => {
-        if (initialData) {
-            return {
-                productName: initialData.productName || "",
-                productNumber: initialData.productNumber || "",
-                shortText: initialData.shortText || "",
-                longText: initialData.longText || "",
-                productGroup: initialData.productGroup || "",
-                unit: initialData.unit || "",
-                manufacturer: initialData.manufacturer || "",
-                supplier: initialData.supplier || "",
-                purchasePrice: initialData.purchasePrice?.toString() || "",
-                retailPrice: initialData.retailPrice?.toString() || "",
-                leadTime: initialData.leadTime || "",
-            };
-        }
-        return { ...defaultFormData };
+    const formDefaultValues = initialData ? {
+        productName: initialData.productName || "",
+        productNumber: initialData.productNumber || "",
+        shortText: initialData.shortText || "",
+        longText: initialData.longText || "",
+        productGroup: initialData.productGroup || "",
+        unit: initialData.unit || "",
+        manufacturer: initialData.manufacturer || "",
+        supplier: initialData.supplier || "",
+        purchasePrice: initialData.purchasePrice?.toString() || "",
+        retailPrice: initialData.retailPrice?.toString() || "",
+        leadTime: initialData.leadTime || "",
+    } : defaultValues;
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors, isSubmitting },
+    } = useForm({
+        resolver: zodResolver(accessorySchema),
+        defaultValues: formDefaultValues,
     });
 
-    const handleChange = (field, value) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
+    const onSubmit = async (data) => {
         try {
-            const url = mode === "edit"
+            const url = isEdit
                 ? `/api/admin/accessories/${initialData.id}`
                 : "/api/admin/accessories";
-            const method = mode === "edit" ? "PUT" : "POST";
+            const method = isEdit ? "PUT" : "POST";
 
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(data),
             });
 
             const response = await res.json();
@@ -80,17 +97,15 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                 throw new Error(response.message || "Failed to save accessory");
             }
 
-            toast.success(response.message || `Accessory ${mode === "edit" ? "updated" : "created"} successfully`);
+            toast.success(response.message || `Accessory ${isEdit ? "updated" : "created"} successfully`);
             router.push("/admin/products");
         } catch (error) {
             toast.error(error.message);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information */}
             <div>
                 <h3 className="text-lg font-semibold font-archivo mb-4">Basic Information</h3>
@@ -98,36 +113,47 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                     <div className="space-y-1">
                         <Label>Product Name *</Label>
                         <Input
-                            value={formData.productName}
-                            onChange={(e) => handleChange("productName", e.target.value)}
-                            required
+                            {...register("productName")}
+                            placeholder="e.g. M-Halterung-FUHD217"
+                            className={errors.productName ? "border-red-500" : ""}
                         />
+                        {errors.productName && (
+                            <p className="text-sm text-red-500">{errors.productName.message}</p>
+                        )}
                     </div>
                     <div className="space-y-1">
                         <Label>Product Number *</Label>
                         <Input
-                            value={formData.productNumber}
-                            onChange={(e) => handleChange("productNumber", e.target.value)}
-                            required
-                            disabled={mode === "edit"}
+                            {...register("productNumber")}
+                            placeholder="e.g. M-700120"
+                            className={errors.productNumber ? "border-red-500" : ""}
+                            disabled={isEdit}
                         />
+                        {errors.productNumber && (
+                            <p className="text-sm text-red-500">{errors.productNumber.message}</p>
+                        )}
                     </div>
                     <div className="space-y-1">
                         <Label>Product Group *</Label>
-                        <Select
-                            value={formData.productGroup}
-                            onValueChange={(val) => handleChange("productGroup", val)}
-                            required
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select product group" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {productGroups.map((group) => (
-                                    <SelectItem key={group} value={group}>{group}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <Controller
+                            name="productGroup"
+                            control={control}
+                            render={({ field }) => (
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                    <SelectTrigger className={errors.productGroup ? "border-red-500" : ""}>
+                                        <SelectValue placeholder="Select product group" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {productGroups.map((group) => (
+                                            <SelectItem key={group} value={group}>{group}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        />
+                        {errors.productGroup && (
+                            <p className="text-sm text-red-500">{errors.productGroup.message}</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -139,16 +165,14 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                     <div className="space-y-1">
                         <Label>Short Text</Label>
                         <Input
-                            value={formData.shortText}
-                            onChange={(e) => handleChange("shortText", e.target.value)}
+                            {...register("shortText")}
                             placeholder="Brief product description"
                         />
                     </div>
                     <div className="space-y-1">
                         <Label>Long Text</Label>
                         <Textarea
-                            value={formData.longText}
-                            onChange={(e) => handleChange("longText", e.target.value)}
+                            {...register("longText")}
                             placeholder="Detailed product description"
                             rows={4}
                         />
@@ -163,24 +187,17 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                     <div className="space-y-1">
                         <Label>Unit</Label>
                         <Input
-                            value={formData.unit}
-                            onChange={(e) => handleChange("unit", e.target.value)}
+                            {...register("unit")}
                             placeholder="e.g. 1, pcs, set"
                         />
                     </div>
                     <div className="space-y-1">
                         <Label>Manufacturer</Label>
-                        <Input
-                            value={formData.manufacturer}
-                            onChange={(e) => handleChange("manufacturer", e.target.value)}
-                        />
+                        <Input {...register("manufacturer")} placeholder="e.g. Hagor" />
                     </div>
                     <div className="space-y-1">
                         <Label>Supplier</Label>
-                        <Input
-                            value={formData.supplier}
-                            onChange={(e) => handleChange("supplier", e.target.value)}
-                        />
+                        <Input {...register("supplier")} placeholder="e.g. LEDALL" />
                     </div>
                     <div className="space-y-1">
                         <Label>Purchase Price (€)</Label>
@@ -188,8 +205,8 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                             type="number"
                             min="0"
                             step="0.01"
-                            value={formData.purchasePrice}
-                            onChange={(e) => handleChange("purchasePrice", e.target.value)}
+                            placeholder="0.00"
+                            {...register("purchasePrice")}
                         />
                     </div>
                     <div className="space-y-1">
@@ -198,15 +215,14 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                             type="number"
                             min="0"
                             step="0.01"
-                            value={formData.retailPrice}
-                            onChange={(e) => handleChange("retailPrice", e.target.value)}
+                            placeholder="0.00"
+                            {...register("retailPrice")}
                         />
                     </div>
                     <div className="space-y-1">
                         <Label>Lead Time</Label>
                         <Input
-                            value={formData.leadTime}
-                            onChange={(e) => handleChange("leadTime", e.target.value)}
+                            {...register("leadTime")}
                             placeholder="e.g. 20 Days"
                         />
                     </div>
@@ -215,9 +231,9 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
 
             {/* Submit */}
             <div className="flex items-center gap-4">
-                <Button type="submit" disabled={loading} size="lg">
-                    {loading && <Spinner className="h-4 w-4 mr-2" />}
-                    {mode === "edit" ? "Update Accessory" : "Add Accessory"}
+                <Button type="submit" disabled={isSubmitting} size="lg">
+                    {isSubmitting && <Spinner className="h-4 w-4 mr-2" />}
+                    {isEdit ? "Update Accessory" : "Add Accessory"}
                 </Button>
                 <Button
                     type="button"

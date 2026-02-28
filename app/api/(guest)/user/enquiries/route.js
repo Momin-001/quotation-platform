@@ -28,10 +28,13 @@ export async function POST(req) {
             .returning();
 
         // Create enquiry items (supports both regular cart and custom Leditor items)
-        const itemsToInsert = items.map((item) => ({
+        const itemsToInsert = items.map((item, index) => ({
             enquiryId: enquiry.id,
             productId: item.productId,
             quantity: item.quantity || 1,
+            itemType: item.itemType || (index === 0 ? "main" : "alternative"),
+            itemOrder: index,
+            controllerId: item.additionalController?.id || null,
             isCustom: item.isCustom || false,
             ...(item.isCustom && {
                 customLedTechnology: item.customLedTechnology || null,

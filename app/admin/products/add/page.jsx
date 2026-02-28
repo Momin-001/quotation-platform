@@ -19,13 +19,13 @@ export default function AddProductPage() {
 
             <Tabs defaultValue="led" className="w-full">
                 <TabsList className="grid w-full max-w-md grid-cols-3 mb-6">
-                    <TabsTrigger value="led" className="text-sm font-semibold">
+                    <TabsTrigger value="led" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">
                         LED Product
                     </TabsTrigger>
-                    <TabsTrigger value="controller" className="text-sm font-semibold">
+                    <TabsTrigger value="controller" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">
                         Controller
                     </TabsTrigger>
-                    <TabsTrigger value="accessory" className="text-sm font-semibold">
+                    <TabsTrigger value="accessory" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">
                         Accessory
                     </TabsTrigger>
                 </TabsList>

@@ -21,6 +21,8 @@ const navbarSchema = z.object({
     navItem4De: z.string().min(1, "Nav Item 4 DE is required"),
     navItem5En: z.string().min(1, "Nav Item 5 EN is required"),
     navItem5De: z.string().min(1, "Nav Item 5 DE is required"),
+    navItem6En: z.string().min(1, "Nav Item 6 EN is required"),
+    navItem6De: z.string().min(1, "Nav Item 6 DE is required"),
 });
 
 export default function NavbarTab({ onDataChange, onValidationChange, onSaveHandlerReady }) {
@@ -45,6 +47,8 @@ export default function NavbarTab({ onDataChange, onValidationChange, onSaveHand
             navItem4De: "",
             navItem5En: "",
             navItem5De: "",
+            navItem6En: "",
+            navItem6De: "",
         },
     });
 
@@ -84,6 +88,8 @@ export default function NavbarTab({ onDataChange, onValidationChange, onSaveHand
                     navItem4De: data.data.navItem4De || "",
                     navItem5En: data.data.navItem5En || "",
                     navItem5De: data.data.navItem5De || "",
+                    navItem6En: data.data.navItem6En || "",
+                    navItem6De: data.data.navItem6De || "",
                 };
                 reset(fetchedData);
             } else {
@@ -315,6 +321,38 @@ export default function NavbarTab({ onDataChange, onValidationChange, onSaveHand
                         />
                         {errors.navItem5De && (
                             <p className="text-sm text-red-500">{errors.navItem5De.message}</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Nav Item 6 */}
+            <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="navItem6En">
+                            Navbar Item 6 EN
+                        </Label>
+                        <Input
+                            id="navItem6En"
+                            {...register("navItem6En")}
+                            placeholder="Enter Nav Item 6 in English"
+                        />
+                        {errors.navItem6En && (
+                            <p className="text-sm text-red-500">{errors.navItem6En.message}</p>
+                        )}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="navItem6De">
+                            Navbar Item 6 DE
+                        </Label>
+                        <Input
+                            id="navItem6De"
+                            {...register("navItem6De")}
+                            placeholder="Enter Nav Item 6 in German"
+                        />
+                        {errors.navItem6De && (
+                            <p className="text-sm text-red-500">{errors.navItem6De.message}</p>
                         )}
                     </div>
                 </div>

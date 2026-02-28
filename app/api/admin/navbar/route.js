@@ -22,6 +22,8 @@ export async function GET() {
                     navItem4De: "",
                     navItem5En: "",
                     navItem5De: "",
+                    navItem6En: "",
+                    navItem6De: "",
                 })
                 .returning();
 
@@ -49,6 +51,8 @@ export async function PUT(req) {
             navItem4De,
             navItem5En,
             navItem5De,
+            navItem6En,
+            navItem6De,
         } = body;
 
         // Get existing navbar or create new one
@@ -70,6 +74,8 @@ export async function PUT(req) {
                     navItem4De: navItem4De || "",
                     navItem5En: navItem5En || "",
                     navItem5De: navItem5De || "",
+                    navItem6En: navItem6En || "",
+                    navItem6De: navItem6De || "",
                     updatedAt: new Date(),
                 })
                 .returning();
@@ -88,6 +94,8 @@ export async function PUT(req) {
                     navItem4De: navItem4De || "",
                     navItem5En: navItem5En || "",
                     navItem5De: navItem5De || "",
+                    navItem6En: navItem6En || "",
+                    navItem6De: navItem6De || "",
                 })
                 .returning();
         }

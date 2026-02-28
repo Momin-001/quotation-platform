@@ -4,13 +4,14 @@ import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Minus, Plus, Trash2, ArrowUpDown } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowUpDown, Cpu } from "lucide-react";
 import { toast } from "sonner";
 import ReCAPTCHA from "react-google-recaptcha";
 import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
@@ -28,6 +29,7 @@ export default function CartPage() {
         cartItems, 
         updateQuantity, 
         removeFromCart, 
+        removeControllerFromProduct,
         clearCart,
         swapProducts,
         canAddToCart 
@@ -67,6 +69,7 @@ export default function CartPage() {
                         productId: item.id,
                         quantity: item.quantity,
                         itemType: item.itemType || (index === 0 ? "main" : "alternative"),
+                        additionalController: item.additionalController || null,
                     })),
                 }),
             });
@@ -166,101 +169,133 @@ export default function CartPage() {
                             return (
                                 <div
                                     key={item.id}
-                                    className={`bg-white border-2 ${typeInfo.borderColor} rounded-lg p-4 flex gap-4 relative`}
+                                    className={`bg-white border-2 ${typeInfo.borderColor} rounded-lg p-4 space-y-4`}
                                 >
-                                    {/* Product Type Badge */}
-                                    <span className={`absolute top-4 right-4 ${typeInfo.bgColor} text-white text-xs px-3 py-1 rounded-full font-medium`}>
-                                        {typeInfo.label}
-                                    </span>
-
-                                    {/* Product Image */}
-                                    <div className="relative w-24 h-30 shrink-0 bg-gray-100 rounded">
-                                        {item.imageUrl ? (
-                                            <Image
-                                                src={item.imageUrl}
-                                                alt={item.productName}
-                                                fill
-                                                className="object-cover rounded"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                                                No Image
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Product Info */}
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-lg mb-1 pr-32">
-                                            {item.productName}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 mb-3">
-                                            {item.productNumber}
-                                        </p>
-
-                                        {/* Quantity Input */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor={`quantity-${item.id}`}>
-                                                Choose Quantity*
-                                            </Label>
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    onClick={() =>
-                                                        updateQuantity(
-                                                            item.id,
-                                                            item.quantity - 1
-                                                        )
-                                                    }
-                                                >
-                                                    <Minus className="h-4 w-4" />
-                                                </Button>
-                                                <Input
-                                                    id={`quantity-${item.id}`}
-                                                    type="number"
-                                                    min="1"
-                                                    value={item.quantity}
-                                                    onChange={(e) =>
-                                                        updateQuantity(
-                                                            item.id,
-                                                            parseInt(e.target.value) || 1
-                                                        )
-                                                    }
-                                                    className="w-16 h-8 pl-6 text-center"
+                                    {/* Main product row */}
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        {/* Product Image */}
+                                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-gray-100 rounded overflow-hidden">
+                                            {item.imageUrl ? (
+                                                <Image
+                                                    src={item.imageUrl}
+                                                    alt={item.productName}
+                                                    fill
+                                                    className="object-cover rounded"
                                                 />
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    onClick={() =>
-                                                        updateQuantity(
-                                                            item.id,
-                                                            item.quantity + 1
-                                                        )
-                                                    }
-                                                >
-                                                    <Plus className="h-4 w-4" />
-                                                </Button>
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                                    No Image
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Product Info + Quantity */}
+                                        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                                            <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className={`${typeInfo.bgColor} text-white text-xs px-3 py-1 rounded-full font-medium shrink-0`}>
+                                                    {typeInfo.label}
+                                                </span>
                                             </div>
+                                            <h3 className="font-bold text-lg mb-1">
+                                                {item.productName}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 mb-3">
+                                                {item.productNumber}
+                                            </p>
+
+                                            {/* Quantity Input */}
+                                            <div className="space-y-2">
+                                                <Label htmlFor={`quantity-${item.id}`}>
+                                                    Choose Quantity*
+                                                </Label>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 shrink-0"
+                                                        onClick={() =>
+                                                            updateQuantity(
+                                                                item.id,
+                                                                item.quantity - 1
+                                                            )
+                                                        }
+                                                    >
+                                                        <Minus className="h-4 w-4" />
+                                                    </Button>
+                                                    <Input
+                                                        id={`quantity-${item.id}`}
+                                                        type="number"
+                                                        min="1"
+                                                        value={item.quantity}
+                                                        onChange={(e) =>
+                                                            updateQuantity(
+                                                                item.id,
+                                                                parseInt(e.target.value) || 1
+                                                            )
+                                                        }
+                                                        className="w-16 h-8 pl-6 text-center"
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 shrink-0"
+                                                        onClick={() =>
+                                                            updateQuantity(
+                                                                item.id,
+                                                                item.quantity + 1
+                                                            )
+                                                        }
+                                                    >
+                                                        <Plus className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="text-red-600 hover:text-red-700 flex items-center gap-1 text-sm self-start sm:mt-8"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                Remove
+                                            </button>
                                         </div>
                                     </div>
 
-                                    {/* Remove Button */}
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFromCart(item.id)}
-                                        className="absolute bottom-6 right-4 text-red-600 hover:text-red-700 flex items-center gap-1 text-sm"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                        Remove
-                                    </button>
+                                    {/* Additional Controller - separate block below (like quotation page) */}
+                                    {item.additionalController && (
+                                        <div className="mt-4 pt-4 border-t border-purple-200 ml-0 sm:ml-8 border-l-0 sm:border-l-4 sm:border-l-purple-300 pl-0 sm:pl-4">
+                                            <h5 className="text-xs font-semibold text-purple-600 uppercase mb-2">Additional Controller</h5>
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-purple-50/50 rounded-lg p-3">
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">{item.additionalController.interfaceName || item.additionalController.productName}</p>
+                                                    <p className="text-xs text-gray-500">{item.additionalController.brandDisplay || item.additionalController.brandName || "N/A"}</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeControllerFromProduct(item.id)}
+                                                    className="text-red-600 hover:text-red-700 text-sm font-medium self-start sm:self-center"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
+
+                        {/* Add Controller Button */}
+                        <Link
+                            href="/controllers"
+                            className="w-full border-2 border-dashed border-purple-300 rounded-lg py-4 text-purple-600 hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Cpu className="h-5 w-5" />
+                            Add Controller
+                        </Link>
 
                         {/* Add More Products Button (if cart not full) */}
                         {canAddToCart() && (

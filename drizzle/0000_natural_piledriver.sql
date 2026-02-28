@@ -1,3 +1,4 @@
+CREATE TYPE "public"."brand_system" AS ENUM('Colorlight', 'Novastar', 'Brompton', 'LINSN', 'Other');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('user', 'super_admin', 'admin');--> statement-breakpoint
 CREATE TYPE "public"."application" AS ENUM('DOOH', 'Indoor Signage', 'Home Theater', 'Stadium Scoreboard', 'Video Cube', 'Conference', 'Stadium Ribbons', 'Corporate Design', 'Staging', 'Virtual Production');--> statement-breakpoint
 CREATE TYPE "public"."calibration_method" AS ENUM('No Calibration', 'Multiple Layers Chroma', 'Multiple Layers Brightness', 'Brightness', 'Chroma', 'Other');--> statement-breakpoint
@@ -55,10 +56,9 @@ CREATE TABLE "certificates" (
 --> statement-breakpoint
 CREATE TABLE "controllers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_name" text NOT NULL,
-	"product_number" text NOT NULL,
-	"brand_name" text,
 	"interface_name" text,
+	"brand_name" "brand_system",
+	"brand_name_other" text,
 	"pixel_capacity" integer,
 	"max_width_height" integer,
 	"dp_1_2" integer DEFAULT 0,
@@ -97,12 +97,9 @@ CREATE TABLE "controllers" (
 	"multi_viewer_mvr" text,
 	"usb_playback" text,
 	"support_3d" text,
-	"purchase_price" numeric(10, 2),
-	"retail_price" numeric(10, 2),
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "controllers_product_number_unique" UNIQUE("product_number")
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "enquiries" (
@@ -363,7 +360,8 @@ CREATE TABLE "products" (
 --> statement-breakpoint
 CREATE TABLE "product_images" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_id" uuid NOT NULL,
+	"product_id" uuid,
+	"controller_id" uuid,
 	"image_url" text NOT NULL,
 	"image_order" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -398,6 +396,8 @@ CREATE TABLE "navbar" (
 	"nav_item_4_de" text DEFAULT '' NOT NULL,
 	"nav_item_5_en" text DEFAULT '' NOT NULL,
 	"nav_item_5_de" text DEFAULT '' NOT NULL,
+	"nav_item_6_en" text DEFAULT '' NOT NULL,
+	"nav_item_6_de" text DEFAULT '' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -408,6 +408,20 @@ CREATE TABLE "partners" (
 	"logo_url" text NOT NULL,
 	"website_url" text NOT NULL,
 	"click_count" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "quotation_additional_items" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"quotation_item_id" uuid NOT NULL,
+	"controller_id" uuid NOT NULL,
+	"quantity" integer DEFAULT 1 NOT NULL,
+	"unit_price" numeric(10, 2) NOT NULL,
+	"tax_percentage" numeric(5, 2) DEFAULT '0',
+	"discount_percentage" numeric(5, 2) DEFAULT '0',
+	"description" text,
+	"item_order" integer DEFAULT 0,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -468,9 +482,12 @@ ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_enquiry_id_enquiries_i
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_area_of_use_id_categories_id_fk" FOREIGN KEY ("area_of_use_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "product_images" ADD CONSTRAINT "product_images_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_certificates" ADD CONSTRAINT "product_certificates_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_certificates" ADD CONSTRAINT "product_certificates_certificate_id_certificates_id_fk" FOREIGN KEY ("certificate_id") REFERENCES "public"."certificates"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_features" ADD CONSTRAINT "product_features_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "quotation_additional_items" ADD CONSTRAINT "quotation_additional_items_quotation_item_id_quotation_items_id_fk" FOREIGN KEY ("quotation_item_id") REFERENCES "public"."quotation_items"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "quotation_additional_items" ADD CONSTRAINT "quotation_additional_items_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quotation_items" ADD CONSTRAINT "quotation_items_quotation_id_quotations_id_fk" FOREIGN KEY ("quotation_id") REFERENCES "public"."quotations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quotation_items" ADD CONSTRAINT "quotation_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quotation_messages" ADD CONSTRAINT "quotation_messages_quotation_id_quotations_id_fk" FOREIGN KEY ("quotation_id") REFERENCES "public"."quotations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

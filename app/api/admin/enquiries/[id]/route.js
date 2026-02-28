@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, users, products, productImages, quotations } from "@/db/schema";
+import { enquiries, enquiryItems, users, products, productImages, quotations, controllers } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
@@ -52,12 +52,15 @@ export async function GET(req, { params }) {
             return errorResponse("Enquiry not found", 404);
         }
 
-        // Fetch enquiry items with product details
+        // Fetch enquiry items with product and controller details
         const itemsData = await db
             .select({
                 id: enquiryItems.id,
                 productId: enquiryItems.productId,
                 quantity: enquiryItems.quantity,
+                itemType: enquiryItems.itemType,
+                itemOrder: enquiryItems.itemOrder,
+                controllerId: enquiryItems.controllerId,
                 isCustom: enquiryItems.isCustom,
                 customLedTechnology: enquiryItems.customLedTechnology,
                 customBrightnessValue: enquiryItems.customBrightnessValue,
@@ -85,9 +88,10 @@ export async function GET(req, { params }) {
             })
             .from(enquiryItems)
             .innerJoin(products, eq(enquiryItems.productId, products.id))
-            .where(eq(enquiryItems.enquiryId, id));
+            .where(eq(enquiryItems.enquiryId, id))
+            .orderBy(asc(enquiryItems.itemOrder));
 
-        // Fetch first image for each product
+        // Fetch first image and controller details for each product
         const items = await Promise.all(
             itemsData.map(async (item) => {
                 const images = await db
@@ -97,9 +101,31 @@ export async function GET(req, { params }) {
                     .orderBy(productImages.imageOrder)
                     .limit(1);
                 
+                let controller = null;
+                if (item.controllerId) {
+                    const [ctrl] = await db
+                        .select({
+                            id: controllers.id,
+                            productName: controllers.interfaceName,
+                            brandName: controllers.brandName,
+                        })
+                        .from(controllers)
+                        .where(eq(controllers.id, item.controllerId))
+                        .limit(1);
+                    if (ctrl) {
+                        controller = {
+                            ...ctrl,
+                            imageUrl: null,
+                            sourceType: "controller",
+                            productNumber: ctrl.brandName || ctrl.id?.slice(0, 8) || "N/A",
+                        };
+                    }
+                }
+                
                 return {
                     ...item,
                     imageUrl: images[0]?.imageUrl || null,
+                    controller,
                 };
             })
         );

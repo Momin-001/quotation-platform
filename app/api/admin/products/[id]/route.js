@@ -156,7 +156,14 @@ export async function PUT(request, { params }) {
             powerConsumptionMax: body.powerConsumptionMax ? parseInt(body.powerConsumptionMax) : null,
             powerConsumptionTypical: body.powerConsumptionTypical ? parseInt(body.powerConsumptionTypical) : null,
             warrantyPeriod: body.warrantyPeriod ? parseInt(body.warrantyPeriod) : null,
-            
+            oemBrand: body.oemBrand?.toString().trim() || null,
+            ledDriver: body.ledDriver?.toString().trim() || null,
+            powerSupply: body.powerSupply?.toString().trim() || null,
+            pricePerCabinetUsd: body.pricePerCabinetUsd != null && body.pricePerCabinetUsd !== "" ? String(body.pricePerCabinetUsd) : null,
+            pricePerMetreSquareUsd: body.pricePerMetreSquareUsd != null && body.pricePerMetreSquareUsd !== "" ? String(body.pricePerMetreSquareUsd) : null,
+            stockPieces: body.stockPieces != null && body.stockPieces !== "" ? parseInt(body.stockPieces) : null,
+            leadtimeDays: body.leadtimeDays != null && body.leadtimeDays !== "" ? parseInt(body.leadtimeDays) : null,
+            notes: body.notes?.toString().trim() || null,
             updatedAt: new Date(),
         };
 

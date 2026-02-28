@@ -11,7 +11,6 @@ import FooterTab from "./components/FooterTab";
 export default function CMSPage() {
     const [activeTab, setActiveTab] = useState("navbar");
     const [saving, setSaving] = useState(false);
-    const [isValid, setIsValid] = useState(false);
 
     // Refs to store save handlers from child components
     const navbarSaveHandlerRef = useRef(null);
@@ -22,12 +21,6 @@ export default function CMSPage() {
     const handleDataChange = (data) => {
         // Store the data if needed, but validation is handled in child components
     };
-
-    // Handle validation change from child components
-    const handleValidationChange = (valid) => {
-        setIsValid(valid);
-    };
-
     // Save handler
     const handleSave = async () => {
         setSaving(true);
@@ -102,7 +95,6 @@ export default function CMSPage() {
                 <TabsContent value="navbar" className="space-y-6">
                     <NavbarTab
                         onDataChange={handleDataChange}
-                        onValidationChange={handleValidationChange}
                         onSaveHandlerReady={(handler) => {
                             navbarSaveHandlerRef.current = handler;
                         }}
@@ -112,7 +104,6 @@ export default function CMSPage() {
                 <TabsContent value="homepage" className="space-y-6">
                     <HomepageTab
                         onDataChange={handleDataChange}
-                        onValidationChange={handleValidationChange}
                         onSaveHandlerReady={(handler) => {
                             homepageSaveHandlerRef.current = handler;
                         }}
@@ -122,7 +113,6 @@ export default function CMSPage() {
                 <TabsContent value="footer" className="space-y-6">
                     <FooterTab
                         onDataChange={handleDataChange}
-                        onValidationChange={handleValidationChange}
                         onSaveHandlerReady={(handler) => {
                             footerSaveHandlerRef.current = handler;
                         }}

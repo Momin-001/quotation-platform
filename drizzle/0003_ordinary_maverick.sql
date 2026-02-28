@@ -1,0 +1,23 @@
+ALTER TABLE "products" ALTER COLUMN "product_type" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "design" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "special_types" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "application" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "pixel_pitch" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "pixel_configuration" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "pixel_technology" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "led_technology" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "chip_bonding" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "colour_depth" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "current_gain_control" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "video_rate" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "calibration_method" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "driving_method" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "control_system" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "cooling" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "power_redundancy" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "memory_on_module" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "smart_module" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "refresh_rate" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "scan_rate_numerator" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "scan_rate_denominator" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "contrast_ratio_denominator" DROP DEFAULT;

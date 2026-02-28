@@ -3,6 +3,7 @@ import {
     quotations, 
     quotationItems, 
     quotationOptionalItems,
+    quotationAdditionalItems,
     products, 
     productImages,
     controllers,
@@ -14,7 +15,6 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne, or } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
-// Helper to get first product image
 async function getProductImage(productId) {
     const images = await db
         .select({ imageUrl: productImages.imageUrl })
@@ -25,9 +25,19 @@ async function getProductImage(productId) {
     return images[0]?.imageUrl || null;
 }
 
-// Helper to get product details (LED product)
+async function getControllerImage(controllerId) {
+    const images = await db
+        .select({ imageUrl: productImages.imageUrl })
+        .from(productImages)
+        .where(eq(productImages.controllerId, controllerId))
+        .orderBy(productImages.imageOrder)
+        .limit(1);
+    return images[0]?.imageUrl || null;
+}
+
+// Helper to get product details (LED)
 async function getProductDetails(productId) {
-    const product = await db
+    const [product] = await db
         .select({
             id: products.id,
             productName: products.productName,
@@ -38,35 +48,40 @@ async function getProductDetails(productId) {
         .where(eq(products.id, productId))
         .limit(1);
     
-    if (product[0]) {
+    if (product) {
         const imageUrl = await getProductImage(productId);
-        return { ...product[0], imageUrl, sourceType: "product" };
+        return { ...product, imageUrl, sourceType: "product" };
     }
     return null;
 }
 
 // Helper to get controller details
 async function getControllerDetails(controllerId) {
-    const controller = await db
+    const [controller] = await db
         .select({
             id: controllers.id,
-            productName: controllers.productName,
-            productNumber: controllers.productNumber,
+            productName: controllers.interfaceName,
             brandName: controllers.brandName,
         })
         .from(controllers)
         .where(eq(controllers.id, controllerId))
         .limit(1);
     
-    if (controller[0]) {
-        return { ...controller[0], imageUrl: null, sourceType: "controller" };
+    if (controller) {
+        const imageUrl = await getControllerImage(controllerId);
+        return {
+            ...controller,
+            productNumber: controller.brandName || controller.id?.slice(0, 8) || "N/A",
+            imageUrl: imageUrl || null,
+            sourceType: "controller",
+        };
     }
     return null;
 }
 
 // Helper to get accessory details
 async function getAccessoryDetails(accessoryId) {
-    const accessory = await db
+    const [accessory] = await db
         .select({
             id: accessories.id,
             productName: accessories.productName,
@@ -77,16 +92,15 @@ async function getAccessoryDetails(accessoryId) {
         .where(eq(accessories.id, accessoryId))
         .limit(1);
     
-    if (accessory[0]) {
-        return { ...accessory[0], imageUrl: null, sourceType: "accessory" };
+    if (accessory) {
+        return { ...accessory, imageUrl: null, sourceType: "accessory" };
     }
     return null;
 }
 
-// Helper to resolve optional item's product details based on source type
+// Resolve polymorphic optional item product
 async function getOptionalItemProduct(opt) {
     const sourceType = opt.itemSourceType || "product";
-    
     if (sourceType === "controller" && opt.controllerId) {
         return await getControllerDetails(opt.controllerId);
     }
@@ -118,19 +132,19 @@ export async function GET(req, { params }) {
         }
 
         // Fetch quotation
-        const quotation = await db
+        const [quotation] = await db
             .select()
             .from(quotations)
             .where(eq(quotations.id, id))
             .limit(1)
-            .then((res) => res[0]);
+           
 
         if (!quotation) {
             return errorResponse("Quotation not found", 404);
         }
 
         // Fetch enquiry with customer info
-        const enquiry = await db
+        const [enquiry] = await db
             .select({
                 id: enquiries.id,
                 message: enquiries.message,
@@ -145,7 +159,6 @@ export async function GET(req, { params }) {
             .innerJoin(users, eq(enquiries.userId, users.id))
             .where(eq(enquiries.id, quotation.enquiryId))
             .limit(1)
-            .then((res) => res[0]);
 
         // Check if there's a newer non-draft quotation for the same enquiry
         const newerQuotation = await db
@@ -158,9 +171,6 @@ export async function GET(req, { params }) {
             ))
             .orderBy(desc(quotations.createdAt))
             .limit(1);
-
-        const hasNewerQuotation = newerQuotation.length > 0 && 
-            new Date(newerQuotation[0].createdAt) > new Date(quotation.createdAt);
 
         // Chat disabled logic:
         // - rejected → disabled
@@ -184,7 +194,7 @@ export async function GET(req, { params }) {
             .where(eq(quotationItems.quotationId, id))
             .orderBy(quotationItems.itemOrder);
 
-        // Build items with product details and optional items
+        // Build items with product details, optional items, and additional items
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
                 const product = await getProductDetails(item.productId);
@@ -203,10 +213,33 @@ export async function GET(req, { params }) {
                     }))
                 );
 
+                // Fetch additional items (controllers)
+                const additionalItemsData = await db
+                    .select()
+                    .from(quotationAdditionalItems)
+                    .where(eq(quotationAdditionalItems.quotationItemId, item.id))
+                    .orderBy(quotationAdditionalItems.itemOrder);
+
+                const additionalItems = await Promise.all(
+                    additionalItemsData.map(async (add) => {
+                        const product = await getControllerDetails(add.controllerId);
+                        return {
+                            ...add,
+                            product,
+                            quantity: add.quantity,
+                            unitPrice: add.unitPrice,
+                            taxPercentage: add.taxPercentage,
+                            discountPercentage: add.discountPercentage,
+                            description: add.description,
+                        };
+                    })
+                );
+
                 return {
                     ...item,
                     product,
                     optionalItems,
+                    additionalItems,
                 };
             })
         );
@@ -218,11 +251,10 @@ export async function GET(req, { params }) {
         return successResponse("Quotation fetched successfully", {
             ...quotation,
             enquiry,
-            items: itemsWithDetails,
             mainProduct,
             alternativeProduct,
-            chatDisabled,
             chatDisabledReason,
+            chatDisabled,
         });
     } catch (error) {
         console.error("Error fetching quotation:", error);
@@ -311,6 +343,9 @@ export async function PUT(req, { params }) {
             await db
                 .delete(quotationOptionalItems)
                 .where(eq(quotationOptionalItems.quotationItemId, item.id));
+            await db
+                .delete(quotationAdditionalItems)
+                .where(eq(quotationAdditionalItems.quotationItemId, item.id));
         }
 
         await db
@@ -361,6 +396,28 @@ export async function PUT(req, { params }) {
                         };
                         await db.insert(quotationOptionalItems).values(optionalData);
                     }
+                }
+            }
+
+            // Create additional items (controllers only)
+            if (item.additionalItems && Array.isArray(item.additionalItems)) {
+                const seenControllerIds = new Set();
+                for (let j = 0; j < item.additionalItems.length; j++) {
+                    const addItem = item.additionalItems[j];
+                    const controllerId = addItem.controllerId || addItem.product?.id;
+                    if (!controllerId || addItem.unitPrice == null) continue;
+                    if (seenControllerIds.has(controllerId)) continue;
+                    seenControllerIds.add(controllerId);
+                    await db.insert(quotationAdditionalItems).values({
+                        quotationItemId,
+                        controllerId,
+                        quantity: addItem.quantity || 1,
+                        unitPrice: addItem.unitPrice.toString(),
+                        taxPercentage: (addItem.taxPercentage ?? 0).toString(),
+                        discountPercentage: (addItem.discountPercentage ?? 0).toString(),
+                        description: addItem.description || null,
+                        itemOrder: j,
+                    });
                 }
             }
         }

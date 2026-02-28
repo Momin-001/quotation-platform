@@ -2,8 +2,9 @@ import { createServer } from "http";
 import { parse } from "url";
 import next from "next";
 import { Server } from "socket.io";
+import { NODE_ENV } from "./lib/constants.js";
 
-const dev = process.env.NODE_ENV === "development";
+const dev = NODE_ENV === "development";
 const hostname = "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
 

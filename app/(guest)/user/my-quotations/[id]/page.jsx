@@ -162,7 +162,28 @@ export default function QuotationDetailPage() {
 
                                 />
 
-                                {/* Main Product Optional Items */}
+                                {/* Main Product Additional Items (included in total) */}
+                                {mainProduct.additionalItems && mainProduct.additionalItems.length > 0 && (
+                                    <div className="mt-4 ml-8 border-l-3 border-purple-300 pl-4 space-y-2">
+                                        <h5 className="text-sm font-semibold text-purple-600">Additional Products</h5>
+                                        {mainProduct.additionalItems.map((add, addIndex) => (
+                                            <div key={addIndex} className="bg-purple-50/50 rounded-lg px-3 py-2">
+                                                <ProductItemDisplay
+                                                    product={add.product}
+                                                    quantity={add.quantity}
+                                                    unitPrice={add.unitPrice}
+                                                    description={add.description}
+                                                    taxPercentage={add.taxPercentage}
+                                                    discountPercentage={add.discountPercentage}
+                                                    badge="Additional"
+                                                    badgeColor="bg-purple-500"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Main Product Optional Items (not in total) */}
                                 {mainProduct.optionalItems && mainProduct.optionalItems.length > 0 && (
                                     <div className="mt-4 ml-8 border-l-3 border-blue-300 pl-4 space-y-2">
                                         <h5 className="text-sm font-semibold text-blue-600">Optional Products</h5>
@@ -183,7 +204,7 @@ export default function QuotationDetailPage() {
                                     </div>
                                 )}
 
-                                {/* Main Product Total */}
+                                {/* Main Product Total (LED + additional only; optional excluded) */}
                                 <div className="mt-6 pt-4">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -192,7 +213,7 @@ export default function QuotationDetailPage() {
                                         <span className="text-2xl font-bold text-blue-700">
                                             {formatCurrency(
                                                 calculateItemTotal(mainProduct.unitPrice, mainProduct.quantity, mainProduct.taxPercentage, mainProduct.discountPercentage) +
-                                                (mainProduct.optionalItems?.reduce((sum, opt) => sum + calculateItemTotal(opt.unitPrice, opt.quantity, opt.taxPercentage, opt.discountPercentage), 0) || 0)
+                                                (mainProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
                                             )}
                                         </span>
                                     </div>
@@ -216,7 +237,28 @@ export default function QuotationDetailPage() {
                                 badgeColor="bg-green-600"
                             />
 
-                            {/* Alternative Product Optional Items */}
+                            {/* Alternative Product Additional Items (included in total) */}
+                            {alternativeProduct.additionalItems && alternativeProduct.additionalItems.length > 0 && (
+                                <div className="mt-4 ml-8 border-l-3 border-purple-300 pl-4 space-y-2">
+                                    <h5 className="text-sm font-semibold text-purple-600">Additional Products</h5>
+                                    {alternativeProduct.additionalItems.map((add, addIndex) => (
+                                        <div key={addIndex} className="bg-purple-50 rounded-lg px-3 py-2">
+                                            <ProductItemDisplay
+                                                product={add.product}
+                                                quantity={add.quantity}
+                                                unitPrice={add.unitPrice}
+                                                description={add.description}
+                                                taxPercentage={add.taxPercentage}
+                                                discountPercentage={add.discountPercentage}
+                                                badge="Additional"
+                                                badgeColor="bg-purple-500"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Alternative Product Optional Items (not in total) */}
                             {alternativeProduct.optionalItems && alternativeProduct.optionalItems.length > 0 && (
                                 <div className="mt-4 ml-8 border-l-3 border-green-300 pl-4 space-y-2">
                                     <h5 className="text-sm font-semibold text-green-600">Optional Products</h5>
@@ -237,7 +279,7 @@ export default function QuotationDetailPage() {
                                 </div>
                             )}
 
-                            {/* Alternative Product Total */}
+                            {/* Alternative Product Total (LED + additional only; optional excluded) */}
                             <div className="mt-6 pt-4">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -246,7 +288,7 @@ export default function QuotationDetailPage() {
                                     <span className="text-2xl font-bold text-green-700">
                                         {formatCurrency(
                                             calculateItemTotal(alternativeProduct.unitPrice, alternativeProduct.quantity, alternativeProduct.taxPercentage, alternativeProduct.discountPercentage) +
-                                            (alternativeProduct.optionalItems?.reduce((sum, opt) => sum + calculateItemTotal(opt.unitPrice, opt.quantity, opt.taxPercentage, opt.discountPercentage), 0) || 0)
+                                            (alternativeProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
                                         )}
                                     </span>
                                 </div>

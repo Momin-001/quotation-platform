@@ -1,6 +1,6 @@
 {
-  "id": "c4c4f5b2-cc9d-40e7-a573-3b83eee06aa9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4feed88d-d167-479e-81f0-38faf688b8cc",
+  "prevId": "c4c4f5b2-cc9d-40e7-a573-3b83eee06aa9",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -627,6 +627,26 @@
           "notNull": true,
           "default": 1
         },
+        "item_type": {
+          "name": "item_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'main'"
+        },
+        "item_order": {
+          "name": "item_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "controller_id": {
+          "name": "controller_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "is_custom": {
           "name": "is_custom",
           "type": "boolean",
@@ -783,6 +803,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "enquiry_items_controller_id_controllers_id_fk": {
+          "name": "enquiry_items_controller_id_controllers_id_fk",
+          "tableFrom": "enquiry_items",
+          "tableTo": "controllers",
+          "columnsFrom": [
+            "controller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

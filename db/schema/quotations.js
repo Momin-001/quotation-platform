@@ -36,7 +36,26 @@ export const quotationItems = pgTable("quotation_items", {
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Optional products for each quotation item (polymorphic: product, controller, or accessory)
+// Additional products (controllers only) per quotation item — price included in item total
+export const quotationAdditionalItems = pgTable("quotation_additional_items", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    quotationItemId: uuid("quotation_item_id")
+        .notNull()
+        .references(() => quotationItems.id, { onDelete: "cascade" }),
+    controllerId: uuid("controller_id")
+        .notNull()
+        .references(() => controllers.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").notNull().default(1),
+    unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
+    discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
+    description: text("description"),
+    itemOrder: integer("item_order").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Optional products for each quotation item (accessories only — not included in totals)
 export const quotationOptionalItems = pgTable("quotation_optional_items", {
     id: uuid("id").defaultRandom().primaryKey(),
     quotationItemId: uuid("quotation_item_id")
@@ -80,6 +99,18 @@ export const quotationItemsRelations = relations(quotationItems, ({ one, many })
         references: [products.id],
     }),
     optionalItems: many(quotationOptionalItems),
+    additionalItems: many(quotationAdditionalItems),
+}));
+
+export const quotationAdditionalItemsRelations = relations(quotationAdditionalItems, ({ one }) => ({
+    quotationItem: one(quotationItems, {
+        fields: [quotationAdditionalItems.quotationItemId],
+        references: [quotationItems.id],
+    }),
+    controller: one(controllers, {
+        fields: [quotationAdditionalItems.controllerId],
+        references: [controllers.id],
+    }),
 }));
 
 export const quotationOptionalItemsRelations = relations(quotationOptionalItems, ({ one }) => ({

@@ -3,10 +3,10 @@ import { ChevronDown, Search } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
 /**
- * Dropdown that fetches from all product types (LED, Controller, Accessory)
- * for optional items in the quotation builder.
+ * Dropdown for optional items: accessories only (not included in totals).
+ * Use searchType="accessory" to restrict to accessories.
  */
-export default function QuotationOptionalDropDown({ value, onChange, placeholder = "Select product", disabled = false }) {
+export default function QuotationOptionalDropDown({ value, onChange, placeholder = "Select accessory", disabled = false, searchType = "accessory" }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState([]);
@@ -18,9 +18,9 @@ export default function QuotationOptionalDropDown({ value, onChange, placeholder
     const fetchProducts = useCallback(async (searchTerm = "", pageNum = 1, append = false) => {
         setLoading(true);
         try {
-            const res = await fetch(
-                `/api/admin/products/search-all?search=${encodeURIComponent(searchTerm)}&page=${pageNum}&limit=20`
-            );
+            const params = new URLSearchParams({ search: searchTerm, page: pageNum, limit: 20 });
+            if (searchType) params.set("type", searchType);
+            const res = await fetch(`/api/admin/products/search-all?${params}`);
             const response = await res.json();
             if (response.success) {
                 if (append) {
@@ -138,7 +138,7 @@ export default function QuotationOptionalDropDown({ value, onChange, placeholder
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Search all products..."
+                                    placeholder={searchType === "accessory" ? "Search accessories..." : "Search..."}
                                     className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                                     autoFocus
                                 />
@@ -168,12 +168,13 @@ export default function QuotationOptionalDropDown({ value, onChange, placeholder
                                             }`}
                                         >
                                             <div className="flex items-center gap-2">
+                                            <span className="font-medium truncate">{product.productName}</span>
+
                                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0 ${getSourceBadgeColor(product.sourceType)}`}>
                                                     {getSourceLabel(product.sourceType)}
                                                 </span>
-                                                <span className="font-medium truncate">{product.productName}</span>
                                             </div>
-                                            <div className="text-xs text-gray-500 ml-12">
+                                            <div className="text-xs text-gray-500">
                                                 {product.subtitle || product.productNumber}
                                             </div>
                                         </button>

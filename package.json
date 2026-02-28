@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
+    "host": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Search, ChevronDown, ChevronUp, FilterIcon } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, FilterIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +17,261 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetClose,
+} from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
 import Image from "next/image";
 import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
+
+function FiltersAccordion({
+    accordionValue, setAccordionValue,
+    productType, setProductType,
+    design, setDesign,
+    specialTypes, setSpecialTypes,
+    application, setApplication,
+    pixelPitch, setPixelPitch,
+    ledTechnology, setLedTechnology,
+    chipBonding, setChipBonding,
+    brightnessControl, setBrightnessControl,
+    contrastRatio, setContrastRatio,
+    powerConsumptionMax, setPowerConsumptionMax,
+    powerConsumptionTypical, setPowerConsumptionTypical,
+    refreshRate, setRefreshRate,
+    powerRedundancy, setPowerRedundancy,
+    memoryOnModule, setMemoryOnModule,
+    smartModule, setSmartModule,
+    controlSystem, setControlSystem,
+    receivingCard, setReceivingCard,
+    ipRating, setIpRating,
+    warrantyPeriod, setWarrantyPeriod,
+}) {
+    return (
+        <Accordion
+            type="multiple"
+            value={accordionValue}
+            onValueChange={setAccordionValue}
+            className="space-y-0"
+        >
+            <AccordionItem value="productInfo" className="border-t pt-4 border-b-0 first:border-t-0 first:pt-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Product Information</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Product Type</label>
+                        <Select value={productType} onValueChange={setProductType}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="AIO Systems">AIO Systems</SelectItem>
+                                <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Design</label>
+                        <Select value={design} onValueChange={setDesign}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Fix">Fix</SelectItem>
+                                <SelectItem value="Mobil">Mobil</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Special Types</label>
+                        <Select value={specialTypes} onValueChange={setSpecialTypes}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Transparent">Transparent</SelectItem>
+                                <SelectItem value="Curved">Curved</SelectItem>
+                                <SelectItem value="Floor">Floor</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Application</label>
+                        <Select value={application} onValueChange={setApplication}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="DOOH">DOOH</SelectItem>
+                                <SelectItem value="Indoor Signage">Indoor Signage</SelectItem>
+                                <SelectItem value="Home Theater">Home Theater</SelectItem>
+                                <SelectItem value="Stadium Scoreboard">Stadium Scoreboard</SelectItem>
+                                <SelectItem value="Video Cube">Video Cube</SelectItem>
+                                <SelectItem value="Conference">Conference</SelectItem>
+                                <SelectItem value="Stadium Ribbons">Stadium Ribbons</SelectItem>
+                                <SelectItem value="Corporate Design">Corporate Design</SelectItem>
+                                <SelectItem value="Staging">Staging</SelectItem>
+                                <SelectItem value="Virtual Production">Virtual Production</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="physicalSpecs" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Physical Specifications</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Pixel Pitch (mm)</label>
+                        <Input type="number" step="0.01" value={pixelPitch} onChange={(e) => setPixelPitch(e.target.value)} placeholder="e.g., 1.2" />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">LED Specifications</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">LED Technology</label>
+                        <Select value={ledTechnology} onValueChange={setLedTechnology}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="SMD">SMD</SelectItem>
+                                <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
+                                <SelectItem value="IMD">IMD</SelectItem>
+                                <SelectItem value="COB">COB</SelectItem>
+                                <SelectItem value="DIP">DIP</SelectItem>
+                                <SelectItem value="LOB">LOB</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Chip-Bonding</label>
+                        <Select value={chipBonding} onValueChange={setChipBonding}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Gold Wire">Gold Wire</SelectItem>
+                                <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
+                                <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="opticalSpecs" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Optical Specifications</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Brightness Control</label>
+                        <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Contrast Ratio</label>
+                        <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="electricalSpecs" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Electrical Specifications</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Power Consumption Max</label>
+                        <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Power Consumption Typical</label>
+                        <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Refresh Rate</label>
+                        <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Power Redundancy</label>
+                        <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Memory on Module</label>
+                        <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Smart Module</label>
+                        <Select value={smartModule} onValueChange={setSmartModule}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Yes">Yes</SelectItem>
+                                <SelectItem value="No">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Control System</label>
+                        <Select value={controlSystem} onValueChange={setControlSystem}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Colorlight">Colorlight</SelectItem>
+                                <SelectItem value="Novastar">Novastar</SelectItem>
+                                <SelectItem value="Brompton">Brompton</SelectItem>
+                                <SelectItem value="LINSN">LINSN</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Receiving Card</label>
+                        <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="operatingConditions" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Operating Conditions</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">IP Rating</label>
+                        <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="warranty" className="border-t pt-4 border-b-0">
+                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
+                    <span className="font-open-sans font-bold text-base">Warranty</span>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">Warranty Period (Months)</label>
+                        <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    );
+}
 
 export default function ProductsPage() {
     const [products, setProducts] = useState([]);
@@ -55,6 +305,7 @@ export default function ProductsPage() {
 
     // Accordion state - all sections open by default
     const [accordionValue, setAccordionValue] = useState([]);
+    const [sheetOpen, setSheetOpen] = useState(false);
 
     const observer = useRef();
 
@@ -224,10 +475,69 @@ export default function ProductsPage() {
                     ))}
                 </div>
 
+                {/* Mobile Filter Button */}
+                <div className="lg:hidden mb-4">
+                    <Button
+                        variant="outline"
+                        onClick={() => setSheetOpen(true)}
+                        className="w-full border-primary text-primary hover:bg-primary hover:text-white"
+                    >
+                        <FilterIcon className="w-4 h-4 mr-2" />
+                        Filters
+                    </Button>
+                </div>
+
+                {/* Mobile Filter Sheet */}
+                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                    <SheetContent side="left" className="w-[320px] sm:w-[380px] p-0 flex flex-col">
+                        <SheetHeader className="px-5 pt-5 pb-3 border-b">
+                            <div className="flex items-center justify-between">
+                                <SheetTitle className="font-bold flex items-center gap-2">
+                                    <FilterIcon className="w-4 h-4" />
+                                    Filters
+                                </SheetTitle>
+                                <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
+                                    Clear All
+                                </Button>
+                            </div>
+                        </SheetHeader>
+                        <div className="flex-1 overflow-y-auto px-5 py-4">
+                            <FiltersAccordion
+                                accordionValue={accordionValue}
+                                setAccordionValue={setAccordionValue}
+                                productType={productType} setProductType={setProductType}
+                                design={design} setDesign={setDesign}
+                                specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
+                                application={application} setApplication={setApplication}
+                                pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
+                                ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
+                                chipBonding={chipBonding} setChipBonding={setChipBonding}
+                                brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
+                                contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
+                                powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
+                                powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
+                                refreshRate={refreshRate} setRefreshRate={setRefreshRate}
+                                powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
+                                memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
+                                smartModule={smartModule} setSmartModule={setSmartModule}
+                                controlSystem={controlSystem} setControlSystem={setControlSystem}
+                                receivingCard={receivingCard} setReceivingCard={setReceivingCard}
+                                ipRating={ipRating} setIpRating={setIpRating}
+                                warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                            />
+                        </div>
+                        <div className="px-5 py-4 border-t">
+                            <Button className="w-full" onClick={() => setSheetOpen(false)}>
+                                Show Results
+                            </Button>
+                        </div>
+                    </SheetContent>
+                </Sheet>
+
                 {/* Main Content: Filters + Products */}
-                <div className="flex gap-8">
-                    {/* Left Sidebar - Filters */}
-                    <div className="w-76 shrink-0 flex flex-col">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left Sidebar - Filters (desktop only) */}
+                    <div className="hidden lg:flex w-76 shrink-0 flex-col">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold flex items-center gap-2">
                                 <FilterIcon className="w-4 h-4" />
@@ -238,293 +548,29 @@ export default function ProductsPage() {
                             </Button>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(100vh-100px)]">
-                            <Accordion
-                                type="multiple"
-                                value={accordionValue}
-                                onValueChange={setAccordionValue}
-                                className="space-y-0"
-                            >
-                                {/* Product Information */}
-                                <AccordionItem value="productInfo" className="border-t pt-4 border-b-0 first:border-t-0 first:pt-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Product Information</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Product Type</label>
-                                            <Select value={productType} onValueChange={setProductType}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="AIO Systems">AIO Systems</SelectItem>
-                                                    <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Design</label>
-                                            <Select value={design} onValueChange={setDesign}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Fix">Fix</SelectItem>
-                                                    <SelectItem value="Mobil">Mobil</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Special Types</label>
-                                            <Select value={specialTypes} onValueChange={setSpecialTypes}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Transparent">Transparent</SelectItem>
-                                                    <SelectItem value="Curved">Curved</SelectItem>
-                                                    <SelectItem value="Floor">Floor</SelectItem>
-                                                    <SelectItem value="Other">Other</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Application</label>
-                                            <Select value={application} onValueChange={setApplication}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="DOOH">DOOH</SelectItem>
-                                                    <SelectItem value="Indoor Signage">Indoor Signage</SelectItem>
-                                                    <SelectItem value="Home Theater">Home Theater</SelectItem>
-                                                    <SelectItem value="Stadium Scoreboard">Stadium Scoreboard</SelectItem>
-                                                    <SelectItem value="Video Cube">Video Cube</SelectItem>
-                                                    <SelectItem value="Conference">Conference</SelectItem>
-                                                    <SelectItem value="Stadium Ribbons">Stadium Ribbons</SelectItem>
-                                                    <SelectItem value="Corporate Design">Corporate Design</SelectItem>
-                                                    <SelectItem value="Staging">Staging</SelectItem>
-                                                    <SelectItem value="Virtual Production">Virtual Production</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* Physical Specifications */}
-                                <AccordionItem value="physicalSpecs" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Physical Specifications</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Pixel Pitch (mm)</label>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                value={pixelPitch}
-                                                onChange={(e) => setPixelPitch(e.target.value)}
-                                                placeholder="e.g., 1.2"
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* LED Specifications */}
-                                <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">LED Specifications</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">LED Technology</label>
-                                            <Select value={ledTechnology} onValueChange={setLedTechnology}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="SMD">SMD</SelectItem>
-                                                    <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
-                                                    <SelectItem value="IMD">IMD</SelectItem>
-                                                    <SelectItem value="COB">COB</SelectItem>
-                                                    <SelectItem value="DIP">DIP</SelectItem>
-                                                    <SelectItem value="LOB">LOB</SelectItem>
-                                                    <SelectItem value="Other">Other</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Chip-Bonding</label>
-                                            <Select value={chipBonding} onValueChange={setChipBonding}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Gold Wire">Gold Wire</SelectItem>
-                                                    <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
-                                                    <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* Optical Specifications */}
-                                <AccordionItem value="opticalSpecs" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Optical Specifications</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Brightness Control</label>
-                                            <Input
-                                                value={brightnessControl}
-                                                onChange={(e) => setBrightnessControl(e.target.value)}
-                                                placeholder="Enter brightness control"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Contrast Ratio</label>
-                                            <Input
-                                                type="number"
-                                                value={contrastRatio}
-                                                onChange={(e) => setContrastRatio(e.target.value)}
-                                                placeholder="Enter number"
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* Electrical Specifications */}
-                                <AccordionItem value="electricalSpecs" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Electrical Specifications</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Power Consumption Max</label>
-                                            <Input
-                                                type="number"
-                                                value={powerConsumptionMax}
-                                                onChange={(e) => setPowerConsumptionMax(e.target.value)}
-                                                placeholder="Enter number"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Power Consumption Typical</label>
-                                            <Input
-                                                type="number"
-                                                value={powerConsumptionTypical}
-                                                onChange={(e) => setPowerConsumptionTypical(e.target.value)}
-                                                placeholder="Enter number"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Refresh Rate</label>
-                                            <Input
-                                                type="number"
-                                                value={refreshRate}
-                                                onChange={(e) => setRefreshRate(e.target.value)}
-                                                placeholder="Enter refresh rate"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Power Redundancy</label>
-                                            <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Yes">Yes</SelectItem>
-                                                    <SelectItem value="No">No</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Memory on Module</label>
-                                            <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Yes">Yes</SelectItem>
-                                                    <SelectItem value="No">No</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Smart Module</label>
-                                            <Select value={smartModule} onValueChange={setSmartModule}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Yes">Yes</SelectItem>
-                                                    <SelectItem value="No">No</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Control System</label>
-                                            <Select value={controlSystem} onValueChange={setControlSystem}>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Colorlight">Colorlight</SelectItem>
-                                                    <SelectItem value="Novastar">Novastar</SelectItem>
-                                                    <SelectItem value="Brompton">Brompton</SelectItem>
-                                                    <SelectItem value="LINSN">LINSN</SelectItem>
-                                                    <SelectItem value="Other">Other</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Receiving Card</label>
-                                            <Input
-                                                value={receivingCard}
-                                                onChange={(e) => setReceivingCard(e.target.value)}
-                                                placeholder="Enter receiving card"
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* Operating Conditions */}
-                                <AccordionItem value="operatingConditions" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Operating Conditions</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">IP Rating</label>
-                                            <Input
-                                                value={ipRating}
-                                                onChange={(e) => setIpRating(e.target.value)}
-                                                placeholder="Enter text"
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-
-                                {/* Warranty */}
-                                <AccordionItem value="warranty" className="border-t pt-4 border-b-0">
-                                    <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                                        <span className="font-open-sans font-bold text-base">Warranty</span>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">Warranty Period (Months)</label>
-                                            <Input
-                                                type="number"
-                                                value={warrantyPeriod}
-                                                onChange={(e) => setWarrantyPeriod(e.target.value)}
-                                                placeholder="Enter number"
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
+                            <FiltersAccordion
+                                accordionValue={accordionValue}
+                                setAccordionValue={setAccordionValue}
+                                productType={productType} setProductType={setProductType}
+                                design={design} setDesign={setDesign}
+                                specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
+                                application={application} setApplication={setApplication}
+                                pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
+                                ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
+                                chipBonding={chipBonding} setChipBonding={setChipBonding}
+                                brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
+                                contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
+                                powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
+                                powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
+                                refreshRate={refreshRate} setRefreshRate={setRefreshRate}
+                                powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
+                                memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
+                                smartModule={smartModule} setSmartModule={setSmartModule}
+                                controlSystem={controlSystem} setControlSystem={setControlSystem}
+                                receivingCard={receivingCard} setReceivingCard={setReceivingCard}
+                                ipRating={ipRating} setIpRating={setIpRating}
+                                warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                            />
                         </div>
                     </div>
 
@@ -538,7 +584,7 @@ export default function ProductsPage() {
                                 </div>
                             </div>
                         ) : products.length > 0 ? (
-                            <div className="grid grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {products.map((product, index) => {
                                     const isLastElement = products.length === index + 1;
                                     return (

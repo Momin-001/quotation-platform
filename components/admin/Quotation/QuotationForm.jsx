@@ -12,13 +12,22 @@ export default function QuotationForm({
     isMainProduct = false,
     productDisabled = false,
     isOptionalItem = false,
+    isAdditionalItem = false,
     label = "Product"
 }) {
     const handleChange = (field, value) => {
         onUpdate({ ...item, [field]: value });
     };
 
-    const DropdownComponent = isOptionalItem ? QuotationOptionalDropDown : QuotationDropDown;
+    // Optional = accessories only (not in total). Additional = controllers only (included in total).
+    const DropdownComponent = isOptionalItem || isAdditionalItem
+        ? QuotationOptionalDropDown
+        : QuotationDropDown;
+    const optionalProps = isOptionalItem
+        ? { searchType: "accessory", placeholder: "Select accessory" }
+        : isAdditionalItem
+            ? { searchType: "controller", placeholder: "Select controller" }
+            : {};
 
     return (
         <div className="bg-white rounded-lg border shadow-sm p-6 space-y-4">
@@ -46,8 +55,9 @@ export default function QuotationForm({
                     <DropdownComponent
                         value={item.product}
                         onChange={(product) => handleChange("product", product)}
-                        placeholder="Select product"
+                        placeholder={optionalProps.placeholder || "Select product"}
                         disabled={productDisabled}
+                        {...(isOptionalItem || isAdditionalItem ? { searchType: optionalProps.searchType } : {})}
                     />
                 </div>
 

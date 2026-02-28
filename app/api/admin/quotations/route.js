@@ -3,6 +3,7 @@ import {
     quotations, 
     quotationItems, 
     quotationOptionalItems,
+    quotationAdditionalItems,
     enquiries,
     users
 } from "@/db/schema";
@@ -236,6 +237,28 @@ export async function POST(request) {
                         };
                         await db.insert(quotationOptionalItems).values(optionalData);
                     }
+                }
+            }
+
+            // Create additional items (controllers only, included in item total)
+            if (item.additionalItems && Array.isArray(item.additionalItems)) {
+                const seenControllerIds = new Set();
+                for (let j = 0; j < item.additionalItems.length; j++) {
+                    const addItem = item.additionalItems[j];
+                    const controllerId = addItem.controllerId || addItem.product?.id;
+                    if (!controllerId || addItem.unitPrice == null) continue;
+                    if (seenControllerIds.has(controllerId)) continue;
+                    seenControllerIds.add(controllerId);
+                    await db.insert(quotationAdditionalItems).values({
+                        quotationItemId,
+                        controllerId,
+                        quantity: addItem.quantity || 1,
+                        unitPrice: addItem.unitPrice.toString(),
+                        taxPercentage: (addItem.taxPercentage ?? 0).toString(),
+                        discountPercentage: (addItem.discountPercentage ?? 0).toString(),
+                        description: addItem.description || null,
+                        itemOrder: j,
+                    });
                 }
             }
         }

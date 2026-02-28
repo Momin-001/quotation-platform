@@ -12,6 +12,8 @@ export const navbar = pgTable("navbar", {
     navItem4De: text("nav_item_4_de").notNull().default(""),
     navItem5En: text("nav_item_5_en").notNull().default(""),
     navItem5De: text("nav_item_5_de").notNull().default(""),
+    navItem6En: text("nav_item_6_en").notNull().default(""),
+    navItem6De: text("nav_item_6_de").notNull().default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

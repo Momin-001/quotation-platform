@@ -6,6 +6,9 @@ import { toast } from "sonner";
 const CartContext = createContext({
     cartItems: [],
     addToCart: () => {},
+    addControllerToProduct: () => {},
+    removeControllerFromProduct: () => {},
+    getControllerForProduct: () => null,
     removeFromCart: () => {},
     updateQuantity: () => {},
     clearCart: () => {},
@@ -28,10 +31,11 @@ export const CartProvider = ({ children }) => {
         if (savedCart) {
             try {
                 const parsed = JSON.parse(savedCart);
-                // Ensure items have itemType
+                // Ensure items have itemType and additionalController
                 const itemsWithType = parsed.map((item, index) => ({
                     ...item,
                     itemType: item.itemType || (index === 0 ? "main" : "alternative"),
+                    additionalController: item.additionalController || null,
                 }));
                 setCartItems(itemsWithType);
             } catch (error) {
@@ -73,8 +77,8 @@ export const CartProvider = ({ children }) => {
             // Determine item type based on position
             const itemType = prevItems.length === 0 ? "main" : "alternative";
             
-            // Add new product with quantity 1 and item type
-            return [...prevItems, { ...product, quantity: 1, itemType }];
+            // Add new product with quantity 1, item type, no additional controller yet
+            return [...prevItems, { ...product, quantity: 1, itemType, additionalController: null }];
         });
     };
 
@@ -122,6 +126,33 @@ export const CartProvider = ({ children }) => {
         return cartItems.find((item) => item.itemType === "alternative") || cartItems[1] || null;
     };
 
+    // Add controller as additional product to a specific LED (max 1 per LED)
+    const addControllerToProduct = (controller, productId) => {
+        setCartItems((prevItems) => {
+            return prevItems.map((item) => {
+                if (item.id === productId) {
+                    return { ...item, additionalController: controller };
+                }
+                return item;
+            });
+        });
+    };
+
+    // Remove controller from a product
+    const removeControllerFromProduct = (productId) => {
+        setCartItems((prevItems) =>
+            prevItems.map((item) =>
+                item.id === productId ? { ...item, additionalController: null } : item
+            )
+        );
+    };
+
+    // Get controller attached to a product
+    const getControllerForProduct = (productId) => {
+        const item = cartItems.find((i) => i.id === productId);
+        return item?.additionalController || null;
+    };
+
     // Swap main and alternative products
     const swapProducts = () => {
         if (cartItems.length !== 2) return;
@@ -140,6 +171,9 @@ export const CartProvider = ({ children }) => {
             value={{
                 cartItems,
                 addToCart,
+                addControllerToProduct,
+                removeControllerFromProduct,
+                getControllerForProduct,
                 removeFromCart,
                 updateQuantity,
                 clearCart,

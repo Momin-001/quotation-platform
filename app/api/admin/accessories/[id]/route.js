@@ -8,12 +8,11 @@ export async function GET(request, { params }) {
     try {
         const { id } = await params;
 
-        const accessory = await db
+        const [accessory] = await db
             .select()
             .from(accessories)
             .where(eq(accessories.id, id))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!accessory) {
             return errorResponse("Accessory not found", 404);
@@ -45,12 +44,11 @@ export async function PUT(request, { params }) {
             return errorResponse("Invalid product group. Must be one of: " + validGroups.join(", "), 400);
         }
 
-        const existing = await db
+        const [existing] = await db
             .select()
             .from(accessories)
             .where(eq(accessories.id, id))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!existing) {
             return errorResponse("Accessory not found", 404);
@@ -87,12 +85,11 @@ export async function DELETE(request, { params }) {
     try {
         const { id } = await params;
 
-        const existing = await db
+        const [existing] = await db
             .select()
             .from(accessories)
             .where(eq(accessories.id, id))
             .limit(1)
-            .then((res) => res[0]);
 
         if (!existing) {
             return errorResponse("Accessory not found", 404);

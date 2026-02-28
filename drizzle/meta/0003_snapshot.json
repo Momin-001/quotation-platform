@@ -1,6 +1,6 @@
 {
-  "id": "c4c4f5b2-cc9d-40e7-a573-3b83eee06aa9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1777e21a-9292-47d5-bae5-148544e0623b",
+  "prevId": "6a04534c-bb1d-4fab-8b8a-4a18caa688c2",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -627,6 +627,26 @@
           "notNull": true,
           "default": 1
         },
+        "item_type": {
+          "name": "item_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'main'"
+        },
+        "item_order": {
+          "name": "item_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "controller_id": {
+          "name": "controller_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "is_custom": {
           "name": "is_custom",
           "type": "boolean",
@@ -783,6 +803,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "enquiry_items_controller_id_controllers_id_fk": {
+          "name": "enquiry_items_controller_id_controllers_id_fk",
+          "tableFrom": "enquiry_items",
+          "tableTo": "controllers",
+          "columnsFrom": [
+            "controller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1861,12 +1894,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "monitoring_function_de": {
-          "name": "monitoring_function_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "additional_certification": {
           "name": "additional_certification",
           "type": "text",
@@ -1891,20 +1918,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "support_during_warranty_de": {
-          "name": "support_during_warranty_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "support_after_warranty_en": {
           "name": "support_after_warranty_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "support_after_warranty_de": {
-          "name": "support_after_warranty_de",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1914,21 +1929,21 @@
           "type": "product_type",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "design": {
           "name": "design",
           "type": "design",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "special_types": {
           "name": "special_types",
           "type": "special_types",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "special_types_other": {
           "name": "special_types_other",
@@ -1941,34 +1956,34 @@
           "type": "application",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_pitch": {
           "name": "pixel_pitch",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_configuration": {
           "name": "pixel_configuration",
           "type": "pixel_configuration",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_technology": {
           "name": "pixel_technology",
           "type": "pixel_technology",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "led_technology": {
           "name": "led_technology",
           "type": "led_technology",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "led_technology_other": {
           "name": "led_technology_other",
@@ -1981,28 +1996,28 @@
           "type": "chip_bonding",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "colour_depth": {
           "name": "colour_depth",
           "type": "colour_depth",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "current_gain_control": {
           "name": "current_gain_control",
           "type": "current_gain_control",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "video_rate": {
           "name": "video_rate",
           "type": "video_rate",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "brightness_value": {
           "name": "brightness_value",
@@ -2015,7 +2030,7 @@
           "type": "calibration_method",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "calibration_method_other": {
           "name": "calibration_method_other",
@@ -2028,14 +2043,14 @@
           "type": "driving_method",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "control_system": {
           "name": "control_system",
           "type": "control_system",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "control_system_other": {
           "name": "control_system_other",
@@ -2048,28 +2063,28 @@
           "type": "cooling",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "power_redundancy": {
           "name": "power_redundancy",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "memory_on_module": {
           "name": "memory_on_module",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "smart_module": {
           "name": "smart_module",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "support": {
           "name": "support",
@@ -2106,20 +2121,20 @@
           "name": "refresh_rate",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "scan_rate_numerator": {
           "name": "scan_rate_numerator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": 1
         },
         "scan_rate_denominator": {
           "name": "scan_rate_denominator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "contrast_ratio_numerator": {
           "name": "contrast_ratio_numerator",
@@ -2131,8 +2146,7 @@
           "name": "contrast_ratio_denominator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "cabinet_resolution_horizontal": {
           "name": "cabinet_resolution_horizontal",
@@ -2198,6 +2212,54 @@
         "warranty_period": {
           "name": "warranty_period",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "oem_brand": {
+          "name": "oem_brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_driver": {
+          "name": "led_driver",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "power_supply": {
+          "name": "power_supply",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_cabinet_usd": {
+          "name": "price_per_cabinet_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_metre_square_usd": {
+          "name": "price_per_metre_square_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_pieces": {
+          "name": "stock_pieces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leadtime_days": {
+          "name": "leadtime_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

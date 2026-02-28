@@ -12,6 +12,10 @@ export default function QuotationBuilderSection({
     onAddOptional,
     onUpdateOptional,
     onRemoveOptional,
+    additionalItems = [],
+    onAddAdditional,
+    onUpdateAdditional,
+    onRemoveAdditional,
     isMainProduct = false,
     productFromEnquiry = false,
     onAddAlternative,
@@ -32,13 +36,44 @@ export default function QuotationBuilderSection({
                         label={isMainProduct ? "Main Product" : "Alternative Product"}
                     />
 
-                    {/* Optional Products */}
+                    {/* Additional Products (controllers, included in total) */}
+                    {additionalItems.length > 0 && (
+                        <div className="ml-4 border-l-3 border-purple-300 pl-4 space-y-4">
+                            <h4 className="text-sm font-semibold text-purple-700">Additional Products</h4>
+                            {additionalItems.map((addItem, addIndex) => (
+                                <QuotationForm
+                                    key={`add-${addIndex}`}
+                                    item={addItem}
+                                    onUpdate={(updated) => onUpdateAdditional(addIndex, updated)}
+                                    onRemove={() => onRemoveAdditional(addIndex)}
+                                    isAdditionalItem={true}
+                                    label={`Additional Product ${addIndex + 1}`}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Add Additional Product Button */}
+                    {onAddAdditional && (
+                        <div className="ml-4">
+                            <button
+                                type="button"
+                                onClick={onAddAdditional}
+                                className="w-full border-2 border-dashed border-purple-300 rounded-lg py-3 text-purple-600 hover:bg-purple-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Additional Product
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Optional Products (accessories only, not in total) */}
                     {optionalItems.length > 0 && (
                         <div className="ml-4 border-l-3 border-blue-300 pl-4 space-y-4">
                             <h4 className="text-sm font-semibold text-blue-700">Optional Products</h4>
                             {optionalItems.map((optItem, optIndex) => (
                                 <QuotationForm
-                                    key={optIndex}
+                                    key={`opt-${optIndex}`}
                                     item={optItem}
                                     onUpdate={(updated) => onUpdateOptional(optIndex, updated)}
                                     onRemove={() => onRemoveOptional(optIndex)}
