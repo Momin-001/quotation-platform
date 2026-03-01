@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: "quoationplatform",
+        name: "quotationplatform",
         script: "./server.js",
         env: {
           NODE_ENV: "production",
