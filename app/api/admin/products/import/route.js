@@ -318,9 +318,10 @@ export async function POST(req) {
         const warrantyPeriod = parseInteger(cell(60, p));
         const pricePerCabinetUsd = parseDecimal(cell(63, p));
         const pricePerMetreSquareUsd = parseDecimal(cell(64, p));
-        const stockPieces = parseInteger(cell(65, p));
-        const leadtimeDays = parseInteger(cell(66, p));
-        const notes = str(cell(67, p));
+        const profitMargin = parseDecimal(cell(65, p));
+        const stockPieces = parseInteger(cell(66, p));
+        const leadtimeDays = parseInteger(cell(67, p));
+        const notes = str(cell(68, p));
 
         // ── Validation ──
         const missing = [];
@@ -467,14 +468,13 @@ export async function POST(req) {
           // Optional fields
           pricePerCabinetUsd: pricePerCabinetUsd || null,
           pricePerMetreSquareUsd: pricePerMetreSquareUsd || null,
-          stockPieces: stockPieces ?? null,
-          leadtimeDays: leadtimeDays ?? null,
+          profitMargin: profitMargin || null,
+          stockPieces: stockPieces || null,
+          leadtimeDays: leadtimeDays || null,
           notes: notes || null,
-
           isActive: false,
           updatedAt: new Date(),
         };
-
         // ── UPSERT ──
         const existing = await db
           .select({ id: products.id })

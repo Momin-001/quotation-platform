@@ -47,7 +47,7 @@ function matchYesNo(value) {
  *   Row 0 = header row
  *   Row 1 = Brand Name
  *   Row 2 = Interface Name
- *   ...etc per the screenshots
+ *   ...etc 
  */
 export async function POST(req) {
     try {
@@ -117,49 +117,7 @@ export async function POST(req) {
 
         for (let c = 0; c < numControllers; c++) {
             try {
-                // Row mapping based on the excel screenshots (0-indexed):
-                // Row 0 = headers (Headings, SPEC_ITEM_EN, Example)
-                // Row 1 = Brand Name
-                // Row 2 = Interface Name
-                // Row 3 = Max. Pixel Capacity
-                // Row 4 = Max. Width/Height (px)
-                // Row 5 = DP 1.2
-                // Row 6 = HDMI 2.0
-                // Row 7 = HDMI 1.3
-                // Row 8 = DVI (Single-Link)
-                // Row 9 = 12G-SDI
-                // Row 10 = 3G-SDI
-                // Row 11 = 10G Optical Fiber Port (In)
-                // Row 12 = USB 3.0 (Media Playback)
-                // Row 13 = Gigabit Ethernet Ports (RJ45)
-                // Row 14 = 10G Optical Fiber Port (Out)
-                // Row 15 = 5G output Port
-                // Row 16 = HDMI 1.3 (Monitoring)
-                // Row 17 = 3D Connector (Mini DIN 4)
-                // Row 18 = HDMI 2.0 LOOP
-                // Row 19 = 12G-SDI LOOP
-                // Row 20 = 3G-SDI LOOP
-                // Row 21 = DVI LOOP
-                // Row 22 = 3.5 mm Audio Input
-                // Row 23 = 3.5 mm Audio Output
-                // Row 24 = Ethernet Control Port
-                // Row 25 = USB (Type-B - PC Control)
-                // Row 26 = USB (Type-A - Cascading)
-                // Row 27 = Genlock IN & LOOP
-                // Row 28 = RS-232
-                // Row 29 = Maximum Layers
-                // Row 30 = Layer-Scaling
-                // Row 31 = HDR Support
-                // Row 32 = Color Depth (bit)
-                // Row 33 = Low Latency
-                // Row 34 = Fiber Converter Mode
-                // Row 35 = V-Can Support
-                // Row 36 = Backup-Mode
-                // Row 37 = Genlock Sync
-                // Row 38 = Multi-Viewer (MVR)
-                // Row 39 = USB-Playback
-                // Row 40 = 3D-Support
-
+                
                 const brandResult = matchBrand(cell(1, c));
                 const interfaceName = str(cell(2, c));
 

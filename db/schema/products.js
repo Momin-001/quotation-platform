@@ -132,6 +132,7 @@ export const products = pgTable("products", {
     powerSupply: text("power_supply"),
     pricePerCabinetUsd: decimal("price_per_cabinet_usd", { precision: 12, scale: 2 }),
     pricePerMetreSquareUsd: decimal("price_per_metre_square_usd", { precision: 12, scale: 2 }),
+    profitMargin: decimal("profit_margin", { precision: 12, scale: 2 }),
     stockPieces: integer("stock_pieces"),
     leadtimeDays: integer("leadtime_days"),
     notes: text("notes"),

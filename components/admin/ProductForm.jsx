@@ -44,14 +44,11 @@ function getDefaultValuesFromInitial(initialData) {
         receivingCard: str(initialData.receivingCard),
         heatDissipation: str(initialData.heatDissipation),
         monitoringFunctionEn: str(initialData.monitoringFunctionEn),
-        monitoringFunctionDe: str(initialData.monitoringFunctionDe),
         additionalCertification: str(initialData.additionalCertification),
         emc: str(initialData.emc),
         safety: str(initialData.safety),
         supportDuringWarrantyEn: str(initialData.supportDuringWarrantyEn),
-        supportDuringWarrantyDe: str(initialData.supportDuringWarrantyDe),
         supportAfterWarrantyEn: str(initialData.supportAfterWarrantyEn),
-        supportAfterWarrantyDe: str(initialData.supportAfterWarrantyDe),
         productType: optStr(initialData.productType),
         design: optStr(initialData.design),
         specialTypes: optStr(initialData.specialTypes),
@@ -99,6 +96,7 @@ function getDefaultValuesFromInitial(initialData) {
         powerSupply: str(initialData.powerSupply),
         pricePerCabinetUsd: initialData.pricePerCabinetUsd !== undefined && initialData.pricePerCabinetUsd !== null && initialData.pricePerCabinetUsd !== "" ? initialData.pricePerCabinetUsd : "",
         pricePerMetreSquareUsd: initialData.pricePerMetreSquareUsd !== undefined && initialData.pricePerMetreSquareUsd !== null && initialData.pricePerMetreSquareUsd !== "" ? initialData.pricePerMetreSquareUsd : "",
+        profitMargin: initialData.profitMargin !== undefined && initialData.profitMargin !== null && initialData.profitMargin !== "" ? initialData.profitMargin : "",
         stockPieces: initialData.stockPieces !== undefined && initialData.stockPieces !== null && initialData.stockPieces !== "" ? initialData.stockPieces : "",
         leadtimeDays: initialData.leadtimeDays !== undefined && initialData.leadtimeDays !== null && initialData.leadtimeDays !== "" ? initialData.leadtimeDays : "",
         notes: str(initialData.notes),
@@ -125,14 +123,11 @@ const productSchema = z.object({
     receivingCard: z.string().optional(),
     heatDissipation: z.string().optional(),
     monitoringFunctionEn: z.string().optional(),
-    monitoringFunctionDe: z.string().optional(),
     additionalCertification: z.string().optional(),
     emc: z.string().optional(),
     safety: z.string().optional(),
     supportDuringWarrantyEn: z.string().optional(),
-    supportDuringWarrantyDe: z.string().optional(),
     supportAfterWarrantyEn: z.string().optional(),
-    supportAfterWarrantyDe: z.string().optional(),
     
     // Dropdown fields (ENUMs - Point 2)
     productType: z.enum(["AIO Systems", "LED Display Single Cabinet"], {
@@ -247,6 +242,7 @@ const productSchema = z.object({
     powerSupply: z.string().optional(),
     pricePerCabinetUsd: z.coerce.number().optional(),
     pricePerMetreSquareUsd: z.coerce.number().optional(),
+    profitMargin: z.coerce.number().optional(),
     stockPieces: z.coerce.number().int().optional(),
     leadtimeDays: z.coerce.number().int().optional(),
     notes: z.string().optional(),
@@ -712,6 +708,7 @@ export default function ProductForm({
                     {renderInput("Power Supply", "powerSupply", "text", { placeholder: "e.g., Meanwell UHP200-5v" })}
                     {renderInput("Price Per Cabinet (USD)", "pricePerCabinetUsd", "number", { step: "0.01", placeholder: "e.g., 1500.00" })}
                     {renderInput("Price Per Metre Square (USD)", "pricePerMetreSquareUsd", "number", { step: "0.01", placeholder: "e.g., 2500.00" })}
+                    {renderInput("Profit Margin (%)", "profitMargin", "number", { step: "0.01", placeholder: "e.g., 10.00" })}
                     {renderInput("Stock (pieces)", "stockPieces", "number", { step: "1", placeholder: "e.g., 10" })}
                     {renderInput("Leadtime (days)", "leadtimeDays", "number", { step: "1", placeholder: "e.g., 14" })}
                     {renderTextarea("Notes", "notes", { placeholder: "Optional notes" })}
@@ -725,14 +722,11 @@ export default function ProductForm({
                     {renderSelect("Support *", "support", ["Frontendside", "Backside", "Frontside and Backside"]) }
                     {renderInput("Warranty Period (months)", "warrantyPeriod", "number", { step: "1", placeholder: "e.g., 24" })}
                     {renderTextarea("Monitoring Function (EN)", "monitoringFunctionEn", { required: true, placeholder: "Enter monitoring function in English" })}
-                    {renderTextarea("Monitoring Function (DE)", "monitoringFunctionDe", { required: true, placeholder: "Enter monitoring function in German" })}
                     {renderTextarea("Additional Certification", "additionalCertification", { required: true, placeholder: "Enter additional certification" })}
                     {renderTextarea("EMC", "emc", { required: true, placeholder: "Enter EMC information" })}
                     {renderTextarea("Safety", "safety", { required: true, placeholder: "Enter safety information" })}
                     {renderTextarea("Support During Warranty (EN)", "supportDuringWarrantyEn", { required: true, placeholder: "Enter support during warranty in English" })}
-                    {renderTextarea("Support During Warranty (DE)", "supportDuringWarrantyDe", { required: true, placeholder: "Enter support during warranty in German" })}
                     {renderTextarea("Support After Warranty (EN)", "supportAfterWarrantyEn", { required: true, placeholder: "Enter support after warranty in English" })}
-                    {renderTextarea("Support After Warranty (DE)", "supportAfterWarrantyDe", { required: true, placeholder: "Enter support after warranty in German" })}
                 </div>
             </div>
 
