@@ -538,11 +538,95 @@ export default function LeditorPage() {
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6">
-                                    <div className="flex items-center justify-center rounded-lg p-4 min-h-[400px]">
-                                        <canvas
-                                            ref={canvasRef}
-                                            className="max-w-full"
-                                        />
+                                    <div className="flex flex-col lg:flex-row gap-6 items-start">
+                                        {/* LED Preview canvas */}
+                                        <div className="flex-1 w-full flex items-center justify-center rounded-lg bg-gray-50 border p-4 min-h-[360px]">
+                                            <canvas
+                                                ref={canvasRef}
+                                                className="max-w-full"
+                                            />
+                                        </div>
+                                        {/* Screen size controls - right of preview (or below on mobile) for live feedback */}
+                                        {selectedProduct && (
+                                            <div className="w-full lg:w-72 shrink-0 rounded-lg border bg-white p-4 space-y-4">
+                                                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Screen Size</h3>
+                                                <div className="space-y-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm">Width (m)</Label>
+                                                        <div className="flex items-center gap-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9 shrink-0"
+                                                                onClick={() => adjustScreenWidth(-1)}
+                                                            >
+                                                                <Minus className="h-4 w-4" />
+                                                            </Button>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.001"
+                                                                value={config.screenWidth}
+                                                                onChange={(e) =>
+                                                                    setConfig((prev) => ({
+                                                                        ...prev,
+                                                                        screenWidth: parseFloat(e.target.value) || 0,
+                                                                    }))
+                                                                }
+                                                                className="text-center flex-1"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9 shrink-0"
+                                                                onClick={() => adjustScreenWidth(1)}
+                                                            >
+                                                                <Plus className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm">Height (m)</Label>
+                                                        <div className="flex items-center gap-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9 shrink-0"
+                                                                onClick={() => adjustScreenHeight(-1)}
+                                                            >
+                                                                <Minus className="h-4 w-4" />
+                                                            </Button>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.001"
+                                                                value={config.screenHeight}
+                                                                onChange={(e) =>
+                                                                    setConfig((prev) => ({
+                                                                        ...prev,
+                                                                        screenHeight: parseFloat(e.target.value) || 0,
+                                                                    }))
+                                                                }
+                                                                className="text-center flex-1"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9 shrink-0"
+                                                                onClick={() => adjustScreenHeight(1)}
+                                                            >
+                                                                <Plus className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p className="text-xs text-gray-500">
+                                                    Change width/height to see the LED preview update live.
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </AccordionContent>
@@ -785,83 +869,7 @@ export default function LeditorPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Screen Width & Height with +/- (Dynamic) */}
-                                            <div className="space-y-2 pt-4">
-                                                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Screen Size Configuration</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <div className="space-y-2">
-                                                    <Label>Width (meters)</Label>
-                                                    <div className="flex items-center gap-3">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-10 w-10 shrink-0"
-                                                            onClick={() => adjustScreenWidth(-1)}
-                                                        >
-                                                            <Minus className="h-4 w-4" />
-                                                        </Button>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.001"
-                                                            value={config.screenWidth}
-                                                            onChange={(e) =>
-                                                                setConfig((prev) => ({
-                                                                    ...prev,
-                                                                    screenWidth: parseFloat(e.target.value) || 0,
-                                                                }))
-                                                            }
-                                                            className="text-center"
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-10 w-10 shrink-0"
-                                                            onClick={() => adjustScreenWidth(1)}
-                                                        >
-                                                            <Plus className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <Label>Height (meters)</Label>
-                                                    <div className="flex items-center gap-3">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-10 w-10 shrink-0"
-                                                            onClick={() => adjustScreenHeight(-1)}
-                                                        >
-                                                            <Minus className="h-4 w-4" />
-                                                        </Button>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.001"
-                                                            value={config.screenHeight}
-                                                            onChange={(e) =>
-                                                                setConfig((prev) => ({
-                                                                    ...prev,
-                                                                    screenHeight: parseFloat(e.target.value) || 0,
-                                                                }))
-                                                            }
-                                                            className="text-center"
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-10 w-10 shrink-0"
-                                                            onClick={() => adjustScreenHeight(1)}
-                                                        >
-                                                            <Plus className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            {/* Screen size controls are in the Preview section for live feedback */}
 
                                             {/* Calculated Fields */}
                                             <div className="space-y-2 pt-4">

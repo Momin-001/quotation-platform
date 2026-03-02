@@ -1,5 +1,6 @@
 import { Archivo, Geist, Geist_Mono, Open_Sans } from "next/font/google"; // Corrected imports
 import "./globals.css";
+import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CartProvider } from "@/context/CartContext";
@@ -37,6 +38,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} ${openSans.variable} antialiased`}
       >
+        <NextTopLoader
+          color="#2563eb"
+          height={3}
+          showSpinner={false}
+          easing="ease"
+        />
         <AuthProvider>
           <LanguageProvider>
             <CartProvider>
