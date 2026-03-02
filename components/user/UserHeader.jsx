@@ -15,34 +15,38 @@ export default function UserHeader() {
 
     return (
         <div className="w-full bg-primary text-white">
-            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                {/* Left Side - Navigation Links */}
-                <div className="flex items-center gap-6 text-sm">
-                    <Link 
-                        href="/user/my-enquiries" 
-                        className="hover:underline"
-                    >
-                        My Enquiries
-                    </Link>
-                    <Link 
-                        href="/user/my-quotations" 
-                        className="hover:underline"
-                    >
-                        My Quotations
-                    </Link>
-                    <Link 
-                        href="/user/account-settings" 
-                        className="hover:underline"
-                    >
-                        Account Setting
-                    </Link>
-                </div>
+            {/* Horizontal scroll container for small screens */}
+            <div className="container mx-auto px-4 py-3 overflow-x-auto">
+                <div className="min-w-max flex justify-between items-center gap-6 text-sm">
+                    {/* Navigation Links */}
+                    <div className="flex items-center gap-6">
 
-                {/* Right Side - Cart */}
-                <div className="flex items-center gap-2">
+                        <Link
+                            href="/user/my-enquiries"
+                            className="hover:underline whitespace-nowrap"
+                        >
+                            My Enquiries
+                        </Link>
+                        <Link
+                            href="/user/my-quotations"
+                            className="hover:underline whitespace-nowrap"
+                        >
+                            My Quotations
+                        </Link>
+                        <Link
+                            href="/user/account-settings"
+                            className="hover:underline whitespace-nowrap"
+                        >
+                            Account Setting
+                        </Link>
+                    </div>
+
+                    {/* Spacer so cart isn't glued to links */}
+
+                    {/* Cart */}
                     <Link
                         href="/user/cart"
-                        className="flex items-center gap-2 hover:underline relative"
+                        className="flex items-center gap-2 hover:underline relative whitespace-nowrap"
                     >
                         <div className="relative">
                             <ShoppingCart className="h-4 w-4" />

@@ -11,7 +11,7 @@ import {
   export default function BreadCrumb({ title, breadcrumbs }) {
     return (
       <div className="bg-secondary">
-        <div className="container text-white mx-auto py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="container text-white mx-auto py-3 px-4 flex flex-wrap gap-3 items-center justify-between">
           {/* Left: Page Title */}
           <h1 className="text-2xl font-semibold tracking-tight">
             {title}

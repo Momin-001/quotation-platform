@@ -26,7 +26,8 @@ export default function UserAvatar() {
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-400 pl-2 pr-2 rounded h-10 flex gap-2 items-center">
+                    <Button variant="outline" className="border-gray-400 pl-2 pr-2 w-full rounded h-10 flex gap-2 justify-between items-center">
+                        <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                             <AvatarImage src="" /> {/* Placeholder for user image */}
                             <AvatarFallback className="bg-gray-200"><User className="h-4 w-4 text-gray-500" /></AvatarFallback>
@@ -35,6 +36,8 @@ export default function UserAvatar() {
                             <span className="text-xs font-bold leading-none text-[#0F2E4A]">{user?.fullName || "User Name"}</span>
                             <span className="text-[10px] text-gray-500 capitalize leading-none mt-0.5">{formatRole(user?.role)}</span>
                         </div>
+                        </div>
+                        
                         <ChevronDown className="h-3 w-3 text-gray-400" />
                     </Button>
                 </DropdownMenuTrigger>

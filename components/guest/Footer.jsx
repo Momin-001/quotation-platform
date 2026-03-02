@@ -77,20 +77,22 @@ export default function Footer({ footerData }) {
                             {getText("quickLinksTitle") || "Quick Links"}
                         </h3>
                         <ul className="space-y-2 text-sm text-gray-300">
-                            {getQuickLinks().map((link, index) => (
-                                <li key={index}>
-                                    <Link href="#" className="hover:text-secondary">
-                                        {link}
-                                    </Link>
-                                </li>
-                            ))}
-                            {getQuickLinks().length === 0 && (
+                            
+                            {getQuickLinks().length > 0 ? (
                                 <>
-                                    <li><Link href="/about" className="hover:text-secondary">About</Link></li>
-                                    <li><Link href="/blogs" className="hover:text-secondary">Blogs</Link></li>
-                                    <li><Link href="/projects" className="hover:text-secondary">Projects</Link></li>
-                                    <li><Link href="/contact" className="hover:text-secondary">Contact Us</Link></li>
-                                    <li><Link href="/help" className="hover:text-secondary">Help</Link></li>
+                                    <li><Link href="/" className="hover:text-secondary">{getText("quickLink1") || "Home"}</Link></li>
+                                    <li><Link href="/products" className="hover:text-secondary">{getText("quickLink2") || "Products"}</Link></li>
+                                    <li><Link href="/controllers" className="hover:text-secondary">{getText("quickLink3") || "Controllers"}</Link></li>
+                                    <li><Link href="/leditor" className="hover:text-secondary">{getText("quickLink4") || "LEDitor"}</Link></li>
+                                    <li><Link href="/become-partner" className="hover:text-secondary">{getText("quickLink5") || "Become Partner"}</Link></li>
+                                </>
+                            ) : (
+                                <>
+                                    <li><Link href="/" className="hover:text-secondary">Home</Link></li>
+                                    <li><Link href="/products" className="hover:text-secondary">Products</Link></li>
+                                    <li><Link href="/controllers" className="hover:text-secondary">Controllers</Link></li>
+                                    <li><Link href="/leditor" className="hover:text-secondary">Leditor</Link></li>
+                                    <li><Link href="/become-partner" className="hover:text-secondary">Become Partner</Link></li>
                                 </>
                             )}
                         </ul>
