@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
     Table,
@@ -64,19 +64,22 @@ export default function AdminEnquiriesPage() {
         }
     }, []);
 
-    // Debounced search
+    const isInitialMount = useRef(true);
+
+    // Single effect: fetch on mount (immediately) and when search/sortBy change (debounced)
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            setPage(1);
+            fetchEnquiries(1, search, sortBy);
+            return;
+        }
         const timer = setTimeout(() => {
             setPage(1);
             fetchEnquiries(1, search, sortBy);
         }, 500);
         return () => clearTimeout(timer);
     }, [search, sortBy, fetchEnquiries]);
-
-    // Initial load
-    useEffect(() => {
-        fetchEnquiries(1, search, sortBy);
-    }, []);
 
     const getStatusColor = (status) => {
         switch (status) {

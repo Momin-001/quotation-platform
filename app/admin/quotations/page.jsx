@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
     Table,
@@ -70,19 +70,22 @@ export default function AdminQuotationsPage() {
         }
     }, []);
 
-    // Debounced search
+    const isInitialMount = useRef(true);
+
+    // Single effect: fetch on mount (immediately) and when search/status/sort change (debounced)
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            setPage(1);
+            fetchQuotations(1, search, statusFilter, sortBy);
+            return;
+        }
         const timer = setTimeout(() => {
             setPage(1);
             fetchQuotations(1, search, statusFilter, sortBy);
         }, 500);
         return () => clearTimeout(timer);
     }, [search, statusFilter, sortBy, fetchQuotations]);
-
-    // Initial load
-    useEffect(() => {
-        fetchQuotations(1, search, statusFilter, sortBy);
-    }, []);
 
     const handleLoadMore = () => {
         const nextPage = page + 1;
