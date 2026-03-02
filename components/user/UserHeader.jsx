@@ -31,12 +31,6 @@ export default function UserHeader() {
                         My Quotations
                     </Link>
                     <Link 
-                        href="/user/recommended-products" 
-                        className="hover:underline"
-                    >
-                        Recommended Products
-                    </Link>
-                    <Link 
                         href="/user/account-settings" 
                         className="hover:underline"
                     >

@@ -20,9 +20,9 @@ export default function UserAvatar() {
 
     return (
         <div className="flex items-center gap-3">
-            <Button size="icon" variant="outline" className="border-gray-400 text-primary rounded">
+            {/* <Button size="icon" variant="outline" className="border-gray-400 text-primary rounded">
                 <Bell className="h-4 w-4" />
-            </Button>
+            </Button> */}
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

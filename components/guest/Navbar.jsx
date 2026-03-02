@@ -71,9 +71,6 @@ export default function Navbar({ navbarData }) {
                     ) : (
                         <>
                         <div className="flex items-center gap-3">
-                            <Button size="icon" className="bg-[#009B8F] hover:bg-[#009B8F]/90 text-white rounded">
-                                <PenLine className="h-4 w-4" />
-                            </Button>
                             <UserAvatar />
                         </div>
                     
