@@ -28,41 +28,34 @@ export async function PATCH(request, { params }) {
             const base64Image = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
             // Get current certificate to delete old image
-            const currentCertificate = await db
+            const [currentCertificate] = await db
                 .select()
                 .from(certificates)
                 .where(eq(certificates.id, id))
                 .limit(1);
 
-            if (currentCertificate.length > 0 && currentCertificate[0].imageUrl) {
+            if (currentCertificate && currentCertificate.publicId) {
                 // Extract public ID from URL and delete from Cloudinary
-                const urlParts = currentCertificate[0].imageUrl.split('/');
-                const publicIdWithExtension = urlParts[urlParts.length - 1];
-                const publicId = `certificates/${publicIdWithExtension.split('.')[0]}`;
-
-                try {
-                    await cloudinary.uploader.destroy(publicId);
-                } catch (deleteError) {
-                    console.error("Error deleting old image:", deleteError);
-                }
+                await cloudinary.uploader.destroy(currentCertificate.publicId);
             }
 
             // Upload new image
             const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                folder: "certificates",
+                folder: "QuotationPlatform/certificates/images",
                 resource_type: "image",
             });
 
             updateData.imageUrl = uploadResult.secure_url;
+            updateData.publicId = uploadResult.public_id;
         }
 
-        const updatedCertificate = await db
+        const [updatedCertificate] = await db
             .update(certificates)
             .set(updateData)
             .where(eq(certificates.id, id))
             .returning();
 
-        if (updatedCertificate.length === 0) {
+        if (!updatedCertificate) {
             return errorResponse("Certificate not found", 404);
         }
 
@@ -79,27 +72,19 @@ export async function DELETE(request, { params }) {
         const { id } = resolvedParams;
 
         // Get certificate to delete image from Cloudinary
-        const certificate = await db
+        const [certificate] = await db
             .select()
             .from(certificates)
             .where(eq(certificates.id, id))
             .limit(1);
 
-        if (certificate.length === 0) {
+        if (!certificate) {
             return errorResponse("Certificate not found", 404);
         }
 
         // Delete image from Cloudinary
-        if (certificate[0].imageUrl) {
-            const urlParts = certificate[0].imageUrl.split('/');
-            const publicIdWithExtension = urlParts[urlParts.length - 1];
-            const publicId = `certificates/${publicIdWithExtension.split('.')[0]}`;
-
-            try {
-                await cloudinary.uploader.destroy(publicId);
-            } catch (deleteError) {
-                console.error("Error deleting image from Cloudinary:", deleteError);
-            }
+        if (certificate.publicId) {
+            await cloudinary.uploader.destroy(certificate.publicId);
         }
 
         // Delete from database

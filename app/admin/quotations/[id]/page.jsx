@@ -17,6 +17,7 @@ export default function AdminQuotationDetailPage() {
     const router = useRouter();
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [pdfLoading, setPdfLoading] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -40,8 +41,25 @@ export default function AdminQuotationDetailPage() {
         }
     };
 
-    const handleDownloadPDF = () => {
-        toast.info("PDF download coming soon");
+    const handleDownloadPDF = async () => {
+        if (pdfLoading) return;
+        setPdfLoading(true);
+        try {
+            const res = await fetch(`/api/admin/quotations/${params.id}/pdf`);
+            if (!res.ok) throw new Error("PDF generation failed");
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Angebot-${quotation.quotationNumber}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success("PDF downloaded");
+        } catch (err) {
+            toast.error(err.message || "Failed to download PDF");
+        } finally {
+            setPdfLoading(false);
+        }
     };
 
     if (loading) {
@@ -280,8 +298,9 @@ export default function AdminQuotationDetailPage() {
                         onClick={handleDownloadPDF}
                         variant="default"
                         size="lg"
+                        disabled={pdfLoading}
                     >
-                        <FileText className="h-4 w-4 mr-2" />
+                        {pdfLoading ? <Spinner className="h-4 w-4 mr-2" /> : <FileText className="h-4 w-4 mr-2" />}
                         Download PDF
                     </Button>
                     <Link href={`/admin/enquiries/${quotation.enquiry?.id}/quotation`}>

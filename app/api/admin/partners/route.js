@@ -38,7 +38,7 @@ export async function POST(request) {
 
         // Upload to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(base64Image, {
-            folder: "partners",
+            folder: "QuotationPlatform/partners/images",
             resource_type: "image",
         });
 
@@ -48,6 +48,7 @@ export async function POST(request) {
             .values({
                 name: name.trim(),
                 logoUrl: uploadResult.secure_url,
+                publicId: uploadResult.public_id,
                 websiteUrl: websiteUrl.trim(),
             })
             .returning();

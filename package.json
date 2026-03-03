@@ -43,6 +43,7 @@
     "nodemailer": "^7.0.12",
     "pdfkit": "^0.17.2",
     "pg": "^8.18.0",
+    "puppeteer": "^24.37.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-fast-marquee": "^1.6.5",

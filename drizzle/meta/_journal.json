@@ -36,6 +36,20 @@
       "when": 1772382618590,
       "tag": "0004_blue_warstar",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1772515756467,
+      "tag": "0005_lucky_flatman",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772531719029,
+      "tag": "0006_known_captain_america",
+      "breakpoints": true
     }
   ]
 }

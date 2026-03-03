@@ -142,13 +142,14 @@ export async function POST(request) {
                     const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
 
                     const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                        folder: "products/images",
+                        folder: "QuotationPlatform/products/images",
                         resource_type: "image",
                     });
 
                     return db.insert(productImages).values({
                         productId,
                         imageUrl: uploadResult.secure_url,
+                        publicId: uploadResult.public_id,
                         imageOrder: index,
                     });
                 }
@@ -191,6 +192,7 @@ export async function POST(request) {
 
         return successResponse("Product created successfully", newProduct[0]);
     } catch (error) {
+        console.log(error);
         return errorResponse(error.message || "Failed to create product");
     }
 }

@@ -71,12 +71,13 @@ async function uploadImages(imageFiles, controllerId) {
             const buffer = Buffer.from(bytes);
             const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
             const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                folder: "controllers/images",
+                folder: "QuotationPlatform/controllers/images",
                 resource_type: "image",
             });
             return db.insert(productImages).values({
                 controllerId,
                 imageUrl: uploadResult.secure_url,
+                publicId: uploadResult.public_id,
                 imageOrder: index,
             });
         }

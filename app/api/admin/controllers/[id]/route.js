@@ -115,19 +115,14 @@ export async function PUT(request, { params }) {
         const removedImageIds = body.removedImageIds || [];
         for (const imageId of removedImageIds) {
             const img = await db
-                .select({ imageUrl: productImages.imageUrl })
+                .select({ publicId: productImages.publicId })
                 .from(productImages)
                 .where(eq(productImages.id, imageId))
                 .limit(1)
                 .then((r) => r[0]);
 
-            if (img?.imageUrl) {
-                try {
-                    const urlParts = img.imageUrl.split("/");
-                    const fileName = urlParts[urlParts.length - 1].split(".")[0];
-                    const folder = urlParts[urlParts.length - 2];
-                    await cloudinary.uploader.destroy(`${folder}/${fileName}`);
-                } catch (_) {}
+            if (img?.publicId) {
+                await cloudinary.uploader.destroy(img.publicId);
             }
             await db.delete(productImages).where(eq(productImages.id, imageId));
         }
@@ -148,12 +143,13 @@ export async function PUT(request, { params }) {
                     const buffer = Buffer.from(bytes);
                     const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
                     const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                        folder: "controllers/images",
+                        folder: "QuotationPlatform/controllers/images",
                         resource_type: "image",
                     });
                     return db.insert(productImages).values({
                         controllerId: id,
                         imageUrl: uploadResult.secure_url,
+                        publicId: uploadResult.public_id,
                         imageOrder: maxOrder + index,
                     });
                 }
@@ -179,6 +175,7 @@ export async function PUT(request, { params }) {
 
         return successResponse("Controller updated successfully", updated);
     } catch (error) {
+        console.log(error);
         return errorResponse(error.message || "Failed to update controller");
     }
 }
@@ -186,7 +183,8 @@ export async function PUT(request, { params }) {
 // DELETE /api/admin/controllers/[id] - Delete a controller
 export async function DELETE(request, { params }) {
     try {
-        const { id } = await params;
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
 
         const [existing] = await db
             .select()
@@ -197,7 +195,10 @@ export async function DELETE(request, { params }) {
         if (!existing) {
             return errorResponse("Controller not found", 404);
         }
-
+        const images = await db.select().from(productImages).where(eq(productImages.controllerId, id));
+        for (const image of images) {
+            await cloudinary.uploader.destroy(image.publicId);
+        }
         await db.delete(controllers).where(eq(controllers.id, id));
 
         return successResponse("Controller deleted successfully");

@@ -13,6 +13,16 @@ import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
 import { formatEnquiryNumber } from "@/lib/helpers";
 import UserQuotationChat from "@/components/user/Quotation/UserQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function QuotationDetailPage() {
     const params = useParams();
@@ -21,6 +31,9 @@ export default function QuotationDetailPage() {
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
+    const [pdfLoading, setPdfLoading] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [pendingAction, setPendingAction] = useState(null);
 
     useEffect(() => {
         fetchQuotation();
@@ -42,17 +55,14 @@ export default function QuotationDetailPage() {
         }
     };
 
+    const openConfirmDialog = (action) => {
+        setPendingAction(action);
+        setConfirmDialogOpen(true);
+    };
+
     const handleAction = async (action) => {
         if (actionLoading) return;
-
-        const confirmMessages = {
-            accept: "Are you sure you want to accept this quotation?",
-            reject: "Are you sure you want to reject this quotation?",
-            request_revision: "Are you sure you want to request a revision?",
-        };
-
-        if (!confirm(confirmMessages[action])) return;
-
+        setConfirmDialogOpen(false);
         setActionLoading(action);
         try {
             const res = await fetch(`/api/user/quotations/${params.id}/action`, {
@@ -70,11 +80,44 @@ export default function QuotationDetailPage() {
             toast.error(error.message);
         } finally {
             setActionLoading(null);
+            setPendingAction(null);
         }
     };
 
-    const handleDownloadPDF = () => {
-        toast.info("PDF download coming soon");
+    const handleDownloadPDF = async () => {
+        if (pdfLoading) return;
+        setPdfLoading(true);
+        try {
+            const res = await fetch(`/api/user/quotations/${params.id}/pdf`);
+            if (!res.ok) throw new Error("PDF generation failed");
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Angebot-${quotation.quotationNumber}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success("PDF downloaded");
+        } catch (err) {
+            toast.error(err.message || "Failed to download PDF");
+        } finally {
+            setPdfLoading(false);
+        }
+    };
+
+    const confirmMessages = {
+        accept: {
+            title: "Accept quotation",
+            description: "Are you sure you want to accept this quotation?",
+        },
+        reject: {
+            title: "Reject quotation",
+            description: "Are you sure you want to reject this quotation?",
+        },
+        request_revision: {
+            title: "Request revision",
+            description: "Are you sure you want to request a revision?",
+        },
     };
 
     if (loading) {
@@ -308,15 +351,15 @@ export default function QuotationDetailPage() {
                                 <Button
                                     variant="secondary"
                                     size="lg"
-                                    onClick={() => handleAction("accept")}
-                                    disabled={actionLoading !== null}
+                                    onClick={() => openConfirmDialog("accept")}
+                                    disabled={actionLoading !== null || pdfLoading}
                                 >
                                     {actionLoading === "accept" ? <Spinner className="h-4 w-4 mr-2" /> : null}
                                     Accept
                                 </Button>
                                 <Button
-                                    onClick={() => handleAction("reject")}
-                                    disabled={actionLoading !== null}
+                                    onClick={() => openConfirmDialog("reject")}
+                                    disabled={actionLoading !== null || pdfLoading}
                                     variant="destructive"
                                     size="lg"
                                 >
@@ -324,8 +367,8 @@ export default function QuotationDetailPage() {
                                     Reject
                                 </Button>
                                 <Button
-                                    onClick={() => handleAction("request_revision")}
-                                    disabled={actionLoading !== null}
+                                    onClick={() => openConfirmDialog("request_revision")}
+                                    disabled={actionLoading !== null || pdfLoading}
                                     className="bg-yellow-500 hover:bg-yellow-600"
                                     size="lg"
                                 >
@@ -347,12 +390,35 @@ export default function QuotationDetailPage() {
                             onClick={handleDownloadPDF}
                             variant="default"
                             size="lg"
+                            disabled={pdfLoading}
                         >
-                            <FileText className="h-4 w-4 mr-2" />
+                            {pdfLoading ? <Spinner className="h-4 w-4 mr-2" /> : <FileText className="h-4 w-4 mr-2" />}
                             Download PDF
                         </Button>
                     </div>
                 </div>
+
+                <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                {pendingAction ? confirmMessages[pendingAction]?.title : ""}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {pendingAction ? confirmMessages[pendingAction]?.description : ""}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={() => pendingAction && handleAction(pendingAction)}
+                                className={pendingAction === "reject" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
+                            >
+                                Confirm
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
                 {/* Chat Section */}
                 <UserQuotationChat

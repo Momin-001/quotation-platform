@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Plus, Pencil, Trash2 } from "lucide-react";
+import { Search, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -204,6 +204,18 @@ export default function ProductsPage() {
         }
     };
 
+    const deleteProduct = async (id) => {
+        if (!confirm("Are you sure you want to delete this product?")) return;
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+            const response = await res.json();
+            if (!response.success) throw new Error(response.message);
+            toast.success("Product deleted");
+            setProducts((prev) => prev.filter((p) => p.id !== id));
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
     // --- Accessories ---
     useEffect(() => {
         let filtered = [...accessoriesList];
@@ -354,11 +366,17 @@ export default function ProductsPage() {
                                             </TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">
                                                 <Link href={`/admin/products/${product.id}/edit`}>
-                                                    <Button variant="outline" size="sm" className="gap-1">
-                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    <Button variant="link" >
                                                         Edit
                                                     </Button>
                                                 </Link>
+                                                <Button
+                                                        variant="link"
+                                                        className=" text-red-500 hover:text-red-700"
+                                                        onClick={() => deleteProduct(product.id)}
+                                                    >
+                                                        <Trash2/>
+                                                    </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -436,18 +454,16 @@ export default function ProductsPage() {
                                             <TableCell className="p-4 whitespace-nowrap">
                                                 <div className="flex gap-2">
                                                     <Link href={`/admin/controllers/${controller.id}/edit`}>
-                                                        <Button variant="outline" size="sm" className="gap-1">
-                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        <Button variant="link" >
                                                             Edit
                                                         </Button>
                                                     </Link>
                                                     <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="gap-1 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        variant="link"
+                                                        className=" text-red-500 hover:text-red-700"
                                                         onClick={() => deleteController(controller.id)}
                                                     >
-                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                        <Trash2/>
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -538,18 +554,16 @@ export default function ProductsPage() {
                                             <TableCell className="p-4 whitespace-nowrap">
                                                 <div className="flex gap-2">
                                                     <Link href={`/admin/accessories/${accessory.id}/edit`}>
-                                                        <Button variant="outline" size="sm" className="gap-1">
-                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        <Button variant="link">
                                                             Edit
                                                         </Button>
                                                     </Link>
                                                     <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="gap-1 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        variant="link"
+                                                        className=" text-red-500 hover:text-red-700"
                                                         onClick={() => deleteAccessory(accessory.id)}
                                                     >
-                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                        <Trash2/>
                                                     </Button>
                                                 </div>
                                             </TableCell>

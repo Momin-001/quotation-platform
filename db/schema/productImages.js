@@ -7,6 +7,7 @@ export const productImages = pgTable("product_images", {
     id: uuid("id").defaultRandom().primaryKey(),
     productId: uuid("product_id").references(() => products.id, { onDelete: "cascade" }),
     controllerId: uuid("controller_id").references(() => controllers.id, { onDelete: "cascade" }),
+    publicId: text("public_id").notNull(),
     imageUrl: text("image_url").notNull(),
     imageOrder: integer("image_order").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

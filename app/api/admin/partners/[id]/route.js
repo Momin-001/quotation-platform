@@ -32,32 +32,24 @@ export async function PATCH(request, { params }) {
             const base64Image = `data:${logoFile.type};base64,${buffer.toString('base64')}`;
 
             // Get current partner to delete old logo
-            const currentPartner = await db
+            const [currentPartner] = await db
                 .select()
                 .from(partners)
                 .where(eq(partners.id, id))
                 .limit(1);
 
-            if (currentPartner.length > 0 && currentPartner[0].logoUrl) {
-                // Extract public ID from URL and delete from Cloudinary
-                const urlParts = currentPartner[0].logoUrl.split('/');
-                const publicIdWithExtension = urlParts[urlParts.length - 1];
-                const publicId = `partners/${publicIdWithExtension.split('.')[0]}`;
-
-                try {
-                    await cloudinary.uploader.destroy(publicId);
-                } catch (deleteError) {
-                    console.error("Error deleting old logo:", deleteError);
-                }
+            if (currentPartner && currentPartner.publicId) {
+                await cloudinary.uploader.destroy(currentPartner.publicId);
             }
 
             // Upload new logo
             const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                folder: "partners",
+                folder: "QuotationPlatform/partners/images",
                 resource_type: "image",
             });
 
             updateData.logoUrl = uploadResult.secure_url;
+            updateData.publicId = uploadResult.public_id;
         }
 
         const updatedPartner = await db
@@ -83,27 +75,19 @@ export async function DELETE(request, { params }) {
         const { id } = resolvedParams;
 
         // Get partner to delete logo from Cloudinary
-        const partner = await db
+        const [partner] = await db
             .select()
             .from(partners)
             .where(eq(partners.id, id))
             .limit(1);
 
-        if (partner.length === 0) {
+        if (!partner) {
             return errorResponse("Partner not found", 404);
         }
 
         // Delete logo from Cloudinary
-        if (partner[0].logoUrl) {
-            const urlParts = partner[0].logoUrl.split('/');
-            const publicIdWithExtension = urlParts[urlParts.length - 1];
-            const publicId = `partners/${publicIdWithExtension.split('.')[0]}`;
-
-            try {
-                await cloudinary.uploader.destroy(publicId);
-            } catch (deleteError) {
-                console.error("Error deleting logo from Cloudinary:", deleteError);
-            }
+        if (partner.publicId) {
+            await cloudinary.uploader.destroy(partner.publicId);
         }
 
         // Delete from database

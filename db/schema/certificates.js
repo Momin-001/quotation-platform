@@ -6,6 +6,7 @@ export const certificates = pgTable("certificates", {
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
     imageUrl: text("image_url").notNull(),
+    publicId: text("public_id").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -176,23 +176,14 @@ export async function PUT(request, { params }) {
             for (const imageId of removedImageIds) {
                 // Get image URL before deleting to remove from Cloudinary
                 const img = await db
-                    .select({ imageUrl: productImages.imageUrl })
+                    .select({ publicId: productImages.publicId })
                     .from(productImages)
                     .where(eq(productImages.id, imageId))
                     .limit(1)
                     .then((r) => r[0]);
                 
-                if (img?.imageUrl) {
-                    try {
-                        // Extract public_id from Cloudinary URL
-                        const urlParts = img.imageUrl.split("/");
-                        const fileName = urlParts[urlParts.length - 1].split(".")[0];
-                        const folder = urlParts[urlParts.length - 2];
-                        await cloudinary.uploader.destroy(`${folder}/${fileName}`);
-                    } catch (e) {
-                        // Non-critical: continue even if Cloudinary cleanup fails
-                        console.error("Cloudinary cleanup failed:", e.message);
-                    }
+                if (img?.publicId) {
+                      await cloudinary.uploader.destroy(img.publicId);
                 }
                 
                 await db.delete(productImages).where(eq(productImages.id, imageId));
@@ -217,13 +208,14 @@ export async function PUT(request, { params }) {
                     const base64Image = `data:${file.type};base64,${buffer.toString("base64")}`;
 
                     const uploadResult = await cloudinary.uploader.upload(base64Image, {
-                        folder: "products/images",
+                        folder: "QuotationPlatform/products/images",
                         resource_type: "image",
                     });
 
                     return db.insert(productImages).values({
                         productId: id,
                         imageUrl: uploadResult.secure_url,
+                        publicId: uploadResult.public_id,
                         imageOrder: maxOrder + index,
                     });
                 }
@@ -266,5 +258,33 @@ export async function PUT(request, { params }) {
         return successResponse("Product updated successfully");
     } catch (error) {
         return errorResponse(error.message || "Failed to update product");
+    }
+}
+
+// DELETE /api/admin/products/[id] - Delete a product
+export async function DELETE(request, { params }) {
+    try {
+        const resolvedParams = await params;
+        const { id } = resolvedParams;
+
+        const product = await db.select().from(products).where(eq(products.id, id)).limit(1).then((r) => r[0]);
+
+        if (!product) {
+            return errorResponse("Product not found", 404);
+        }
+
+        // Delete product images from Cloudinary
+        const images = await db.select().from(productImages).where(eq(productImages.productId, id));
+       
+        for (const image of images) {
+           const result = await cloudinary.uploader.destroy(image.publicId);
+        }
+
+        // Delete product from database
+        await db.delete(products).where(eq(products.id, id));
+
+        return successResponse("Product deleted successfully");
+    } catch (error) {
+        return errorResponse(error.message || "Failed to delete product");
     }
 }

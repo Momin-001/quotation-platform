@@ -17,6 +17,7 @@ export async function GET(req) {
             columns: {},
             with: {
                 quotations: {
+                    where: ne(quotations.status, "draft"),
                     columns: {
                         id: true,
                         enquiryId: true,
