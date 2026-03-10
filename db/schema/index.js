@@ -15,3 +15,6 @@ export * from "./enquiries";
 export * from "./quotations";
 export * from "./controllers";
 export * from "./accessories";
+export * from "./productIcons";
+export * from "./productProductIcons";
+export * from "./userHeader";

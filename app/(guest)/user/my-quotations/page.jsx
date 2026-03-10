@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { formatEnquiryNumber, formatDate, getStatusLabel, getQuotationStatusColor } from "@/lib/helpers";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MyQuotationsPage() {
+    const { language } = useLanguage();
     const router = useRouter();
     const [quotations, setQuotations] = useState([]);
     const [pendingCount, setPendingCount] = useState(0);
@@ -45,10 +47,10 @@ export default function MyQuotationsPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <BreadCrumb 
-                title="My Quotations" 
+                title={language === "en" ? "My Quotations" : "Meine Angebote"} 
                 breadcrumbs={[
-                    { label: "Home", href: "/" }, 
-                    { label: "Quotations" }
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                    { label: language === "en" ? "Quotations" : "Angebote" }
                 ]} 
             />
             <div className="container mx-auto px-4 py-8">

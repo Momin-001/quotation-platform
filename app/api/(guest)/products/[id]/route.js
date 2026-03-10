@@ -42,6 +42,20 @@ export async function GET(req, { params }) {
                         },
                     },
                 },
+                productProductIcons: {
+                    columns: {
+                        iconOrder: true,
+                    },
+                    with: {
+                        productIcon: {
+                            columns: {
+                                id: true,
+                                name: true,
+                                imageUrl: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 
@@ -49,12 +63,17 @@ export async function GET(req, { params }) {
             return errorResponse("Product not found", 404);
         }
 
+        const productIconsSorted = (product.productProductIcons || [])
+            .sort((a, b) => (a.iconOrder ?? 0) - (b.iconOrder ?? 0))
+            .map((row) => ({ ...row.productIcon }));
+
         const formattedProduct = {
             ...product,
-            areaOfUse: product.areaOfUse.name,
-            images: product.images.map((image) => image.imageUrl),
-            productCertificates: product.productCertificates.map((certificate) => certificate.certificate),
-            features: product.features.map((feature) => feature.feature),
+            areaOfUse: product.areaOfUse?.name,
+            images: product.images?.map((image) => image.imageUrl) ?? [],
+            productCertificates: product.productCertificates?.map((cert) => cert.certificate) ?? [],
+            productIcons: productIconsSorted,
+            features: product.features?.map((feature) => feature.feature) ?? [],
         };
         return successResponse("Product fetched successfully", formattedProduct);
     } catch (error) {

@@ -46,10 +46,10 @@ export default function FAQsPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title="FAQs" 
+            <BreadCrumb title={language === "en" ? "FAQs" : "Häufig gestellte Fragen"} 
             breadcrumbs={[
-                { label: "Home", href: "/" }, 
-                { label: "FAQs" }
+                { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                { label: language === "en" ? "FAQs" : "Häufig gestellte Fragen" }
                 ]} />
             <main className="flex-1">
                 <section className="w-full bg-linear-to-br from-white to-blue-100 py-16 lg:py-24">

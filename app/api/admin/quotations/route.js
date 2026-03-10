@@ -9,6 +9,7 @@ import {
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc, ilike, or, and, sql } from "drizzle-orm";
+import { getOrCreateSectionDefaults } from "@/lib/quotation-section-defaults";
 // Helper function to generate quotation number
 function generateQuotationNumber() {
     const year = new Date().getFullYear();
@@ -180,6 +181,9 @@ export async function POST(request) {
                 );
         }
 
+        // Copy global section defaults into the new quotation
+        const sectionDefaults = await getOrCreateSectionDefaults();
+
         // Create quotation
         const quotationNumber = generateQuotationNumber();
         const newQuotation = await db
@@ -188,6 +192,9 @@ export async function POST(request) {
                 enquiryId,
                 quotationNumber,
                 status: quotationStatus,
+                sectionOfferHtml: sectionDefaults.sectionOfferHtml,
+                sectionConditionsHtml: sectionDefaults.sectionConditionsHtml,
+                sectionOptionsHtml: sectionDefaults.sectionOptionsHtml,
             })
             .returning();
 

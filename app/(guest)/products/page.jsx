@@ -29,6 +29,7 @@ import Image from "next/image";
 import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 function FiltersAccordion({
     accordionValue, setAccordionValue,
@@ -52,6 +53,7 @@ function FiltersAccordion({
     ipRating, setIpRating,
     warrantyPeriod, setWarrantyPeriod,
 }) {
+    const { language } = useLanguage();
     return (
         <Accordion
             type="multiple"
@@ -61,11 +63,11 @@ function FiltersAccordion({
         >
             <AccordionItem value="productInfo" className="border-t pt-4 border-b-0 first:border-t-0 first:pt-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Product Information</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Product Information" : "Produktinformation"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Product Type</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
                         <Select value={productType} onValueChange={setProductType}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -75,7 +77,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Design</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Design" : "Design"}</label>
                         <Select value={design} onValueChange={setDesign}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -85,7 +87,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Special Types</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
                         <Select value={specialTypes} onValueChange={setSpecialTypes}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -97,7 +99,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Application</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
                         <Select value={application} onValueChange={setApplication}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -119,11 +121,11 @@ function FiltersAccordion({
 
             <AccordionItem value="physicalSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Physical Specifications</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Pixel Pitch (mm)</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
                         <Input type="number" step="0.01" value={pixelPitch} onChange={(e) => setPixelPitch(e.target.value)} placeholder="e.g., 1.2" />
                     </div>
                 </AccordionContent>
@@ -131,11 +133,11 @@ function FiltersAccordion({
 
             <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">LED Specifications</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "LED Specifications" : "LED-Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">LED Technology</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
                         <Select value={ledTechnology} onValueChange={setLedTechnology}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -150,7 +152,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Chip-Bonding</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
                         <Select value={chipBonding} onValueChange={setChipBonding}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -165,15 +167,15 @@ function FiltersAccordion({
 
             <AccordionItem value="opticalSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Optical Specifications</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Brightness Control</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
                         <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Contrast Ratio</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
                         <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
                     </div>
                 </AccordionContent>
@@ -181,23 +183,23 @@ function FiltersAccordion({
 
             <AccordionItem value="electricalSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Electrical Specifications</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Power Consumption Max</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
                         <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Power Consumption Typical</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
                         <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Refresh Rate</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
                         <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Power Redundancy</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
                         <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -207,7 +209,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Memory on Module</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
                         <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -217,7 +219,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Smart Module</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
                         <Select value={smartModule} onValueChange={setSmartModule}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -227,7 +229,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Control System</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
                         <Select value={controlSystem} onValueChange={setControlSystem}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -240,7 +242,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Receiving Card</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
                         <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
                     </div>
                 </AccordionContent>
@@ -248,11 +250,11 @@ function FiltersAccordion({
 
             <AccordionItem value="operatingConditions" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Operating Conditions</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">IP Rating</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
                         <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
                     </div>
                 </AccordionContent>
@@ -260,11 +262,11 @@ function FiltersAccordion({
 
             <AccordionItem value="warranty" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">Warranty</span>
+                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Warranty" : "Garantie"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">Warranty Period (Months)</label>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
                         <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
                     </div>
                 </AccordionContent>
@@ -275,6 +277,7 @@ function FiltersAccordion({
 
 export default function ProductsPage() {
     const [products, setProducts] = useState([]);
+    const { language } = useLanguage();
     const [categories, setCategories] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -434,10 +437,10 @@ export default function ProductsPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title="Products" 
+            <BreadCrumb title={language === "en" ? "Products" : "Produkte"} 
             breadcrumbs={[
-                { label: "Home", href: "/" }, 
-                { label: "Products" }
+                { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                { label: language === "en" ? "Products" : "Produkte" }
                 ]} />
             <main className="flex-1 container mx-auto px-4 py-8">
                 {/* Search Bar */}
@@ -447,7 +450,7 @@ export default function ProductsPage() {
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search Products by Name or Product Number"
+                            placeholder={language === "en" ? "Search Products by Name or Product Number" : "Produkte nach Name oder Produktnummer suchen"}
                             className="pl-10"
                         />
                     </div>
@@ -461,7 +464,7 @@ export default function ProductsPage() {
                         onClick={() => setSelectedCategory("")}
                         
                     >
-                        All
+                        {language === "en" ? "All" : "Alle"}
                     </Button>
                     {categories.map((category) => (
                         <Button
@@ -483,7 +486,7 @@ export default function ProductsPage() {
                         className="w-full border-primary text-primary hover:bg-primary hover:text-white"
                     >
                         <FilterIcon className="w-4 h-4 mr-2" />
-                        Filters
+                        {language === "en" ? "Filters" : "Filter"}
                     </Button>
                 </div>
 
@@ -494,10 +497,10 @@ export default function ProductsPage() {
                             <div className="flex items-center justify-between">
                                 <SheetTitle className="font-bold flex items-center gap-2">
                                     <FilterIcon className="w-4 h-4" />
-                                    Filters
+                                    {language === "en" ? "Filters" : "Filter"}
                                 </SheetTitle>
                                 <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
-                                    Clear All
+                                    {language === "en" ? "Clear All" : "Alle löschen"}
                                 </Button>
                             </div>
                         </SheetHeader>
@@ -528,7 +531,7 @@ export default function ProductsPage() {
                         </div>
                         <div className="px-5 py-4 border-t">
                             <Button className="w-full" onClick={() => setSheetOpen(false)}>
-                                Show Results
+                                {language === "en" ? "Show Results" : "Ergebnisse anzeigen"}
                             </Button>
                         </div>
                     </SheetContent>
@@ -541,10 +544,10 @@ export default function ProductsPage() {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold flex items-center gap-2">
                                 <FilterIcon className="w-4 h-4" />
-                                Filters
+                                {language === "en" ? "Filters" : "Filter"}
                                 </h3>
                             <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
-                                Clear All
+                                {language === "en" ? "Clear All" : "Alle löschen"}
                             </Button>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(100vh-100px)]">

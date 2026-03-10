@@ -4,14 +4,22 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 
-export default function UserHeader() {
+export default function UserHeader({ userHeaderData }) {
     const { isAuthenticated, isUser } = useAuth();
+    const { language } = useLanguage();
     const { getTotalItems } = useCart();
     // Only show this header if user is authenticated
     if (!isAuthenticated || isUser === false) {
         return null;
     }
+
+    const getUserHeaderText = (text) => {
+        if (!userHeaderData) return "";
+        const key = language === "en" ? `${text}En` : `${text}De`;
+        return userHeaderData[key] || userHeaderData[`userHeader${text}En`] || "";
+    };
 
     return (
         <div className="w-full bg-primary text-white">
@@ -25,19 +33,19 @@ export default function UserHeader() {
                             href="/user/my-enquiries"
                             className="hover:underline whitespace-nowrap"
                         >
-                            My Enquiries
+                            {getUserHeaderText("userHeaderMyEnquiry")}
                         </Link>
                         <Link
                             href="/user/my-quotations"
                             className="hover:underline whitespace-nowrap"
                         >
-                            My Quotations
+                            {getUserHeaderText("userHeaderMyQuotation")}
                         </Link>
                         <Link
                             href="/user/account-settings"
                             className="hover:underline whitespace-nowrap"
                         >
-                            Account Setting
+                            {getUserHeaderText("userHeaderMyAccount")}
                         </Link>
                     </div>
 
@@ -56,7 +64,7 @@ export default function UserHeader() {
                                 </span>
                             )}
                         </div>
-                        <span className="text-sm">Cart</span>
+                        <span className="text-sm">{getUserHeaderText("userHeaderMyCart")}</span>
                     </Link>
                 </div>
             </div>

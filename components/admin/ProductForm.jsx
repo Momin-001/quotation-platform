@@ -17,7 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { X, Plus } from "lucide-react";
+import { X, Plus, FileText } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -29,6 +29,7 @@ function getDefaultValuesFromInitial(initialData) {
     return {
         productName: str(initialData.productName),
         productNumber: str(initialData.productNumber),
+        productDescription: str(initialData.productDescription),
         viewingAngleHorizontal: str(initialData.viewingAngleHorizontal),
         viewingAngleVertical: str(initialData.viewingAngleVertical),
         brightnessControl: str(initialData.brightnessControl),
@@ -108,6 +109,7 @@ const productSchema = z.object({
     // String fields (Point 1)
     productName: z.string().min(1, "Product name is required"),
     productNumber: z.string().min(1, "Product number is required"),
+    productDescription: z.string().optional(),
     viewingAngleHorizontal: z.string().optional(),
     viewingAngleVertical: z.string().optional(),
     brightnessControl: z.string().optional(),
@@ -294,10 +296,12 @@ export default function ProductForm({
     initialImages = [],
     initialFeatures = [],
     initialCertificateIds = [],
+    initialIconIds = [],
 }) {
     const router = useRouter();
     const [categories, setCategories] = useState([]);
     const [certificates, setCertificates] = useState([]);
+    const [productIcons, setProductIcons] = useState([]);
     const [submitting, setSubmitting] = useState(false);
     
     // File states
@@ -308,6 +312,16 @@ export default function ProductForm({
     });
     const [removedImageIds, setRemovedImageIds] = useState([]); // IDs to remove
     const [selectedCertificates, setSelectedCertificates] = useState(() => Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
+    const [selectedIcons, setSelectedIcons] = useState(() => Array.isArray(initialIconIds) ? [...initialIconIds] : []);
+
+    // PDF file states
+    const [installationManualFile, setInstallationManualFile] = useState(null);
+    const [maintenanceGuideFile, setMaintenanceGuideFile] = useState(null);
+    const [certificatesPdfFile, setCertificatesPdfFile] = useState(null);
+    const [existingInstallationManual, setExistingInstallationManual] = useState(initialData?.installationManualUrl || null);
+    const [existingMaintenanceGuide, setExistingMaintenanceGuide] = useState(initialData?.maintenanceGuideUrl || null);
+    const [existingCertificatesPdf, setExistingCertificatesPdf] = useState(initialData?.certificatesPdfUrl || null);
+    const [removedPdfs, setRemovedPdfs] = useState([]);
     
     // Features state
     const [features, setFeatures] = useState(() =>
@@ -344,12 +358,20 @@ export default function ProductForm({
         const imgs = Array.isArray(initialImages) ? initialImages : [];
         setExistingImages([...imgs].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0)));
         setSelectedCertificates(Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
+        setSelectedIcons(Array.isArray(initialIconIds) ? [...initialIconIds] : []);
         setFeatures(
             (Array.isArray(initialFeatures) ? initialFeatures : []).map((f) =>
                 typeof f === "string" ? f : (f?.feature ?? f)
             )
         );
-    }, [isEdit, initialData, initialImages, initialCertificateIds, initialFeatures, reset]);
+        setExistingInstallationManual(initialData?.installationManualUrl || null);
+        setExistingMaintenanceGuide(initialData?.maintenanceGuideUrl || null);
+        setExistingCertificatesPdf(initialData?.certificatesPdfUrl || null);
+        setInstallationManualFile(null);
+        setMaintenanceGuideFile(null);
+        setCertificatesPdfFile(null);
+        setRemovedPdfs([]);
+    }, [isEdit, initialData, initialImages, initialCertificateIds, initialIconIds, initialFeatures, reset]);
 
     // Watch for conditional fields
     const greyscaleProcessing = watch("greyscaleProcessing");
@@ -361,6 +383,7 @@ export default function ProductForm({
     useEffect(() => {
         fetchCategories();
         fetchCertificates();
+        fetchProductIcons();
     }, []);
 
     const fetchCategories = async () => {
@@ -389,6 +412,19 @@ export default function ProductForm({
         }
     };
 
+    const fetchProductIcons = async () => {
+        try {
+            const res = await fetch("/api/admin/product-icons");
+            const response = await res.json();
+            if (!response.success) {
+                throw new Error(response.message || "Failed to fetch product icons");
+            }
+            setProductIcons(response.data);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     const onSubmit = async (data) => {
         setSubmitting(true);
         try {
@@ -401,13 +437,20 @@ export default function ProductForm({
                     ...data,
                     features: features,
                     productCertificates: selectedCertificates,
+                    productIcons: selectedIcons,
                     removedImageIds: removedImageIds,
+                    removedPdfs: removedPdfs,
                 }));
 
                 // Append new image files
                 productImages.forEach((file) => {
                     formData.append("images", file);
                 });
+
+                // Append PDF files
+                if (installationManualFile) formData.append("installationManual", installationManualFile);
+                if (maintenanceGuideFile) formData.append("maintenanceGuide", maintenanceGuideFile);
+                if (certificatesPdfFile) formData.append("certificatesPdf", certificatesPdfFile);
 
                 const res = await fetch(`/api/admin/products/${initialData.id}`, {
                     method: "PUT",
@@ -428,12 +471,18 @@ export default function ProductForm({
                     ...data,
                     features: features,
                     productCertificates: selectedCertificates,
+                    productIcons: selectedIcons,
                 }));
 
                 // Append new image files
                 productImages.forEach((file) => {
                     formData.append("images", file);
                 });
+
+                // Append PDF files
+                if (installationManualFile) formData.append("installationManual", installationManualFile);
+                if (maintenanceGuideFile) formData.append("maintenanceGuide", maintenanceGuideFile);
+                if (certificatesPdfFile) formData.append("certificatesPdf", certificatesPdfFile);
 
                 const res = await fetch("/api/admin/products", {
                     method: "POST",
@@ -474,6 +523,16 @@ export default function ProductForm({
                 return prev.filter((id) => id !== certificateId);
             } else {
                 return [...prev, certificateId];
+            }
+        });
+    };
+
+    const handleIconToggle = (iconId) => {
+        setSelectedIcons((prev) => {
+            if (prev.includes(iconId)) {
+                return prev.filter((id) => id !== iconId);
+            } else {
+                return [...prev, iconId];
             }
         });
     };
@@ -583,6 +642,9 @@ export default function ProductForm({
 
                     {/* Product Number */}
                     {renderInput("Product Number *", "productNumber", "text", { required: true, disabled: isEdit })}
+
+                    {/* Product Description */}
+                    {renderTextarea("Product Description", "productDescription", { placeholder: "Enter product description" })}
 
                     {/* Product Type */}
                     {renderSelect("Product Type *", "productType", ["AIO Systems", "LED Display Single Cabinet"])}
@@ -787,63 +849,189 @@ export default function ProductForm({
             </div>
 
             {/* File Uploads Section */}
-            <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Product Files</h2>
-                
-                {/* Product Images */}
-                <div className="space-y-2">
-                    <Label>Product Images</Label>
-                    <div className="flex flex-wrap gap-4">
-                        {/* Existing images (edit mode) */}
-                        {existingImages.map((img) => (
-                            <div key={img.id} className="relative">
-                                <Image
-                                    src={img.imageUrl}
-                                    alt="Product image"
-                                    width={100}
-                                    height={100}
-                                    className="rounded object-cover"
+            <div className="space-y-6 py-4">
+                <h2 className="text-lg font-semibold font-archivo">Media</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Product Images */}
+                    <div className="space-y-2">
+                        <Label>Upload Product Images</Label>
+                        <div className="flex flex-wrap items-start gap-3">
+                            {existingImages.map((img) => (
+                                <div key={img.id} className="relative h-20 w-20 border rounded-lg overflow-hidden bg-white shadow-xs">
+                                    <Image
+                                        src={img.imageUrl}
+                                        alt="Product image"
+                                        fill
+                                        className="object-contain p-1"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                        onClick={() => removeExistingImage(img.id)}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))}
+                            {productImages.map((file, index) => (
+                                <div key={`new-${index}`} className="relative h-20 w-20 border rounded-lg overflow-hidden bg-white shadow-xs">
+                                    <Image
+                                        src={URL.createObjectURL(file)}
+                                        alt={`Preview ${index + 1}`}
+                                        fill
+                                        className="object-contain p-1"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                        onClick={() => removeNewImage(index)}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))}
+                            <label className="flex items-center justify-center h-20 w-20 border rounded-lg cursor-pointer bg-white shadow-xs hover:bg-gray-50 transition-colors">
+                                <span className="text-4xl text-gray-400">+</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleImageChange}
+                                    className="hidden"
                                 />
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="sm"
-                                    className="absolute -top-2 -right-2"
-                                    onClick={() => removeExistingImage(img.id)}
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
-                        {/* New images */}
-                        {productImages.map((file, index) => (
-                            <div key={`new-${index}`} className="relative">
-                                <Image
-                                    src={URL.createObjectURL(file)}
-                                    alt={`Preview ${index + 1}`}
-                                    width={100}
-                                    height={100}
-                                    className="rounded object-cover"
-                                />
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="sm"
-                                    className="absolute -top-2 -right-2"
-                                    onClick={() => removeNewImage(index)}
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
+                            </label>
+                        </div>
                     </div>
-                    <Input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                        className="cursor-pointer"
-                    />
+
+                    {/* Upload Datasheet PDF - placeholder visual only, handled elsewhere */}
+                    <div className="space-y-2">
+                        <Label>Upload Installation Manual</Label>
+                        <div className="flex items-start gap-3">
+                            <label className="flex items-center justify-center h-20 w-20 border rounded-lg cursor-pointer bg-white shadow-xs hover:bg-gray-50 transition-colors">
+                                <span className="text-4xl text-gray-400">+</span>
+                                <input
+                                    type="file"
+                                    accept=".pdf"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setInstallationManualFile(file);
+                                            setExistingInstallationManual(null);
+                                        }
+                                    }}
+                                    className="hidden"
+                                />
+                            </label>
+                            {(installationManualFile || existingInstallationManual) && (
+                                <div className="relative flex items-center gap-2 h-20 border rounded-lg px-3 bg-white shadow-xs">
+                                    <FileText className="h-5 w-5 text-red-500 shrink-0" />
+                                    <span className="text-sm truncate max-w-[120px]">
+                                        {installationManualFile?.name || "Installation Manual.pdf"}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="ml-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600 shrink-0"
+                                        onClick={() => {
+                                            setInstallationManualFile(null);
+                                            if (existingInstallationManual) {
+                                                setRemovedPdfs((p) => [...p, "installationManual"]);
+                                                setExistingInstallationManual(null);
+                                            }
+                                        }}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Upload Maintenance Guide */}
+                    <div className="space-y-2">
+                        <Label>Upload Maintenance Guide</Label>
+                        <div className="flex items-start gap-3">
+                            <label className="flex items-center justify-center h-20 w-20 border rounded-lg cursor-pointer bg-white shadow-xs hover:bg-gray-50 transition-colors">
+                                <span className="text-4xl text-gray-400">+</span>
+                                <input
+                                    type="file"
+                                    accept=".pdf"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setMaintenanceGuideFile(file);
+                                            setExistingMaintenanceGuide(null);
+                                        }
+                                    }}
+                                    className="hidden"
+                                />
+                            </label>
+                            {(maintenanceGuideFile || existingMaintenanceGuide) && (
+                                <div className="relative flex items-center gap-2 h-20 border rounded-lg px-3 bg-white shadow-xs">
+                                    <FileText className="h-5 w-5 text-red-500 shrink-0" />
+                                    <span className="text-sm truncate max-w-[120px]">
+                                        {maintenanceGuideFile?.name || "Maintenance Guide.pdf"}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="ml-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600 shrink-0"
+                                        onClick={() => {
+                                            setMaintenanceGuideFile(null);
+                                            if (existingMaintenanceGuide) {
+                                                setRemovedPdfs((p) => [...p, "maintenanceGuide"]);
+                                                setExistingMaintenanceGuide(null);
+                                            }
+                                        }}
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Certificates PDF - full-width row below */}
+                <div className="space-y-2">
+                    <Label>Upload Certificates PDF</Label>
+                    <div className="flex items-start gap-3">
+                        <label className="flex items-center justify-center h-20 w-20 border rounded-lg cursor-pointer bg-white shadow-xs hover:bg-gray-50 transition-colors">
+                            <span className="text-4xl text-gray-400">+</span>
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setCertificatesPdfFile(file);
+                                        setExistingCertificatesPdf(null);
+                                    }
+                                }}
+                                className="hidden"
+                            />
+                        </label>
+                        {(certificatesPdfFile || existingCertificatesPdf) && (
+                            <div className="relative flex items-center gap-2 h-20 border rounded-lg px-3 bg-white shadow-xs">
+                                <FileText className="h-5 w-5 text-red-500 shrink-0" />
+                                <span className="text-sm truncate max-w-[120px]">
+                                    {certificatesPdfFile?.name || "Certificates.pdf"}
+                                </span>
+                                <button
+                                    type="button"
+                                    className="ml-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600 shrink-0"
+                                    onClick={() => {
+                                        setCertificatesPdfFile(null);
+                                        if (existingCertificatesPdf) {
+                                            setRemovedPdfs((p) => [...p, "certificatesPdf"]);
+                                            setExistingCertificatesPdf(null);
+                                        }
+                                    }}
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Product Certificates */}
@@ -889,6 +1077,49 @@ export default function ProductForm({
                     ) : (
                         <p className="text-sm text-muted-foreground">
                             No certificates available. Please add certificates first.
+                        </p>
+                    )}
+                </div>
+
+                {/* Product Icons (feature icons shown on product detail) */}
+                <div className="space-y-2">
+                    <Label>Product Icons</Label>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        Select feature icons to show on the product detail page (e.g. High Contrast, Energy Saving). Order of selection is preserved. Manage icons from the Product Icons page.
+                    </p>
+                    {productIcons.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {productIcons.map((icon) => (
+                                <div
+                                    key={icon.id}
+                                    className={`border rounded-lg p-3 bg-white transition-all ${
+                                        selectedIcons.includes(icon.id) ? "border-primary" : ""
+                                    }`}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <Checkbox
+                                            checked={selectedIcons.includes(icon.id)}
+                                            onCheckedChange={() => handleIconToggle(icon.id)}
+                                        />
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium">{icon.name}</p>
+                                            <div className="mt-2">
+                                                <Image
+                                                    src={icon.imageUrl}
+                                                    alt={icon.name}
+                                                    width={80}
+                                                    height={80}
+                                                    className="rounded object-contain"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">
+                            No product icons available. Please add icons from the Product Icons page first.
                         </p>
                     )}
                 </div>

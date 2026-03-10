@@ -12,8 +12,10 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { formatEnquiryNumber, formatDate, getStatusLabel, getEnquiryStatusColor } from "@/lib/helpers";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function MyEnquiriesPage() {
+    const { language } = useLanguage();
     const [enquiries, setEnquiries] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -51,10 +53,10 @@ export default function MyEnquiriesPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <BreadCrumb title="My Enquiries" 
+            <BreadCrumb title={language === "en" ? "My Enquiries" : "Meine Anfragen"} 
             breadcrumbs={[
-                { label: "Home", href: "/" }, 
-                { label: "Enquiries" }
+                { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                { label: language === "en" ? "Enquiries" : "Anfragen" }
                 ]} />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold mb-6 text-primary">

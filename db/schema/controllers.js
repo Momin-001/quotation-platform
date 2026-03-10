@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer, boolean, pgEnum, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { quotationOptionalItems, quotationAdditionalItems } from "./quotations";
 import { productImages } from "./productImages";
@@ -10,6 +10,7 @@ export const controllers = pgTable("controllers", {
     id: uuid("id").defaultRandom().primaryKey(),
     interfaceName: text("interface_name"),
     brandName: BrandSystemEnum("brand_name"),
+    controllerNumber: text("controller_number").unique(),
     brandNameOther: text("brand_name_other"),
     // Capacity
     pixelCapacity: integer("pixel_capacity"),
@@ -56,7 +57,10 @@ export const controllers = pgTable("controllers", {
     multiViewerMvr: text("multi_viewer_mvr"), // "Yes" / "No"
     usbPlayback: text("usb_playback"), // "Yes" / "No"
     support3d: text("support_3d"), // "Yes" / "No"
-
+    downloadUrl: text("download_url"),
+    pricePerControllerUsd: decimal("price_per_controller_usd", { precision: 12, scale: 2 }),
+    stockPieces: integer("stock_pieces"),
+    leadtimeDays: integer("leadtime_days"),
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

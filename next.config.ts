@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['pdfkit', 'puppeteer'],
+  serverExternalPackages: ['puppeteer'],
 };
 
 export default nextConfig;

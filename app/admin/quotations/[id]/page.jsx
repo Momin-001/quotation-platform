@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft } from "lucide-react";
+import { FileText, ArrowLeft, ChevronDown, ChevronUp, Save } from "lucide-react";
 import Link from "next/link";
 import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
 import AdminQuotationChat from "@/components/admin/Quotation/AdminQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
+
+const RichTextEditor = lazy(() => import("@/components/admin/RichTextEditor"));
 
 export default function AdminQuotationDetailPage() {
     const params = useParams();
@@ -18,6 +20,14 @@ export default function AdminQuotationDetailPage() {
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pdfLoading, setPdfLoading] = useState(false);
+    const [sectionsOpen, setSectionsOpen] = useState(false);
+    const [sections, setSections] = useState({
+        sectionOfferHtml: "",
+        sectionConditionsHtml: "",
+        sectionOptionsHtml: "",
+    });
+    const [sectionsLoading, setSectionsLoading] = useState(false);
+    const [sectionsSaving, setSectionsSaving] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -41,6 +51,47 @@ export default function AdminQuotationDetailPage() {
         }
     };
 
+    const handleToggleSections = async () => {
+        const opening = !sectionsOpen;
+        setSectionsOpen(opening);
+        if (opening && !sections.sectionOfferHtml) {
+            setSectionsLoading(true);
+            try {
+                const res = await fetch(`/api/admin/quotations/${params.id}/sections`);
+                const response = await res.json();
+                if (response.success) {
+                    setSections({
+                        sectionOfferHtml: response.data.sectionOfferHtml || "",
+                        sectionConditionsHtml: response.data.sectionConditionsHtml || "",
+                        sectionOptionsHtml: response.data.sectionOptionsHtml || "",
+                    });
+                }
+            } catch (err) {
+                toast.error("Failed to load sections");
+            } finally {
+                setSectionsLoading(false);
+            }
+        }
+    };
+
+    const handleSaveSections = async () => {
+        setSectionsSaving(true);
+        try {
+            const res = await fetch(`/api/admin/quotations/${params.id}/sections`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(sections),
+            });
+            const response = await res.json();
+            if (!response.success) throw new Error(response.message);
+            toast.success("PDF sections saved");
+        } catch (err) {
+            toast.error(err.message || "Failed to save sections");
+        } finally {
+            setSectionsSaving(false);
+        }
+    };
+
     const handleDownloadPDF = async () => {
         if (pdfLoading) return;
         setPdfLoading(true);
@@ -48,11 +99,17 @@ export default function AdminQuotationDetailPage() {
             const res = await fetch(`/api/admin/quotations/${params.id}/pdf`);
             if (!res.ok) throw new Error("PDF generation failed");
             const blob = await res.blob();
+            if (blob.size === 0) {
+                return;
+            }
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = `Angebot-${quotation.quotationNumber}.pdf`;
+            a.style.display = "none";
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
             toast.success("PDF downloaded");
         } catch (err) {
@@ -309,6 +366,78 @@ export default function AdminQuotationDetailPage() {
                         </Button>
                     </Link>
                 </div>
+            </div>
+
+            {/* PDF Sections Editor */}
+            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                <button
+                    onClick={handleToggleSections}
+                    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                >
+                    <h3 className="text-lg font-semibold">Edit PDF Sections</h3>
+                    {sectionsOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
+                </button>
+                {sectionsOpen && (
+                    <div className="px-4 pb-4 space-y-6 border-t">
+                        {sectionsLoading ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Spinner className="h-6 w-6" />
+                            </div>
+                        ) : (
+                            <>
+                                <div className="pt-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        1. Unser Angebot / Our Offer
+                                    </label>
+                                    <Suspense fallback={<div className="border rounded-lg p-3 min-h-[120px] bg-gray-50 animate-pulse" />}>
+                                        <RichTextEditor
+                                            content={sections.sectionOfferHtml}
+                                            onChange={(html) =>
+                                                setSections((prev) => ({ ...prev, sectionOfferHtml: html }))
+                                            }
+                                        />
+                                    </Suspense>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        3. Konditionen / Conditions
+                                    </label>
+                                    <Suspense fallback={<div className="border rounded-lg p-3 min-h-[120px] bg-gray-50 animate-pulse" />}>
+                                        <RichTextEditor
+                                            content={sections.sectionConditionsHtml}
+                                            onChange={(html) =>
+                                                setSections((prev) => ({ ...prev, sectionConditionsHtml: html }))
+                                            }
+                                        />
+                                    </Suspense>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        5. Optionen / Options
+                                    </label>
+                                    <Suspense fallback={<div className="border rounded-lg p-3 min-h-[120px] bg-gray-50 animate-pulse" />}>
+                                        <RichTextEditor
+                                            content={sections.sectionOptionsHtml}
+                                            onChange={(html) =>
+                                                setSections((prev) => ({ ...prev, sectionOptionsHtml: html }))
+                                            }
+                                        />
+                                    </Suspense>
+                                </div>
+                                <div className="flex justify-end">
+                                    <Button
+                                        onClick={handleSaveSections}
+                                        disabled={sectionsSaving}
+                                        size="lg"
+                                    >
+                                        {sectionsSaving ? <Spinner className="h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                                        Save Sections
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Chat Section */}

@@ -14,6 +14,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import { useLanguage } from "@/context/LanguageContext";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email"),
@@ -22,6 +23,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
+    const { language } = useLanguage();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -64,10 +66,10 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex flex-col">
             <BreadCrumb
-                title="Login"
+                title={language === "en" ? "Login" : "Login"}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Login" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Login" : "Login" },
                     
                 ]}
             />

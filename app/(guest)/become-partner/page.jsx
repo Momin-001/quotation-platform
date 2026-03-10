@@ -14,6 +14,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { cn } from "@/lib/utils";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import { useLanguage } from "@/context/LanguageContext";
 
 const formSchema = z.object({
     name: z.string().min(2, "Name is too short"),
@@ -29,7 +30,7 @@ const formSchema = z.object({
 export default function BecomePartnersPage() {
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const { language } = useLanguage();
     const {
         register,
         handleSubmit,
@@ -68,10 +69,10 @@ export default function BecomePartnersPage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title="Become a Partner"
+            <BreadCrumb title={language === "en" ? "Become a Partner" : "Werden Sie ein Partner"}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Become a Partner" }
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Become a Partner" : "Werden Sie ein Partner" }
                 ]} />
 
             <main className="grow relative">

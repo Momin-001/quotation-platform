@@ -34,6 +34,8 @@ export default function ProductDetailPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [datasheetLoading, setDatasheetLoading] = useState(false);
+    const [pdfDownloading, setPdfDownloading] = useState(null); // 'installationManual' | 'maintenanceGuide' | 'certificatesPdf'
 
     useEffect(() => {
         if (params.id) {
@@ -57,6 +59,7 @@ export default function ProductDetailPage() {
     };
 
     const handleDownloadDatasheet = async () => {
+        setDatasheetLoading(true);
         try {
             const res = await fetch(`/api/products/${params.id}/datasheet`);
             if (!res.ok) {
@@ -71,11 +74,13 @@ export default function ProductDetailPage() {
                 return;
             }
             
-            // Create download link
+            // Create download link (sanitize filename so extension is preserved)
+            const safeName = String(product.productNumber || "datasheet").replace(/[/\\:*?"<>|]/g, "_").trim() || "datasheet";
+            const filename = `${safeName}_datasheet.pdf`;
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${product.productNumber}_datasheet.pdf`;
+            a.download = filename;
             a.style.display = "none";
             document.body.appendChild(a);
             
@@ -91,6 +96,36 @@ export default function ProductDetailPage() {
             toast.success("Datasheet downloaded successfully");
         } catch (error) {
             toast.error(error.message || "Failed to download datasheet");
+        } finally {
+            setDatasheetLoading(false);
+        }
+    };
+
+    const handleDownloadPdf = async (type, filename) => {
+        setPdfDownloading(type);
+        try {
+            const res = await fetch(`/api/products/${params.id}/download-pdf?type=${type}`);
+            if (!res.ok) {
+                throw new Error("Failed to download PDF");
+            }
+            const blob = await res.blob();
+            if (blob.size === 0) return;
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }, 100);
+            toast.success("Download started");
+        } catch (error) {
+            toast.error(error.message || "Failed to download");
+        } finally {
+            setPdfDownloading(null);
         }
     };
 
@@ -119,19 +154,33 @@ export default function ProductDetailPage() {
 
     // Format enum values for display
     const formatEnum = (value) => {
-        if (!value) return "N/A";
+        if (!value) 
+            return "N/A";
         return value
             .split("_")
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(" ");
     };
 
+    const SpecRow = ({ label, value, unit }) => {
+        const displayValue = value ?? "N/A";
+        return (
+            <div className="flex justify-between items-baseline gap-4 py-1">
+                <span className="text-sm text-gray-600 shrink-0">{label}</span>
+                <div className="flex items-baseline justify-end gap-3 min-w-0 flex-1">
+                    <span className="font-medium text-right">{String(displayValue)}</span>
+                    <span className="text-gray-600 w-10 shrink-0"> {unit ? unit : ""}</span>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <>
             <BreadCrumb title={product.productName}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Products", href: "/products" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Products" : "Produkte", href: "/products" },
                     { label: product.productName }
                 ]} />
             <div className="min-h-screen bg-gray-50">
@@ -206,6 +255,9 @@ export default function ProductDetailPage() {
                                             {product.categoryName.toUpperCase()}
                                         </span>
                                     )}
+                                    {product.productDescription && (
+                                        <p className="mb-4">{product.productDescription}</p>
+                                    )}
                                 </div>
 
                                 {/* Features */}
@@ -225,6 +277,7 @@ export default function ProductDetailPage() {
                             </div>
 
                             {/* Downloads */}
+    
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4">
                                 <div>
                                     <h3 className="text-lg font-bold">Downloads</h3>
@@ -234,15 +287,26 @@ export default function ProductDetailPage() {
                                 <div className="mt-4 md:mt-0">
                                     <button
                                         onClick={handleDownloadDatasheet}
-                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                                        disabled={datasheetLoading}
+                                        className="flex items-center cursor-pointer text-blue-600 hover:text-blue-700 font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        <FileText className="h-5 w-5 mr-2 text-red-500" />
-                                        <span>Product Datasheet</span>
+                                        {datasheetLoading ? (
+                                            <>
+                                                <Spinner className="h-5 w-5 mr-2 text-blue-600" />
+                                                <span>Generating…</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FileText className="h-5 w-5 mr-2 text-red-500" />
+                                                <span>Product Datasheet</span>
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </div>
 
                             {/* Action Buttons */}
+                            
                             {isAuthenticated && isUser && (
                             <div className="flex gap-3">
                                 <Button
@@ -275,16 +339,29 @@ export default function ProductDetailPage() {
                             </div>
                             )}
 
-                            {/* Placeholder squares */}
-                            <div className="grid grid-cols-8 gap-2">
-                                {[...Array(8)].map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className="aspect-square bg-white shadow-lg border-b-8 border-black
-                                     border"
-                                    />
-                                ))}
-                            </div>
+                            {/* Product feature icons (max 8 per line) */}
+                            {product.productIcons && product.productIcons.length > 0 && (
+                                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                                    {product.productIcons.map((icon) => (
+                                        <div
+                                            key={icon.id}
+                                            className="aspect-square bg-white shadow-lg border-b-8 border-black border rounded flex flex-col items-center justify-end"
+                                        >
+                                            <div className="relative w-full flex-1">
+                                                <Image
+                                                    src={icon.imageUrl}
+                                                    alt={icon.name}
+                                                    fill
+                                                    className="object-fill"
+                                                />
+                                            </div>
+                                            {/* <p className="text-xs font-medium text-center line-clamp-2 leading-tight">
+                                                {icon.name}
+                                            </p> */}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -293,261 +370,182 @@ export default function ProductDetailPage() {
                         {/* Left Column */}
                         <div className="space-y-4">
                             {/* Basic Information */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="basic-info" collapsible className="rounded-lg">
                                 <AccordionItem value="basic-info">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Basic Information
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-sm text-gray-600">Product Type</p>
-                                                <p className="font-medium">{product.productType || "N/A"}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Design</p>
-                                                <p className="font-medium">{formatEnum(product.design)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Special Types</p>
-                                                <p className="font-medium">{formatEnum(product.specialTypes)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Application</p>
-                                                <p className="font-medium">{product.application || "N/A"}</p>
-                                            </div>
-                                            {product.categoryName && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Category</p>
-                                                    <p className="font-medium">{product.categoryName}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Product Type" value={product.productType} />
+                                            <SpecRow label="Design" value={product.design} />
+                                            <SpecRow label="Special Types" value={product.specialTypes } />
+                                            <SpecRow label="Application" value={product.application} />
+                                            <SpecRow label="Category" value={product.areaOfUse} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {/* Physical Specifications */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="physical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="physical-specs">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Physical Specifications
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-sm text-gray-600">Pixel Pitch</p>
-                                                <p className="font-medium">{product.pixelPitch} mm</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Pixel Technology</p>
-                                                <p className="font-medium">{formatEnum(product.pixelTechnology)}</p>
-                                            </div>
-                                            {product.cabinetWidth && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Cabinet Width</p>
-                                                    <p className="font-medium">{product.cabinetWidth} mm</p>
-                                                </div>
-                                            )}
-                                            {product.cabinetHeight && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Cabinet Height</p>
-                                                    <p className="font-medium">{product.cabinetHeight} mm</p>
-                                                </div>
-                                            )}
-                                            {product.cabinetResolutionHorizontal && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Cabinet Resolution (Horizontal)</p>
-                                                    <p className="font-medium">{product.cabinetResolutionHorizontal} px</p>
-                                                </div>
-                                            )}
-                                            {product.cabinetResolutionVertical && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Cabinet Resolution (Vertical)</p>
-                                                    <p className="font-medium">{product.cabinetResolutionVertical} px</p>
-                                                </div>
-                                            )}
-                                            {product.pixelDensity && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Pixel Density</p>
-                                                    <p className="font-medium">
-                                                        {product.pixelDensity.toLocaleString()} pixels/m²
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {product.weightWithoutPackaging && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Weight Without Packaging</p>
-                                                    <p className="font-medium">{product.weightWithoutPackaging} kg</p>
-                                                </div>
-                                            )}
-                                            {product.ipRating && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">IP Rating</p>
-                                                    <p className="font-medium">{product.ipRating}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Pixel Pitch" value={product.pixelPitch} unit="mm" />
+                                            <SpecRow label="Pixel Technology" value={product.pixelTechnology} />
+                                            <SpecRow label="Cabinet Width" value={product.cabinetWidth} unit="mm" />
+                                            <SpecRow label="Cabinet Height" value={product.cabinetHeight} unit="mm" />
+                                            <SpecRow label="Cabinet Resolution (Horizontal)" value={product.cabinetResolutionHorizontal} unit="px" />
+                                            <SpecRow label="Cabinet Resolution (Vertical)" value={product.cabinetResolutionVertical} unit="px" />
+                                            <SpecRow label="Pixel Density" value={product.pixelDensity} unit="px/m²" />
+                                            <SpecRow label="Weight Without Packaging" value={product.weightWithoutPackaging} unit="kg" />
+                                            <SpecRow label="IP Rating" value={product.ipRating} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {/* Electrical Specifications */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="electrical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="electrical-specs">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Electrical Specifications
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {product.inputVoltage && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Input Voltage</p>
-                                                    <p className="font-medium">{product.inputVoltage}</p>
-                                                </div>
-                                            )}
-                                            {product.powerConsumptionMax && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Power Consumption (Max)</p>
-                                                    <p className="font-medium">{product.powerConsumptionMax} W</p>
-                                                </div>
-                                            )}
-                                            {product.powerConsumptionTypical && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Power Consumption (Typical)</p>
-                                                    <p className="font-medium">{product.powerConsumptionTypical} W</p>
-                                                </div>
-                                            )}
-                                            <div>
-                                                <p className="text-sm text-gray-600">Driving Method</p>
-                                                <p className="font-medium">{formatEnum(product.drivingMethod)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Current Gain Control</p>
-                                                <p className="font-medium">{product.currentGainControl}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Power Redundancy</p>
-                                                <p className="font-medium">{formatEnum(product.powerRedundancy)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Memory on Module</p>
-                                                <p className="font-medium">{formatEnum(product.memoryOnModule)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Smart Module</p>
-                                                <p className="font-medium">{formatEnum(product.smartModule)}</p>
-                                            </div>
-                                            {product.mtbfPowerSupply && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">MTBF Power Supply</p>
-                                                    <p className="font-medium">{product.mtbfPowerSupply.toLocaleString()} hours</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Input Voltage" value={product.inputVoltage} unit="V(AC)" />
+                                            <SpecRow label="Power Consumption (Max)" value={product.powerConsumptionMax} unit="W" />
+                                            <SpecRow label="Power Consumption (Typical)" value={product.powerConsumptionTypical} unit="W" />
+                                            <SpecRow label="Driving Method" value={formatEnum(product.drivingMethod)} />
+                                            <SpecRow label="Current Gain Control" value={product.currentGainControl} />
+                                            <SpecRow label="Power Redundancy" value={formatEnum(product.powerRedundancy)} />
+                                            <SpecRow label="Memory on Module" value={formatEnum(product.memoryOnModule)} />
+                                            <SpecRow label="Smart Module" value={formatEnum(product.smartModule)} />
+                                            <SpecRow label="MTBF Power Supply" value={product.mtbfPowerSupply} unit="hours" />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {/* Control System */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="control-system" collapsible className="rounded-lg">
                                 <AccordionItem value="control-system">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Control System
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-sm text-gray-600">Control System</p>
-                                                <p className="font-medium">
-                                                    {product.controlSystem === "other" && product.controlSystemOther
-                                                        ? product.controlSystemOther
-                                                        : formatEnum(product.controlSystem)}
-                                                </p>
-                                            </div>
-                                            {product.receivingCard && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Receiving Card</p>
-                                                    <p className="font-medium">{product.receivingCard}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow
+                                                label="Control System"
+                                                value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
+                                            />
+                                            <SpecRow label="Receiving Card" value={product.receivingCard} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
-                            {/* LED Driver & Power Supply */}
-                            {(product.ledDriver || product.powerSupply) && (
-                                <Accordion type="single" collapsible className="rounded-lg">
-                                    <AccordionItem value="led-driver-power-supply">
-                                        <AccordionTrigger className="font-semibold bg-blue-100 px-4">
-                                            LED Driver & Power Supply
-                                        </AccordionTrigger>
-                                        <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {product.ledDriver && (
-                                                    <div>
-                                                        <p className="text-sm text-gray-600">LED Driver</p>
-                                                        <p className="font-medium">{product.ledDriver}</p>
-                                                    </div>
-                                                )}
-                                                {product.powerSupply && (
-                                                    <div>
-                                                        <p className="text-sm text-gray-600">Power Supply</p>
-                                                        <p className="font-medium">{product.powerSupply}</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-                            )}
-
                             {/* Operating Conditions */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Operating Conditions
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {product.operatingTemperature && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Operating Temperature</p>
-                                                    <p className="font-medium">{product.operatingTemperature}</p>
-                                                </div>
-                                            )}
-                                            {product.operatingHumidity && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Operating Humidity</p>
-                                                    <p className="font-medium">{product.operatingHumidity}</p>
-                                                </div>
-                                            )}
-                                            <div>
-                                                <p className="text-sm text-gray-600">Cooling</p>
-                                                <p className="font-medium">{formatEnum(product.cooling)}</p>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="bg-white px-4 pb-4 pt-2">
+                                        <div className="space-y-3">
+                                            {/* Product Datasheet */}
+                                            <div className="flex items-center justify-between gap-4 py-1">
+                                                <p className="text-sm text-gray-800">Product Datasheet</p>
+                                                <button
+                                                    onClick={handleDownloadDatasheet}
+                                                    disabled={datasheetLoading}
+                                                    className="flex items-center cursor-pointer text-blue-600 hover:text-blue-700 font-medium underline disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+                                                >
+                                                    {datasheetLoading ? (
+                                                        <>
+                                                            <Spinner className="h-5 w-5 mr-2 text-blue-600" />
+                                                            <span>Generating…</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
+                                                            <span>Product Datasheet</span>
+                                                        </>
+                                                    )}
+                                                </button>
                                             </div>
-                                            {product.heatDissipation && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Heat Dissipation</p>
-                                                    <p className="font-medium">{product.heatDissipation}</p>
+                                            {product.installationManualUrl && (
+                                                <div className="flex items-center justify-between gap-4 py-1">
+                                                    <p className="text-sm text-gray-800">Installation Manual</p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDownloadPdf("installationManual", "Installation_Manual.pdf")}
+                                                        disabled={pdfDownloading !== null}
+                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    >
+                                                        {pdfDownloading === "installationManual" ? (
+                                                            <>
+                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
+                                                                <span>Downloading…</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
+                                                                <span>Installation Manual</span>
+                                                            </>
+                                                        )}
+                                                    </button>
                                                 </div>
                                             )}
-                                            {(product.monitoringFunctionEn || product.monitoringFunctionDe) && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Monitoring Function ({language === "de" ? "DE" : "EN"})</p>
-                                                    <p className="font-medium">
-                                                        {getLocalizedField(
-                                                            product.monitoringFunctionEn,
-                                                            product.monitoringFunctionDe
-                                                        ) || "N/A"}
-                                                    </p>
+                                           
+                                            {product.maintenanceGuideUrl && (
+                                                <div className="flex items-center justify-between gap-4 py-1">
+                                                    <p className="text-sm text-gray-800">Maintenance Guide</p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDownloadPdf("maintenanceGuide", "Maintenance_Guide.pdf")}
+                                                        disabled={pdfDownloading !== null}
+                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    >
+                                                        {pdfDownloading === "maintenanceGuide" ? (
+                                                            <>
+                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
+                                                                <span>Downloading…</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
+                                                                <span>Maintenance Guide</span>
+                                                            </>
+                                                        )}
+                                                    </button>
                                                 </div>
                                             )}
-                                            {product.support && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Support</p>
-                                                    <p className="font-medium">{formatEnum(product.support)}</p>
+                                            {product.certificatesPdfUrl && (
+                                                <div className="flex items-center justify-between gap-4 py-1">
+                                                    <p className="text-sm text-gray-800">Certificates PDF</p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDownloadPdf("certificatesPdf", "Certificates.pdf")}
+                                                        disabled={pdfDownloading !== null}
+                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    >
+                                                        {pdfDownloading === "certificatesPdf" ? (
+                                                            <>
+                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
+                                                                <span>Downloading…</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
+                                                                <span>Certificates PDF</span>
+                                                            </>
+                                                        )}
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
@@ -559,156 +557,67 @@ export default function ProductDetailPage() {
                         {/* Right Column */}
                         <div className="space-y-4">
                             {/* LED Specifications */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="led-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="led-specs">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         LED Specifications
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-sm text-gray-600">LED Technology</p>
-                                                <p className="font-medium">{formatEnum(product.ledTechnology)}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Pixel Configuration</p>
-                                                <p className="font-medium">{product.pixelConfiguration}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-600">Chip Bonding</p>
-                                                <p className="font-medium">{formatEnum(product.chipBonding)}</p>
-                                            </div>
-                                            {product.ledLifespan && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">LED Lifespan</p>
-                                                    <p className="font-medium">{product.ledLifespan.toLocaleString()} hours</p>
-                                                </div>
-                                            )}
-                                            {product.ledChipManufacturer && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">LED Chip Manufacturer</p>
-                                                    <p className="font-medium">{product.ledChipManufacturer}</p>
-                                                </div>
-                                            )}
-                                            {product.ledModulesPerCabinet && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">LED Modules per Cabinet</p>
-                                                    <p className="font-medium">{product.ledModulesPerCabinet}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="LED Technology" value={formatEnum(product.ledTechnology)} />
+                                            <SpecRow label="Pixel Configuration" value={product.pixelConfiguration} />
+                                            <SpecRow label="Chip Bonding" value={formatEnum(product.chipBonding)} />
+                                            <SpecRow label="LED Lifespan" value={product.ledLifespan} unit="hours" />
+                                            <SpecRow label="LED Chip Manufacturer" value={product.ledChipManufacturer} />
+                                            <SpecRow label="LED Modules per Cabinet" value={product.ledModulesPerCabinet} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {/* Display Performance */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="display-performance" collapsible className="rounded-lg">
                                 <AccordionItem value="display-performance">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Display Performance
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {product.refreshRate && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Refresh Rate</p>
-                                                    <p className="font-medium">{product.refreshRate} Hz</p>
-                                                </div>
-                                            )}
-                                            {product.scanRateDenominator && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Scan Rate</p>
-                                                    <p className="font-medium">
-                                                        1/{product.scanRateDenominator}
-                                                        {product.scanRateNumerator && product.scanRateNumerator !== 1 
-                                                            ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})`
-                                                            : ""}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {product.videoRate && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Video Rate</p>
-                                                    <p className="font-medium">{product.videoRate}</p>
-                                                </div>
-                                            )}
-                                            <div>
-                                                <p className="text-sm text-gray-600">Colour Depth</p>
-                                                <p className="font-medium">{product.colourDepth} bit</p>
-                                            </div>
-                                            {product.greyscaleProcessing && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Greyscale Processing</p>
-                                                    <p className="font-medium">
-                                                        {product.greyscaleProcessing === "other" && product.greyscaleProcessingOther
-                                                            ? product.greyscaleProcessingOther
-                                                            : product.greyscaleProcessing}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {product.numberOfColours && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Number of Colours</p>
-                                                    <p className="font-medium">{product.numberOfColours.toLocaleString()}</p>
-                                                </div>
-                                            )}
-                                            {product.viewingAngleHorizontal && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Viewing Angle (Horizontal)</p>
-                                                    <p className="font-medium">{product.viewingAngleHorizontal}</p>
-                                                </div>
-                                            )}
-                                            {product.viewingAngleVertical && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Viewing Angle (Vertical)</p>
-                                                    <p className="font-medium">{product.viewingAngleVertical}</p>
-                                                </div>
-                                            )}
-                                            {product.brightnessControl && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Brightness Control</p>
-                                                    <p className="font-medium">{product.brightnessControl}</p>
-                                                </div>
-                                            )}
-                                            {product.contrastRatioNumerator && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Contrast Ratio</p>
-                                                    <p className="font-medium">
-                                                        {product.contrastRatioNumerator}:{product.contrastRatioDenominator || 1}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {product.dciP3Coverage && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">DCI-P3 Coverage</p>
-                                                    <p className="font-medium">{product.dciP3Coverage}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Refresh Rate" value={product.refreshRate} unit="Hz" />
+                                            <SpecRow
+                                                label="Scan Rate"
+                                                value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null}
+                                            />
+                                            <SpecRow label="Video Rate" value={product.videoRate} />
+                                            <SpecRow label="Colour Depth" value={product.colourDepth} unit="bit" />
+                                            <SpecRow
+                                                label="Greyscale Processing"
+                                                value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
+                                            />
+                                            <SpecRow label="Number of Colours" value={product.numberOfColours} />
+                                            <SpecRow label="Viewing Angle (Horizontal)" value={product.viewingAngleHorizontal} />
+                                            <SpecRow label="Viewing Angle (Vertical)" value={product.viewingAngleVertical} />
+                                            <SpecRow label="Brightness Control" value={product.brightnessControl} />
+                                            <SpecRow
+                                                label="Contrast Ratio"
+                                                value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
+                                            />
+                                            <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
 
                             {/* Calibration */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="calibration" collapsible className="rounded-lg">
                                 <AccordionItem value="calibration">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Calibration
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {product.calibrationMethod && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Calibration Method</p>
-                                                    <p className="font-medium">{formatEnum(product.calibrationMethod)}</p>
-                                                </div>
-                                            )}
-                                            {product.whitePointCalibration && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">White Point Calibration</p>
-                                                    <p className="font-medium">{product.whitePointCalibration}</p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Calibration Method" value={formatEnum(product.calibrationMethod)} />
+                                            <SpecRow label="White Point Calibration" value={product.whitePointCalibration} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -716,12 +625,12 @@ export default function ProductDetailPage() {
 
                             {/* Certifications & Standards */}
                             {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
-                                <Accordion type="single" collapsible className="rounded-lg">
+                                <Accordion type="single" defaultValue="certifications" collapsible className="rounded-lg">
                                     <AccordionItem value="certifications">
                                         <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                             Certifications & Standards
                                         </AccordionTrigger>
-                                        <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
+                                        <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
                                             {product.productCertificates && product.productCertificates.length > 0 && (
                                                 <div className="mb-4">
                                                     <p className="text-sm text-gray-600 mb-2">Certificates</p>
@@ -741,25 +650,10 @@ export default function ProductDetailPage() {
                                                     </div>
                                                 </div>
                                             )}
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {product.additionalCertification && (
-                                                    <div>
-                                                        <p className="text-sm text-gray-600">Additional Certification</p>
-                                                        <p className="font-medium">{product.additionalCertification}</p>
-                                                    </div>
-                                                )}
-                                                {product.emc && (
-                                                    <div>
-                                                        <p className="text-sm text-gray-600">EMC</p>
-                                                        <p className="font-medium">{product.emc}</p>
-                                                    </div>
-                                                )}
-                                                {product.safety && (
-                                                    <div>
-                                                        <p className="text-sm text-gray-600">Safety</p>
-                                                        <p className="font-medium">{product.safety}</p>
-                                                    </div>
-                                                )}
+                                            <div>
+                                                <SpecRow label="Additional Certification" value={product.additionalCertification} />
+                                                <SpecRow label="EMC" value={product.emc} />
+                                                <SpecRow label="Safety" value={product.safety} />
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
@@ -767,41 +661,22 @@ export default function ProductDetailPage() {
                             )}
                            
                             {/* Warranty & Support */}
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="warranty" collapsible className="rounded-lg">
                                 <AccordionItem value="warranty">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Warranty & Support
                                     </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {product.warrantyPeriod && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Warranty Period</p>
-                                                    <p className="font-medium">{product.warrantyPeriod} months</p>
-                                                </div>
-                                            )}
-                                            {(product.supportDuringWarrantyEn || product.supportDuringWarrantyDe) && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Support During Warranty ({language === "de" ? "DE" : "EN"})</p>
-                                                    <p className="font-medium">
-                                                        {getLocalizedField(
-                                                            product.supportDuringWarrantyEn,
-                                                            product.supportDuringWarrantyDe
-                                                        ) || "N/A"}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {(product.supportAfterWarrantyEn || product.supportAfterWarrantyDe) && (
-                                                <div>
-                                                    <p className="text-sm text-gray-600">Support After Warranty ({language === "de" ? "DE" : "EN"})</p>
-                                                    <p className="font-medium">
-                                                        {getLocalizedField(
-                                                            product.supportAfterWarrantyEn,
-                                                            product.supportAfterWarrantyDe
-                                                        ) || "N/A"}
-                                                    </p>
-                                                </div>
-                                            )}
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Warranty Period" value={product.warrantyPeriod} unit="months" />
+                                            <SpecRow
+                                                label={`Support During Warranty (${language === "de" ? "DE" : "EN"})`}
+                                                value={getLocalizedField(product.supportDuringWarrantyEn, product.supportDuringWarrantyDe)}
+                                            />
+                                            <SpecRow
+                                                label={`Support After Warranty (${language === "de" ? "DE" : "EN"})`}
+                                                value={getLocalizedField(product.supportAfterWarrantyEn, product.supportAfterWarrantyDe)}
+                                            />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>

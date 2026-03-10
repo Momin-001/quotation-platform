@@ -34,6 +34,7 @@ import {
     Send,
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { useLanguage } from "@/context/LanguageContext";
 
 const enquirySchema = z.object({
     message: z.string().min(10, "Please enter a message (at least 10 characters)"),
@@ -44,7 +45,7 @@ const enquirySchema = z.object({
 export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
-
+    const { language } = useLanguage();
     // Data states
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
@@ -511,10 +512,10 @@ export default function LeditorPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <BreadCrumb
-                title="Leditor"
+                title={language === "en" ? "Leditor" : "Leditor"}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Leditor" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Leditor" : "Leditor" },
                 ]}
             />
 

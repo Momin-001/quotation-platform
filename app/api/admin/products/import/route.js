@@ -251,8 +251,9 @@ export async function POST(req) {
         // Sequential cell reads for readability
         const productName = str(cell(1, p));
         const productNumber = str(cell(2, p));
-        const oemBrand = str(cell(3, p));
-        const areaOfUseRaw = str(cell(5, p));
+        const productDescription = str(cell(3, p));
+        const oemBrand = str(cell(4, p));
+        const areaOfUseRaw = str(cell(6, p));
 
         if (!productName || !productNumber) {
           results.errors.push(`Column ${p + 1}: Missing product name or number, skipped.`);
@@ -260,68 +261,68 @@ export async function POST(req) {
         }
 
         // Parse + match all relevant fields in row order
-        const productType = matchEnum(cell(4, p), PRODUCT_TYPES);
-        const design = matchEnum(cell(6, p), DESIGNS);
-        const specialTypesResult = matchEnumWithOther(cell(7, p), SPECIAL_TYPES);
-        const application = matchEnum(cell(8, p), APPLICATIONS);
-        const pixelPitch = parseDecimal(cell(9, p));
-        const pixelConfiguration = matchEnum(cell(10, p), PIXEL_CONFIGS);
-        const pixelTechnology = matchPixelTech(cell(11, p));
-        const cabinetWidth = parseDecimal(cell(12, p));
-        const cabinetHeight = parseDecimal(cell(13, p));
-        const cabinetResolutionHorizontal = parseInteger(cell(14, p));
-        const cabinetResolutionVertical = parseInteger(cell(15, p));
-        const ledModulesPerCabinet = str(cell(16, p));
-        const pixelDensity = parseInteger(cell(17, p));
-        const weightWithoutPackaging = parseDecimal(cell(18, p));
-        const ledTechResult = matchEnumWithOther(cell(19, p), LED_TECHS);
-        const ledChipManufacturer = str(cell(20, p));
-        const chipBonding = matchEnum(cell(21, p), CHIP_BONDINGS);
-        const ledLifespan = parseInteger(cell(22, p));
-        const brightnessValue = str(cell(23, p));
-        const contrast = parseContrastRatio(cell(24, p));
-        const viewingAngleHorizontal = str(cell(25, p));
-        const viewingAngleVertical = str(cell(26, p));
-        const colourDepth = matchEnum(cell(27, p), COLOUR_DEPTHS);
-        const greyscaleResult = matchGreyscale(cell(28, p));
-        const numberOfColours = parseInteger(cell(29, p));
-        const brightnessControl = str(cell(30, p));
-        const ledDriver = str(cell(31, p));
-        const currentGainControl = matchEnum(cell(32, p), CURRENT_GAINS);
-        const videoRate = matchEnum(cell(33, p), VIDEO_RATES);
-        const whitePointCalibration = str(cell(34, p));
-        const calibMethodResult = matchEnumWithOther(cell(35, p), CALIBRATION_METHODS);
-        const dciP3Coverage = str(cell(36, p));
-        const inputVoltage = str(cell(37, p));
-        const powerConsumptionMax = parseInteger(cell(38, p));
-        const powerConsumptionTypical = parseInteger(cell(39, p));
-        const refreshRate = parseInteger(cell(40, p));
-        const scanRate = parseScanRate(cell(41, p));
-        const drivingMethod = matchEnum(cell(42, p), DRIVING_METHODS);
-        const powerSupply = str(cell(43, p));
-        const mtbfPowerSupply = parseInteger(cell(44, p));
-        const powerRedundancy = matchYesNo(cell(45, p));
-        const memoryOnModule = matchYesNo(cell(46, p));
-        const smartModule = matchYesNo(cell(47, p));
-        const controlSysResult = matchEnumWithOther(cell(48, p), CONTROL_SYSTEMS);
-        const receivingCard = str(cell(49, p));
-        const operatingTemperature = str(cell(50, p));
-        const operatingHumidity = str(cell(51, p));
-        const cooling = matchEnum(cell(52, p), COOLINGS);
-        const heatDissipation = str(cell(53, p));
-        const ipRating = str(cell(54, p));
-        const monitoringFunctionEn = str(cell(55, p));
-        const additionalCertification = str(cell(56, p));
-        const emc = str(cell(57, p));
-        const safety = str(cell(58, p));
-        const support = matchSupport(cell(59, p));
-        const warrantyPeriod = parseInteger(cell(60, p));
-        const pricePerCabinetUsd = parseDecimal(cell(63, p));
-        const pricePerMetreSquareUsd = parseDecimal(cell(64, p));
-        const profitMargin = parseDecimal(cell(65, p));
-        const stockPieces = parseInteger(cell(66, p));
-        const leadtimeDays = parseInteger(cell(67, p));
-        const notes = str(cell(68, p));
+        const productType = matchEnum(cell(5, p), PRODUCT_TYPES);
+        const design = matchEnum(cell(7, p), DESIGNS);
+        const specialTypesResult = matchEnumWithOther(cell(8, p), SPECIAL_TYPES);
+        const application = matchEnum(cell(9, p), APPLICATIONS);
+        const pixelPitch = parseDecimal(cell(10, p));
+        const pixelConfiguration = matchEnum(cell(11, p), PIXEL_CONFIGS);
+        const pixelTechnology = matchPixelTech(cell(12, p));
+        const cabinetWidth = parseDecimal(cell(13, p));
+        const cabinetHeight = parseDecimal(cell(14, p));
+        const cabinetResolutionHorizontal = parseInteger(cell(15, p));
+        const cabinetResolutionVertical = parseInteger(cell(16, p));
+        const ledModulesPerCabinet = str(cell(17, p));
+        const pixelDensity = parseInteger(cell(18, p));
+        const weightWithoutPackaging = parseDecimal(cell(19, p));
+        const ledTechResult = matchEnumWithOther(cell(20, p), LED_TECHS);
+        const ledChipManufacturer = str(cell(21, p));
+        const chipBonding = matchEnum(cell(22, p), CHIP_BONDINGS);
+        const ledLifespan = parseInteger(cell(23, p));
+        const brightnessValue = str(cell(24, p));
+        const contrast = parseContrastRatio(cell(25, p));
+        const viewingAngleHorizontal = str(cell(26, p));
+        const viewingAngleVertical = str(cell(27, p));
+        const colourDepth = matchEnum(cell(28, p), COLOUR_DEPTHS);
+        const greyscaleResult = matchGreyscale(cell(29, p));
+        const numberOfColours = parseInteger(cell(30, p));
+        const brightnessControl = str(cell(31, p));
+        const ledDriver = str(cell(32, p));
+        const currentGainControl = matchEnum(cell(33, p), CURRENT_GAINS);
+        const videoRate = matchEnum(cell(34, p), VIDEO_RATES);
+        const whitePointCalibration = str(cell(35, p));
+        const calibMethodResult = matchEnumWithOther(cell(36, p), CALIBRATION_METHODS);
+        const dciP3Coverage = str(cell(37, p));
+        const inputVoltage = str(cell(38, p));
+        const powerConsumptionMax = parseInteger(cell(39, p));
+        const powerConsumptionTypical = parseInteger(cell(40, p));
+        const refreshRate = parseInteger(cell(41, p));
+        const scanRate = parseScanRate(cell(42, p));
+        const drivingMethod = matchEnum(cell(43, p), DRIVING_METHODS);
+        const powerSupply = str(cell(44, p));
+        const mtbfPowerSupply = parseInteger(cell(45, p));
+        const powerRedundancy = matchYesNo(cell(46, p));
+        const memoryOnModule = matchYesNo(cell(47, p));
+        const smartModule = matchYesNo(cell(48, p));
+        const controlSysResult = matchEnumWithOther(cell(49, p), CONTROL_SYSTEMS);
+        const receivingCard = str(cell(50, p));
+        const operatingTemperature = str(cell(51, p));
+        const operatingHumidity = str(cell(52, p));
+        const cooling = matchEnum(cell(53, p), COOLINGS);
+        const heatDissipation = str(cell(54, p));
+        const ipRating = str(cell(55, p));
+        const monitoringFunctionEn = str(cell(56, p));
+        const additionalCertification = str(cell(57, p));
+        const emc = str(cell(58, p));
+        const safety = str(cell(59, p));
+        const support = matchSupport(cell(60, p));
+        const warrantyPeriod = parseInteger(cell(61, p));
+        const pricePerCabinetUsd = parseDecimal(cell(64, p));
+        const pricePerMetreSquareUsd = parseDecimal(cell(65, p));
+        const profitMargin = parseDecimal(cell(66, p));
+        const stockPieces = parseInteger(cell(67, p));
+        const leadtimeDays = parseInteger(cell(68, p));
+        const notes = str(cell(69, p));
 
         // ── Validation ──
         const missing = [];
@@ -393,6 +394,7 @@ export async function POST(req) {
         const productData = {
           productName,
           productNumber,
+          productDescription,
           oemBrand,
           ledDriver,
           powerSupply,

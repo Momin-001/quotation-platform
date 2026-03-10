@@ -7,6 +7,8 @@ import { Save } from "lucide-react";
 import NavbarTab from "./components/NavbarTab";
 import HomepageTab from "./components/HomepageTab";
 import FooterTab from "./components/FooterTab";
+import QuotationPdfTab from "./components/QuotationPdfTab";
+import UserHeaderTab from "./components/UserHeaderTab";
 
 export default function CMSPage() {
     const [activeTab, setActiveTab] = useState("navbar");
@@ -16,7 +18,8 @@ export default function CMSPage() {
     const navbarSaveHandlerRef = useRef(null);
     const homepageSaveHandlerRef = useRef(null);
     const footerSaveHandlerRef = useRef(null);
-
+    const quotationPdfSaveHandlerRef = useRef(null);
+    const userHeaderSaveHandlerRef = useRef(null);
     // Handle data change from child components
     const handleDataChange = (data) => {
         // Store the data if needed, but validation is handled in child components
@@ -42,6 +45,18 @@ export default function CMSPage() {
             } else if (activeTab === "footer") {
                 if (footerSaveHandlerRef.current) {
                     result = await footerSaveHandlerRef.current();
+                } else {
+                    return;
+                }
+            } else if (activeTab === "quotation-pdf") {
+                if (quotationPdfSaveHandlerRef.current) {
+                    result = await quotationPdfSaveHandlerRef.current();
+                } else {
+                    return;
+                }
+            } else if (activeTab === "user-header") {
+                if (userHeaderSaveHandlerRef.current) {
+                    result = await userHeaderSaveHandlerRef.current();
                 } else {
                     return;
                 }
@@ -88,6 +103,18 @@ export default function CMSPage() {
                         >
                             FOOTER
                         </TabsTrigger>
+                        <TabsTrigger
+                            value="quotation-pdf"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
+                        >
+                            QUOTATION PDF
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="user-header"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
+                        >
+                            USER HEADER
+                        </TabsTrigger>
                     </TabsList>
 
                 </div>
@@ -115,6 +142,22 @@ export default function CMSPage() {
                         onDataChange={handleDataChange}
                         onSaveHandlerReady={(handler) => {
                             footerSaveHandlerRef.current = handler;
+                        }}
+                    />
+                </TabsContent>
+
+                <TabsContent value="quotation-pdf" className="space-y-6">
+                    <QuotationPdfTab
+                        onSaveHandlerReady={(handler) => {
+                            quotationPdfSaveHandlerRef.current = handler;
+                        }}
+                    />
+                </TabsContent>
+
+                <TabsContent value="user-header" className="space-y-6">
+                    <UserHeaderTab
+                        onSaveHandlerReady={(handler) => {
+                            userHeaderSaveHandlerRef.current = handler;
                         }}
                     />
                 </TabsContent>

@@ -23,11 +23,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function QuotationDetailPage() {
     const params = useParams();
     const router = useRouter();
     const { user } = useAuth();
+    const { language } = useLanguage();
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
@@ -91,13 +93,19 @@ export default function QuotationDetailPage() {
             const res = await fetch(`/api/user/quotations/${params.id}/pdf`);
             if (!res.ok) throw new Error("PDF generation failed");
             const blob = await res.blob();
+            if (blob.size === 0) {
+                return;
+            }
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = `Angebot-${quotation.quotationNumber}.pdf`;
+            a.style.display = "none";
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
             toast.success("PDF downloaded");
+            setTimeout(() => setPdfLoading(false), 4000);
         } catch (err) {
             toast.error(err.message || "Failed to download PDF");
         } finally {
@@ -141,10 +149,10 @@ export default function QuotationDetailPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <BreadCrumb
-                title="Quotation Details"
+                title={language === "en" ? "Quotation Details" : "Angebot Details"}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Quotations", href: "/user/my-quotations" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Quotations" : "Angebote", href: "/user/my-quotations" },
                     { label: quotation.quotationNumber }
                 ]}
             />

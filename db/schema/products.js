@@ -2,6 +2,7 @@ import { pgTable, uuid, text, timestamp, integer, decimal, pgEnum, boolean, json
 import { categories } from "./categories";
 import { productImages } from "./productImages";
 import { productCertificates } from "./productCertificates";
+import { productProductIcons } from "./productProductIcons";
 import { productFeatures } from "./productFeatures";
 import { relations } from "drizzle-orm";
 import { enquiryItems } from "./enquiries";
@@ -24,7 +25,7 @@ export const applicationEnum = pgEnum("application", [
     "Virtual Production"
 ]);
 export const pixelConfigurationEnum = pgEnum("pixel_configuration", ["1R1G1B", "2R1G1B"]);
-export const pixelTechnologyEnum = pgEnum("pixel_technology", ["Real", "Virtual"]);
+export const pixelTechnologyEnum = pgEnum("pixel_technology", ["Real", "Virtual (Quadruple)", "Virtual (Triple)"]);
 export const ledTechnologyEnum = pgEnum("led_technology", ["SMD", "SMD+GOB", "IMD", "COB", "DIP", "LOB", "Other"]);
 export const chipBondingEnum = pgEnum("chip_bonding", ["Gold Wire", "Copper Wire", "Flip-Chip"]);
 export const colourDepthEnum = pgEnum("colour_depth", ["8", "10", "12"]);
@@ -47,10 +48,11 @@ export const supportEnum = pgEnum("support", ["Frontendside", "Backside", "Front
 
 export const products = pgTable("products", {
     id: uuid("id").defaultRandom().primaryKey(),
-    
+    productDescription: text("product_description"),
     // String fields (Point 1)
     productName: text("product_name").notNull(),
     productNumber: text("product_number").notNull(),
+
     viewingAngleHorizontal: text("viewing_angle_horizontal"),
     viewingAngleVertical: text("viewing_angle_vertical"),
     brightnessControl: text("brightness_control"),
@@ -137,6 +139,14 @@ export const products = pgTable("products", {
     leadtimeDays: integer("leadtime_days"),
     notes: text("notes"),
     
+    // PDF document uploads
+    installationManualUrl: text("installation_manual_url"),
+    installationManualPublicId: text("installation_manual_public_id"),
+    maintenanceGuideUrl: text("maintenance_guide_url"),
+    maintenanceGuidePublicId: text("maintenance_guide_public_id"),
+    certificatesPdfUrl: text("certificates_pdf_url"),
+    certificatesPdfPublicId: text("certificates_pdf_public_id"),
+
     // Active status – products imported via Excel are inactive until admin adds images
     isActive: boolean("is_active").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -150,6 +160,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     }),
     images: many(productImages),
     productCertificates: many(productCertificates),
+    productProductIcons: many(productProductIcons),
     features: many(productFeatures),
     enquiryItems: many(enquiryItems),
     quotationItems: many(quotationItems),

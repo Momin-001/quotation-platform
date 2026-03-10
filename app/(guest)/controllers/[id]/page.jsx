@@ -29,6 +29,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useLanguage } from "@/context/LanguageContext";
 
 function SpecRow({ label, value }) {
     const display = value !== null && value !== undefined && value !== "" ? String(value) : "N/A";
@@ -42,6 +43,7 @@ function SpecRow({ label, value }) {
 
 export default function ControllerDetailPage() {
     const params = useParams();
+    const { language } = useLanguage();
     const router = useRouter();
     const { cartItems, addControllerToProduct, getControllerForProduct } = useCart();
     const [controller, setController] = useState(null);
@@ -138,8 +140,8 @@ export default function ControllerDetailPage() {
             <BreadCrumb
                 title={title}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Controllers", href: "/controllers" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Controllers" : "Controller", href: "/controllers" },
                     { label: title },
                 ]}
             />
@@ -154,7 +156,7 @@ export default function ControllerDetailPage() {
                                         src={selectedImage}
                                         alt={title}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
@@ -178,7 +180,7 @@ export default function ControllerDetailPage() {
                                                         src={image}
                                                         alt={`${title} ${index + 1}`}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-contain"
                                                     />
                                                 </button>
                                             </CarouselItem>
@@ -257,7 +259,7 @@ export default function ControllerDetailPage() {
                     {/* Specifications - Accordions */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="basic" collapsible className="rounded-lg">
                                 <AccordionItem value="basic">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Basic Information
@@ -273,7 +275,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="input" collapsible className="rounded-lg">
                                 <AccordionItem value="input">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Input Ports
@@ -293,7 +295,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="output" collapsible className="rounded-lg">
                                 <AccordionItem value="output">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Output Ports
@@ -308,7 +310,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="monitoring" collapsible className="rounded-lg">
                                 <AccordionItem value="monitoring">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Monitoring Ports
@@ -322,7 +324,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="loop" collapsible className="rounded-lg">
                                 <AccordionItem value="loop">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Loop Ports
@@ -338,7 +340,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="audio" collapsible className="rounded-lg">
                                 <AccordionItem value="audio">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Audio & Control Ports
@@ -359,7 +361,7 @@ export default function ControllerDetailPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="layer" collapsible className="rounded-lg">
                                 <AccordionItem value="layer">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         Layer & Image Quality
@@ -376,7 +378,7 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="system" collapsible className="rounded-lg">
                                 <AccordionItem value="system">
                                     <AccordionTrigger className="font-semibold bg-blue-100 px-4">
                                         System & Special Features

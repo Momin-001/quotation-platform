@@ -9,10 +9,12 @@ import Image from "next/image";
 import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"];
 
 export default function ControllersPage() {
+    const { language } = useLanguage();
     const [controllers, setControllers] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -85,10 +87,10 @@ export default function ControllersPage() {
     return (
         <div className="min-h-screen flex flex-col">
             <BreadCrumb
-                title="Controllers"
+                title={language === "en" ? "Controllers" : "Controller"}
                 breadcrumbs={[
-                    { label: "Home", href: "/" },
-                    { label: "Controllers" },
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Controllers" : "Controller" },
                 ]}
             />
             <main className="flex-1 container mx-auto px-4 py-8">
@@ -152,7 +154,7 @@ export default function ControllersPage() {
                                                     src={controller.images[0]}
                                                     alt={controller.interfaceName || "Controller"}
                                                     fill
-                                                    className="object-cover"
+                                                    className="object-contain"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-400">

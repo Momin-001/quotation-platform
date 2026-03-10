@@ -67,6 +67,11 @@ export default async function EditProductPage({ params }) {
                 initialCertificateIds={
                     product.certificates?.map((c) => c.id) || []
                 }
+                initialIconIds={
+                    (product.icons || [])
+                        .sort((a, b) => (a.iconOrder ?? 0) - (b.iconOrder ?? 0))
+                        .map((i) => i.id) || []
+                }
             />
         </div>
     );

@@ -44,28 +44,41 @@ const defaultFooterData = {
     copyrightTextDe: "© Copyright Quotationsplattform. Alle Rechte vorbehalten",
 };
 
+const defaultUserHeaderData = {
+    userHeaderMyEnquiryEn: "My Enquiry",
+    userHeaderMyEnquiryDe: "Meine Anfrage",
+    userHeaderMyQuotationEn: "My Quotation",
+    userHeaderMyQuotationDe: "Meine Angebot",
+    userHeaderMyAccountEn: "My Account",
+    userHeaderMyAccountDe: "Mein Konto",
+    userHeaderMyCartEn: "My Cart",
+    userHeaderMyCartDe: "Mein Warenkorb",
+};
+
 async function getLayoutData() {
-    const [navbarRes, footerRes] = await Promise.all([
+    const [navbarRes, footerRes, userHeaderRes] = await Promise.all([
       fetch(`${BASE_URL}/api/navbar`, { cache: "no-store" }),
       fetch(`${BASE_URL}/api/footer`, { cache: "no-store" }),
+      fetch(`${BASE_URL}/api/user-header`, { cache: "no-store" }),
     ]);
   
     const navbarJson = await navbarRes.json();
     const footerJson = await footerRes.json();
-  
+    const userHeaderJson = await userHeaderRes.json();
     return {
       navbarData: navbarJson?.data || defaultNavbarData,
       footerData: footerJson?.data || defaultFooterData,
+      userHeaderData: userHeaderJson?.data || defaultUserHeaderData,
     };
   }
   
   export default async function GuestLayout({ children }) {
-    const { navbarData, footerData } = await getLayoutData();
+    const { navbarData, footerData, userHeaderData } = await getLayoutData();
   
     return (
       <div>
         <Navbar navbarData={navbarData} />
-        <UserHeader />
+        <UserHeader userHeaderData={userHeaderData} />
         {children}
         <Footer footerData={footerData} />
       </div>

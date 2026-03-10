@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import { useLanguage } from "@/context/LanguageContext";
 
 const formSchema = z.object({
     message: z.string().min(10, "Message must be at least 10 characters"),
@@ -38,7 +39,7 @@ export default function CartPage() {
     const router = useRouter();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const { language } = useLanguage();
     const {
         register,
         handleSubmit,
@@ -125,10 +126,10 @@ export default function CartPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <BreadCrumb 
-                title="My Cart" 
+                title={language === "en" ? "My Cart" : "Mein Warenkorb"} 
                 breadcrumbs={[
-                    { label: "Home", href: "/" }, 
-                    { label: "Cart" }
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                    { label: language === "en" ? "Cart" : "Warenkorb" }
                 ]} 
             />
             <div className="container mx-auto px-4 py-8">

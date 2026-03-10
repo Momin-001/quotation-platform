@@ -12,7 +12,18 @@ export const quotations = pgTable("quotations", {
         .references(() => enquiries.id, { onDelete: "cascade" }),
     quotationNumber: text("quotation_number").notNull(), // e.g., "Q-2025-347"
     status: text("status").default("draft").notNull(), // draft, pending, accepted, requested revision, rejected, closed, expired
+    sectionOfferHtml: text("section_offer_html"),
+    sectionConditionsHtml: text("section_conditions_html"),
+    sectionOptionsHtml: text("section_options_html"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const quotationSectionDefaults = pgTable("quotation_section_defaults", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sectionOfferHtml: text("section_offer_html").notNull().default(""),
+    sectionConditionsHtml: text("section_conditions_html").notNull().default(""),
+    sectionOptionsHtml: text("section_options_html").notNull().default(""),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

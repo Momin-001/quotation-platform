@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import UserAvatar from "@/components/common/UserAvatar";
@@ -26,6 +26,7 @@ const navItems = [
     { href: "/admin/quotations", label: "Quotations", icon: FileText },
     { href: "/admin/cms", label: "CMS Pages", icon: NotebookText },
     { href: "/admin/certificates", label: "Certificates", icon: TicketCheck },
+    { href: "/admin/product-icons", label: "Product Icons", icon: ImageIcon },
     { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
 ];
 

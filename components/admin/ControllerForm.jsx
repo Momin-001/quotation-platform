@@ -26,6 +26,7 @@ const controllerSchema = z.object({
     brandName: z.string().optional(),
     brandNameOther: z.string().optional(),
     interfaceName: z.string().optional(),
+    controllerNumber: z.string().optional(),
     pixelCapacity: z.union([z.string(), z.number()]).optional(),
     maxWidthHeight: z.union([z.string(), z.number()]).optional(),
     dp12: z.union([z.string(), z.number()]).optional(),
@@ -64,12 +65,17 @@ const controllerSchema = z.object({
     multiViewerMvr: z.string().optional(),
     usbPlayback: z.string().optional(),
     support3d: z.string().optional(),
+    downloadUrl: z.string().optional(),
+    pricePerControllerUsd: z.union([z.string(), z.number()]).optional(),
+    stockPieces: z.union([z.string(), z.number()]).optional(),
+    leadtimeDays: z.union([z.string(), z.number()]).optional(),
 });
 
 const defaultValues = {
     brandName: "",
     brandNameOther: "",
     interfaceName: "",
+    controllerNumber: "",
     pixelCapacity: "",
     maxWidthHeight: "",
     dp12: "0",
@@ -119,9 +125,10 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
     const [removedImageIds, setRemovedImageIds] = useState([]);
 
     const formDefaultValues = initialData ? {
+        interfaceName: initialData.interfaceName || "",
         brandName: initialData.brandName || "",
         brandNameOther: initialData.brandNameOther || "",
-        interfaceName: initialData.interfaceName || "",
+        controllerNumber: initialData.controllerNumber || "",
         pixelCapacity: initialData.pixelCapacity?.toString() || "",
         maxWidthHeight: initialData.maxWidthHeight?.toString() || "",
         dp12: initialData.dp12?.toString() || "0",
@@ -160,6 +167,10 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
         multiViewerMvr: initialData.multiViewerMvr || "",
         usbPlayback: initialData.usbPlayback || "",
         support3d: initialData.support3d || "",
+        downloadUrl: initialData.downloadUrl || "",
+        pricePerControllerUsd: initialData.pricePerControllerUsd?.toString() || "",
+        stockPieces: initialData.stockPieces?.toString() || "",
+        leadtimeDays: initialData.leadtimeDays?.toString() || "",
     } : defaultValues;
 
     const {
@@ -268,6 +279,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     {renderInput("Interface Name", "interfaceName", "text", { placeholder: "e.g. VX2000 Pro Max" })}
                     {renderSelect("Brand Name", "brandName", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"])}
                     {brandName === "Other" && renderInput("Brand Name Other", "brandNameOther", "text", { placeholder: "Enter brand name" })}
+                    {renderInput("Controller Number", "controllerNumber", "text", { placeholder: "e.g. 1234567890" })}
                     {renderInput("Max. Pixel Capacity", "pixelCapacity", "number", { placeholder: "e.g. 13000000" })}
                     {renderInput("Max. Width/Height (px)", "maxWidthHeight", "number", { placeholder: "e.g. 10240" })}
                 </div>
@@ -348,6 +360,10 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     {renderSelect("Multi-Viewer (MVR)", "multiViewerMvr", yesNoOptions)}
                     {renderSelect("USB Playback", "usbPlayback", yesNoOptions)}
                     {renderSelect("3D Support", "support3d", yesNoOptions)}
+                    {renderInput("Download URL", "downloadUrl", "text", { placeholder: "e.g. https://www.example.com/controller.pdf" })}
+                    {renderInput("Price Per Controller (USD)", "pricePerControllerUsd", "number", { step: "0.01", placeholder: "e.g. 1000.00" })}
+                    {renderInput("Stock Pieces", "stockPieces", "number", { step: "1", placeholder: "e.g. 10" })}
+                    {renderInput("Leadtime (days)", "leadtimeDays", "number", { step: "1", placeholder: "e.g. 14" })}
                 </div>
             </div>
 

@@ -16,6 +16,7 @@ import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import { useLanguage } from "@/context/LanguageContext";
 
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -36,6 +37,7 @@ const formSchema = z.object({
 });
 
 export default function RegisterPage() {
+    const { language } = useLanguage();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -77,10 +79,10 @@ export default function RegisterPage() {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Header Section */}
-            <BreadCrumb title="Register" 
+            <BreadCrumb title={language === "en" ? "Register" : "Registrieren"} 
             breadcrumbs={[
-                { label: "Home", href: "/" }, 
-                { label: "Register" }
+                { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
+                { label: language === "en" ? "Register" : "Registrieren" }
                 ]} />
             {/* Main Content */}
             <main className="grow relative">

@@ -117,71 +117,76 @@ export async function POST(req) {
 
         for (let c = 0; c < numControllers; c++) {
             try {
+                const interfaceName = str(cell(1, c));
+                const controllerNumber = str(cell(2, c));
+                const brandResult = matchBrand(cell(3, c));
                 
-                const brandResult = matchBrand(cell(1, c));
-                const interfaceName = str(cell(2, c));
-
-                if (!interfaceName) {
-                    results.errors.push(`Column ${c + 1}: Missing interface name, skipped.`);
+                if (!interfaceName || !controllerNumber) {
+                    results.errors.push(`Column ${c + 1}: Missing interface name or controller number, skipped.`);
                     continue;
                 }
-
+                
                 const controllerData = {
                     interfaceName,
                     brandName: brandResult.value,
                     brandNameOther: brandResult.other,
 
                     // Capacity
-                    pixelCapacity: parseInteger(cell(3, c)),
-                    maxWidthHeight: parseInteger(cell(4, c)),
+                    controllerNumber,
+                    pixelCapacity: parseInteger(cell(4, c)),
+                    maxWidthHeight: parseInteger(cell(5, c)),
 
                     // Input Ports
-                    dp12: parseInteger(cell(5, c)) ?? 0,
-                    hdmi20: parseInteger(cell(6, c)) ?? 0,
-                    hdmi13: parseInteger(cell(7, c)) ?? 0,
-                    dviSingleLink: parseInteger(cell(8, c)) ?? 0,
-                    sdi12g: parseInteger(cell(9, c)) ?? 0,
-                    sdi3g: parseInteger(cell(10, c)) ?? 0,
-                    opticalFiberIn10g: parseInteger(cell(11, c)) ?? 0,
-                    usb30MediaPlayback: parseInteger(cell(12, c)) ?? 0,
+                    dp12: parseInteger(cell(6, c)) ?? 0,
+                    hdmi20: parseInteger(cell(7, c)) ?? 0,
+                    hdmi13: parseInteger(cell(8, c)) ?? 0,
+                    dviSingleLink: parseInteger(cell(9, c)) ?? 0,
+                    sdi12g: parseInteger(cell(10, c)) ?? 0,
+                    sdi3g: parseInteger(cell(11, c)) ?? 0,
+                    opticalFiberIn10g: parseInteger(cell(12, c)) ?? 0,
+                    usb30MediaPlayback: parseInteger(cell(13, c)) ?? 0,
 
                     // Output Ports
-                    gigabitEthernetRj45: parseInteger(cell(13, c)) ?? 0,
-                    opticalFiberOut10g: parseInteger(cell(14, c)) ?? 0,
-                    output5g: matchYesNo(cell(15, c)),
+                    gigabitEthernetRj45: parseInteger(cell(14, c)) ?? 0,
+                    opticalFiberOut10g: parseInteger(cell(15, c)) ?? 0,
+                    output5g: matchYesNo(cell(16, c)),
 
                     // Monitoring
-                    hdmi13Monitoring: parseInteger(cell(16, c)) ?? 0,
-                    connector3dMiniDin4: parseInteger(cell(17, c)) ?? 0,
+                    hdmi13Monitoring: parseInteger(cell(17, c)) ?? 0,
+                    connector3dMiniDin4: parseInteger(cell(18, c)) ?? 0,
 
                     // Loop
-                    hdmi20Loop: parseInteger(cell(18, c)) ?? 0,
-                    sdi12gLoop: parseInteger(cell(19, c)) ?? 0,
-                    sdi3gLoop: parseInteger(cell(20, c)) ?? 0,
-                    dviLoop: parseInteger(cell(21, c)) ?? 0,
+                    hdmi20Loop: parseInteger(cell(19, c)) ?? 0,
+                    sdi12gLoop: parseInteger(cell(20, c)) ?? 0,
+                    sdi3gLoop: parseInteger(cell(21, c)) ?? 0,
+                    dviLoop: parseInteger(cell(22, c)) ?? 0,
 
                     // Audio & Control
-                    audioInput35mm: parseInteger(cell(22, c)) ?? 0,
-                    audioOutput35mm: parseInteger(cell(23, c)) ?? 0,
-                    ethernetControlPort: parseInteger(cell(24, c)) ?? 0,
-                    usbTypeBPcControl: parseInteger(cell(25, c)) ?? 0,
-                    usbTypeACascading: parseInteger(cell(26, c)) ?? 0,
-                    genlockInLoop: parseInteger(cell(27, c)) ?? 0,
-                    rs232: parseInteger(cell(28, c)) ?? 0,
+                    audioInput35mm: parseInteger(cell(23, c)) ?? 0,
+                    audioOutput35mm: parseInteger(cell(24, c)) ?? 0,
+                    ethernetControlPort: parseInteger(cell(25, c)) ?? 0,
+                    usbTypeBPcControl: parseInteger(cell(26, c)) ?? 0,
+                    usbTypeACascading: parseInteger(cell(27, c)) ?? 0,
+                    genlockInLoop: parseInteger(cell(28, c)) ?? 0,
+                    rs232: parseInteger(cell(29, c)) ?? 0,
 
                     // Features
-                    maximumLayers: str(cell(29, c)),
-                    layerScaling: matchYesNo(cell(30, c)),
-                    hdrSupport: str(cell(31, c)),
-                    colorDepthBit: parseInteger(cell(32, c)),
-                    lowLatency: matchYesNo(cell(33, c)),
-                    fibreConverterMode: matchYesNo(cell(34, c)),
-                    vCanSupport: matchYesNo(cell(35, c)),
-                    backupMode: str(cell(36, c)),
-                    genlockSync: matchYesNo(cell(37, c)),
-                    multiViewerMvr: matchYesNo(cell(38, c)),
-                    usbPlayback: matchYesNo(cell(39, c)),
-                    support3d: matchYesNo(cell(40, c)),
+                    maximumLayers: str(cell(30, c)),
+                    layerScaling: matchYesNo(cell(31, c)),
+                    hdrSupport: str(cell(32, c)),
+                    colorDepthBit: parseInteger(cell(33, c)),
+                    lowLatency: matchYesNo(cell(34, c)),
+                    fibreConverterMode: matchYesNo(cell(35, c)),
+                    vCanSupport: matchYesNo(cell(36, c)),
+                    backupMode: str(cell(37, c)),
+                    genlockSync: matchYesNo(cell(38, c)),
+                    multiViewerMvr: matchYesNo(cell(39, c)),
+                    usbPlayback: matchYesNo(cell(40, c)),
+                    support3d: matchYesNo(cell(41, c)),
+                    downloadUrl: str(cell(42, c)),
+                    pricePerControllerUsd: parseFloat(cell(43, c)) ?? 0,
+                    stockPieces: parseInteger(cell(44, c)) ?? 0,
+                    leadtimeDays: parseInteger(cell(45, c)) ?? 0,
 
                     // Excel-imported controllers are inactive until they have images
                     isActive: false,
@@ -192,7 +197,7 @@ export async function POST(req) {
                 const [existing] = await db
                     .select({ id: controllers.id })
                     .from(controllers)
-                    .where(eq(controllers.interfaceName, interfaceName))
+                    .where(eq(controllers.controllerNumber, controllerNumber))
                     .limit(1)
                     
 

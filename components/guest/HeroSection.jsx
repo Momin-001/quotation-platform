@@ -79,18 +79,23 @@ export default function HeroSection({ homepageData }) {
                         />
 
 
-                        {/* Hotline CTA - Bottom Left */}
-                        <div className="absolute bottom-0 left-0 bg-[#009B8F] rounded-tr-lg text-white px-8 py-6 flex items-center gap-3 shadow-lg z-10 max-w-xs">
-                            <Phone className="h-5 w-5 flex-shrink-0" />
-                            <p className="text-sm font-medium font-open-sans">
-                                {getText("heroHotlineCta")}
-                            </p>
-                        </div>
+                       {/* Bottom Actions */}
+<div className="absolute bottom-0 left-0 w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 p-4 sm:p-0 z-10">
 
-                        {/* Request for Offer Button - Bottom Right */}
-                        <Button className="absolute bottom-4 right-16 bg-[#009B8F] hover:bg-[#009B8F]/90 text-white px-6 py-4 rounded-lg shadow-lg z-10 font-open-sans">
-                            {getText("heroRequestButton")}
-                        </Button>
+{/* Hotline CTA */}
+<div className="bg-[#009B8F] rounded-tr-lg text-white px-6 py-4 flex items-center gap-3 shadow-lg max-w-xs">
+    <Phone className="h-5 w-5 flex-shrink-0" />
+    <p className="text-sm font-medium font-open-sans">
+        {getText("heroHotlineCta")}
+    </p>
+</div>
+
+{/* Request for Offer Button */}
+<Button className="bg-[#009B8F] hover:bg-[#009B8F]/90 text-white px-6 py-4 rounded-lg shadow-lg font-open-sans sm:mr-16 sm:mb-6">
+    {getText("heroRequestButton")}
+</Button>
+
+</div>
                     </div>
                 </div>
             </div>

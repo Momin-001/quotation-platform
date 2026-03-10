@@ -22,7 +22,7 @@ export default function EnquiryDetailPage() {
     const router = useRouter();
     const [enquiry, setEnquiry] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [generatingPdf, setGeneratingPdf] = useState(false);
+    const [datasheetLoadingId, setDatasheetLoadingId] = useState(null);
 
     useEffect(() => {
         if (params.id) {
@@ -47,7 +47,7 @@ export default function EnquiryDetailPage() {
     };
 
     const handleDownloadDatasheet = async (productId, productNumber) => {
-        setGeneratingPdf(true);
+        setDatasheetLoadingId(productId);
         try {
             const res = await fetch(`/api/products/${productId}/datasheet`);
             if (!res.ok) {
@@ -77,7 +77,7 @@ export default function EnquiryDetailPage() {
         } catch (error) {
             toast.error(error.message || "Failed to download datasheet");
         } finally {
-            setGeneratingPdf(false);
+            setDatasheetLoadingId(null);
         }
     };
 
@@ -191,11 +191,20 @@ export default function EnquiryDetailPage() {
                                                     item.productId,
                                                     item.productNumber
                                                 )}
-                                                disabled={generatingPdf}
-                                                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-50"
+                                                disabled={datasheetLoadingId !== null}
+                                                className="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                             >
-                                                <FileText className="h-4 w-4 text-red-500" />
-                                                <span className="text-sm">{item.productNumber}_datasheet.pdf</span>
+                                                {datasheetLoadingId === item.productId ? (
+                                                    <>
+                                                        <Spinner className="h-4 w-4 text-blue-600" />
+                                                        <span className="text-sm">Generating…</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <FileText className="h-4 w-4 text-red-500" />
+                                                        <span className="text-sm">{item.productNumber}_datasheet.pdf</span>
+                                                    </>
+                                                )}
                                             </button>
                                         </TableCell>
                                     </TableRow>

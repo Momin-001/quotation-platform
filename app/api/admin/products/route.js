@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { products, productImages, productCertificates, productFeatures, certificates } from "@/db/schema";
+import { products, productImages, productCertificates, productFeatures, productProductIcons, certificates } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, eq } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
@@ -41,6 +41,7 @@ export async function POST(request) {
             // String fields
             productName: body.productName?.toString().trim() || "",
             productNumber: body.productNumber?.toString().trim() || "",
+            productDescription: body.productDescription?.toString().trim() || null,
             oemBrand: body.oemBrand?.toString().trim() || null,
             // Foreign Key
             areaOfUseId: body.areaOfUseId?.toString() || null,
@@ -176,6 +177,19 @@ export async function POST(request) {
             }
         }
 
+        // Handle product icons (order preserved)
+        const selectedIconIds = body.productIcons || [];
+        if (selectedIconIds.length > 0) {
+            const iconIds = selectedIconIds.filter((iid) => iid && iid !== "");
+            for (let i = 0; i < iconIds.length; i++) {
+                await db.insert(productProductIcons).values({
+                    productId,
+                    productIconId: iconIds[i].toString(),
+                    iconOrder: i,
+                });
+            }
+        }
+
         // Handle product features
         const features = body.features;
         if (features && Array.isArray(features) && features.length > 0) {
@@ -188,6 +202,31 @@ export async function POST(request) {
                     })
                 );
             await Promise.all(featurePromises);
+        }
+
+        // Handle PDF uploads
+        const pdfFields = [
+            { key: "installationManual", urlCol: "installationManualUrl", pidCol: "installationManualPublicId" },
+            { key: "maintenanceGuide", urlCol: "maintenanceGuideUrl", pidCol: "maintenanceGuidePublicId" },
+            { key: "certificatesPdf", urlCol: "certificatesPdfUrl", pidCol: "certificatesPdfPublicId" },
+        ];
+        const pdfUpdate = {};
+        for (const { key, urlCol, pidCol } of pdfFields) {
+            const file = formData.get(key);
+            if (file && file.size > 0) {
+                const bytes = await file.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+                const result = await cloudinary.uploader.upload(base64, {
+                    folder: `QuotationPlatform/products/${key}`,
+                    resource_type: "raw",
+                });
+                pdfUpdate[urlCol] = result.secure_url;
+                pdfUpdate[pidCol] = result.public_id;
+            }
+        }
+        if (Object.keys(pdfUpdate).length > 0) {
+            await db.update(products).set(pdfUpdate).where(eq(products.id, productId));
         }
 
         return successResponse("Product created successfully", newProduct[0]);

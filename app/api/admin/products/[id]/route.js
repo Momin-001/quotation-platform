@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { products, productImages, productCertificates, productFeatures, certificates } from "@/db/schema";
+import { products, productImages, productCertificates, productFeatures, productProductIcons, productIcons, certificates } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
 
 // GET /api/admin/products/[id] - Fetch a single product with all details
@@ -52,11 +52,23 @@ export async function GET(request, { params }) {
             .innerJoin(certificates, eq(productCertificates.certificateId, certificates.id))
             .where(eq(productCertificates.productId, id));
 
+        // Get product icons (ordered)
+        const productIconLinks = await db
+            .select({
+                id: productIcons.id,
+                iconOrder: productProductIcons.iconOrder,
+            })
+            .from(productProductIcons)
+            .innerJoin(productIcons, eq(productProductIcons.productIconId, productIcons.id))
+            .where(eq(productProductIcons.productId, id))
+            .orderBy(asc(productProductIcons.iconOrder));
+
         return successResponse("Product fetched successfully", {
             ...product,
             images,
             features,
             certificates: productCerts,
+            icons: productIconLinks,
         });
     } catch (error) {
         return errorResponse(error.message || "Failed to fetch product");
@@ -87,6 +99,7 @@ export async function PUT(request, { params }) {
         // Build product update data
         const productData = {
             productName: body.productName?.toString().trim() || "",
+            productDescription: body.productDescription?.toString().trim() || null,
             viewingAngleHorizontal: body.viewingAngleHorizontal?.toString().trim() || null,
             viewingAngleVertical: body.viewingAngleVertical?.toString().trim() || null,
             brightnessControl: body.brightnessControl?.toString().trim() || null,
@@ -240,6 +253,20 @@ export async function PUT(request, { params }) {
             }
         }
 
+        // Handle product icons - replace all
+        await db.delete(productProductIcons).where(eq(productProductIcons.productId, id));
+        const selectedIconIds = body.productIcons || [];
+        if (selectedIconIds.length > 0) {
+            const iconIds = selectedIconIds.filter((iid) => iid && iid !== "");
+            for (let i = 0; i < iconIds.length; i++) {
+                await db.insert(productProductIcons).values({
+                    productId: id,
+                    productIconId: iconIds[i].toString(),
+                    iconOrder: i,
+                });
+            }
+        }
+
         // Handle features - replace all
         await db.delete(productFeatures).where(eq(productFeatures.productId, id));
         const features = body.features || [];
@@ -253,6 +280,60 @@ export async function PUT(request, { params }) {
                     })
                 );
             await Promise.all(featurePromises);
+        }
+
+        // Handle removed PDFs
+        const removedPdfs = body.removedPdfs || [];
+        const pdfFieldMap = {
+            installationManual: { urlCol: "installationManualUrl", pidCol: "installationManualPublicId" },
+            maintenanceGuide: { urlCol: "maintenanceGuideUrl", pidCol: "maintenanceGuidePublicId" },
+            certificatesPdf: { urlCol: "certificatesPdfUrl", pidCol: "certificatesPdfPublicId" },
+        };
+        if (removedPdfs.length > 0) {
+            const existing = await db.select().from(products).where(eq(products.id, id)).limit(1).then((r) => r[0]);
+            const clearUpdate = {};
+            for (const key of removedPdfs) {
+                const map = pdfFieldMap[key];
+                if (map && existing?.[map.pidCol]) {
+                    await cloudinary.uploader.destroy(existing[map.pidCol], { resource_type: "raw" });
+                }
+                if (map) {
+                    clearUpdate[map.urlCol] = null;
+                    clearUpdate[map.pidCol] = null;
+                }
+            }
+            if (Object.keys(clearUpdate).length > 0) {
+                await db.update(products).set(clearUpdate).where(eq(products.id, id));
+            }
+        }
+
+        // Handle PDF uploads (new or replacement)
+        const pdfUploadFields = [
+            { key: "installationManual", urlCol: "installationManualUrl", pidCol: "installationManualPublicId" },
+            { key: "maintenanceGuide", urlCol: "maintenanceGuideUrl", pidCol: "maintenanceGuidePublicId" },
+            { key: "certificatesPdf", urlCol: "certificatesPdfUrl", pidCol: "certificatesPdfPublicId" },
+        ];
+        const pdfUpdate = {};
+        for (const { key, urlCol, pidCol } of pdfUploadFields) {
+            const file = formData.get(key);
+            if (file && file.size > 0) {
+                const existingProduct = await db.select().from(products).where(eq(products.id, id)).limit(1).then((r) => r[0]);
+                if (existingProduct?.[pidCol]) {
+                    await cloudinary.uploader.destroy(existingProduct[pidCol], { resource_type: "raw" });
+                }
+                const bytes = await file.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+                const result = await cloudinary.uploader.upload(base64, {
+                    folder: `QuotationPlatform/products/${key}`,
+                    resource_type: "raw",
+                });
+                pdfUpdate[urlCol] = result.secure_url;
+                pdfUpdate[pidCol] = result.public_id;
+            }
+        }
+        if (Object.keys(pdfUpdate).length > 0) {
+            await db.update(products).set(pdfUpdate).where(eq(products.id, id));
         }
 
         return successResponse("Product updated successfully");
@@ -277,7 +358,13 @@ export async function DELETE(request, { params }) {
         const images = await db.select().from(productImages).where(eq(productImages.productId, id));
        
         for (const image of images) {
-           const result = await cloudinary.uploader.destroy(image.publicId);
+           await cloudinary.uploader.destroy(image.publicId);
+        }
+
+        // Delete product PDFs from Cloudinary
+        const pdfPublicIds = [product.installationManualPublicId, product.maintenanceGuidePublicId, product.certificatesPdfPublicId].filter(Boolean);
+        for (const pid of pdfPublicIds) {
+            await cloudinary.uploader.destroy(pid, { resource_type: "raw" });
         }
 
         // Delete product from database

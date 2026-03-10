@@ -35,7 +35,7 @@ export default function Navbar({ navbarData }) {
     };
 
     return (
-        <nav className="w-full border-b bg-background font-archivo">
+        <nav className="w-full border-b bg-background sticky top-0 left-0 right-0 z-50 font-archivo">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 <Link href="/" className="shrink-0">
                     <Image className="" src="/logo.png" alt="Logo" width={40} height={40} />
