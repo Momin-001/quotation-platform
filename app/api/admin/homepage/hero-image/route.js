@@ -3,9 +3,6 @@ import { homepage } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import cloudinary from "@/lib/cloudinary";
 
-// Allow longer run for large image uploads (e.g. Vercel/serverless)
-export const maxDuration = 60;
-
 export async function POST(req) {
     try {
         const formData = await req.formData();
@@ -28,7 +25,6 @@ export async function POST(req) {
         const result = await cloudinary.uploader.upload(base64, {
             folder: "QuotationPlatform/homepage",
             resource_type: "image",
-            timeout: 120000, // 2 minutes for Cloudinary API call
         });
 
         // Delete old image from Cloudinary after successful upload
