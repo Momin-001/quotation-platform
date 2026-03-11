@@ -9,12 +9,14 @@ const defaultNavbarData = {
     navItem1De: "STARTSEITE",
     navItem2En: "PRODUCTS",
     navItem2De: "PRODUKTE",
-    navItem3En: "LEDITOR",
-    navItem3De: "LEDITOR",
-    navItem4En: "CASE STUDIES",
-    navItem4De: "FALLSTUDIEN",
-    navItem5En: "BECOME PARTNERS",
-    navItem5De: "PARTNER WERDEN",
+    navItem3En: "CONTROLLERS",
+    navItem3De: "CONTROLLER",
+    navItem4En: "LEDITOR",
+    navItem4De: "LEDITOR",
+    navItem5En: "BLOGS",
+    navItem5De: "BLOGS",
+    navItem6En: "BECOME PARTNERS",
+    navItem6De: "PARTNER WERDEN",
 };
 
 const defaultFooterData = {

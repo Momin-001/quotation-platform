@@ -101,6 +101,11 @@ export default function LeditorPage() {
     const personImgRef = useRef(null);
     const [imagesLoaded, setImagesLoaded] = useState(false);
 
+    // User's own image for preview (local state only, cleared on refresh)
+    const [userPreviewImageUrl, setUserPreviewImageUrl] = useState(null);
+    const userPreviewImageRef = useRef(null);
+    const [userPreviewImageLoaded, setUserPreviewImageLoaded] = useState(false);
+
     useEffect(() => {
         let loaded = 0;
         const checkLoaded = () => {
@@ -120,6 +125,30 @@ export default function LeditorPage() {
         personImg.onerror = checkLoaded;
         personImgRef.current = personImg;
     }, []);
+
+    // Load user's preview image when they select a file
+    useEffect(() => {
+        if (!userPreviewImageUrl) {
+            userPreviewImageRef.current = null;
+            setUserPreviewImageLoaded(false);
+            return;
+        }
+        const img = new window.Image();
+        img.onload = () => {
+            userPreviewImageRef.current = img;
+            setUserPreviewImageLoaded(true);
+        };
+        img.onerror = () => {
+            userPreviewImageRef.current = null;
+            setUserPreviewImageLoaded(false);
+        };
+        img.src = userPreviewImageUrl;
+        return () => {
+            URL.revokeObjectURL(userPreviewImageUrl);
+            userPreviewImageRef.current = null;
+            setUserPreviewImageLoaded(false);
+        };
+    }, [userPreviewImageUrl]);
 
     // Accordion open sections
     const [accordionSections, setAccordionSections] = useState([
@@ -352,10 +381,13 @@ export default function LeditorPage() {
 
         const cabInfo = computed.cabInfo;
 
-        // ── Draw leditor image inside the LED area ──
-        if (leditorImgRef.current && leditorImgRef.current.complete && leditorImgRef.current.naturalWidth) {
+        // ── Draw leditor image inside the LED area (user's image or default) ──
+        const imgToDraw = userPreviewImageRef.current?.complete && userPreviewImageRef.current?.naturalWidth
+            ? userPreviewImageRef.current
+            : leditorImgRef.current;
+        if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth) {
             // Draw image to fill LED area (cover)
-            const img = leditorImgRef.current;
+            const img = imgToDraw;
             const imgRatio = img.naturalWidth / img.naturalHeight;
             const ledRatio = drawW / drawH;
             let sx, sy, sw, sh;
@@ -452,7 +484,7 @@ export default function LeditorPage() {
         ctx.textAlign = "center";
         const cabLabel = `${cabInfo.countH} × ${cabInfo.countV} Cabinets`;
         ctx.fillText(cabLabel, ledX + drawW / 2, ledBottomY + 18);
-    }, [config, computed.cabInfo, imagesLoaded]);
+    }, [config, computed.cabInfo, imagesLoaded, userPreviewImageLoaded]);
 
     // Submit enquiry
     const onSubmitEnquiry = async (data) => {
@@ -626,6 +658,43 @@ export default function LeditorPage() {
                                                 <p className="text-xs text-gray-500">
                                                     Change width/height to see the LED preview update live.
                                                 </p>
+                                                {/* Preview with your own image (local only, cleared on refresh) */}
+                                                <div className="space-y-2 pt-2 border-t">
+                                                    <Label className="text-sm">Preview with your own image</Label>
+                                                    <p className="text-xs text-gray-500">
+                                                        Upload an image to see how it would look on the screen.
+                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        <label className="flex items-center w-full justify-center h-10 px-4 border rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors text-sm font-medium">
+                                                            <span className="mr-2">+</span>
+                                                            {userPreviewImageUrl ? "Change image" : "Upload image"}
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) {
+                                                                        if (userPreviewImageUrl) URL.revokeObjectURL(userPreviewImageUrl);
+                                                                        setUserPreviewImageUrl(URL.createObjectURL(file));
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
+                                                        {userPreviewImageUrl && (
+                                                            <Button
+                                                                type="button"
+                                                                
+                                                                onClick={() => {
+                                                                    URL.revokeObjectURL(userPreviewImageUrl);
+                                                                    setUserPreviewImageUrl(null);
+                                                                }}
+                                                            >
+                                                                Clear
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>

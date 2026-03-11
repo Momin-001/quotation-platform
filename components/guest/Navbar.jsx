@@ -53,9 +53,9 @@ export default function Navbar({ navbarData }) {
                     <Link href="/leditor" className="hover:text-primary transition-colors">
                         {getNavText(4)}
                     </Link>
-                    {/* <Link href="/case-studies" className="hover:text-primary transition-colors">
+                    <Link href="/blogs" className="hover:text-primary transition-colors">
                         {getNavText(5)}
-                    </Link> */}
+                    </Link>
                     <Link href="/become-partner" className="hover:text-primary transition-colors">
                         {getNavText(6)}
                     </Link>
