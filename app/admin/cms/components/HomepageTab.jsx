@@ -107,6 +107,10 @@ const homepageSchema = z.object({
 
 export default function HomepageTab({ onDataChange, onValidationChange, onSaveHandlerReady }) {
     const [loading, setLoading] = useState(true);
+    const [heroImageUrl, setHeroImageUrl] = useState(null);
+    const [pendingHeroImageFile, setPendingHeroImageFile] = useState(null);
+    const [pendingHeroImagePreviewUrl, setPendingHeroImagePreviewUrl] = useState(null);
+    const [heroImageWillRemove, setHeroImageWillRemove] = useState(false);
     const {
         register,
         reset,
@@ -326,6 +330,11 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
                     partnersSubtitleDe: data.data.partnersSubtitleDe || "",
                 };
                 reset(fetchedData);
+                setHeroImageUrl(data.data.heroImageUrl || null);
+                setPendingHeroImageFile(null);
+                if (pendingHeroImagePreviewUrl) URL.revokeObjectURL(pendingHeroImagePreviewUrl);
+                setPendingHeroImagePreviewUrl(null);
+                setHeroImageWillRemove(false);
             } else {
                 toast.error(data.message);
             }
@@ -355,14 +364,47 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             if (!response.success) {
                 throw new Error(response.message || "Failed to save homepage content");
             }
+
+            // Apply hero image change only when Save is clicked
+            if (pendingHeroImageFile) {
+                const fd = new FormData();
+                fd.append("heroImage", pendingHeroImageFile);
+                const imgRes = await fetch("/api/admin/homepage/hero-image", {
+                    method: "POST",
+                    body: fd,
+                });
+                const imgJson = await imgRes.json();
+                if (!imgJson.success) {
+                    throw new Error(imgJson.message || "Failed to upload hero image");
+                }
+                setHeroImageUrl(imgJson.data.heroImageUrl || null);
+                setPendingHeroImageFile(null);
+                if (pendingHeroImagePreviewUrl) URL.revokeObjectURL(pendingHeroImagePreviewUrl);
+                setPendingHeroImagePreviewUrl(null);
+                setHeroImageWillRemove(false);
+            } else if (heroImageWillRemove) {
+                const delRes = await fetch("/api/admin/homepage/hero-image", { method: "DELETE" });
+                const delJson = await delRes.json();
+                if (!delJson.success) {
+                    throw new Error(delJson.message || "Failed to remove hero image");
+                }
+                setHeroImageUrl(null);
+                setHeroImageWillRemove(false);
+            }
+
             toast.success(response.message || "Homepage content saved successfully");
-            fetchHomepageData(); // Refresh data
+            fetchHomepageData(); // Refresh data (also resets preview state)
             return { success: true };
         } catch (error) {
             toast.error(error.message);
             return { success: false };
         }
-    }, [fetchHomepageData]);
+    }, [
+        fetchHomepageData,
+        pendingHeroImageFile,
+        pendingHeroImagePreviewUrl,
+        heroImageWillRemove,
+    ]);
 
     // Wrapper for save handler that validates first
     const onSave = useCallback(async () => {
@@ -396,7 +438,29 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
 
     return (
         <div className="space-y-12">
-            <HeroSection register={register} errors={errors} />
+            <HeroSection
+                register={register}
+                errors={errors}
+                heroImageUrl={heroImageUrl}
+                pendingHeroImageFile={pendingHeroImageFile}
+                pendingHeroImagePreviewUrl={pendingHeroImagePreviewUrl}
+                heroImageWillRemove={heroImageWillRemove}
+                disabled={loading}
+                onPickHeroImageFile={(file) => {
+                    setPendingHeroImageFile(file);
+                    if (pendingHeroImagePreviewUrl) URL.revokeObjectURL(pendingHeroImagePreviewUrl);
+                    setPendingHeroImagePreviewUrl(URL.createObjectURL(file));
+                    setHeroImageWillRemove(false);
+                }}
+                onClearPendingHeroImage={() => {
+                    setPendingHeroImageFile(null);
+                    if (pendingHeroImagePreviewUrl) URL.revokeObjectURL(pendingHeroImagePreviewUrl);
+                    setPendingHeroImagePreviewUrl(null);
+                }}
+                onToggleRemoveHeroImage={() => {
+                    setHeroImageWillRemove((v) => !v);
+                }}
+            />
             <ValueBlocksSection register={register} errors={errors} />
             <HowItWorksSection register={register} errors={errors} />
             <FAQSection register={register} errors={errors} />

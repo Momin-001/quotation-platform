@@ -3,13 +3,83 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { X } from "lucide-react";
+import Image from "next/image";
 
-export default function HeroSection({ register, errors }) {
+export default function HeroSection({
+    register,
+    errors,
+    heroImageUrl,
+    pendingHeroImageFile,
+    pendingHeroImagePreviewUrl,
+    heroImageWillRemove,
+    onPickHeroImageFile,
+    onClearPendingHeroImage,
+    onToggleRemoveHeroImage,
+    disabled = false,
+}) {
+    const showPreview = pendingHeroImagePreviewUrl || heroImageUrl;
+
     return (
         <div className="space-y-6">
             <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
                 SECTION 1 — HERO SECTION
             </h2>
+
+            {/* Hero Background Image */}
+            <div className="space-y-2">
+                <Label>Hero Background Image</Label>
+                <div className="flex items-start gap-4">
+                    <label className="flex items-center justify-center h-24 w-24 border rounded-lg cursor-pointer bg-white shadow-xs hover:bg-gray-50 transition-colors">
+                        <span className="text-4xl text-gray-400">+</span>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                onPickHeroImageFile?.(file);
+                            }}
+                            className="hidden"
+                            disabled={disabled}
+                        />
+                    </label>
+                    {showPreview && (
+                        <div className="relative h-24 w-40 border rounded-lg overflow-hidden bg-white shadow-xs">
+                            <Image
+                                src={showPreview}
+                                alt="Hero background"
+                                fill
+                                className="object-cover"
+                            />
+                            <button
+                                type="button"
+                                disabled={disabled}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs hover:bg-red-600 disabled:opacity-50"
+                                onClick={() => {
+                                    if (pendingHeroImageFile) {
+                                        onClearPendingHeroImage?.();
+                                    } else {
+                                        onToggleRemoveHeroImage?.();
+                                    }
+                                }}
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </div>
+                    )}
+                    {!showPreview && (
+                        <p className="text-sm text-muted-foreground self-center">
+                            No custom image. Using default: /hero-led-display.jpg
+                        </p>
+                    )}
+                    {heroImageWillRemove && !pendingHeroImageFile && (
+                        <p className="text-sm text-red-600 self-center">
+                            Will be removed on save.
+                        </p>
+                    )}
+                </div>
+            </div>
             
             {/* Small Label */}
             <div className="space-y-4">

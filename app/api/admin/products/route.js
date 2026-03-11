@@ -51,7 +51,7 @@ export async function POST(request) {
             specialTypes: body.specialTypes?.toString() || "",
             specialTypesOther: body.specialTypesOther?.toString().trim() || null,
 
-            application: body.application?.toString() || "",
+            application: Array.isArray(body.application) ? body.application : (body.application ? [body.application.toString()] : []),
             pixelPitch: body.pixelPitch ? parseFloat(body.pixelPitch) : null,
             pixelConfiguration: body.pixelConfiguration?.toString() || "",
             pixelTechnology: body.pixelTechnology?.toString() || "",

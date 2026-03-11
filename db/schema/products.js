@@ -78,7 +78,7 @@ export const products = pgTable("products", {
     design: designEnum("design"),
     specialTypes: specialTypesEnum("special_types"),
     specialTypesOther: text("special_types_other"),
-    application: applicationEnum("application"),
+    application: text("application").array(),
     pixelPitch: decimal("pixel_pitch", { precision: 10, scale: 2 }),
     pixelConfiguration: pixelConfigurationEnum("pixel_configuration"),
     pixelTechnology: pixelTechnologyEnum("pixel_technology"),

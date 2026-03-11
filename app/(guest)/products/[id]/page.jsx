@@ -380,7 +380,7 @@ export default function ProductDetailPage() {
                                             <SpecRow label="Product Type" value={product.productType} />
                                             <SpecRow label="Design" value={product.design} />
                                             <SpecRow label="Special Types" value={product.specialTypes } />
-                                            <SpecRow label="Application" value={product.application} />
+                                            <SpecRow label="Application" value={Array.isArray(product.application) ? product.application.join(", ") : product.application} />
                                             <SpecRow label="Category" value={product.areaOfUse} />
                                         </div>
                                     </AccordionContent>

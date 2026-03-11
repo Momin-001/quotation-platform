@@ -12,7 +12,7 @@ CREATE TYPE "public"."driving_method" AS ENUM('Common Anode', 'Common Cathode');
 CREATE TYPE "public"."greyscale_processing" AS ENUM('<16', '16', '18+', '22+', 'Other');--> statement-breakpoint
 CREATE TYPE "public"."led_technology" AS ENUM('SMD', 'SMD+GOB', 'IMD', 'COB', 'DIP', 'LOB', 'Other');--> statement-breakpoint
 CREATE TYPE "public"."pixel_configuration" AS ENUM('1R1G1B', '2R1G1B');--> statement-breakpoint
-CREATE TYPE "public"."pixel_technology" AS ENUM('Real', 'Virtual');--> statement-breakpoint
+CREATE TYPE "public"."pixel_technology" AS ENUM('Real', 'Virtual (Quadruple)', 'Virtual (Triple)');--> statement-breakpoint
 CREATE TYPE "public"."product_type" AS ENUM('AIO Systems', 'LED Display Single Cabinet');--> statement-breakpoint
 CREATE TYPE "public"."special_types" AS ENUM('Transparent', 'Curved', 'Floor', 'Other');--> statement-breakpoint
 CREATE TYPE "public"."support" AS ENUM('Frontendside', 'Backside', 'Frontside and Backside');--> statement-breakpoint
@@ -50,6 +50,7 @@ CREATE TABLE "certificates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"image_url" text NOT NULL,
+	"public_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -58,6 +59,7 @@ CREATE TABLE "controllers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"interface_name" text,
 	"brand_name" "brand_system",
+	"controller_number" text,
 	"brand_name_other" text,
 	"pixel_capacity" integer,
 	"max_width_height" integer,
@@ -97,9 +99,14 @@ CREATE TABLE "controllers" (
 	"multi_viewer_mvr" text,
 	"usb_playback" text,
 	"support_3d" text,
+	"download_url" text,
+	"price_per_controller_usd" numeric(12, 2),
+	"stock_pieces" integer,
+	"leadtime_days" integer,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "controllers_controller_number_unique" UNIQUE("controller_number")
 );
 --> statement-breakpoint
 CREATE TABLE "enquiries" (
@@ -116,6 +123,9 @@ CREATE TABLE "enquiry_items" (
 	"enquiry_id" uuid NOT NULL,
 	"product_id" uuid NOT NULL,
 	"quantity" integer DEFAULT 1 NOT NULL,
+	"item_type" text DEFAULT 'main' NOT NULL,
+	"item_order" integer DEFAULT 0,
+	"controller_id" uuid,
 	"is_custom" boolean DEFAULT false NOT NULL,
 	"custom_led_technology" text,
 	"custom_brightness_value" text,
@@ -284,6 +294,7 @@ CREATE TABLE "users" (
 --> statement-breakpoint
 CREATE TABLE "products" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"product_description" text,
 	"product_name" text NOT NULL,
 	"product_number" text NOT NULL,
 	"viewing_angle_horizontal" text,
@@ -300,48 +311,45 @@ CREATE TABLE "products" (
 	"receiving_card" text,
 	"heat_dissipation" text,
 	"monitoring_function_en" text,
-	"monitoring_function_de" text,
 	"additional_certification" text,
 	"emc" text,
 	"safety" text,
 	"support_during_warranty_en" text,
-	"support_during_warranty_de" text,
 	"support_after_warranty_en" text,
-	"support_after_warranty_de" text,
-	"product_type" "product_type" NOT NULL,
-	"design" "design" NOT NULL,
-	"special_types" "special_types" NOT NULL,
+	"product_type" "product_type",
+	"design" "design",
+	"special_types" "special_types",
 	"special_types_other" text,
-	"application" "application" NOT NULL,
-	"pixel_pitch" numeric(10, 2) NOT NULL,
-	"pixel_configuration" "pixel_configuration" NOT NULL,
-	"pixel_technology" "pixel_technology" NOT NULL,
-	"led_technology" "led_technology" NOT NULL,
+	"application" text[],
+	"pixel_pitch" numeric(10, 2),
+	"pixel_configuration" "pixel_configuration",
+	"pixel_technology" "pixel_technology",
+	"led_technology" "led_technology",
 	"led_technology_other" text,
-	"chip_bonding" "chip_bonding" NOT NULL,
-	"colour_depth" "colour_depth" NOT NULL,
-	"current_gain_control" "current_gain_control" NOT NULL,
-	"video_rate" "video_rate" NOT NULL,
+	"chip_bonding" "chip_bonding",
+	"colour_depth" "colour_depth",
+	"current_gain_control" "current_gain_control",
+	"video_rate" "video_rate",
 	"brightness_value" text,
-	"calibration_method" "calibration_method" NOT NULL,
+	"calibration_method" "calibration_method",
 	"calibration_method_other" text,
-	"driving_method" "driving_method" NOT NULL,
-	"control_system" "control_system" NOT NULL,
+	"driving_method" "driving_method",
+	"control_system" "control_system",
 	"control_system_other" text,
-	"cooling" "cooling" NOT NULL,
-	"power_redundancy" "yes_no" NOT NULL,
-	"memory_on_module" "yes_no" NOT NULL,
-	"smart_module" "yes_no" NOT NULL,
+	"cooling" "cooling",
+	"power_redundancy" "yes_no",
+	"memory_on_module" "yes_no",
+	"smart_module" "yes_no",
 	"support" "support",
 	"area_of_use_id" uuid,
 	"cabinet_width" numeric(10, 2),
 	"cabinet_height" numeric(10, 2),
 	"weight_without_packaging" numeric(10, 2),
-	"refresh_rate" integer NOT NULL,
-	"scan_rate_numerator" integer DEFAULT 1 NOT NULL,
-	"scan_rate_denominator" integer NOT NULL,
+	"refresh_rate" integer,
+	"scan_rate_numerator" integer DEFAULT 1,
+	"scan_rate_denominator" integer,
 	"contrast_ratio_numerator" integer,
-	"contrast_ratio_denominator" integer DEFAULT 1,
+	"contrast_ratio_denominator" integer,
 	"cabinet_resolution_horizontal" integer,
 	"cabinet_resolution_vertical" integer,
 	"pixel_density" integer,
@@ -353,6 +361,21 @@ CREATE TABLE "products" (
 	"power_consumption_max" integer,
 	"power_consumption_typical" integer,
 	"warranty_period" integer,
+	"oem_brand" text,
+	"led_driver" text,
+	"power_supply" text,
+	"price_per_cabinet_usd" numeric(12, 2),
+	"price_per_metre_square_usd" numeric(12, 2),
+	"profit_margin" numeric(12, 2),
+	"stock_pieces" integer,
+	"leadtime_days" integer,
+	"notes" text,
+	"installation_manual_url" text,
+	"installation_manual_public_id" text,
+	"maintenance_guide_url" text,
+	"maintenance_guide_public_id" text,
+	"certificates_pdf_url" text,
+	"certificates_pdf_public_id" text,
 	"is_active" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -362,6 +385,7 @@ CREATE TABLE "product_images" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"product_id" uuid,
 	"controller_id" uuid,
+	"public_id" text NOT NULL,
 	"image_url" text NOT NULL,
 	"image_order" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -406,6 +430,7 @@ CREATE TABLE "partners" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"logo_url" text NOT NULL,
+	"public_id" text NOT NULL,
 	"website_url" text NOT NULL,
 	"click_count" integer DEFAULT 0 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -468,11 +493,54 @@ CREATE TABLE "quotation_optional_items" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "quotation_section_defaults" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"section_offer_html" text DEFAULT '' NOT NULL,
+	"section_conditions_html" text DEFAULT '' NOT NULL,
+	"section_options_html" text DEFAULT '' NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "quotations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"enquiry_id" uuid NOT NULL,
 	"quotation_number" text NOT NULL,
 	"status" text DEFAULT 'draft' NOT NULL,
+	"section_offer_html" text,
+	"section_conditions_html" text,
+	"section_options_html" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "product_icons" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"image_url" text NOT NULL,
+	"public_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "product_product_icons" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"product_id" uuid NOT NULL,
+	"product_icon_id" uuid NOT NULL,
+	"icon_order" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user_header" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_header_my_enquiry_en" text DEFAULT '' NOT NULL,
+	"user_header_my_enquiry_de" text DEFAULT '' NOT NULL,
+	"user_header_my_quotation_en" text DEFAULT '' NOT NULL,
+	"user_header_my_quotation_de" text DEFAULT '' NOT NULL,
+	"user_header_my_account_en" text DEFAULT '' NOT NULL,
+	"user_header_my_account_de" text DEFAULT '' NOT NULL,
+	"user_header_my_cart_en" text DEFAULT '' NOT NULL,
+	"user_header_my_cart_de" text DEFAULT '' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -480,6 +548,7 @@ CREATE TABLE "quotations" (
 ALTER TABLE "enquiries" ADD CONSTRAINT "enquiries_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_enquiry_id_enquiries_id_fk" FOREIGN KEY ("enquiry_id") REFERENCES "public"."enquiries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_area_of_use_id_categories_id_fk" FOREIGN KEY ("area_of_use_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_images" ADD CONSTRAINT "product_images_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_images" ADD CONSTRAINT "product_images_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -495,4 +564,6 @@ ALTER TABLE "quotation_optional_items" ADD CONSTRAINT "quotation_optional_items_
 ALTER TABLE "quotation_optional_items" ADD CONSTRAINT "quotation_optional_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quotation_optional_items" ADD CONSTRAINT "quotation_optional_items_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "quotation_optional_items" ADD CONSTRAINT "quotation_optional_items_accessory_id_accessories_id_fk" FOREIGN KEY ("accessory_id") REFERENCES "public"."accessories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "quotations" ADD CONSTRAINT "quotations_enquiry_id_enquiries_id_fk" FOREIGN KEY ("enquiry_id") REFERENCES "public"."enquiries"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "quotations" ADD CONSTRAINT "quotations_enquiry_id_enquiries_id_fk" FOREIGN KEY ("enquiry_id") REFERENCES "public"."enquiries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "product_product_icons" ADD CONSTRAINT "product_product_icons_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "product_product_icons" ADD CONSTRAINT "product_product_icons_product_icon_id_product_icons_id_fk" FOREIGN KEY ("product_icon_id") REFERENCES "public"."product_icons"("id") ON DELETE cascade ON UPDATE no action;

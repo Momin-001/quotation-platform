@@ -1,6 +1,6 @@
 {
-  "id": "4feed88d-d167-479e-81f0-38faf688b8cc",
-  "prevId": "c4c4f5b2-cc9d-40e7-a573-3b83eee06aa9",
+  "id": "dd1bea97-0a70-4bd9-b7a3-a1d540cd7984",
+  "prevId": "03228329-6840-40ae-ab2e-23f4014e1309",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -196,6 +196,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "public_id": {
+          "name": "public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -240,6 +246,12 @@
           "name": "brand_name",
           "type": "brand_system",
           "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "controller_number": {
+          "name": "controller_number",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -500,6 +512,30 @@
           "primaryKey": false,
           "notNull": false
         },
+        "download_url": {
+          "name": "download_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_controller_usd": {
+          "name": "price_per_controller_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_pieces": {
+          "name": "stock_pieces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leadtime_days": {
+          "name": "leadtime_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "is_active": {
           "name": "is_active",
           "type": "boolean",
@@ -525,7 +561,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "controllers_controller_number_unique": {
+          "name": "controllers_controller_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "controller_number"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1095,6 +1139,18 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "hero_image_url": {
+          "name": "hero_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hero_image_public_id": {
+          "name": "hero_image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "hero_small_label_en": {
           "name": "hero_small_label_en",
@@ -1798,6 +1854,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "product_description": {
+          "name": "product_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "product_name": {
           "name": "product_name",
           "type": "text",
@@ -1894,12 +1956,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "monitoring_function_de": {
-          "name": "monitoring_function_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "additional_certification": {
           "name": "additional_certification",
           "type": "text",
@@ -1924,20 +1980,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "support_during_warranty_de": {
-          "name": "support_during_warranty_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "support_after_warranty_en": {
           "name": "support_after_warranty_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "support_after_warranty_de": {
-          "name": "support_after_warranty_de",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1947,21 +1991,21 @@
           "type": "product_type",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "design": {
           "name": "design",
           "type": "design",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "special_types": {
           "name": "special_types",
           "type": "special_types",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "special_types_other": {
           "name": "special_types_other",
@@ -1971,37 +2015,36 @@
         },
         "application": {
           "name": "application",
-          "type": "application",
-          "typeSchema": "public",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_pitch": {
           "name": "pixel_pitch",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_configuration": {
           "name": "pixel_configuration",
           "type": "pixel_configuration",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "pixel_technology": {
           "name": "pixel_technology",
           "type": "pixel_technology",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "led_technology": {
           "name": "led_technology",
           "type": "led_technology",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "led_technology_other": {
           "name": "led_technology_other",
@@ -2014,28 +2057,28 @@
           "type": "chip_bonding",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "colour_depth": {
           "name": "colour_depth",
           "type": "colour_depth",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "current_gain_control": {
           "name": "current_gain_control",
           "type": "current_gain_control",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "video_rate": {
           "name": "video_rate",
           "type": "video_rate",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "brightness_value": {
           "name": "brightness_value",
@@ -2048,7 +2091,7 @@
           "type": "calibration_method",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "calibration_method_other": {
           "name": "calibration_method_other",
@@ -2061,14 +2104,14 @@
           "type": "driving_method",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "control_system": {
           "name": "control_system",
           "type": "control_system",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "control_system_other": {
           "name": "control_system_other",
@@ -2081,28 +2124,28 @@
           "type": "cooling",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "power_redundancy": {
           "name": "power_redundancy",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "memory_on_module": {
           "name": "memory_on_module",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "smart_module": {
           "name": "smart_module",
           "type": "yes_no",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "support": {
           "name": "support",
@@ -2139,20 +2182,20 @@
           "name": "refresh_rate",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "scan_rate_numerator": {
           "name": "scan_rate_numerator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": 1
         },
         "scan_rate_denominator": {
           "name": "scan_rate_denominator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "contrast_ratio_numerator": {
           "name": "contrast_ratio_numerator",
@@ -2164,8 +2207,7 @@
           "name": "contrast_ratio_denominator",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "default": 1
+          "notNull": false
         },
         "cabinet_resolution_horizontal": {
           "name": "cabinet_resolution_horizontal",
@@ -2231,6 +2273,96 @@
         "warranty_period": {
           "name": "warranty_period",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "oem_brand": {
+          "name": "oem_brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "led_driver": {
+          "name": "led_driver",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "power_supply": {
+          "name": "power_supply",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_cabinet_usd": {
+          "name": "price_per_cabinet_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_per_metre_square_usd": {
+          "name": "price_per_metre_square_usd",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profit_margin": {
+          "name": "profit_margin",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_pieces": {
+          "name": "stock_pieces",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leadtime_days": {
+          "name": "leadtime_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "installation_manual_url": {
+          "name": "installation_manual_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "installation_manual_public_id": {
+          "name": "installation_manual_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maintenance_guide_url": {
+          "name": "maintenance_guide_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maintenance_guide_public_id": {
+          "name": "maintenance_guide_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certificates_pdf_url": {
+          "name": "certificates_pdf_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certificates_pdf_public_id": {
+          "name": "certificates_pdf_public_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -2300,6 +2432,12 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
+        },
+        "public_id": {
+          "name": "public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "image_url": {
           "name": "image_url",
@@ -2634,6 +2772,12 @@
         },
         "logo_url": {
           "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_id": {
+          "name": "public_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -3137,6 +3281,54 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.quotation_section_defaults": {
+      "name": "quotation_section_defaults",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "section_offer_html": {
+          "name": "section_offer_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "section_conditions_html": {
+          "name": "section_conditions_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "section_options_html": {
+          "name": "section_options_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.quotations": {
       "name": "quotations",
       "schema": "",
@@ -3166,6 +3358,24 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'draft'"
+        },
+        "section_offer_html": {
+          "name": "section_offer_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "section_conditions_html": {
+          "name": "section_conditions_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "section_options_html": {
+          "name": "section_options_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -3198,6 +3408,228 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_icons": {
+      "name": "product_icons",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_id": {
+          "name": "public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.product_product_icons": {
+      "name": "product_product_icons",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_icon_id": {
+          "name": "product_icon_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "icon_order": {
+          "name": "icon_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "product_product_icons_product_id_products_id_fk": {
+          "name": "product_product_icons_product_id_products_id_fk",
+          "tableFrom": "product_product_icons",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "product_product_icons_product_icon_id_product_icons_id_fk": {
+          "name": "product_product_icons_product_icon_id_product_icons_id_fk",
+          "tableFrom": "product_product_icons",
+          "tableTo": "product_icons",
+          "columnsFrom": [
+            "product_icon_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_header": {
+      "name": "user_header",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_header_my_enquiry_en": {
+          "name": "user_header_my_enquiry_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_enquiry_de": {
+          "name": "user_header_my_enquiry_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_quotation_en": {
+          "name": "user_header_my_quotation_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_quotation_de": {
+          "name": "user_header_my_quotation_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_account_en": {
+          "name": "user_header_my_account_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_account_de": {
+          "name": "user_header_my_account_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_cart_en": {
+          "name": "user_header_my_cart_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "user_header_my_cart_de": {
+          "name": "user_header_my_cart_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -3352,7 +3784,8 @@
       "schema": "public",
       "values": [
         "Real",
-        "Virtual"
+        "Virtual (Quadruple)",
+        "Virtual (Triple)"
       ]
     },
     "public.product_type": {

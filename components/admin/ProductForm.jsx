@@ -54,7 +54,7 @@ function getDefaultValuesFromInitial(initialData) {
         design: optStr(initialData.design),
         specialTypes: optStr(initialData.specialTypes),
         specialTypesOther: str(initialData.specialTypesOther),
-        application: optStr(initialData.application),
+        // application is handled separately as multi-select state
         pixelPitch: initialData.pixelPitch !== undefined && initialData.pixelPitch !== null && initialData.pixelPitch !== "" ? initialData.pixelPitch : "",
         pixelConfiguration: optStr(initialData.pixelConfiguration),
         pixelTechnology: optStr(initialData.pixelTechnology),
@@ -142,20 +142,7 @@ const productSchema = z.object({
         required_error: "Special types is required",
     }),
     specialTypesOther: z.string().optional(),
-    application: z.enum([
-        "DOOH",
-        "Indoor Signage",
-        "Home Theater",
-        "Stadium Scoreboard",
-        "Video Cube",
-        "Conference",
-        "Stadium Ribbons",
-        "Corporate Design",
-        "Staging",
-        "Virtual Production"
-    ], {
-        required_error: "Application is required",
-    }),
+    // application is handled outside of react-hook-form (multi-select state)
     pixelPitch: z.coerce.number("Pixel pitch must be a number"),
     pixelConfiguration: z.enum(["1R1G1B", "2R1G1B"], {
         required_error: "Pixel configuration is required",
@@ -313,6 +300,7 @@ export default function ProductForm({
     const [removedImageIds, setRemovedImageIds] = useState([]); // IDs to remove
     const [selectedCertificates, setSelectedCertificates] = useState(() => Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
     const [selectedIcons, setSelectedIcons] = useState(() => Array.isArray(initialIconIds) ? [...initialIconIds] : []);
+    const [selectedApplications, setSelectedApplications] = useState(() => Array.isArray(initialData?.application) ? [...initialData.application] : []);
 
     // PDF file states
     const [installationManualFile, setInstallationManualFile] = useState(null);
@@ -359,6 +347,7 @@ export default function ProductForm({
         setExistingImages([...imgs].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0)));
         setSelectedCertificates(Array.isArray(initialCertificateIds) ? [...initialCertificateIds] : []);
         setSelectedIcons(Array.isArray(initialIconIds) ? [...initialIconIds] : []);
+        setSelectedApplications(Array.isArray(initialData?.application) ? [...initialData.application] : []);
         setFeatures(
             (Array.isArray(initialFeatures) ? initialFeatures : []).map((f) =>
                 typeof f === "string" ? f : (f?.feature ?? f)
@@ -435,6 +424,7 @@ export default function ProductForm({
                 // Append all form fields as JSON
                 formData.append("fields", JSON.stringify({
                     ...data,
+                    application: selectedApplications,
                     features: features,
                     productCertificates: selectedCertificates,
                     productIcons: selectedIcons,
@@ -469,6 +459,7 @@ export default function ProductForm({
                 
                 formData.append("fields", JSON.stringify({
                     ...data,
+                    application: selectedApplications,
                     features: features,
                     productCertificates: selectedCertificates,
                     productIcons: selectedIcons,
@@ -656,7 +647,25 @@ export default function ProductForm({
                     {renderSelect("Design *", "design", ["Fix", "Mobil"])}
                     {renderSelect("Special Types *", "specialTypes", ["Transparent", "Curved", "Floor", "Other"])}
                     {specialTypes === "Other" && renderInput("Special Types Other", "specialTypesOther", "text", { required: true })}
-                    {renderSelect("Application *", "application", ["DOOH", "Indoor Signage", "Home Theater", "Stadium Scoreboard", "Video Cube", "Conference", "Stadium Ribbons", "Corporate Design", "Staging", "Virtual Production"])}
+                    {/* Application - Multi-select */}
+                    <div className="space-y-2 md:col-span-2">
+                        <Label>Application *</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                            {["DOOH", "Indoor Signage", "Home Theater", "Stadium Scoreboard", "Video Cube", "Conference", "Stadium Ribbons", "Corporate Design", "Staging", "Virtual Production"].map((app) => (
+                                <div key={app} className={`flex items-center gap-2 border rounded-lg p-2 bg-white transition-all ${selectedApplications.includes(app) ? "border-primary" : ""}`}>
+                                    <Checkbox
+                                        checked={selectedApplications.includes(app)}
+                                        onCheckedChange={() => {
+                                            setSelectedApplications((prev) =>
+                                                prev.includes(app) ? prev.filter((a) => a !== app) : [...prev, app]
+                                            );
+                                        }}
+                                    />
+                                    <span className="text-sm">{app}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -70,9 +70,9 @@ export async function GET(req) {
             conditions.push(eq(products.specialTypes, specialTypes));
         }
 
-        // Application filter
+        // Application filter (products.application is text[], check if array contains the value)
         if (application) {
-            conditions.push(eq(products.application, application));
+            conditions.push(sql`${products.application} @> ARRAY[${application}]::text[]`);
         }
 
         // Pixel Pitch filter (decimal - exact match or range)

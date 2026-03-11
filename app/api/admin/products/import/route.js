@@ -264,7 +264,10 @@ export async function POST(req) {
         const productType = matchEnum(cell(5, p), PRODUCT_TYPES);
         const design = matchEnum(cell(7, p), DESIGNS);
         const specialTypesResult = matchEnumWithOther(cell(8, p), SPECIAL_TYPES);
-        const application = matchEnum(cell(9, p), APPLICATIONS);
+        const applicationRaw = cell(9, p);
+        const application = applicationRaw
+          ? applicationRaw.toString().split(",").map((s) => matchEnum(s.trim(), APPLICATIONS)).filter(Boolean)
+          : [];
         const pixelPitch = parseDecimal(cell(10, p));
         const pixelConfiguration = matchEnum(cell(11, p), PIXEL_CONFIGS);
         const pixelTechnology = matchPixelTech(cell(12, p));

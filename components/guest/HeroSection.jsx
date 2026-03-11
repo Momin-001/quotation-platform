@@ -71,7 +71,7 @@ export default function HeroSection({ homepageData }) {
                     {/* Right Section - Image with Overlays */}
                     <div className="relative h-[700px] overflow-hidden">
                         <Image
-                            src="/hero-led-display.jpg"
+                            src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
                             alt="LED Display"
                             fill
                             className="object-cover"

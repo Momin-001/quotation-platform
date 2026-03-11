@@ -5,106 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1771884458900,
-      "tag": "0000_natural_piledriver",
+      "when": 1773133784984,
+      "tag": "0000_rainy_longshot",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1771893433008,
-      "tag": "0001_groovy_supreme_intelligence",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1772185209971,
-      "tag": "0002_magical_slipstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1772188499696,
-      "tag": "0003_ordinary_maverick",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1772382618590,
-      "tag": "0004_blue_warstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1772515756467,
-      "tag": "0005_lucky_flatman",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1772531719029,
-      "tag": "0006_known_captain_america",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1772724054623,
-      "tag": "0007_fluffy_jack_flag",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1772801886703,
-      "tag": "0008_stormy_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1773071784894,
-      "tag": "0009_secret_expediter",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1773072793947,
-      "tag": "0010_nebulous_omega_red",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1773072861546,
-      "tag": "0011_thankful_lucky_pierre",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1773091227577,
-      "tag": "0012_wild_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1773095129856,
-      "tag": "0013_sharp_ares",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1773112130634,
-      "tag": "0014_melodic_tigra",
+      "when": 1773136387837,
+      "tag": "0001_large_abomination",
       "breakpoints": true
     }
   ]

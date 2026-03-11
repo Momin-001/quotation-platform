@@ -128,7 +128,7 @@ export async function PUT(request, { params }) {
             design: body.design?.toString() || "",
             specialTypes: body.specialTypes?.toString() || "",
             specialTypesOther: body.specialTypesOther?.toString().trim() || null,
-            application: body.application?.toString() || "",
+            application: Array.isArray(body.application) ? body.application : (body.application ? [body.application.toString()] : []),
             pixelConfiguration: body.pixelConfiguration?.toString() || "",
             pixelTechnology: body.pixelTechnology?.toString() || "",
             ledTechnology: body.ledTechnology?.toString() || "",

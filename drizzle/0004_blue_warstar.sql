@@ -1,1 +1,0 @@
-ALTER TABLE "products" ADD COLUMN "profit_margin" numeric(12, 2);

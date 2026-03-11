@@ -3,6 +3,8 @@ import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 export const homepage = pgTable("homepage", {
     id: uuid("id").defaultRandom().primaryKey(),
     // Hero Section - Section 1
+    heroImageUrl: text("hero_image_url"),
+    heroImagePublicId: text("hero_image_public_id"),
     heroSmallLabelEn: text("hero_small_label_en").notNull().default(""),
     heroSmallLabelDe: text("hero_small_label_de").notNull().default(""),
     heroTitleEn: text("hero_title_en").notNull().default(""),
