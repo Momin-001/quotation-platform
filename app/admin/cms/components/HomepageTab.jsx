@@ -11,6 +11,7 @@ import ValueBlocksSection from "./sections/ValueBlocksSection";
 import HowItWorksSection from "./sections/HowItWorksSection";
 import FAQSection from "./sections/FAQSection";
 import PartnersSection from "./sections/PartnersSection";
+import BlogsSectionCMS from "./sections/BlogsSection";
 
 // Zod schema for homepage validation
 const homepageSchema = z.object({
@@ -103,6 +104,16 @@ const homepageSchema = z.object({
     partnersTitleDe: z.string().min(1, "Partners Title DE is required"),
     partnersSubtitleEn: z.string().min(1, "Partners Subtitle EN is required"),
     partnersSubtitleDe: z.string().min(1, "Partners Subtitle DE is required"),
+    // Marketing Partners Section
+    marketingPartnersTitleEn: z.string().optional().default(""),
+    marketingPartnersTitleDe: z.string().optional().default(""),
+    marketingPartnersSubtitleEn: z.string().optional().default(""),
+    marketingPartnersSubtitleDe: z.string().optional().default(""),
+    // Blogs Section
+    blogsSectionTitleEn: z.string().optional().default(""),
+    blogsSectionTitleDe: z.string().optional().default(""),
+    blogsSectionSubtitleEn: z.string().optional().default(""),
+    blogsSectionSubtitleDe: z.string().optional().default(""),
 });
 
 export default function HomepageTab({ onDataChange, onValidationChange, onSaveHandlerReady }) {
@@ -210,6 +221,16 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             partnersTitleDe: "",
             partnersSubtitleEn: "",
             partnersSubtitleDe: "",
+            // Marketing Partners Section
+            marketingPartnersTitleEn: "",
+            marketingPartnersTitleDe: "",
+            marketingPartnersSubtitleEn: "",
+            marketingPartnersSubtitleDe: "",
+            // Blogs Section
+            blogsSectionTitleEn: "",
+            blogsSectionTitleDe: "",
+            blogsSectionSubtitleEn: "",
+            blogsSectionSubtitleDe: "",
         },
     });
 
@@ -328,6 +349,16 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
                     partnersTitleDe: data.data.partnersTitleDe || "",
                     partnersSubtitleEn: data.data.partnersSubtitleEn || "",
                     partnersSubtitleDe: data.data.partnersSubtitleDe || "",
+                    // Marketing Partners Section
+                    marketingPartnersTitleEn: data.data.marketingPartnersTitleEn || "",
+                    marketingPartnersTitleDe: data.data.marketingPartnersTitleDe || "",
+                    marketingPartnersSubtitleEn: data.data.marketingPartnersSubtitleEn || "",
+                    marketingPartnersSubtitleDe: data.data.marketingPartnersSubtitleDe || "",
+                    // Blogs Section
+                    blogsSectionTitleEn: data.data.blogsSectionTitleEn || "",
+                    blogsSectionTitleDe: data.data.blogsSectionTitleDe || "",
+                    blogsSectionSubtitleEn: data.data.blogsSectionSubtitleEn || "",
+                    blogsSectionSubtitleDe: data.data.blogsSectionSubtitleDe || "",
                 };
                 reset(fetchedData);
                 setHeroImageUrl(data.data.heroImageUrl || null);
@@ -465,6 +496,7 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             <HowItWorksSection register={register} errors={errors} />
             <FAQSection register={register} errors={errors} />
             <PartnersSection register={register} errors={errors} />
+            <BlogsSectionCMS register={register} errors={errors} />
         </div>
     );
 }

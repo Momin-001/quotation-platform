@@ -94,11 +94,21 @@ export const homepage = pgTable("homepage", {
     faqTitleDe: text("faq_title_de").notNull().default(""),
     faqSubtitleEn: text("faq_subtitle_en").notNull().default(""),
     faqSubtitleDe: text("faq_subtitle_de").notNull().default(""),
-    // Partners Section - Section 5
+    // Partners Section - Section 5 (Technology Partners)
     partnersTitleEn: text("partners_title_en").notNull().default(""),
     partnersTitleDe: text("partners_title_de").notNull().default(""),
     partnersSubtitleEn: text("partners_subtitle_en").notNull().default(""),
     partnersSubtitleDe: text("partners_subtitle_de").notNull().default(""),
+    // Marketing Partners Section
+    marketingPartnersTitleEn: text("marketing_partners_title_en").notNull().default(""),
+    marketingPartnersTitleDe: text("marketing_partners_title_de").notNull().default(""),
+    marketingPartnersSubtitleEn: text("marketing_partners_subtitle_en").notNull().default(""),
+    marketingPartnersSubtitleDe: text("marketing_partners_subtitle_de").notNull().default(""),
+    // Blogs Section
+    blogsSectionTitleEn: text("blogs_section_title_en").notNull().default(""),
+    blogsSectionTitleDe: text("blogs_section_title_de").notNull().default(""),
+    blogsSectionSubtitleEn: text("blogs_section_subtitle_en").notNull().default(""),
+    blogsSectionSubtitleDe: text("blogs_section_subtitle_de").notNull().default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

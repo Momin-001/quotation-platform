@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,6 +33,10 @@ import {
     ChevronRight,
     Monitor,
     Send,
+    X,
+    Upload,
+    FileText,
+    ChevronDown,
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useLanguage } from "@/context/LanguageContext";
@@ -94,6 +99,30 @@ export default function LeditorPage() {
         },
     });
 
+    // Installation & Service state
+    const [installationData, setInstallationData] = useState({
+        serviceAccess: "Front Service",
+        mountingMethod: "Wall Mount",
+        operatingHours: "Standard (8-12 hours/day)",
+        powerRedundancy: "Required",
+        ipRating: "",
+    });
+
+    // Optional accessories state
+    const [selectedAccessories, setSelectedAccessories] = useState([]);
+    const [accessorySearch, setAccessorySearch] = useState("");
+    const [accessoryResults, setAccessoryResults] = useState([]);
+    const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
+    const [accessoryLoading, setAccessoryLoading] = useState(false);
+    const [accessoryDropdownRect, setAccessoryDropdownRect] = useState(null);
+    const accessorySearchRef = useRef(null);
+    const accessoryTriggerRef = useRef(null);
+
+    // File upload state
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+
+    // Notes state
+
     // Canvas ref
     const canvasRef = useRef(null);
     // Pre-load images for canvas
@@ -155,6 +184,11 @@ export default function LeditorPage() {
         "preview",
         "selection",
         "screen-info",
+        "installation-service",
+        "optional-services",
+        "file-upload",
+        "notes-submission",
+        "submit-enquiry",
     ]);
 
     // Fetch products from API
@@ -486,6 +520,79 @@ export default function LeditorPage() {
         ctx.fillText(cabLabel, ledX + drawW / 2, ledBottomY + 18);
     }, [config, computed.cabInfo, imagesLoaded, userPreviewImageLoaded]);
 
+    // Fetch accessories when dropdown opens (show list by default) and when search changes (filter)
+    useEffect(() => {
+        if (!accessoryDropdownOpen) return;
+        const timer = setTimeout(async () => {
+            setAccessoryLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (accessorySearch.trim()) params.set("search", accessorySearch.trim());
+                const res = await fetch(`/api/accessories?${params.toString()}`);
+                const json = await res.json();
+                if (json.success) {
+                    const filtered = (json.data || []).filter(
+                        (a) => !selectedAccessories.some((s) => s.id === a.id)
+                    );
+                    setAccessoryResults(filtered);
+                }
+            } catch (e) {
+                console.error("Failed to fetch accessories:", e);
+            } finally {
+                setAccessoryLoading(false);
+            }
+        }, accessorySearch.trim() ? 300 : 0);
+        return () => clearTimeout(timer);
+    }, [accessoryDropdownOpen, accessorySearch, selectedAccessories]);
+
+    // Measure trigger position when dropdown opens; clear when closes
+    useEffect(() => {
+        if (!accessoryDropdownOpen) {
+            setAccessoryDropdownRect(null);
+            return;
+        }
+        const updateRect = () => {
+            if (accessoryTriggerRef.current) {
+                setAccessoryDropdownRect(accessoryTriggerRef.current.getBoundingClientRect());
+            }
+        };
+        updateRect();
+        window.addEventListener("scroll", updateRect, true);
+        window.addEventListener("resize", updateRect);
+        return () => {
+            window.removeEventListener("scroll", updateRect, true);
+            window.removeEventListener("resize", updateRect);
+        };
+    }, [accessoryDropdownOpen]);
+
+    const handleAddAccessory = (accessory) => {
+        setSelectedAccessories((prev) => [...prev, accessory]);
+        setAccessorySearch("");
+        setAccessoryResults([]);
+        setAccessoryDropdownOpen(false);
+    };
+
+    const handleRemoveAccessory = (id) => {
+        setSelectedAccessories((prev) => prev.filter((a) => a.id !== id));
+    };
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files || []);
+        const validFiles = files.filter((f) => {
+            const ext = f.name.split(".").pop()?.toLowerCase();
+            return ["pdf", "jpg", "jpeg", "png", "dwg"].includes(ext);
+        });
+        if (validFiles.length !== files.length) {
+            toast.error("Some files were skipped. Accepted: PDF, JPG, PNG, DWG");
+        }
+        setUploadedFiles((prev) => [...prev, ...validFiles]);
+        e.target.value = "";
+    };
+
+    const handleRemoveFile = (index) => {
+        setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
     // Submit enquiry
     const onSubmitEnquiry = async (data) => {
         if (!selectedProduct) {
@@ -494,39 +601,53 @@ export default function LeditorPage() {
         }
 
         try {
+            const payload = {
+                message: data.message.trim(),
+                isCustom: true,
+                items: [
+                    {
+                        productId: selectedProduct.id,
+                        quantity: 1,
+                        isCustom: true,
+                        customLedTechnology: config.ledTechnology,
+                        customBrightnessValue: config.brightnessValue,
+                        customPixelPitch: config.pixelPitch,
+                        customRefreshRate: parseInt(config.refreshRate) || 0,
+                        customResolutionHorizontal: selectedProduct.cabinetResolutionHorizontal || null,
+                        customResolutionVertical: selectedProduct.cabinetResolutionVertical || null,
+                        customCabinetWidth: config.cabinetWidth,
+                        customCabinetHeight: config.cabinetHeight,
+                        customScreenWidth: config.screenWidth.toString(),
+                        customScreenHeight: config.screenHeight.toString(),
+                        customTotalResolutionH: computed.totalResH,
+                        customTotalResolutionV: computed.totalResV,
+                        customWeight: computed.totalWeight.toString(),
+                        customDisplayArea: computed.displayArea.toString(),
+                        customDimension: computed.dimension,
+                        customPowerConsumptionMax: computed.powerMax.toString(),
+                        customPowerConsumptionTyp: computed.powerTypical.toString(),
+                        customTotalCabinets: computed.totalCabinets,
+                        // Installation & Service
+                        customServiceAccess: installationData.serviceAccess,
+                        customMountingMethod: installationData.mountingMethod,
+                        customOperatingHours: installationData.operatingHours,
+                        customPowerRedundancy: installationData.powerRedundancy,
+                        customIpRating: installationData.ipRating || null,
+                        // Selected accessories
+                        accessoryIds: selectedAccessories.map((a) => a.id),
+                    },
+                ],
+            };
+
+            const formData = new FormData();
+            formData.append("payload", JSON.stringify(payload));
+            uploadedFiles.forEach((file) => {
+                formData.append("files", file);
+            });
+
             const res = await fetch("/api/user/enquiries", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: data.message.trim(),
-                    isCustom: true,
-                    items: [
-                        {
-                            productId: selectedProduct.id,
-                            quantity: 1,
-                            isCustom: true,
-                            customLedTechnology: config.ledTechnology,
-                            customBrightnessValue: config.brightnessValue,
-                            customPixelPitch: config.pixelPitch,
-                            customRefreshRate: parseInt(config.refreshRate) || 0,
-                            customResolutionHorizontal: selectedProduct.cabinetResolutionHorizontal || null,
-                            customResolutionVertical: selectedProduct.cabinetResolutionVertical || null,
-                            customCabinetWidth: config.cabinetWidth,
-                            customCabinetHeight: config.cabinetHeight,
-                            customScreenWidth: config.screenWidth.toString(),
-                            customScreenHeight: config.screenHeight.toString(),
-                            // New calculated fields
-                            customTotalResolutionH: computed.totalResH,
-                            customTotalResolutionV: computed.totalResV,
-                            customWeight: computed.totalWeight.toString(),
-                            customDisplayArea: computed.displayArea.toString(),
-                            customDimension: computed.dimension,
-                            customPowerConsumptionMax: computed.powerMax.toString(),
-                            customPowerConsumptionTyp: computed.powerTypical.toString(),
-                            customTotalCabinets: computed.totalCabinets,
-                        },
-                    ],
-                }),
+                body: formData,
             });
 
             const response = await res.json();
@@ -560,7 +681,7 @@ export default function LeditorPage() {
                 >
                     {/* ===== SECTION 1: PREVIEW ===== */}
                     <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="preview" className="border-0">
+                        <AccordionItem value="preview" defaultValue="preview" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-6 bg-blue-500 rounded-full" />
@@ -684,7 +805,7 @@ export default function LeditorPage() {
                                                         {userPreviewImageUrl && (
                                                             <Button
                                                                 type="button"
-                                                                
+
                                                                 onClick={() => {
                                                                     URL.revokeObjectURL(userPreviewImageUrl);
                                                                     setUserPreviewImageUrl(null);
@@ -705,7 +826,7 @@ export default function LeditorPage() {
 
                     {/* ===== SECTION 2: SELECT A MODEL CONFIGURATION ===== */}
                     <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="selection" className="border-0">
+                        <AccordionItem value="selection" defaultValue="selection" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-6 bg-blue-500 rounded-full" />
@@ -720,11 +841,10 @@ export default function LeditorPage() {
                                     <div className="flex flex-wrap items-center gap-2">
                                         <button
                                             onClick={() => handleCategoryChange("all")}
-                                            className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${
-                                                selectedCategory === "all"
+                                            className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${selectedCategory === "all"
                                                     ? "bg-blue-500 text-white border-blue-500"
                                                     : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                                            }`}
+                                                }`}
                                         >
                                             ALL
                                         </button>
@@ -732,11 +852,10 @@ export default function LeditorPage() {
                                             <button
                                                 key={cat.id}
                                                 onClick={() => handleCategoryChange(cat.id)}
-                                                className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all uppercase ${
-                                                    selectedCategory === cat.id
+                                                className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all uppercase ${selectedCategory === cat.id
                                                         ? "bg-blue-500 text-white border-blue-500"
                                                         : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                                                }`}
+                                                    }`}
                                             >
                                                 {cat.name}
                                             </button>
@@ -792,11 +911,10 @@ export default function LeditorPage() {
                                                         <TableRow
                                                             key={product.id}
                                                             onClick={() => handleSelectProduct(product)}
-                                                            className={`cursor-pointer transition-colors ${
-                                                                selectedProduct?.id === product.id
+                                                            className={`cursor-pointer transition-colors ${selectedProduct?.id === product.id
                                                                     ? "bg-blue-50 border-l-4 border-l-blue-500"
                                                                     : "hover:bg-gray-50"
-                                                            }`}
+                                                                }`}
                                                         >
                                                             <TableCell className="p-4 font-medium">
                                                                 {product.productName}
@@ -858,7 +976,7 @@ export default function LeditorPage() {
                         id="screen-info-section"
                         className="bg-white rounded-xl border shadow-sm overflow-hidden"
                     >
-                        <AccordionItem value="screen-info" className="border-0">
+                        <AccordionItem value="screen-info" defaultValue="screen-info" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-6 bg-blue-500 rounded-full" />
@@ -896,7 +1014,7 @@ export default function LeditorPage() {
                                                     <Label>Brightness (nits)</Label>
                                                     <Input
                                                         value={config.brightnessValue}
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -905,7 +1023,7 @@ export default function LeditorPage() {
                                                     <Label>Pixel Pitch (mm)</Label>
                                                     <Input
                                                         value={config.pixelPitch}
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -914,7 +1032,7 @@ export default function LeditorPage() {
                                                     <Label>Refresh Rate (Hz)</Label>
                                                     <Input
                                                         value={config.refreshRate}
-                                                       
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -923,7 +1041,7 @@ export default function LeditorPage() {
                                                     <Label>Cabinet Width (mm)</Label>
                                                     <Input
                                                         value={config.cabinetWidth}
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -932,7 +1050,7 @@ export default function LeditorPage() {
                                                     <Label>Cabinet Height (mm)</Label>
                                                     <Input
                                                         value={config.cabinetHeight}
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -954,7 +1072,7 @@ export default function LeditorPage() {
                                                                 ? `${computed.totalResH} × ${computed.totalResV} px`
                                                                 : "N/A"
                                                         }
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -967,9 +1085,9 @@ export default function LeditorPage() {
                                                                 ? `${computed.totalWeight} kg`
                                                                 : "N/A"
                                                         }
-                                                        
+
                                                         readOnly
-                                                    className="bg-gray-100"
+                                                        className="bg-gray-100"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
@@ -980,7 +1098,7 @@ export default function LeditorPage() {
                                                                 ? `${computed.displayArea} m²`
                                                                 : "N/A"
                                                         }
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -989,7 +1107,7 @@ export default function LeditorPage() {
                                                     <Label>Dimension</Label>
                                                     <Input
                                                         value={computed.dimension}
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1002,7 +1120,7 @@ export default function LeditorPage() {
                                                                 ? `${computed.powerMax} W`
                                                                 : "N/A"
                                                         }
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1015,7 +1133,7 @@ export default function LeditorPage() {
                                                                 ? `${computed.powerTypical} W`
                                                                 : "N/A"
                                                         }
-                                                        
+
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1030,119 +1148,389 @@ export default function LeditorPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Enquiry Submission */}
-                                            <div className="pt-6 mt-6">
-                                                <h3 className="text-lg font-bold mb-4">
-                                                    Submit Custom Enquiry
-                                                </h3>
 
-                                                {isAuthenticated ? (
-                                                    <form
-                                                        onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
-                                                        className="space-y-4 max-w-2xl"
-                                                    >
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                            <div className="space-y-2">
-                                                                <Label>Your Name</Label>
-                                                                <Input
-                                                                    value={user?.fullName || ""}
-                                                                    disabled
-                                                                    className="bg-gray-100"
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <Label>Your Email</Label>
-                                                                <Input
-                                                                    value={user?.email || ""}
-                                                                    disabled
-                                                                    className="bg-gray-100"
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="space-y-2">
-                                                            <Label htmlFor="enquiry-message">Your Message*</Label>
-                                                            <Textarea
-                                                                id="enquiry-message"
-                                                                {...register("message")}
-                                                                placeholder="Describe your custom LED screen requirements..."
-                                                                rows={4}
-                                                                className={errors.message ? "border-red-500" : ""}
-                                                            />
-                                                            {errors.message && (
-                                                                <p className="text-sm text-red-500">{errors.message.message}</p>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2">
-                                                            <Controller
-                                                                name="privacy"
-                                                                control={control}
-                                                                render={({ field }) => (
-                                                                    <Checkbox
-                                                                        id="privacy-leditor"
-                                                                        checked={field.value}
-                                                                        onCheckedChange={field.onChange}
-                                                                    />
-                                                                )}
-                                                            />
-                                                            <Label
-                                                                htmlFor="privacy-leditor"
-                                                                className="text-sm cursor-pointer"
-                                                            >
-                                                                I agree to the Privacy Policy and Terms & Conditions.
-                                                            </Label>
-                                                            {errors.privacy && (
-                                                                <p className="text-sm text-red-500 ml-2">{errors.privacy.message}</p>
-                                                            )}
-                                                        </div>
-
-                                                        <div>
-                                                            <ReCAPTCHA
-                                                                sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                                                                onChange={(val) => setValue("captcha", val || "", { shouldValidate: true })}
-                                                            />
-                                                            {errors.captcha && (
-                                                                <p className="text-sm text-red-500 mt-1">{errors.captcha.message}</p>
-                                                            )}
-                                                        </div>
-
-                                                        <Button
-                                                            type="submit"
-                                                            disabled={isSubmitting}
-                                                            className="w-full md:w-auto px-10"
-                                                            size="lg"
-                                                        >
-                                                            {isSubmitting ? (
-                                                                <>
-                                                                    <Spinner className="h-4 w-4 mr-2" />
-                                                                    Submitting...
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Send className="h-4 w-4 mr-2" />
-                                                                    Submit Enquiry
-                                                                </>
-                                                            )}
-                                                        </Button>
-                                                    </form>
-                                                ) : (
-                                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                                                        <p className="text-blue-800 mb-4">
-                                                            Please login to submit your custom LED enquiry.
-                                                        </p>
-                                                        <Button onClick={() => router.push("/login")}>
-                                                            Login to Continue
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
                                         </>
                                     )}
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
                     </div>
+                {/* Installation & Service Accordion */}
+                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    
+                        <AccordionItem value="installation-service" defaultValue="installation-service" className="border-0">
+                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
+                                    <h2 className="text-lg font-bold text-gray-900">Installation & Service</h2>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-6 pb-6 space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <Label className="font-semibold">Service Access</Label>
+                                            <div className="flex flex-wrap gap-4 pt-1">
+                                                {["Front Service", "Rear Service"].map((val) => (
+                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="serviceAccess"
+                                                            value={val}
+                                                            checked={installationData.serviceAccess === val}
+                                                            onChange={(e) => setInstallationData((p) => ({ ...p, serviceAccess: e.target.value }))}
+                                                            className="accent-teal-500"
+                                                        />
+                                                        <span className="text-sm">{val}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="font-semibold">Mounting Method</Label>
+                                            <div className="flex flex-wrap gap-4 pt-1">
+                                                {["Wall Mount", "Hanging / Rigging", "Ground Support", "Freestanding Structure"].map((val) => (
+                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="mountingMethod"
+                                                            value={val}
+                                                            checked={installationData.mountingMethod === val}
+                                                            onChange={(e) => setInstallationData((p) => ({ ...p, mountingMethod: e.target.value }))}
+                                                            className="accent-teal-500"
+                                                        />
+                                                        <span className="text-sm">{val}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="ipRating" className="font-semibold">IP Rating (Weather Protection)</Label>
+                                            <Input
+                                                id="ipRating"
+                                                value={installationData.ipRating}
+                                                onChange={(e) => setInstallationData((p) => ({ ...p, ipRating: e.target.value }))}
+                                                placeholder="e.g. IP65"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="font-semibold">Power Redundancy</Label>
+                                            <div className="flex flex-wrap gap-4 pt-1">
+                                                {["Required", "Not Required"].map((val) => (
+                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="powerRedundancy"
+                                                            value={val}
+                                                            checked={installationData.powerRedundancy === val}
+                                                            onChange={(e) => setInstallationData((p) => ({ ...p, powerRedundancy: e.target.value }))}
+                                                            className="accent-teal-500"
+                                                        />
+                                                        <span className="text-sm">{val}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="font-semibold">Operating Hours</Label>
+                                        <div className="flex flex-wrap gap-4 pt-1">
+                                            {["Standard (8-12 hours/day)", "Extended (12-20 hours/day)", "24/7 Operation"].map((val) => (
+                                                <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="operatingHours"
+                                                        value={val}
+                                                        checked={installationData.operatingHours === val}
+                                                        onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
+                                                        className="accent-teal-500"
+                                                    />
+                                                    <span className="text-sm">{val}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    
+                </div>
+
+                {/* Optional Services Accordion */}
+                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                  
+                        <AccordionItem value="optional-services" defaultValue="optional-services" className="border-0">
+                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
+                                    <h2 className="text-lg font-bold text-gray-900">Optional Services</h2>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-6 pb-6 space-y-4">
+                                    <Label className="font-semibold">Additional Services Needed</Label>
+                                    <div ref={accessorySearchRef} className="relative max-w-lg">
+                                        <button
+                                            ref={accessoryTriggerRef}
+                                            type="button"
+                                            onClick={() => setAccessoryDropdownOpen((prev) => !prev)}
+                                            className="w-full flex items-center justify-between px-3 py-2.5 text-sm border rounded-lg bg-white hover:border-gray-400 transition-colors text-left"
+                                        >
+                                            <span className="text-gray-400">-Select</span>
+                                            <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+                                        </button>
+                                        {accessoryDropdownOpen && accessoryDropdownRect && typeof document !== "undefined" && createPortal(
+                                            <>
+                                                <div
+                                                    className="fixed inset-0 z-[100]"
+                                                    onClick={() => setAccessoryDropdownOpen(false)}
+                                                    aria-hidden
+                                                />
+                                                <div
+                                                    className="fixed z-[101] bg-white border rounded-lg shadow-lg"
+                                                    style={{
+                                                        top: accessoryDropdownRect.bottom + 4,
+                                                        left: accessoryDropdownRect.left,
+                                                        width: Math.max(accessoryDropdownRect.width, 280),
+                                                        minWidth: 280,
+                                                    }}
+                                                >
+                                                    <div className="p-2 border-b">
+                                                        <div className="relative">
+                                                            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                                            <input
+                                                                type="text"
+                                                                value={accessorySearch}
+                                                                onChange={(e) => setAccessorySearch(e.target.value)}
+                                                                placeholder="Search accessories..."
+                                                                className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                                                autoFocus
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="max-h-60 overflow-y-auto">
+                                                        {accessoryLoading && accessoryResults.length === 0 ? (
+                                                            <div className="flex items-center justify-center py-4">
+                                                                <Spinner className="h-5 w-5" />
+                                                                <span className="ml-2 text-sm text-gray-500">Loading...</span>
+                                                            </div>
+                                                        ) : accessoryResults.length === 0 ? (
+                                                            <div className="px-4 py-3 text-sm text-gray-500">No accessories found</div>
+                                                        ) : (
+                                                            accessoryResults.map((acc) => (
+                                                                <button
+                                                                    key={acc.id}
+                                                                    type="button"
+                                                                    onClick={() => handleAddAccessory(acc)}
+                                                                    className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="font-medium">{acc.productName}</span>
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 shrink-0">Accessory</span>
+                                                                    </div>
+                                                                    <p className="text-xs text-gray-500 mt-0.5">{acc.productNumber}</p>
+                                                                </button>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </>,
+                                            document.body
+                                        )}
+                                    </div>
+                                    {selectedAccessories.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {selectedAccessories.map((acc) => (
+                                                <div
+                                                    key={acc.id}
+                                                    className="flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-800 px-3 py-1.5 rounded-full text-sm"
+                                                >
+                                                    <span>{acc.productName}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveAccessory(acc.id)}
+                                                        className="hover:text-red-600 transition-colors"
+                                                    >
+                                                        <X className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                </div>
+
+                {/* File Upload Accordion */}
+                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                        <AccordionItem value="file-upload" defaultValue="file-upload" className="border-0">
+                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
+                                    <h2 className="text-lg font-bold text-gray-900">File Upload</h2>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-6 pb-6 space-y-4">
+                                    <Label className="font-semibold">Upload Reference Files</Label>
+                                    <label className="flex items-center gap-2 cursor-pointer border rounded-lg px-4 py-3 max-w-sm hover:bg-gray-50 transition-colors">
+                                        <Upload className="h-4 w-4 text-gray-500" />
+                                        <span className="text-sm text-gray-600">Attach</span>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept=".pdf,.jpg,.jpeg,.png,.dwg"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                    <p className="text-xs text-teal-600">Accepted file types: PDF, JPG, PNG, DWG</p>
+                                    {uploadedFiles.length > 0 && (
+                                        <div className="space-y-2 mt-2">
+                                            {uploadedFiles.map((file, idx) => (
+                                                <div key={idx} className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-2">
+                                                    <FileText className="h-4 w-4 text-gray-500 shrink-0" />
+                                                    <span className="text-sm flex-1 truncate">{file.name}</span>
+                                                    <span className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveFile(idx)}
+                                                        className="text-red-500 hover:text-red-700 transition-colors"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                </div>
+
+                {/* Notes & Submission Accordion */}
+                <div
+                    id="submit-enquiry-section"
+                    className="bg-white rounded-xl border shadow-sm overflow-hidden"
+                >
+                    <AccordionItem value="notes-submission" defaultValue="notes-submission" className="border-0">
+                    <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                           <div className="flex items-center gap-3">
+                                <div className="w-1 h-6 bg-teal-500 rounded-full" />
+                                <h2 className="text-lg font-bold text-gray-900">
+                                    Notes & Submission
+                                </h2>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="px-6 pb-6 space-y-6">
+                                {isAuthenticated ? (
+                                    <form
+                                        onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
+                                        className="space-y-4 max-w-2xl"
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label>Your Name</Label>
+                                                <Input
+                                                    value={user?.fullName || ""}
+                                                    disabled
+                                                    className="bg-gray-100"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Your Email</Label>
+                                                <Input
+                                                    value={user?.email || ""}
+                                                    disabled
+                                                    className="bg-gray-100"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="enquiry-message">Your Message*</Label>
+                                            <Textarea
+                                                id="enquiry-message"
+                                                {...register("message")}
+                                                placeholder="Describe your custom LED screen requirements..."
+                                                rows={4}
+                                                className={errors.message ? "border-red-500" : ""}
+                                            />
+                                            {errors.message && (
+                                                <p className="text-sm text-red-500">{errors.message.message}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <Controller
+                                                name="privacy"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Checkbox
+                                                        id="privacy-leditor"
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                    />
+                                                )}
+                                            />
+                                            <Label
+                                                htmlFor="privacy-leditor"
+                                                className="text-sm cursor-pointer"
+                                            >
+                                                I agree to the Privacy Policy and Terms & Conditions.
+                                            </Label>
+                                            {errors.privacy && (
+                                                <p className="text-sm text-red-500 ml-2">{errors.privacy.message}</p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <ReCAPTCHA
+                                                sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                                                onChange={(val) => setValue("captcha", val || "", { shouldValidate: true })}
+                                            />
+                                            {errors.captcha && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.captcha.message}</p>
+                                            )}
+                                        </div>
+
+                                        <Button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="w-full md:w-auto px-10"
+                                            size="lg"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    <Spinner className="h-4 w-4 mr-2" />
+                                                    Submitting...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Send className="h-4 w-4 mr-2" />
+                                                    Submit Enquiry
+                                                </>
+                                            )}
+                                        </Button>
+                                    </form>
+                                ) : (
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                                        <p className="text-blue-800 mb-4">
+                                            Please login to submit your custom LED enquiry.
+                                        </p>
+                                        <Button onClick={() => router.push("/login")}>
+                                            Login to Continue
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </div>
                 </Accordion>
             </div>
         </div>

@@ -25,6 +25,7 @@ export async function POST(request) {
         const formData = await request.formData();
         const name = formData.get("name");
         const websiteUrl = formData.get("websiteUrl");
+        const type = formData.get("type") || "technology";
         const logoFile = formData.get("logo");
 
         if (!name || !websiteUrl || !logoFile) {
@@ -47,6 +48,7 @@ export async function POST(request) {
             .insert(partners)
             .values({
                 name: name.trim(),
+                type,
                 logoUrl: uploadResult.secure_url,
                 publicId: uploadResult.public_id,
                 websiteUrl: websiteUrl.trim(),

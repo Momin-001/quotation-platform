@@ -59,7 +59,24 @@ export default function QuotationBuilderPage() {
             setEnquiry(response.data);
 
             const items = response.data.items || [];
-            
+
+            const buildOptionalItems = (item) => {
+                if (!item.accessories || item.accessories.length === 0) return [];
+                return item.accessories.map((acc) => ({
+                    product: {
+                        id: acc.id,
+                        productName: acc.productName,
+                        productNumber: acc.productNumber,
+                        sourceType: "accessory",
+                    },
+                    quantity: acc.quantity || 1,
+                    unitPrice: "",
+                    taxPercentage: "",
+                    discountPercentage: "",
+                    description: "",
+                }));
+            };
+
             // First item is always the main product
             if (items[0]) {
                 const mainAdditionalItems = items[0].controller
@@ -85,7 +102,7 @@ export default function QuotationBuilderPage() {
                     taxPercentage: "",
                     discountPercentage: "",
                     description: "",
-                    optionalItems: [],
+                    optionalItems: buildOptionalItems(items[0]),
                     additionalItems: mainAdditionalItems,
                 });
             }
@@ -115,7 +132,7 @@ export default function QuotationBuilderPage() {
                     taxPercentage: "",
                     discountPercentage: "",
                     description: "",
-                    optionalItems: [],
+                    optionalItems: buildOptionalItems(items[1]),
                     additionalItems: altAdditionalItems,
                 });
                 setAlternativeFromEnquiry(true);

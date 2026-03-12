@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft, Eye, Pencil, Monitor } from "lucide-react";
+import { FileText, ArrowLeft, Eye, Pencil, Monitor, Wrench, Package, Upload, StickyNote } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -23,6 +23,7 @@ export default function EnquiryDetailPage() {
     const [enquiry, setEnquiry] = useState(null);
     const [loading, setLoading] = useState(true);
     const [datasheetLoadingId, setDatasheetLoadingId] = useState(null);
+    const [referenceFileLoadingId, setReferenceFileLoadingId] = useState(null);
 
     useEffect(() => {
         if (params.id) {
@@ -78,6 +79,34 @@ export default function EnquiryDetailPage() {
             toast.error(error.message || "Failed to download datasheet");
         } finally {
             setDatasheetLoadingId(null);
+        }
+    };
+
+    const handleDownloadReferenceFile = async (fileId, fileName) => {
+        setReferenceFileLoadingId(fileId);
+        try {
+            const res = await fetch(`/api/admin/enquiries/files/${fileId}/download`);
+            if (!res.ok) {
+                throw new Error("Failed to download file");
+            }
+            const blob = await res.blob();
+            if (blob.size === 0) return;
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName || "download";
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }, 100);
+            toast.success("File downloaded successfully");
+        } catch (error) {
+            toast.error(error.message || "Failed to download file");
+        } finally {
+            setReferenceFileLoadingId(null);
         }
     };
 
@@ -318,6 +347,92 @@ export default function EnquiryDetailPage() {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Installation & Service (Leditor) */}
+            {items.some((item) => item.isCustom && (item.customServiceAccess || item.customMountingMethod)) && (
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Wrench className="h-5 w-5 text-teal-600" />
+                        <h2 className="text-xl font-bold font-archivo">Installation & Service</h2>
+                    </div>
+                    {items.filter((item) => item.isCustom).map((item) => (
+                        <div key={`install-${item.id}`} className="bg-gray-50 border rounded-lg p-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Service Access</p>
+                                    <p className="font-semibold">{item.customServiceAccess || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Mounting Method</p>
+                                    <p className="font-semibold">{item.customMountingMethod || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Operating Hours</p>
+                                    <p className="font-semibold">{item.customOperatingHours || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Power Redundancy</p>
+                                    <p className="font-semibold">{item.customPowerRedundancy || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">IP Rating</p>
+                                    <p className="font-semibold">{item.customIpRating || "N/A"}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Optional Services / Accessories (Leditor) */}
+            {items.some((item) => item.accessories && item.accessories.length > 0) && (
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Package className="h-5 w-5 text-teal-600" />
+                        <h2 className="text-xl font-bold font-archivo">Requested Optional Services</h2>
+                    </div>
+                    {items.filter((item) => item.accessories && item.accessories.length > 0).map((item) => (
+                        <div key={`acc-${item.id}`} className="space-y-2">
+                            {item.accessories.map((acc) => (
+                                <div key={acc.id} className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-3">
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-sm">{acc.productName}</p>
+                                        <p className="text-xs text-gray-500">{acc.productNumber} · {acc.productGroup}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Uploaded Files */}
+            {enquiry.files && enquiry.files.length > 0 && (
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Upload className="h-5 w-5 text-teal-600" />
+                        <h2 className="text-xl font-bold font-archivo">Reference Files</h2>
+                    </div>
+                    <div className="space-y-2">
+                        {enquiry.files.map((file) => (
+                            <button
+                                key={file.id}
+                                type="button"
+                                onClick={() => handleDownloadReferenceFile(file.id, file.fileName)}
+                                disabled={referenceFileLoadingId !== null}
+                                className="w-full flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-3 hover:bg-gray-100 transition-colors text-left disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                                {referenceFileLoadingId === file.id ? (
+                                    <Spinner className="h-4 w-4 text-teal-600 shrink-0" />
+                                ) : (
+                                    <FileText className="h-4 w-4 text-red-500 shrink-0" />
+                                )}
+                                <span className="text-sm font-medium text-blue-600 flex-1">{file.fileName}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 

@@ -44,6 +44,7 @@ export default function PartnersPage() {
     // Form states
     const [name, setName] = useState("");
     const [websiteUrl, setWebsiteUrl] = useState("");
+    const [type, setType] = useState("technology");
     const [logoFile, setLogoFile] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const [editingId, setEditingId] = useState(null);
@@ -128,6 +129,7 @@ export default function PartnersPage() {
         const formData = new FormData();
         formData.append("name", name.trim());
         formData.append("websiteUrl", websiteUrl.trim());
+        formData.append("type", type);
         if (logoFile) {
             formData.append("logo", logoFile);
         }
@@ -160,6 +162,7 @@ export default function PartnersPage() {
         setEditingId(partner.id);
         setName(partner.name);
         setWebsiteUrl(partner.websiteUrl);
+        setType(partner.type || "technology");
         setLogoPreview(partner.logoUrl);
         setLogoFile(null);
     };
@@ -196,6 +199,7 @@ export default function PartnersPage() {
     const clearForm = () => {
         setName("");
         setWebsiteUrl("");
+        setType("technology");
         setLogoFile(null);
         setLogoPreview(null);
         setEditingId(null);
@@ -212,7 +216,7 @@ export default function PartnersPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Partner Name</Label>
                         <Input
@@ -230,6 +234,18 @@ export default function PartnersPage() {
                             onChange={(e) => setWebsiteUrl(e.target.value)}
                             placeholder="https://example.com"
                         />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="type">Partner Type</Label>
+                        <Select value={type} onValueChange={setType}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="technology">Technology</SelectItem>
+                                <SelectItem value="marketing">Marketing</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
@@ -309,6 +325,7 @@ export default function PartnersPage() {
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Logo</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Name</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Type</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Website</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Click Count</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
@@ -317,7 +334,7 @@ export default function PartnersPage() {
                     <TableBody>
                         {loading && filteredPartners.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={6} className="h-24 text-center">
                                     <div className="flex items-center justify-center gap-2">
                                         <Spinner className="h-5 w-5" />
                                         <span>Loading partners...</span>
@@ -341,6 +358,7 @@ export default function PartnersPage() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{partner.name}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap capitalize">{partner.type || "technology"}</TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{partner.websiteUrl}</TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{partner.clickCount}</TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
@@ -363,7 +381,7 @@ export default function PartnersPage() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={6} className="h-24 text-center">
                                     No partners found.
                                 </TableCell>
                             </TableRow>

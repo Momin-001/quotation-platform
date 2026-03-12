@@ -96,6 +96,14 @@ export async function GET() {
                     partnersTitleDe: "",
                     partnersSubtitleEn: "",
                     partnersSubtitleDe: "",
+                    marketingPartnersTitleEn: "",
+                    marketingPartnersTitleDe: "",
+                    marketingPartnersSubtitleEn: "",
+                    marketingPartnersSubtitleDe: "",
+                    blogsSectionTitleEn: "",
+                    blogsSectionTitleDe: "",
+                    blogsSectionSubtitleEn: "",
+                    blogsSectionSubtitleDe: "",
                 })
                 .returning();
 
@@ -197,6 +205,14 @@ export async function PUT(req) {
             partnersTitleDe,
             partnersSubtitleEn,
             partnersSubtitleDe,
+            marketingPartnersTitleEn,
+            marketingPartnersTitleDe,
+            marketingPartnersSubtitleEn,
+            marketingPartnersSubtitleDe,
+            blogsSectionTitleEn,
+            blogsSectionTitleDe,
+            blogsSectionSubtitleEn,
+            blogsSectionSubtitleDe,
         } = body;
 
         // Get existing homepage or create new one
@@ -292,6 +308,14 @@ export async function PUT(req) {
                     partnersTitleDe: partnersTitleDe || "",
                     partnersSubtitleEn: partnersSubtitleEn || "",
                     partnersSubtitleDe: partnersSubtitleDe || "",
+                    marketingPartnersTitleEn: marketingPartnersTitleEn || "",
+                    marketingPartnersTitleDe: marketingPartnersTitleDe || "",
+                    marketingPartnersSubtitleEn: marketingPartnersSubtitleEn || "",
+                    marketingPartnersSubtitleDe: marketingPartnersSubtitleDe || "",
+                    blogsSectionTitleEn: blogsSectionTitleEn || "",
+                    blogsSectionTitleDe: blogsSectionTitleDe || "",
+                    blogsSectionSubtitleEn: blogsSectionSubtitleEn || "",
+                    blogsSectionSubtitleDe: blogsSectionSubtitleDe || "",
                     updatedAt: new Date(),
                 })
                 .returning();
@@ -384,6 +408,14 @@ export async function PUT(req) {
                     partnersTitleDe: partnersTitleDe || "",
                     partnersSubtitleEn: partnersSubtitleEn || "",
                     partnersSubtitleDe: partnersSubtitleDe || "",
+                    marketingPartnersTitleEn: marketingPartnersTitleEn || "",
+                    marketingPartnersTitleDe: marketingPartnersTitleDe || "",
+                    marketingPartnersSubtitleEn: marketingPartnersSubtitleEn || "",
+                    marketingPartnersSubtitleDe: marketingPartnersSubtitleDe || "",
+                    blogsSectionTitleEn: blogsSectionTitleEn || "",
+                    blogsSectionTitleDe: blogsSectionTitleDe || "",
+                    blogsSectionSubtitleEn: blogsSectionSubtitleEn || "",
+                    blogsSectionSubtitleDe: blogsSectionSubtitleDe || "",
                 })
                 .returning();
         }

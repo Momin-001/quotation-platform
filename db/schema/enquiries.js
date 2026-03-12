@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, integer, decimal, boolean } from "drizzle-orm/pg-core";
-import { users, products, controllers } from "./index";
+import { users, products, controllers, accessories } from "./index";
 import { relations } from "drizzle-orm";
 import { quotations } from "./quotations";
 
@@ -51,12 +51,45 @@ export const enquiryItems = pgTable("enquiry_items", {
     customPowerConsumptionTyp: decimal("custom_power_consumption_typ", { precision: 10, scale: 2 }),
     customTotalCabinets: integer("custom_total_cabinets"),
 
+    // Installation & Service fields
+    customServiceAccess: text("custom_service_access"),
+    customMountingMethod: text("custom_mounting_method"),
+    customOperatingHours: text("custom_operating_hours"),
+    customPowerRedundancy: text("custom_power_redundancy"),
+    customIpRating: text("custom_ip_rating"),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Junction table: optional accessories selected by user per enquiry item
+export const enquiryItemAccessories = pgTable("enquiry_item_accessories", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    enquiryItemId: uuid("enquiry_item_id")
+        .notNull()
+        .references(() => enquiryItems.id, { onDelete: "cascade" }),
+    accessoryId: uuid("accessory_id")
+        .notNull()
+        .references(() => accessories.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").notNull().default(1),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Files uploaded with an enquiry
+export const enquiryFiles = pgTable("enquiry_files", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    enquiryId: uuid("enquiry_id")
+        .notNull()
+        .references(() => enquiries.id, { onDelete: "cascade" }),
+    fileUrl: text("file_url").notNull(),
+    publicId: text("public_id").notNull(),
+    fileName: text("file_name").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const enquiriesRelations = relations(enquiries, ({ many, one }) => ({
     items: many(enquiryItems),
+    files: many(enquiryFiles),
     quotations: many(quotations),
     user: one(users, {
         fields: [enquiries.userId],
@@ -64,7 +97,7 @@ export const enquiriesRelations = relations(enquiries, ({ many, one }) => ({
     }),
 }));
 
-export const enquiryItemsRelations = relations(enquiryItems, ({ one }) => ({
+export const enquiryItemsRelations = relations(enquiryItems, ({ one, many }) => ({
     enquiry: one(enquiries, {
         fields: [enquiryItems.enquiryId],
         references: [enquiries.id],
@@ -76,5 +109,24 @@ export const enquiryItemsRelations = relations(enquiryItems, ({ one }) => ({
     controller: one(controllers, {
         fields: [enquiryItems.controllerId],
         references: [controllers.id],
+    }),
+    accessories: many(enquiryItemAccessories),
+}));
+
+export const enquiryItemAccessoriesRelations = relations(enquiryItemAccessories, ({ one }) => ({
+    enquiryItem: one(enquiryItems, {
+        fields: [enquiryItemAccessories.enquiryItemId],
+        references: [enquiryItems.id],
+    }),
+    accessory: one(accessories, {
+        fields: [enquiryItemAccessories.accessoryId],
+        references: [accessories.id],
+    }),
+}));
+
+export const enquiryFilesRelations = relations(enquiryFiles, ({ one }) => ({
+    enquiry: one(enquiries, {
+        fields: [enquiryFiles.enquiryId],
+        references: [enquiries.id],
     }),
 }));

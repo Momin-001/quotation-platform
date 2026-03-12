@@ -18,3 +18,4 @@ export * from "./accessories";
 export * from "./productIcons";
 export * from "./productProductIcons";
 export * from "./userHeader";
+export * from "./blogs";

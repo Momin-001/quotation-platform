@@ -3,6 +3,8 @@ import ValueBlocksSection from "@/components/guest/ValueBlocksSection";
 import HowItWorksSection from "@/components/guest/HowItWorksSection";
 import FAQSection from "@/components/guest/FAQSection";
 import PartnersSection from "@/components/guest/PartnersSection";
+import MarketingPartnersSection from "@/components/guest/MarketingPartnersSection";
+import BlogsSection from "@/components/guest/BlogsSection";
 import { BASE_URL } from "@/lib/constants";
 
 const defaultHomepageData = {
@@ -119,6 +121,16 @@ const defaultHomepageData = {
     partnersTitleDe: "Unsere Partner",
     partnersSubtitleEn: "Trusted by leading brands",
     partnersSubtitleDe: "Vertraut von führenden Marken",
+    // Marketing Partners
+    marketingPartnersTitleEn: "Marketing Partners",
+    marketingPartnersTitleDe: "Marketing Partner",
+    marketingPartnersSubtitleEn: "Trusted collaborations that strengthen every project",
+    marketingPartnersSubtitleDe: "Vertrauensvolle Zusammenarbeit, die jedes Projekt stärkt",
+    // Blogs
+    blogsSectionTitleEn: "Blogs & Insights",
+    blogsSectionTitleDe: "Blogs & Einblicke",
+    blogsSectionSubtitleEn: "Expert Knowledge to Help You Make Informed Decisions",
+    blogsSectionSubtitleDe: "Expertenwissen, um fundierte Entscheidungen zu treffen",
 };
 
 async function getHomeData() {
@@ -132,24 +144,33 @@ async function getHomeData() {
     const partnersJson = await partnersRes.json();
     const faqsJson = await faqsRes.json();
   
+    const allPartners = partnersJson?.data || [];
+    const technologyPartners = allPartners.filter((p) => !p.type || p.type === "technology");
+    const marketingPartners = allPartners.filter((p) => p.type === "marketing");
+
     return {
       homepageData: homepageJson?.data
         ? { ...defaultHomepageData, ...homepageJson.data }
         : defaultHomepageData,
-      partners: partnersJson?.data || [],
+      technologyPartners,
+      marketingPartners,
       faqs: faqsJson?.data || [],
     };
   }
   
   export default async function Home() {
-    const { homepageData, partners, faqs } = await getHomeData();
+    const { homepageData, technologyPartners, marketingPartners, faqs } = await getHomeData();
   
     return (
       <div className="min-h-screen">
         <HeroSection homepageData={homepageData} />
         <ValueBlocksSection homepageData={homepageData} />
         <HowItWorksSection homepageData={homepageData} />
-        <PartnersSection homepageData={homepageData} partners={partners} />
+        <PartnersSection homepageData={homepageData} partners={technologyPartners} />
+        {marketingPartners.length > 0 && (
+          <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} />
+        )}
+        <BlogsSection homepageData={homepageData} />
         <FAQSection homepageData={homepageData} faqsData={faqs} />
       </div>
     );

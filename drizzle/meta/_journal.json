@@ -15,6 +15,34 @@
       "when": 1773136387837,
       "tag": "0001_large_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773253956120,
+      "tag": "0002_common_tempest",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773264976810,
+      "tag": "0003_unknown_newton_destine",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1773280377709,
+      "tag": "0004_lonely_lizard",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773291906874,
+      "tag": "0005_chubby_gressill",
+      "breakpoints": true
     }
   ]
 }

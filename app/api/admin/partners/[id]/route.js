@@ -13,6 +13,7 @@ export async function PATCH(request, { params }) {
         const formData = await request.formData();
         const name = formData.get("name");
         const websiteUrl = formData.get("websiteUrl");
+        const type = formData.get("type") || "technology";
         const logoFile = formData.get("logo");
 
         if (!name || !websiteUrl) {
@@ -21,6 +22,7 @@ export async function PATCH(request, { params }) {
 
         const updateData = {
             name: name.trim(),
+            type,
             websiteUrl: websiteUrl.trim(),
             updatedAt: new Date(),
         };

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, users, products, productImages, quotations, controllers } from "@/db/schema";
+import { enquiries, enquiryItems, enquiryItemAccessories, enquiryFiles, users, products, productImages, quotations, controllers, accessories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
@@ -80,6 +80,11 @@ export async function GET(req, { params }) {
                 customPowerConsumptionMax: enquiryItems.customPowerConsumptionMax,
                 customPowerConsumptionTyp: enquiryItems.customPowerConsumptionTyp,
                 customTotalCabinets: enquiryItems.customTotalCabinets,
+                customServiceAccess: enquiryItems.customServiceAccess,
+                customMountingMethod: enquiryItems.customMountingMethod,
+                customOperatingHours: enquiryItems.customOperatingHours,
+                customPowerRedundancy: enquiryItems.customPowerRedundancy,
+                customIpRating: enquiryItems.customIpRating,
                 productName: products.productName,
                 productNumber: products.productNumber,
                 pixelPitch: products.pixelPitch,
@@ -122,13 +127,34 @@ export async function GET(req, { params }) {
                     }
                 }
                 
+                // Fetch accessories linked to this enquiry item
+                const itemAccessories = await db
+                    .select({
+                        id: accessories.id,
+                        productName: accessories.productName,
+                        productNumber: accessories.productNumber,
+                        productGroup: accessories.productGroup,
+                        quantity: enquiryItemAccessories.quantity,
+                    })
+                    .from(enquiryItemAccessories)
+                    .innerJoin(accessories, eq(enquiryItemAccessories.accessoryId, accessories.id))
+                    .where(eq(enquiryItemAccessories.enquiryItemId, item.id));
+
                 return {
                     ...item,
                     imageUrl: images[0]?.imageUrl || null,
                     controller,
+                    accessories: itemAccessories,
                 };
             })
         );
+
+        // Fetch enquiry files
+        const files = await db
+            .select()
+            .from(enquiryFiles)
+            .where(eq(enquiryFiles.enquiryId, id))
+            .orderBy(asc(enquiryFiles.createdAt));
 
         // Fetch quotations for this enquiry
         const enquiryQuotations = await db
@@ -144,6 +170,7 @@ export async function GET(req, { params }) {
             ...enquiry,
             enquiryId,
             items,
+            files,
             quotations: enquiryQuotations,
         });
     } catch (error) {

@@ -9,6 +9,7 @@ export async function GET() {
             .select({
                 id: partners.id,
                 name: partners.name,
+                type: partners.type,
                 logoUrl: partners.logoUrl,
                 websiteUrl: partners.websiteUrl,
             })

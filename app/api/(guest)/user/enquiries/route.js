@@ -1,17 +1,35 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, quotations, products } from "@/db/schema";
+import { enquiries, enquiryItems, enquiryItemAccessories, enquiryFiles, quotations, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, and, ne } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
+import cloudinary from "@/lib/cloudinary";
 
 export async function POST(req) {
     try {
-        const {user, error} = await getCurrentUser();
+        const { user, error } = await getCurrentUser();
         if (error) {
             return errorResponse(error, 401);
         }
-        const body = await req.json();
-        const { message, items } = body;
+
+        const contentType = req.headers.get("content-type") || "";
+        let message, items, files = [];
+
+        if (contentType.includes("multipart/form-data")) {
+            const formData = await req.formData();
+            const payloadStr = formData.get("payload");
+            if (!payloadStr) {
+                return errorResponse("Missing payload", 400);
+            }
+            const payload = JSON.parse(payloadStr);
+            message = payload.message;
+            items = payload.items;
+            files = formData.getAll("files") || [];
+        } else {
+            const body = await req.json();
+            message = body.message;
+            items = body.items;
+        }
 
         if (!message || !items || !Array.isArray(items) || items.length === 0) {
             return errorResponse("Message and at least one product item are required", 400);
@@ -27,7 +45,7 @@ export async function POST(req) {
             })
             .returning();
 
-        // Create enquiry items (supports both regular cart and custom Leditor items)
+        // Create enquiry items
         const itemsToInsert = items.map((item, index) => ({
             enquiryId: enquiry.id,
             productId: item.productId,
@@ -47,7 +65,6 @@ export async function POST(req) {
                 customCabinetHeight: item.customCabinetHeight || null,
                 customScreenWidth: item.customScreenWidth || null,
                 customScreenHeight: item.customScreenHeight || null,
-                // Calculated Leditor fields
                 customTotalResolutionH: item.customTotalResolutionH || null,
                 customTotalResolutionV: item.customTotalResolutionV || null,
                 customWeight: item.customWeight || null,
@@ -56,10 +73,51 @@ export async function POST(req) {
                 customPowerConsumptionMax: item.customPowerConsumptionMax || null,
                 customPowerConsumptionTyp: item.customPowerConsumptionTyp || null,
                 customTotalCabinets: item.customTotalCabinets || null,
+                customServiceAccess: item.customServiceAccess || null,
+                customMountingMethod: item.customMountingMethod || null,
+                customOperatingHours: item.customOperatingHours || null,
+                customPowerRedundancy: item.customPowerRedundancy || null,
+                customIpRating: item.customIpRating || null,
             }),
         }));
 
-        await db.insert(enquiryItems).values(itemsToInsert);
+        const insertedItems = await db.insert(enquiryItems).values(itemsToInsert).returning();
+
+        // Insert enquiry item accessories (junction table)
+        for (let i = 0; i < items.length; i++) {
+            const accessoryIds = items[i].accessoryIds || [];
+            if (accessoryIds.length > 0 && insertedItems[i]) {
+                const accessoriesToInsert = accessoryIds.map((accId) => ({
+                    enquiryItemId: insertedItems[i].id,
+                    accessoryId: accId,
+                    quantity: 1,
+                }));
+                await db.insert(enquiryItemAccessories).values(accessoriesToInsert);
+            }
+        }
+
+        // Upload files to Cloudinary and save references
+        if (files.length > 0) {
+            for (const file of files) {
+                if (!file || !file.size) continue;
+                const bytes = await file.arrayBuffer();
+                const buffer = Buffer.from(bytes);
+                const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+
+                const uploadResult = await cloudinary.uploader.upload(base64, {
+                    folder: "QuotationPlatform/enquiry-files",
+                    // Match product document upload strategy (raw files).
+                    resource_type: "raw",
+                });
+
+                await db.insert(enquiryFiles).values({
+                    enquiryId: enquiry.id,
+                    fileUrl: uploadResult.secure_url,
+                    publicId: uploadResult.public_id,
+                    fileName: file.name || "file",
+                });
+            }
+        }
 
         return successResponse(
             "Enquiry submitted successfully",
@@ -72,7 +130,7 @@ export async function POST(req) {
 
 export async function GET(req) {
     try {
-        const {user, error} = await getCurrentUser();
+        const { user, error } = await getCurrentUser();
         if (error) {
             return errorResponse(error, 401);
         }
@@ -80,7 +138,7 @@ export async function GET(req) {
         const status = searchParams.get("status");
 
         let whereConditions = eq(enquiries.userId, user.id);
-        
+
         if (status) {
             whereConditions = and(whereConditions, eq(enquiries.status, status));
         }

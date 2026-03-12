@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import UserAvatar from "@/components/common/UserAvatar";
@@ -27,6 +27,7 @@ const navItems = [
     { href: "/admin/cms", label: "CMS Pages", icon: NotebookText },
     { href: "/admin/certificates", label: "Certificates", icon: TicketCheck },
     { href: "/admin/product-icons", label: "Product Icons", icon: ImageIcon },
+    { href: "/admin/blogs", label: "Blogs", icon: BookOpen },
     { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
 ];
 
@@ -35,7 +36,9 @@ function NavLinks({ pathname, onNavigate, className = "" }) {
         <nav className={`flex-1 min-h-0 overflow-y-auto py-4 ${className}`}>
             {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = item.href === "/admin"
+                    ? pathname === "/admin"
+                    : pathname.startsWith(item.href);
                 return (
                     <Link key={item.href} href={item.href} onClick={onNavigate}>
                         <Button
