@@ -46,35 +46,15 @@ function BlogCard({ blog }) {
     );
 }
 
-export default function BlogsSection({ homepageData }) {
+export default function BlogsSection({ homepageData, blogs }) {
     const { language } = useLanguage();
-    const [blogs, setBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     const getText = (field) => {
         if (!homepageData) return "";
         const key = language === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 
-    useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                const res = await fetch("/api/blogs?limit=6");
-                const response = await res.json();
-                if (response.success) {
-                    setBlogs(response.data);
-                }
-            } catch {
-                // silent
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchBlogs();
-    }, []);
-
-    if (loading || blogs.length === 0) return null;
+    if (blogs.length === 0) return null;
 
     return (
         <section className="w-full bg-white py-16 lg:py-24">

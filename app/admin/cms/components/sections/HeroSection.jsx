@@ -45,7 +45,7 @@ export default function HeroSection({
                         />
                     </label>
                     {showPreview && (
-                        <div className="relative h-24 w-40 border rounded-lg overflow-hidden bg-white shadow-xs">
+                        <div className="relative h-24 w-24 border rounded-lg overflow-hidden bg-white shadow-xs">
                             <Image
                                 src={showPreview}
                                 alt="Hero background"

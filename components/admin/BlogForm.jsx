@@ -8,7 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Plus, Trash2, GripVertical, Upload, X, Save } from "lucide-react";
+import { Plus, Trash2, GripVertical, X, Save } from "lucide-react";
 
 const RichTextEditor = lazy(() => import("@/components/admin/RichTextEditor"));
 
@@ -166,7 +166,7 @@ export default function BlogForm({ initialData = null }) {
             <div className="bg-white rounded-lg border p-6 space-y-4">
                 <h2 className="text-lg font-semibold font-archivo">Basic Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="title">Title *</Label>
                         <Input
                             id="title"
@@ -175,7 +175,7 @@ export default function BlogForm({ initialData = null }) {
                             placeholder="Blog title"
                         />
                     </div>
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="authorName">Author Name *</Label>
                         <Input
                             id="authorName"
@@ -191,18 +191,39 @@ export default function BlogForm({ initialData = null }) {
             <div className="bg-white rounded-lg border p-6 space-y-4">
                 <h2 className="text-lg font-semibold font-archivo">Main Image *</h2>
                 <div className="flex items-start gap-4">
+                    <label
+                        htmlFor="mainImage"
+                        className="flex items-center justify-center shadow-xs h-24 w-24 bg-white border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors shrink-0"
+                    >
+                        <span className="text-4xl text-gray-400">+</span>
+                    </label>
+                    <input
+                        id="mainImage"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleMainImageChange}
+                        className="hidden"
+                    />
                     {mainImagePreview && (
-                        <div className="relative w-48 h-32 rounded-lg overflow-hidden border shrink-0">
-                            <Image src={mainImagePreview} alt="Main" fill className="object-cover" />
+                        <div className="relative h-24 w-24 shadow-xs bg-white border rounded-lg overflow-hidden shrink-0">
+                            <Image
+                                src={mainImagePreview}
+                                alt="Main"
+                                fill
+                                className="object-cover"
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center hover:bg-red-600"
+                                onClick={() => {
+                                    setMainImageFile(null);
+                                    setMainImagePreview(null);
+                                }}
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
                         </div>
                     )}
-                    <div>
-                        <label className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm">
-                            <Upload className="h-4 w-4" />
-                            {mainImagePreview ? "Change Image" : "Upload Image"}
-                            <input type="file" accept="image/*" className="hidden" onChange={handleMainImageChange} />
-                        </label>
-                    </div>
                 </div>
             </div>
 
@@ -225,25 +246,33 @@ export default function BlogForm({ initialData = null }) {
                 </p>
                 <div className="space-y-4">
                     <div className="flex items-start gap-4">
+                        <label
+                            htmlFor="partnerAdImage"
+                            className="flex items-center justify-center shadow-xs h-24 w-24 bg-white border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors shrink-0"
+                        >
+                            <span className="text-4xl text-gray-400">+</span>
+                        </label>
+                        <input
+                            id="partnerAdImage"
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePartnerAdImageChange}
+                            className="hidden"
+                        />
                         {partnerAdImagePreview && !removePartnerAd && (
-                            <div className="relative w-48 h-32 rounded-lg overflow-hidden border shrink-0 group">
+                            <div className="relative h-24 w-24 shadow-xs bg-white border rounded-lg overflow-hidden shrink-0">
                                 <Image src={partnerAdImagePreview} alt="Partner Ad" fill className="object-cover" />
                                 <button
                                     type="button"
                                     onClick={handleRemovePartnerAd}
-                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center hover:bg-red-600"
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
                             </div>
                         )}
-                        <label className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors text-sm">
-                            <Upload className="h-4 w-4" />
-                            {partnerAdImagePreview && !removePartnerAd ? "Change Image" : "Upload Image"}
-                            <input type="file" accept="image/*" className="hidden" onChange={handlePartnerAdImageChange} />
-                        </label>
                     </div>
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="partnerAdLinkUrl">Partner Website URL</Label>
                         <Input
                             id="partnerAdLinkUrl"
@@ -258,13 +287,13 @@ export default function BlogForm({ initialData = null }) {
             {/* Content Blocks */}
             <div className="bg-white rounded-lg border p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="space-y-2">
                         <h2 className="text-lg font-semibold font-archivo">Additional Content Blocks</h2>
                         <p className="text-sm text-muted-foreground mt-1">
                             Add numbered text sections, each with an optional image below.
                         </p>
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={addContentBlock}>
+                    <Button type="button" variant="outline" size="lg" onClick={addContentBlock}>
                         <Plus className="h-4 w-4 mr-1" /> Add Block
                     </Button>
                 </div>
@@ -304,28 +333,36 @@ export default function BlogForm({ initialData = null }) {
                             <div>
                                 <Label className="text-xs text-gray-500">Optional Image</Label>
                                 <div className="flex items-start gap-3 mt-1">
-                                    {block.newImagePreview && (
-                                        <div className="relative w-36 h-24 rounded-lg overflow-hidden border shrink-0 group">
-                                            <Image src={block.newImagePreview} alt={`Block ${index + 1}`} fill className="object-cover" />
+                                    <label
+                                        htmlFor={`blockImage-${index}`}
+                                        className="flex items-center justify-center shadow-xs h-24 w-24 bg-white border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors shrink-0"
+                                    >
+                                        <span className="text-4xl text-gray-400">+</span>
+                                    </label>
+                                    <input
+                                        id={`blockImage-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => handleBlockImageChange(index, e)}
+                                    />
+                                    {(block.newImagePreview || block.existingImageUrl) && (
+                                        <div className="relative h-24 w-24 shadow-xs bg-white border rounded-lg overflow-hidden shrink-0">
+                                            <Image
+                                                src={block.newImagePreview || block.existingImageUrl}
+                                                alt={`Block ${index + 1}`}
+                                                fill
+                                                className="object-cover"
+                                            />
                                             <button
                                                 type="button"
                                                 onClick={() => removeBlockImage(index)}
-                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center hover:bg-red-600"
                                             >
                                                 <X className="h-3 w-3" />
                                             </button>
                                         </div>
                                     )}
-                                    <label className="inline-flex items-center gap-2 px-3 py-1.5 border rounded-lg cursor-pointer hover:bg-white transition-colors text-xs">
-                                        <Upload className="h-3 w-3" />
-                                        {block.newImagePreview ? "Change" : "Upload"}
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) => handleBlockImageChange(index, e)}
-                                        />
-                                    </label>
                                 </div>
                             </div>
                         </div>

@@ -134,16 +134,18 @@ const defaultHomepageData = {
 };
 
 async function getHomeData() {
-    const [homepageRes, partnersRes, faqsRes] = await Promise.all([
+    const [homepageRes, partnersRes, faqsRes, blogsRes] = await Promise.all([
       fetch(`${BASE_URL}/api/homepage`, { cache: "no-store" }),
       fetch(`${BASE_URL}/api/partners`, { cache: "no-store" }),
       fetch(`${BASE_URL}/api/faqs?limit=6`, { cache: "no-store" }),
+      fetch(`${BASE_URL}/api/blogs?limit=6`, { cache: "no-store" }),
     ]);
   
     const homepageJson = await homepageRes.json();
     const partnersJson = await partnersRes.json();
     const faqsJson = await faqsRes.json();
-  
+    const blogsJson = await blogsRes.json();
+    const blogs = blogsJson?.data || [];
     const allPartners = partnersJson?.data || [];
     const technologyPartners = allPartners.filter((p) => !p.type || p.type === "technology");
     const marketingPartners = allPartners.filter((p) => p.type === "marketing");
@@ -155,11 +157,12 @@ async function getHomeData() {
       technologyPartners,
       marketingPartners,
       faqs: faqsJson?.data || [],
+      blogs,
     };
   }
   
   export default async function Home() {
-    const { homepageData, technologyPartners, marketingPartners, faqs } = await getHomeData();
+    const { homepageData, technologyPartners, marketingPartners, faqs, blogs } = await getHomeData();
   
     return (
       <div className="min-h-screen">
@@ -170,7 +173,7 @@ async function getHomeData() {
         {marketingPartners.length > 0 && (
           <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} />
         )}
-        <BlogsSection homepageData={homepageData} />
+        <BlogsSection homepageData={homepageData} blogs={blogs} />
         <FAQSection homepageData={homepageData} faqsData={faqs} />
       </div>
     );

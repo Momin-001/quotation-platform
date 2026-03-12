@@ -11,9 +11,16 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Pencil, Trash2 } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -34,6 +41,7 @@ export default function AdminBlogsPage() {
     const [search, setSearch] = useState("");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [blogToDelete, setBlogToDelete] = useState(null);
+    const [sortBy, setSortBy] = useState("");
 
     const fetchBlogs = async () => {
         setLoading(true);
@@ -55,19 +63,22 @@ export default function AdminBlogsPage() {
     }, []);
 
     useEffect(() => {
-        if (!search) {
-            setFilteredBlogs(blogs);
-            return;
-        }
-        const q = search.toLowerCase();
-        setFilteredBlogs(
-            blogs.filter(
+        let filtered = [...blogs];
+        if (search) {
+            const q = search.toLowerCase();
+            filtered = filtered.filter(
                 (b) =>
                     b.title.toLowerCase().includes(q) ||
                     b.authorName.toLowerCase().includes(q)
-            )
-        );
-    }, [search, blogs]);
+            );
+        }
+        filtered.sort((a, b) => {
+            if (sortBy === "title") return a.title.localeCompare(b.title);
+            if (sortBy === "date") return new Date(b.createdAt) - new Date(a.createdAt);
+            return 0;
+        });
+        setFilteredBlogs(filtered);
+    }, [search, sortBy, blogs]);
 
     const openDeleteDialog = (blog) => {
         setBlogToDelete(blog);
@@ -106,40 +117,59 @@ export default function AdminBlogsPage() {
                 </Link>
             </div>
 
-            {/* Search */}
-            <div className="relative max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                    placeholder="Search blogs..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-9"
-                />
+            {/* Search and Sort */}
+            <div className="flex justify-end items-center gap-4">
+                <div className="relative">
+                    <Search className="absolute left-2 top-4 h-4 w-4" />
+                    <Input
+                        placeholder="Search..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-8 placeholder:text-gray-800"
+                    />
+                </div>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sort By" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="title">Title</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
             {/* Table */}
-            {loading ? (
-                <div className="flex items-center justify-center py-12">
-                    <Spinner className="h-6 w-6" />
-                </div>
-            ) : filteredBlogs.length > 0 ? (
-                <div className="border rounded-lg bg-white overflow-hidden">
-                    <Table>
-                        <TableHeader>
+            <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
+                <Table className="min-w-full">
+                    <TableHeader className="bg-secondary font-archivo">
+                        <TableRow>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Image</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Title</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Author</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Date</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {loading && filteredBlogs.length === 0 ? (
                             <TableRow>
-                                <TableHead className="w-16">Image</TableHead>
-                                <TableHead>Title</TableHead>
-                                <TableHead>Author</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Spinner className="h-5 w-5" />
+                                        <span>Loading blogs...</span>
+                                    </div>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredBlogs.map((blog) => (
-                                <TableRow key={blog.id}>
-                                    <TableCell>
+                        ) : filteredBlogs.length > 0 ? (
+                            filteredBlogs.map((blog) => (
+                                <TableRow
+                                    key={blog.id}
+                                    className="even:bg-[#EAF6FF] font-open-sans"
+                                >
+                                    <TableCell className="p-4 whitespace-nowrap">
                                         {blog.mainImageUrl ? (
-                                            <div className="relative w-14 h-10 rounded overflow-hidden">
+                                            <div className="relative w-14 h-10 rounded overflow-hidden shrink-0">
                                                 <Image
                                                     src={blog.mainImageUrl}
                                                     alt={blog.title}
@@ -148,49 +178,48 @@ export default function AdminBlogsPage() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="w-14 h-10 rounded bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                                                N/A
-                                            </div>
+                                            <span className="text-gray-400">—</span>
                                         )}
                                     </TableCell>
-                                    <TableCell className="font-medium max-w-xs truncate">
+                                    <TableCell className="p-4 whitespace-nowrap max-w-xs truncate">
                                         {blog.title}
                                     </TableCell>
-                                    <TableCell>{blog.authorName}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">{blog.authorName}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">
                                         {new Date(blog.createdAt).toLocaleDateString("en-US", {
                                             month: "short",
                                             day: "numeric",
                                             year: "numeric",
                                         })}
                                     </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex items-center justify-end gap-1">
+                                    <TableCell className="p-4 whitespace-nowrap">
+                                        <div>
                                             <Link href={`/admin/blogs/${blog.id}/edit`}>
-                                                <Button variant="ghost" size="sm">
-                                                    <Pencil className="h-4 w-4" />
+                                                <Button variant="link" className="p-0 h-auto">
+                                                    Edit
                                                 </Button>
                                             </Link>
                                             <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-red-500 hover:text-red-700"
+                                                variant="link"
+                                                className="p-0 h-auto text-red-600 hover:text-red-700"
                                                 onClick={() => openDeleteDialog(blog)}
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                Delete
                                             </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
-            ) : (
-                <div className="text-center py-12 text-gray-500 bg-white border rounded-lg">
-                    {search ? "No blogs match your search." : "No blogs yet. Create your first blog post!"}
-                </div>
-            )}
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                    {search ? "No blogs match your search." : "No blogs yet. Create your first blog post!"}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
 
             {/* Delete Dialog */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
