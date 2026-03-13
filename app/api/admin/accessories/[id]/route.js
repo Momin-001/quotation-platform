@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
-import { accessories } from "@/db/schema";
+import { accessories, accessoryFeatures } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 
-// GET /api/admin/accessories/[id] - Fetch a single accessory
+// GET /api/admin/accessories/[id] - Fetch a single accessory with features
 export async function GET(request, { params }) {
     try {
         const { id } = await params;
@@ -12,13 +12,21 @@ export async function GET(request, { params }) {
             .select()
             .from(accessories)
             .where(eq(accessories.id, id))
-            .limit(1)
+            .limit(1);
 
         if (!accessory) {
             return errorResponse("Accessory not found", 404);
         }
 
-        return successResponse("Accessory fetched successfully", accessory);
+        const featuresRows = await db
+            .select({ id: accessoryFeatures.id, feature: accessoryFeatures.feature })
+            .from(accessoryFeatures)
+            .where(eq(accessoryFeatures.accessoryId, id));
+
+        return successResponse("Accessory fetched successfully", {
+            ...accessory,
+            features: featuresRows.map((r) => r.feature),
+        });
     } catch (error) {
         return errorResponse(error.message || "Failed to fetch accessory");
     }
@@ -62,19 +70,35 @@ export async function PUT(request, { params }) {
             unit: body.unit?.trim() || null,
             manufacturer: body.manufacturer?.trim() || null,
             supplier: body.supplier?.trim() || null,
+            productDatasheetUrl: body.productDatasheetUrl?.trim() || null,
             purchasePrice: body.purchasePrice?.toString() || null,
             retailPrice: body.retailPrice?.toString() || null,
             leadTime: body.leadTime?.trim() || null,
+            optionalField: Array.isArray(body.optionalField) ? body.optionalField.filter(Boolean).map((s) => String(s).trim()) : (body.optionalField != null && body.optionalField !== "" ? [String(body.optionalField).trim()] : []),
             updatedAt: new Date(),
         };
 
-        const updated = await db
-            .update(accessories)
-            .set(updateData)
-            .where(eq(accessories.id, id))
-            .returning();
+        await db.update(accessories).set(updateData).where(eq(accessories.id, id));
 
-        return successResponse("Accessory updated successfully", updated[0]);
+        // Replace accessory features
+        await db.delete(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, id));
+        const features = body.features;
+        if (features && Array.isArray(features) && features.length > 0) {
+            await Promise.all(
+                features
+                    .filter((f) => f && String(f).trim() !== "")
+                    .map((feature) =>
+                        db.insert(accessoryFeatures).values({
+                            accessoryId: id,
+                            feature: String(feature).trim(),
+                        })
+                    )
+            );
+        }
+
+        const [updated] = await db.select().from(accessories).where(eq(accessories.id, id)).limit(1);
+        const featuresRows = await db.select().from(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, id));
+        return successResponse("Accessory updated successfully", { ...updated, features: featuresRows.map((r) => r.feature) });
     } catch (error) {
         return errorResponse(error.message || "Failed to update accessory");
     }

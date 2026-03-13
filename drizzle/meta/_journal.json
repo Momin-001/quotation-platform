@@ -43,6 +43,13 @@
       "when": 1773291906874,
       "tag": "0005_chubby_gressill",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773311067791,
+      "tag": "0006_abandoned_blue_shield",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { accessories } from "@/db/schema";
+import { accessories, accessoryFeatures } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 // GET /api/admin/accessories - Fetch all accessories
 export async function GET() {
@@ -45,9 +45,11 @@ export async function POST(request) {
             unit: body.unit?.trim() || null,
             manufacturer: body.manufacturer?.trim() || null,
             supplier: body.supplier?.trim() || null,
+            productDatasheetUrl: body.productDatasheetUrl?.trim() || null,
             purchasePrice: body.purchasePrice?.toString() || null,
             retailPrice: body.retailPrice?.toString() || null,
             leadTime: body.leadTime?.trim() || null,
+            optionalField: Array.isArray(body.optionalField) ? body.optionalField.filter(Boolean).map((s) => String(s).trim()) : (body.optionalField ? [String(body.optionalField).trim()] : []),
             isActive: true,
         };
 
@@ -56,7 +58,26 @@ export async function POST(request) {
             .values(accessoryData)
             .returning();
 
-        return successResponse("Accessory created successfully", newAccessory[0]);
+        const accessoryId = newAccessory[0].id;
+
+        // Insert accessory features
+        const features = body.features;
+        if (features && Array.isArray(features) && features.length > 0) {
+            await Promise.all(
+                features
+                    .filter((f) => f && String(f).trim() !== "")
+                    .map((feature) =>
+                        db.insert(accessoryFeatures).values({
+                            accessoryId,
+                            feature: String(feature).trim(),
+                        })
+                    )
+            );
+        }
+
+        const [created] = await db.select().from(accessories).where(eq(accessories.id, accessoryId)).limit(1);
+        const featuresRows = await db.select().from(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, accessoryId));
+        return successResponse("Accessory created successfully", { ...created, features: featuresRows.map((r) => r.feature) });
     } catch (error) {
         if (error.message?.includes("unique") || error.code === "23505") {
             return errorResponse("An accessory with this product number already exists", 400);

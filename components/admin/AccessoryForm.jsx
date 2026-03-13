@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { Plus, X } from "lucide-react";
 
 const productGroups = ["Mechanics", "Service", "Software", "Maintenance"];
 
@@ -32,6 +34,7 @@ const accessorySchema = z.object({
     unit: z.string().optional(),
     manufacturer: z.string().optional(),
     supplier: z.string().optional(),
+    productDatasheetUrl: z.string().optional(),
     purchasePrice: z.union([z.string(), z.number()]).optional(),
     retailPrice: z.union([z.string(), z.number()]).optional(),
     leadTime: z.string().optional(),
@@ -46,6 +49,7 @@ const defaultValues = {
     unit: "",
     manufacturer: "",
     supplier: "",
+    productDatasheetUrl: "",
     purchasePrice: "",
     retailPrice: "",
     leadTime: "",
@@ -54,6 +58,15 @@ const defaultValues = {
 export default function AccessoryForm({ mode = "add", initialData = null }) {
     const router = useRouter();
     const isEdit = mode === "edit";
+
+    const [features, setFeatures] = useState(() =>
+        Array.isArray(initialData?.features) ? [...initialData.features] : []
+    );
+    const [featureInput, setFeatureInput] = useState("");
+    const [optionalField, setOptionalField] = useState(() =>
+        Array.isArray(initialData?.optionalField) ? [...initialData.optionalField] : []
+    );
+    const [optionalFieldInput, setOptionalFieldInput] = useState("");
 
     const formDefaultValues = initialData ? {
         productName: initialData.productName || "",
@@ -64,6 +77,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
         unit: initialData.unit || "",
         manufacturer: initialData.manufacturer || "",
         supplier: initialData.supplier || "",
+        productDatasheetUrl: initialData.productDatasheetUrl || "",
         purchasePrice: initialData.purchasePrice?.toString() || "",
         retailPrice: initialData.retailPrice?.toString() || "",
         leadTime: initialData.leadTime || "",
@@ -79,6 +93,30 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
         defaultValues: formDefaultValues,
     });
 
+    const handleAddFeature = () => {
+        const trimmed = featureInput.trim();
+        if (trimmed) {
+            setFeatures((prev) => [...prev, trimmed]);
+            setFeatureInput("");
+        }
+    };
+
+    const handleRemoveFeature = (index) => {
+        setFeatures((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleAddOptionalField = () => {
+        const trimmed = optionalFieldInput.trim();
+        if (trimmed) {
+            setOptionalField((prev) => [...prev, trimmed]);
+            setOptionalFieldInput("");
+        }
+    };
+
+    const handleRemoveOptionalField = (index) => {
+        setOptionalField((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const onSubmit = async (data) => {
         try {
             const url = isEdit
@@ -89,7 +127,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ ...data, features, optionalField }),
             });
 
             const response = await res.json();
@@ -180,6 +218,106 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                 </div>
             </div>
 
+            {/* Features (after Long Text) */}
+            <div>
+                <h3 className="text-lg font-semibold font-archivo mb-4">Features</h3>
+                <div className="space-y-4">
+                    <div className="flex gap-2">
+                        <Input
+                            type="text"
+                            value={featureInput}
+                            onChange={(e) => setFeatureInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleAddFeature();
+                                }
+                            }}
+                            placeholder="Enter a feature"
+                            className="flex-1"
+                        />
+                        <Button type="button" variant="default" size="lg" className="h-10" onClick={handleAddFeature}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add
+                        </Button>
+                    </div>
+                    {features.length > 0 && (
+                        <div className="space-y-2">
+                            <Label>Added Features</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {features.map((feature, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-2 bg-secondary/10 px-3 py-2 rounded-md border"
+                                    >
+                                        <span className="text-sm">{feature}</span>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                                            onClick={() => handleRemoveFeature(index)}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Optional Field (multi-valued) */}
+            <div>
+                <h3 className="text-lg font-semibold font-archivo mb-4">Optional Field</h3>
+                <div className="space-y-4">
+                    <div className="flex gap-2">
+                        <Input
+                            type="text"
+                            value={optionalFieldInput}
+                            onChange={(e) => setOptionalFieldInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleAddOptionalField();
+                                }
+                            }}
+                            placeholder="Enter a value"
+                            className="flex-1"
+                        />
+                        <Button type="button" variant="default" size="lg" className="h-10" onClick={handleAddOptionalField}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add
+                        </Button>
+                    </div>
+                    {optionalField.length > 0 && (
+                        <div className="space-y-2">
+                            <Label>Added values</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {optionalField.map((val, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-2 bg-secondary/10 px-3 py-2 rounded-md border"
+                                    >
+                                        <span className="text-sm">{val}</span>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                                            onClick={() => handleRemoveOptionalField(index)}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Supply & Pricing */}
             <div>
                 <h3 className="text-lg font-semibold font-archivo mb-4">Supply & Pricing</h3>
@@ -198,6 +336,14 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                     <div className="space-y-1">
                         <Label>Supplier</Label>
                         <Input {...register("supplier")} placeholder="e.g. LEDALL" />
+                    </div>
+                    <div className="space-y-1">
+                        <Label>Product Datasheet (URL)</Label>
+                        <Input
+                            {...register("productDatasheetUrl")}
+                            type="url"
+                            placeholder="https://..."
+                        />
                     </div>
                     <div className="space-y-1">
                         <Label>Purchase Price (€)</Label>

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { accessories } from "@/db/schema";
+import { accessories, accessoryFeatures } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import * as XLSX from "xlsx";
@@ -42,6 +42,16 @@ function parseDecimal(value) {
     return isNaN(num) ? null : num.toString();
 }
 
+/** Parse comma-separated string into array of non-empty trimmed strings */
+function parseCommaSeparated(value) {
+    if (value === null || value === undefined || value === "") return [];
+    return value
+        .toString()
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+}
+
 /**
  * Accessory Excel layout (row-oriented):
  *   Row 1 = headers (ITEM_EN, ITEM_DE, unit, then product data columns)
@@ -82,18 +92,21 @@ export async function POST(req) {
 
         // Find header row: look for a row that contains "Product Name" or "ITEM_EN"
         let headerRowIdx = 0;
+        // Order matters: price rows must be matched before "unit" (else "Price per unit (purchase price)" matches "unit")
         const headerMappings = {
             productName: ["product name", "artikelbezeichnung", "item_en", "name"],
             productNumber: ["product number", "artikelnummer", "article number", "item number", "product_number"],
             shortText: ["short text", "kurztext", "short_text"],
             longText: ["long text", "langtext", "long_text"],
+            features: ["features", "feature"],
+            optionalField: ["optional field", "optional_field", "optional"],
             productGroup: ["product group", "warengruppe", "product_group", "group"],
-            // purchasePrice/retailPrice must be matched before unit (unit would match "price per unit")
+            manufacturer: ["manufacturer", "hersteller"],
+            supplier: ["supplier", "lieferant"],
+            productDatasheetUrl: ["product datasheet", "datasheet", "product_datasheet_url", "product datasheet url"],
             purchasePrice: ["price per unit (purchase price)", "preis pro einheit ek", "purchase price", "purchase_price", "ek"],
             retailPrice: ["price per unit (retail price)", "preis pro einheit vk", "retail price", "retail_price", "vk"],
             unit: ["unit", "einheit"],
-            manufacturer: ["manufacturer", "hersteller"],
-            supplier: ["supplier", "lieferant"],
             leadTime: ["leadtime", "lieferzeit", "lead time", "lead_time"],
         };
 
@@ -194,6 +207,9 @@ export async function POST(req) {
                         continue;
                     }
 
+                    const featuresArray = parseCommaSeparated(cell("features", a));
+                    const optionalFieldArray = parseCommaSeparated(cell("optionalField", a));
+
                     const accessoryData = {
                         productName,
                         productNumber,
@@ -203,9 +219,11 @@ export async function POST(req) {
                         unit: str(cell("unit", a)),
                         manufacturer: str(cell("manufacturer", a)),
                         supplier: str(cell("supplier", a)),
+                        productDatasheetUrl: str(cell("productDatasheetUrl", a)),
                         purchasePrice: parseDecimal(cell("purchasePrice", a)),
                         retailPrice: parseDecimal(cell("retailPrice", a)),
                         leadTime: str(cell("leadTime", a)),
+                        optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
                         isActive: true,
                         updatedAt: new Date(),
                     };
@@ -214,15 +232,35 @@ export async function POST(req) {
                         .select({ id: accessories.id })
                         .from(accessories)
                         .where(eq(accessories.productNumber, productNumber))
-                        .limit(1)
-                       
+                        .limit(1);
 
                     if (existing) {
                         const { productNumber: _pn, isActive: _ia, ...updateData } = accessoryData;
                         await db.update(accessories).set(updateData).where(eq(accessories.id, existing.id));
+                        await db.delete(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, existing.id));
+                        if (featuresArray.length > 0) {
+                            await Promise.all(
+                                featuresArray.map((feature) =>
+                                    db.insert(accessoryFeatures).values({
+                                        accessoryId: existing.id,
+                                        feature: feature.trim(),
+                                    })
+                                )
+                            );
+                        }
                         results.updated++;
                     } else {
-                        await db.insert(accessories).values(accessoryData);
+                        const [inserted] = await db.insert(accessories).values(accessoryData).returning();
+                        if (featuresArray.length > 0) {
+                            await Promise.all(
+                                featuresArray.map((feature) =>
+                                    db.insert(accessoryFeatures).values({
+                                        accessoryId: inserted.id,
+                                        feature: feature.trim(),
+                                    })
+                                )
+                            );
+                        }
                         results.created++;
                     }
                 } catch (accessoryErr) {
@@ -302,6 +340,9 @@ export async function POST(req) {
                         continue;
                     }
 
+                    const featuresArray = parseCommaSeparated(get("features"));
+                    const optionalFieldArray = parseCommaSeparated(get("optionalField"));
+
                     const accessoryData = {
                         productName,
                         productNumber,
@@ -311,9 +352,11 @@ export async function POST(req) {
                         unit: str(get("unit")),
                         manufacturer: str(get("manufacturer")),
                         supplier: str(get("supplier")),
+                        productDatasheetUrl: str(get("productDatasheetUrl")),
                         purchasePrice: parseDecimal(get("purchasePrice")),
                         retailPrice: parseDecimal(get("retailPrice")),
                         leadTime: str(get("leadTime")),
+                        optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
                         isActive: true,
                         updatedAt: new Date(),
                     };
@@ -322,14 +365,35 @@ export async function POST(req) {
                         .select({ id: accessories.id })
                         .from(accessories)
                         .where(eq(accessories.productNumber, productNumber))
-                        .limit(1)
+                        .limit(1);
 
                     if (existing) {
                         const { productNumber: _pn, isActive: _ia, ...updateData } = accessoryData;
                         await db.update(accessories).set(updateData).where(eq(accessories.id, existing.id));
+                        await db.delete(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, existing.id));
+                        if (featuresArray.length > 0) {
+                            await Promise.all(
+                                featuresArray.map((feature) =>
+                                    db.insert(accessoryFeatures).values({
+                                        accessoryId: existing.id,
+                                        feature: feature.trim(),
+                                    })
+                                )
+                            );
+                        }
                         results.updated++;
                     } else {
-                        await db.insert(accessories).values(accessoryData);
+                        const [inserted] = await db.insert(accessories).values(accessoryData).returning();
+                        if (featuresArray.length > 0) {
+                            await Promise.all(
+                                featuresArray.map((feature) =>
+                                    db.insert(accessoryFeatures).values({
+                                        accessoryId: inserted.id,
+                                        feature: feature.trim(),
+                                    })
+                                )
+                            );
+                        }
                         results.created++;
                     }
                 } catch (accessoryErr) {
