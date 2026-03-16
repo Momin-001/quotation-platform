@@ -14,7 +14,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { Download, ShoppingCart, FileText, Wrench } from "lucide-react";
-import Header from "@/components/user/BreadCrumb";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +24,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { RestrictedContentOverlay } from "@/app/(guest)/products/page";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -366,6 +366,7 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Product Specifications */}
+                    <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Left Column */}
                         <div className="space-y-4">
@@ -683,6 +684,7 @@ export default function ProductDetailPage() {
                             </Accordion>
                         </div>
                     </div>
+                    </RestrictedContentOverlay>
                 </div>
             </div>
         </>

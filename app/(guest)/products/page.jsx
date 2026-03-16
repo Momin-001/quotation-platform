@@ -32,7 +32,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 
-function RestrictedContentOverlay({ children, isAuthenticated }) {
+export const RestrictedContentOverlay = ({ children, isAuthenticated }) => {
     if (isAuthenticated) return children;
     return (
         <div className="relative min-h-[120px]">
@@ -56,7 +56,7 @@ function RestrictedContentOverlay({ children, isAuthenticated }) {
             </div>
         </div>
     );
-}
+};
 
 function FiltersAccordion({
     accordionValue, setAccordionValue,
