@@ -24,7 +24,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import { RestrictedContentOverlay } from "@/app/(guest)/products/page";
+import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
 
 export default function ProductDetailPage() {
     const params = useParams();
