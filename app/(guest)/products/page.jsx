@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Search, ChevronDown, ChevronUp, FilterIcon, X } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, FilterIcon, X, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +30,33 @@ import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+
+function RestrictedContentOverlay({ children, isAuthenticated }) {
+    if (isAuthenticated) return children;
+    return (
+        <div className="relative min-h-[120px]">
+            <div className="blur-sm pointer-events-none select-none">
+                {children}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
+                <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm text-center border border-gray-100">
+                    <div className="flex justify-center mb-3">
+                        <div className="w-14 h-14 rounded-full border border-gray-200 flex items-center justify-center bg-gray-50">
+                            <Lock className="h-7 w-7 text-primary" />
+                        </div>
+                    </div>
+                    <p className="font-bold text-gray-900 mb-4 text-sm leading-snug">
+                        Full specifications are available to registered customers only.
+                    </p>
+                    <Link href="/register">
+                        <Button className="w-full bg-primary text-white font-semibold">REGISTER</Button>
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function FiltersAccordion({
     accordionValue, setAccordionValue,
@@ -52,6 +79,7 @@ function FiltersAccordion({
     receivingCard, setReceivingCard,
     ipRating, setIpRating,
     warrantyPeriod, setWarrantyPeriod,
+    isAuthenticated,
 }) {
     const { language } = useLanguage();
     return (
@@ -130,38 +158,41 @@ function FiltersAccordion({
                     </div>
                 </AccordionContent>
             </AccordionItem>
+            <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
 
             <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "LED Specifications" : "LED-Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
-                        <Select value={ledTechnology} onValueChange={setLedTechnology}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="SMD">SMD</SelectItem>
-                                <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
-                                <SelectItem value="IMD">IMD</SelectItem>
-                                <SelectItem value="COB">COB</SelectItem>
-                                <SelectItem value="DIP">DIP</SelectItem>
-                                <SelectItem value="LOB">LOB</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
-                        <Select value={chipBonding} onValueChange={setChipBonding}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Gold Wire">Gold Wire</SelectItem>
-                                <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
-                                <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
+                                <Select value={ledTechnology} onValueChange={setLedTechnology}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="SMD">SMD</SelectItem>
+                                        <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
+                                        <SelectItem value="IMD">IMD</SelectItem>
+                                        <SelectItem value="COB">COB</SelectItem>
+                                        <SelectItem value="DIP">DIP</SelectItem>
+                                        <SelectItem value="LOB">LOB</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
+                                <Select value={chipBonding} onValueChange={setChipBonding}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Gold Wire">Gold Wire</SelectItem>
+                                        <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
+                                        <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -170,14 +201,16 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
-                        <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
-                        <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
-                    </div>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
+                                <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
+                                <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
+                            </div>
+                        </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -186,65 +219,67 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
-                        <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
-                        <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
-                        <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
-                        <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
-                        <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
-                        <Select value={smartModule} onValueChange={setSmartModule}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Yes">Yes</SelectItem>
-                                <SelectItem value="No">No</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
-                        <Select value={controlSystem} onValueChange={setControlSystem}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Colorlight">Colorlight</SelectItem>
-                                <SelectItem value="Novastar">Novastar</SelectItem>
-                                <SelectItem value="Brompton">Brompton</SelectItem>
-                                <SelectItem value="LINSN">LINSN</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
-                        <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
-                    </div>
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
+                                <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
+                                <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
+                                <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
+                                <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
+                                <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
+                                <Select value={smartModule} onValueChange={setSmartModule}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="No">No</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
+                                <Select value={controlSystem} onValueChange={setControlSystem}>
+                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Colorlight">Colorlight</SelectItem>
+                                        <SelectItem value="Novastar">Novastar</SelectItem>
+                                        <SelectItem value="Brompton">Brompton</SelectItem>
+                                        <SelectItem value="LINSN">LINSN</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
+                                <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
+                            </div>
+                        </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -253,10 +288,10 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
-                        <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
-                    </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
+                            <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
+                        </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -265,12 +300,14 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Warranty" : "Garantie"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
-                        <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
-                    </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
+                            <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
+                        </div>
                 </AccordionContent>
             </AccordionItem>
+            </RestrictedContentOverlay>
+
         </Accordion>
     );
 }
@@ -278,6 +315,7 @@ function FiltersAccordion({
 export default function ProductsPage() {
     const [products, setProducts] = useState([]);
     const { language } = useLanguage();
+    const { isAuthenticated } = useAuth();
     const [categories, setCategories] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -527,6 +565,7 @@ export default function ProductsPage() {
                                 receivingCard={receivingCard} setReceivingCard={setReceivingCard}
                                 ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                                isAuthenticated={isAuthenticated}
                             />
                         </div>
                         <div className="px-5 py-4 border-t">
@@ -573,6 +612,7 @@ export default function ProductsPage() {
                                 receivingCard={receivingCard} setReceivingCard={setReceivingCard}
                                 ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                                isAuthenticated={isAuthenticated}
                             />
                         </div>
                     </div>
