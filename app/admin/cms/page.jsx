@@ -84,7 +84,7 @@ export default function CMSPage() {
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <div className="flex justify-between items-center mb-4">
-                    <TabsList className="">
+                    <TabsList>
                         <TabsTrigger
                             value="navbar"
                             className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"

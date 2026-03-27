@@ -143,7 +143,7 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Commercial Register Number (Optional)</label>
+                                    <label className="text-sm font-medium">Commercial Register Number</label>
                                     <Input {...register("commercialRegisterNumber")} placeholder="Commercial Register Number" />
                                 </div>
 
