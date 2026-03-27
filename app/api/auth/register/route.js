@@ -2,15 +2,26 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import bcrypt from "bcryptjs";
 
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { fullName, email, password, companyName, phoneNumber } = body;
+        const {
+            fullName,
+            companyName,
+            companyAddress,
+            email,
+            phoneNumber,
+            commercialRegisterNumber,
+            privacyAccepted,
+        } = body;
 
-        if (!fullName || !email || !password) {
+        if (!fullName || !companyName || !companyAddress || !email || !phoneNumber) {
             return errorResponse("All fields are required", 400);
+        }
+
+        if (!privacyAccepted) {
+            return errorResponse("Privacy policy must be accepted", 400);
         }
 
         const existingUser = await db
@@ -23,17 +34,18 @@ export async function POST(req) {
             return errorResponse("User already exists", 409);
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
         const newUser = await db
             .insert(users)
             .values({
                 fullName,
-                email,
-                password: hashedPassword,
                 companyName,
+                companyAddress,
+                email,
                 phoneNumber,
+                commercialRegisterNumber: commercialRegisterNumber || null,
+                password: null,
                 role: "user",
+                isActive: false,
             })
             .returning();
 

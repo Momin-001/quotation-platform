@@ -26,14 +26,18 @@ export async function POST(req) {
             return errorResponse("Invalid credentials", 401);
         }
 
+        if (!user.isActive && user.role !== 'admin' && user.role !== 'super_admin') {
+            return errorResponse("Your account is pending activation by admin.", 403);
+        }
+
+        if (!user.password) {
+            return errorResponse("Your account is not ready yet. Please wait for admin approval email.", 403);
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return errorResponse("Invalid credentials", 401);
-        }
-
-        if (!user.isActive && user.role !== 'admin' && user.role !== 'super_admin') {
-            return errorResponse("Your account is pending activation by admin.", 403);
         }
 
         const token = jwt.sign(

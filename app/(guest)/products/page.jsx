@@ -627,7 +627,7 @@ export default function ProductsPage() {
                                                     </div>
                                                 )}
                                                 {/* Certificates */}
-                                                {product.productCertificates && product.productCertificates.length > 0 && (
+                                                {/* {product.productCertificates && product.productCertificates.length > 0 && (
                                                     <div className="absolute top-2 right-2 flex gap-1 flex-col flex-wrap justify-end">
                                                         {product.productCertificates.map((cert) => (
                                                             <div
@@ -644,7 +644,7 @@ export default function ProductsPage() {
                                                             </div>
                                                         ))}
                                                     </div>
-                                                )}
+                                                )} */}
                                             </div>
                                             {/* Product Info */}
                                             <div className="p-4">

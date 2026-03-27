@@ -83,7 +83,10 @@ export default function Navbar({ navbarData }) {
                         ) : (
                             <>
                                 <UserAvatar />
-                                <DropdownMenu>
+                                
+                            </>
+                        )}
+                        <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="justify-center border-gray-400 rounded">
                                             <Image
@@ -112,8 +115,6 @@ export default function Navbar({ navbarData }) {
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
-                            </>
-                        )}
                     </div>
 
                     {/* Mobile hamburger */}
@@ -174,7 +175,10 @@ export default function Navbar({ navbarData }) {
                                                 <div className="w-full" onClick={() => setMobileOpen(false)}>
                                                     <UserAvatar />
                                                 </div>
-                                                <DropdownMenu>
+                                               
+                                            </div>
+                                        )}
+                                         <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="outline" className="w-full justify-between border-gray-300">
                                                             <span className="flex items-center gap-2">
@@ -206,8 +210,6 @@ export default function Navbar({ navbarData }) {
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </SheetContent>

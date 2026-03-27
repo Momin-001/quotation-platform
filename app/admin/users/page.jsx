@@ -136,14 +136,15 @@ export default function AdminUsersPage() {
             const response = await res.json();
 
             if (!response.success) {
+                setUsers((prev) =>
+                    prev.map((user) =>
+                        user.id === id ? { ...user, isActive: currentStatus } : user
+                    )
+                );
                 throw new Error(response.message || "Failed to update user status");
             }
             // Revert on failure
-            setUsers((prev) =>
-                prev.map((user) =>
-                    user.id === id ? { ...user, isActive: currentStatus } : user
-                )
-            );
+           
             toast.success(response.message || "User status updated");
         } catch (error) {
             // Revert on failure

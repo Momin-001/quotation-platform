@@ -37,6 +37,7 @@ export default function CertificatesPage() {
     const [certificates, setCertificates] = useState([]);
     const [filteredCertificates, setFilteredCertificates] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [loadingCertificates, setLoadingCertificates] = useState(false);
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("name");
 
@@ -51,7 +52,7 @@ export default function CertificatesPage() {
     const [certificateToDelete, setCertificateToDelete] = useState(null);
 
     const fetchCertificates = async () => {
-        setLoading(true);
+        setLoadingCertificates(true);
         try {
             const res = await fetch("/api/admin/certificates");
             const data = await res.json();
@@ -66,7 +67,7 @@ export default function CertificatesPage() {
             console.error(error);
             toast.error("Failed to fetch certificates");
         } finally {
-            setLoading(false);
+            setLoadingCertificates(false);
         }
     };
 
@@ -113,7 +114,7 @@ export default function CertificatesPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         if (!name.trim()) {
             toast.error("Certificate name is required");
             return;
@@ -151,6 +152,8 @@ export default function CertificatesPage() {
             clearForm();
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -253,7 +256,13 @@ export default function CertificatesPage() {
                     {editingId ? (
                         <>
                             <Button type="submit" size="lg" className="bg-primary">
-                                Edit Certificate
+                                {loading ? (
+                                    <>
+                                        <Spinner className="h-4 w-4" /> <span>Editing Certificate...</span>
+                                    </>
+                                ) : (
+                                    "Edit Certificate"
+                                )}
                             </Button>
                             <Button type="button" size="lg" variant="outline" onClick={clearForm}>
                                 Clear
@@ -261,7 +270,12 @@ export default function CertificatesPage() {
                         </>
                     ) : (
                         <Button type="submit" size="lg" className="bg-primary">
-                            Add Certificate
+                            {loading ? (
+                                <>
+                                    <Spinner className="h-4 w-4" /> <span>Adding Certificate...</span></>
+                            ) : (
+                                "Add Certificate"
+                            )}
                         </Button>
                     )}
                 </div>
@@ -308,7 +322,7 @@ export default function CertificatesPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {loading && filteredCertificates.length === 0 ? (
+                        {loadingCertificates && filteredCertificates.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={4} className="h-24 text-center">
                                     <div className="flex items-center justify-center gap-2">

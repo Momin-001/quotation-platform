@@ -21,6 +21,7 @@ import { useLanguage } from "@/context/LanguageContext";
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     companyName: z.string().min(2, "Company name is too short"),
+    companyAddress: z.string().min(3, "Company address is too short"),
     email: z.string().email("Invalid email"),
     phoneNumber: z
         .string()
@@ -28,12 +29,8 @@ const formSchema = z.object({
         .refine((val) => isValidPhoneNumber(val), {
             message: "Please enter a valid phone number",
         }),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, "You must agree to terms"),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
+    commercialRegisterNumber: z.string().optional(),
+    privacyAccepted: z.boolean().refine((val) => val === true, "You must accept the privacy policy"),
 });
 
 export default function RegisterPage() {
@@ -111,6 +108,12 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className="space-y-1">
+                                    <label className="text-sm font-medium">Company Address<span className="text-red-500">*</span></label>
+                                    <Input {...register("companyAddress")} placeholder="Company Address" className={errors.companyAddress ? "border-red-500" : ""} />
+                                    {errors.companyAddress && <p className="text-xs text-red-500">{errors.companyAddress.message}</p>}
+                                </div>
+
+                                <div className="space-y-1">
                                     <label className="text-sm font-medium">Your Email<span className="text-red-500">*</span></label>
                                     <Input {...register("email")} type="email" placeholder="Email" className={errors.email ? "border-red-500" : ""} />
                                     {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
@@ -140,27 +143,24 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Your Password<span className="text-red-500">*</span></label>
-                                    <Input {...register("password")} type="password" placeholder="Password" className={errors.password ? "border-red-500" : ""} />
-                                    {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
-                                </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium">Confirm Password<span className="text-red-500">*</span></label>
-                                    <Input {...register("confirmPassword")} type="password" placeholder="Confirm Password" className={errors.confirmPassword ? "border-red-500" : ""} />
-                                    {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>}
+                                    <label className="text-sm font-medium">Commercial Register Number (Optional)</label>
+                                    <Input {...register("commercialRegisterNumber")} placeholder="Commercial Register Number" />
                                 </div>
 
                                 <div className="flex items-center space-x-2 pt-2">
-                                    <Checkbox id="terms" onCheckedChange={(checked) => setValue("terms", checked)} />
+                                    <Checkbox id="privacyAccepted" onCheckedChange={(checked) => setValue("privacyAccepted", checked)} />
                                     <label
-                                        htmlFor="terms"
+                                        htmlFor="privacyAccepted"
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                     >
-                                        I agree to the Terms & Conditions.
+                                        I accept the{" "}
+                                        <Link href="/privacy-policy" target="_blank" className="underline">
+                                            Privacy Policy
+                                        </Link>
+                                        .
                                     </label>
                                 </div>
-                                {errors.terms && <p className="text-xs text-red-500">{errors.terms.message}</p>}
+                                {errors.privacyAccepted && <p className="text-xs text-red-500">{errors.privacyAccepted.message}</p>}
 
                                 <div className="pt-2">
                                     <ReCAPTCHA

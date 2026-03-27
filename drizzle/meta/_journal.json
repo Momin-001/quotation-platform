@@ -50,6 +50,13 @@
       "when": 1773311067791,
       "tag": "0006_abandoned_blue_shield",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774577053834,
+      "tag": "0007_slippery_shiva",
+      "breakpoints": true
     }
   ]
 }

@@ -274,10 +274,31 @@ export default function ProductDetailPage() {
                                         </ul>
                                     </div>
                                 )}
+
+                                {(product.leadtimeDays || product.stockPieces) && (
+                                    <div className="mt-4 space-y-1">
+                                        {product.leadtimeDays && 
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold">Stock:</span>
+                                            <span>
+                                                {product.stockPieces} pieces
+                                            </span>
+                                        </div>
+                                        }
+                                        {product.leadtimeDays && 
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold">Lead Time:</span>
+                                            <span>
+                                                {product.leadtimeDays} days
+                                            </span>
+                                        </div>
+                                        }
+                                    </div>
+                                )}
                             </div>
 
                             {/* Downloads */}
-    
+                            {isAuthenticated && isUser && (
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4">
                                 <div>
                                     <h3 className="text-lg font-bold">Downloads</h3>
@@ -304,7 +325,7 @@ export default function ProductDetailPage() {
                                     </button>
                                 </div>
                             </div>
-
+                            )}
                             {/* Action Buttons */}
                             
                             {isAuthenticated && isUser && (
