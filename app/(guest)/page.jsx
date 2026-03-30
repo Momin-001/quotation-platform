@@ -151,9 +151,7 @@ async function getHomeData() {
     const marketingPartners = allPartners.filter((p) => p.type === "marketing");
 
     return {
-      homepageData: homepageJson?.data
-        ? { ...defaultHomepageData, ...homepageJson.data }
-        : defaultHomepageData,
+      homepageData: homepageJson?.data ? { ...defaultHomepageData, ...homepageJson.data } : defaultHomepageData,
       technologyPartners,
       marketingPartners,
       faqs: faqsJson?.data || [],

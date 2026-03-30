@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { Search, BarChart3, Network, FileText, CheckCircle, ArrowRight, MoveRightIcon } from "lucide-react";
+import { MoveRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HowItWorksSection({ homepageData }) {
@@ -18,35 +18,30 @@ export default function HowItWorksSection({ homepageData }) {
     const steps = [
         {
             number: "01",
-            icon: Search,
             title: getText("step1Title"),
             description1: getText("step1Description1"),
             description2: getText("step1Description2"),
         },
         {
             number: "02",
-            icon: BarChart3,
             title: getText("step2Title"),
             description1: getText("step2Description1"),
             description2: getText("step2Description2"),
         },
         {
             number: "03",
-            icon: Network,
             title: getText("step3Title"),
             description1: getText("step3Description1"),
             description2: getText("step3Description2"),
         },
         {
             number: "04",
-            icon: FileText,
             title: getText("step4Title"),
             description1: getText("step4Description1"),
             description2: getText("step4Description2"),
         },
         {
             number: "05",
-            icon: CheckCircle,
             title: getText("step5Title"),
             description1: getText("step5Description1"),
             description2: getText("step5Description2"),
@@ -70,35 +65,29 @@ export default function HowItWorksSection({ homepageData }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Step Boxes 1-5 */}
                     {steps.map((step, index) => {
-                        const IconComponent = step.icon;
                         return (
                             <div
                                 key={index}
-                                className="bg-white rounded-lg p-6 lg:p-10 relative border border-gray-200"
+                                className="bg-white rounded-lg p-6 lg:px-10 pt-30 pb-22 relative border border-gray-200 shadow-sm"
                             >
-                                {/* Large Number - Top Right */}
-                                <div className="absolute top-4 right-4 text-4xl lg:text-5xl font-bold text-[#00A8CC33] leading-none font-archivo">
+                                {/* Large Number - Top Left */}
+                                <div className="absolute top-10 left-8 text-8xl lg:text-9xl font-bold text-[#00A8CC33] leading-none font-open-sans">
                                     {step.number}
                                 </div>
 
-                                {/* Icon - Top Left */}
-                                <div className="text-white bg-primary rounded-full p-2 w-10 mb-4 relative z-10">
-                                    <IconComponent className="h-6 w-6" strokeWidth={1.5} />
-                                </div>
-
                                 {/* Title */}
-                                <h3 className="text-xl font-bold text-gray-900 mb-4 font-archivo relative z-10 pr-16">
+                                <h3 className="text-xl font-bold text-secondary mb-4 font-archivo relative z-10 pt-14">
                                     {step.title}
                                 </h3>
 
                                 {/* Bullet Points */}
-                                <ul className="space-y-2 relative z-10">
-                                    <li className="text-gray-700 font-open-sans flex items-start text-sm lg:text-base">
-                                        <span className="mr-2 text-primary mt-1"><MoveRightIcon className="h-4 w-4" /></span>
+                                <ul className="space-y-2 relative z-10 w-xs">
+                                    <li className="font-archivo text-xl flex items-start">
+                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRightIcon className="h-4 w-4" /></span>
                                         <span>{step.description1}</span>
                                     </li>
-                                    <li className="text-gray-700 font-open-sans flex items-start text-sm lg:text-base">
-                                        <span className="mr-2 text-primary mt-1"><MoveRightIcon className="h-4 w-4" /></span>
+                                    <li className="font-archivo text-xl flex items-start">
+                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRightIcon className="h-4 w-4" /></span>
                                         <span>{step.description2}</span>
                                     </li>
                                 </ul>

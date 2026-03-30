@@ -42,9 +42,12 @@ function FiltersAccordion({
     application, setApplication,
     pixelPitch, setPixelPitch,
     ledTechnology, setLedTechnology,
+    ledLifespan, setLedLifespan,
     chipBonding, setChipBonding,
     brightnessControl, setBrightnessControl,
     contrastRatio, setContrastRatio,
+    viewingAngleHorizontal, setViewingAngleHorizontal,
+    viewingAngleVertical, setViewingAngleVertical,
     powerConsumptionMax, setPowerConsumptionMax,
     powerConsumptionTypical, setPowerConsumptionTypical,
     refreshRate, setRefreshRate,
@@ -55,6 +58,7 @@ function FiltersAccordion({
     receivingCard, setReceivingCard,
     ipRating, setIpRating,
     warrantyPeriod, setWarrantyPeriod,
+    supportDuringWarrantyEn, setSupportDuringWarrantyEn,
     isAuthenticated,
 }) {
     const { language } = useLanguage();
@@ -69,17 +73,7 @@ function FiltersAccordion({
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Product Information" : "Produktinformation"}</span>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3">
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
-                        <Select value={productType} onValueChange={setProductType}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="AIO Systems">AIO Systems</SelectItem>
-                                <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
                     <div>
                         <label className="text-sm font-medium mb-1 block">{language === "en" ? "Design" : "Design"}</label>
                         <Select value={design} onValueChange={setDesign}>
@@ -90,19 +84,7 @@ function FiltersAccordion({
                             </SelectContent>
                         </Select>
                     </div>
-                    <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
-                        <Select value={specialTypes} onValueChange={setSpecialTypes}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Transparent">Transparent</SelectItem>
-                                <SelectItem value="Curved">Curved</SelectItem>
-                                <SelectItem value="Floor">Floor</SelectItem>
-                                <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
+                    <div className={`${isAuthenticated ? "" : "mb-10"}`}>
                         <label className="text-sm font-medium mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
                         <Select value={application} onValueChange={setApplication}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
@@ -120,6 +102,32 @@ function FiltersAccordion({
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
+                            <Select value={productType} onValueChange={setProductType}>
+                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="AIO Systems">AIO Systems</SelectItem>
+                                    <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
+                            <Select value={specialTypes} onValueChange={setSpecialTypes}>
+                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Transparent">Transparent</SelectItem>
+                                    <SelectItem value="Curved">Curved</SelectItem>
+                                    <SelectItem value="Floor">Floor</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </RestrictedContentOverlay>
                 </AccordionContent>
             </AccordionItem>
 
@@ -134,29 +142,33 @@ function FiltersAccordion({
                     </div>
                 </AccordionContent>
             </AccordionItem>
-            <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
 
             <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "LED Specifications" : "LED-Spezifikationen"}</span>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3">
-                        <div className="space-y-3">
-                            <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
-                                <Select value={ledTechnology} onValueChange={setLedTechnology}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="SMD">SMD</SelectItem>
-                                        <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
-                                        <SelectItem value="IMD">IMD</SelectItem>
-                                        <SelectItem value="COB">COB</SelectItem>
-                                        <SelectItem value="DIP">DIP</SelectItem>
-                                        <SelectItem value="LOB">LOB</SelectItem>
-                                        <SelectItem value="Other">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
+                            <Select value={ledTechnology} onValueChange={setLedTechnology}>
+                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="SMD">SMD</SelectItem>
+                                    <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
+                                    <SelectItem value="IMD">IMD</SelectItem>
+                                    <SelectItem value="COB">COB</SelectItem>
+                                    <SelectItem value="DIP">DIP</SelectItem>
+                                    <SelectItem value="LOB">LOB</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className={`${isAuthenticated ? "" : "mb-14"}`}>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
+                            <Input type="number" value={ledLifespan} onChange={(e) => setLedLifespan(e.target.value)} placeholder="Enter number" />
+                        </div>
+                        <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
                                 <label className="text-sm font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
                                 <Select value={chipBonding} onValueChange={setChipBonding}>
@@ -168,7 +180,8 @@ function FiltersAccordion({
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
+                        </RestrictedContentOverlay>
+                    </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -177,16 +190,24 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                        <div className="space-y-3">
-                            <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
-                                <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
-                                <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
-                            </div>
+                    <div className="space-y-3">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
+                            <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
                         </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
+                            <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
+                            <Input value={viewingAngleHorizontal} onChange={(e) => setViewingAngleHorizontal(e.target.value)} placeholder="Enter viewing angle" />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
+                            <Input value={viewingAngleVertical} onChange={(e) => setViewingAngleVertical(e.target.value)} placeholder="Enter viewing angle" />
+                        </div>
+                    </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -195,7 +216,12 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                        <div className="space-y-3">
+                    <div className="space-y-3">
+                        <div>
+                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
+                            <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
+                        </div>
+                        <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
                                 <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
                                 <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
@@ -204,10 +230,7 @@ function FiltersAccordion({
                                 <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
                                 <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
                             </div>
-                            <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
-                                <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
-                            </div>
+
                             <div>
                                 <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
@@ -255,7 +278,8 @@ function FiltersAccordion({
                                 <label className="text-sm font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
                                 <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
                             </div>
-                        </div>
+                        </RestrictedContentOverlay>
+                    </div>
                 </AccordionContent>
             </AccordionItem>
 
@@ -264,25 +288,30 @@ function FiltersAccordion({
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}</span>
                 </AccordionTrigger>
                 <AccordionContent className="space-y-3">
-                        <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
-                            <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
-                        </div>
+                    <div>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
+                        <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
+                    </div>
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="warranty" className="border-t pt-4 border-b-0">
+            <AccordionItem value="warranty" className="border-t pt-4 pb-10 border-b-0">
                 <AccordionTrigger className="w-full flex items-center justify-between font-medium">
                     <span className="font-open-sans font-bold text-base">{language === "en" ? "Warranty" : "Garantie"}</span>
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
+                    <div className={`${isAuthenticated ? "" : "mb-14"}`}>
+                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
+                        <Input value={supportDuringWarrantyEn} onChange={(e) => setSupportDuringWarrantyEn(e.target.value)} placeholder="Enter support during warranty" />
+                    </div>
+                    <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
                             <label className="text-sm font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
                             <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
                         </div>
+                    </RestrictedContentOverlay>
                 </AccordionContent>
             </AccordionItem>
-            </RestrictedContentOverlay>
 
         </Accordion>
     );
@@ -298,7 +327,7 @@ export default function ProductsPage() {
     const [hasMore, setHasMore] = useState(true);
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
-    
+
     // Filter states
     const [productType, setProductType] = useState("");
     const [design, setDesign] = useState("");
@@ -306,9 +335,12 @@ export default function ProductsPage() {
     const [application, setApplication] = useState("");
     const [pixelPitch, setPixelPitch] = useState("");
     const [ledTechnology, setLedTechnology] = useState("");
+    const [ledLifespan, setLedLifespan] = useState("");
     const [chipBonding, setChipBonding] = useState("");
     const [brightnessControl, setBrightnessControl] = useState("");
     const [contrastRatio, setContrastRatio] = useState("");
+    const [viewingAngleHorizontal, setViewingAngleHorizontal] = useState("");
+    const [viewingAngleVertical, setViewingAngleVertical] = useState("");
     const [powerConsumptionMax, setPowerConsumptionMax] = useState("");
     const [powerConsumptionTypical, setPowerConsumptionTypical] = useState("");
     const [refreshRate, setRefreshRate] = useState("");
@@ -319,7 +351,7 @@ export default function ProductsPage() {
     const [receivingCard, setReceivingCard] = useState("");
     const [ipRating, setIpRating] = useState("");
     const [warrantyPeriod, setWarrantyPeriod] = useState("");
-
+    const [supportDuringWarrantyEn, setSupportDuringWarrantyEn] = useState("");
     // Accordion state - all sections open by default
     const [accordionValue, setAccordionValue] = useState([]);
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -356,9 +388,12 @@ export default function ProductsPage() {
         if (application) params.append("application", application);
         if (pixelPitch) params.append("pixelPitch", pixelPitch);
         if (ledTechnology) params.append("ledTechnology", ledTechnology);
+        if (ledLifespan) params.append("ledLifespan", ledLifespan);
         if (chipBonding) params.append("chipBonding", chipBonding);
         if (brightnessControl) params.append("brightnessControl", brightnessControl);
         if (contrastRatio) params.append("contrastRatio", contrastRatio);
+        if (viewingAngleHorizontal) params.append("viewingAngleHorizontal", viewingAngleHorizontal);
+        if (viewingAngleVertical) params.append("viewingAngleVertical", viewingAngleVertical);
         if (powerConsumptionMax) params.append("powerConsumptionMax", powerConsumptionMax);
         if (powerConsumptionTypical) params.append("powerConsumptionTypical", powerConsumptionTypical);
         if (refreshRate) params.append("refreshRate", refreshRate);
@@ -369,8 +404,9 @@ export default function ProductsPage() {
         if (receivingCard) params.append("receivingCard", receivingCard);
         if (ipRating) params.append("ipRating", ipRating);
         if (warrantyPeriod) params.append("warrantyPeriod", warrantyPeriod);
+        if (supportDuringWarrantyEn !== "") params.append("supportDuringWarrantyEn", supportDuringWarrantyEn);
         return params.toString();
-    }, [page, search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, chipBonding, brightnessControl, contrastRatio, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod]);
+    }, [page, search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, ledLifespan, chipBonding, brightnessControl, contrastRatio, viewingAngleHorizontal, viewingAngleVertical, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod, supportDuringWarrantyEn]);
 
     // Fetch products
     const fetchProducts = useCallback(async (pageNum, reset = false) => {
@@ -383,12 +419,12 @@ export default function ProductsPage() {
             if (!response.success) {
                 throw new Error(response.message || "Failed to fetch products");
             }
-                if (reset) {
-                    setProducts(response.data);
-                } else {
-                    setProducts((prev) => [...prev, ...response.data]);
-                }
-                setHasMore(response.data.length === 10);
+            if (reset) {
+                setProducts(response.data);
+            } else {
+                setProducts((prev) => [...prev, ...response.data]);
+            }
+            setHasMore(response.data.length === 10);
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -402,7 +438,7 @@ export default function ProductsPage() {
         setProducts([]);
         fetchProducts(1, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, chipBonding, brightnessControl, contrastRatio, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod]);
+    }, [search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, ledLifespan, chipBonding, brightnessControl, contrastRatio, viewingAngleHorizontal, viewingAngleVertical, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod, supportDuringWarrantyEn]);
 
     // Infinite scroll
     const loadMore = useCallback(() => {
@@ -434,9 +470,12 @@ export default function ProductsPage() {
         setApplication("");
         setPixelPitch("");
         setLedTechnology("");
+        setLedLifespan("");
         setChipBonding("");
         setBrightnessControl("");
         setContrastRatio("");
+        setViewingAngleHorizontal("");
+        setViewingAngleVertical("");
         setPowerConsumptionMax("");
         setPowerConsumptionTypical("");
         setRefreshRate("");
@@ -447,14 +486,15 @@ export default function ProductsPage() {
         setReceivingCard("");
         setIpRating("");
         setWarrantyPeriod("");
+        setSupportDuringWarrantyEn("");
     };
 
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title={language === "en" ? "Products" : "Produkte"} 
-            breadcrumbs={[
-                { label: language === "en" ? "Home" : "Startseite", href: "/" }, 
-                { label: language === "en" ? "Products" : "Produkte" }
+            <BreadCrumb title={language === "en" ? "Products" : "Produkte"}
+                breadcrumbs={[
+                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
+                    { label: language === "en" ? "Products" : "Produkte" }
                 ]} />
             <main className="flex-1 container mx-auto px-4 py-8">
                 {/* Search Bar */}
@@ -476,7 +516,7 @@ export default function ProductsPage() {
                         variant={selectedCategory === "" ? "default" : "outline"}
                         className={`${selectedCategory === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         onClick={() => setSelectedCategory("")}
-                        
+
                     >
                         {language === "en" ? "All" : "Alle"}
                     </Button>
@@ -528,9 +568,12 @@ export default function ProductsPage() {
                                 application={application} setApplication={setApplication}
                                 pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
+                                ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
                                 brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
+                                viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
+                                viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
                                 powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
                                 powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
@@ -541,6 +584,7 @@ export default function ProductsPage() {
                                 receivingCard={receivingCard} setReceivingCard={setReceivingCard}
                                 ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                                supportDuringWarrantyEn={supportDuringWarrantyEn} setSupportDuringWarrantyEn={setSupportDuringWarrantyEn}
                                 isAuthenticated={isAuthenticated}
                             />
                         </div>
@@ -555,12 +599,12 @@ export default function ProductsPage() {
                 {/* Main Content: Filters + Products */}
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Sidebar - Filters (desktop only) */}
-                    <div className="hidden lg:flex w-76 shrink-0 flex-col">
+                    <div className="hidden lg:flex w-76 shrink-0 flex-col sticky top-20 h-full">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold flex items-center gap-2">
                                 <FilterIcon className="w-4 h-4" />
                                 {language === "en" ? "Filters" : "Filter"}
-                                </h3>
+                            </h3>
                             <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
                                 {language === "en" ? "Clear All" : "Alle löschen"}
                             </Button>
@@ -575,9 +619,12 @@ export default function ProductsPage() {
                                 application={application} setApplication={setApplication}
                                 pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
+                                ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
                                 brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
+                                viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
+                                viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
                                 powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
                                 powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
@@ -588,6 +635,7 @@ export default function ProductsPage() {
                                 receivingCard={receivingCard} setReceivingCard={setReceivingCard}
                                 ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
+                                supportDuringWarrantyEn={supportDuringWarrantyEn} setSupportDuringWarrantyEn={setSupportDuringWarrantyEn}
                                 isAuthenticated={isAuthenticated}
                             />
                         </div>
@@ -613,13 +661,13 @@ export default function ProductsPage() {
                                             className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer block"
                                         >
                                             {/* Product Image with Certificates */}
-                                            <div className="relative aspect-8/7 bg-gray-100">
+                                            <div className="relative aspect-square bg-gray-100">
                                                 {product.images.length > 0 ? (
                                                     <Image
                                                         src={product.images[0]}
                                                         alt={product.productName}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-contain"
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -648,11 +696,11 @@ export default function ProductsPage() {
                                             </div>
                                             {/* Product Info */}
                                             <div className="p-4">
-                                                <h3 className="font-semibold text-lg mb-1">
+                                                <h3 className="font-bold font-open-sans text-lg mb-1">
                                                     {product.productName}
                                                 </h3>
-                                                <p className="text-sm text-gray-600 mb-1">{product.productNumber}</p>
-                                                <p className="text-sm bg-secondary text-white rounded-md px-2 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
+                                                <p className="text-md mb-1">{product.productNumber}</p>
+                                                <p className="text-md bg-secondary text-white rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
                                             </div>
                                         </Link>
                                     );

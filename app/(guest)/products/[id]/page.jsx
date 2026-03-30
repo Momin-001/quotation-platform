@@ -190,13 +190,13 @@ export default function ProductDetailPage() {
                         {/* Left Side - Image Gallery */}
                         <div className="space-y-4">
                             {/* Main Selected Image */}
-                            <div className="relative aspect-square overflow-hidden rounded-lg">
+                            <div className="relative aspect-video overflow-hidden rounded-lg">
                                 {selectedImage ? (
                                     <Image
                                         src={selectedImage}
                                         alt={product.productName}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
@@ -218,7 +218,7 @@ export default function ProductDetailPage() {
                                         {product.images.map((image, index) => (
                                             <CarouselItem 
                                                 key={index} 
-                                                className=" py-2 basis-1/3 md:basis-1/4"
+                                                className="py-2 basis-1/3 md:basis-1/4"
                                             >
                                                 <button
                                                     onClick={() => setSelectedImageIndex(index)}

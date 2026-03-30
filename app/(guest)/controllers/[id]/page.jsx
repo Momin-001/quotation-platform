@@ -150,7 +150,7 @@ export default function ControllerDetailPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                         {/* Left - Image Gallery */}
                         <div className="space-y-4">
-                            <div className="relative aspect-square overflow-hidden rounded-lg">
+                            <div className="relative aspect-video overflow-hidden rounded-lg">
                                 {selectedImage ? (
                                     <Image
                                         src={selectedImage}
@@ -180,7 +180,7 @@ export default function ControllerDetailPage() {
                                                         src={image}
                                                         alt={`${title} ${index + 1}`}
                                                         fill
-                                                        className="object-contain"
+                                                        className="object-cover"
                                                     />
                                                 </button>
                                             </CarouselItem>

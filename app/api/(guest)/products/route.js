@@ -18,9 +18,12 @@ export async function GET(req) {
         const application = searchParams.get("application") || "";
         const pixelPitch = searchParams.get("pixelPitch") || "";
         const ledTechnology = searchParams.get("ledTechnology") || "";
+        const ledLifespan = searchParams.get("ledLifespan") || "";
         const chipBonding = searchParams.get("chipBonding") || "";
         const brightnessControl = searchParams.get("brightnessControl") || "";
         const contrastRatio = searchParams.get("contrastRatio") || "";
+        const viewingAngleHorizontal = searchParams.get("viewingAngleHorizontal") || "";
+        const viewingAngleVertical = searchParams.get("viewingAngleVertical") || "";
         const powerConsumptionMax = searchParams.get("powerConsumptionMax") || "";
         const powerConsumptionTypical = searchParams.get("powerConsumptionTypical") || "";
         const refreshRate = searchParams.get("refreshRate") || "";
@@ -31,7 +34,7 @@ export async function GET(req) {
         const receivingCard = searchParams.get("receivingCard") || "";
         const ipRating = searchParams.get("ipRating") || "";
         const warrantyPeriod = searchParams.get("warrantyPeriod") || "";
-
+        const supportDuringWarrantyEn = searchParams.get("supportDuringWarrantyEn") || "";
         const offset = (page - 1) * limit;
 
         // Build where clause
@@ -88,6 +91,14 @@ export async function GET(req) {
             conditions.push(eq(products.ledTechnology, ledTechnology));
         }
 
+        // LED Lifespan filter (integer match)
+        if (ledLifespan) {
+            const lifespanNum = parseInt(ledLifespan);
+            if (!isNaN(lifespanNum)) {
+                conditions.push(eq(products.ledLifespan, lifespanNum));
+            }
+        }
+
         // Chip Bonding filter (ENUM)
         if (chipBonding) {
             conditions.push(eq(products.chipBonding, chipBonding));
@@ -104,6 +115,16 @@ export async function GET(req) {
             if (!isNaN(ratioNum)) {
                 conditions.push(eq(products.contrastRatioNumerator, ratioNum));
             }
+        }
+
+        // Viewing Angle Horizontal filter (text search)
+        if (viewingAngleHorizontal) {
+            conditions.push(ilike(products.viewingAngleHorizontal, `%${viewingAngleHorizontal}%`));
+        }
+
+        // Viewing Angle Vertical filter (text search)
+        if (viewingAngleVertical) {
+            conditions.push(ilike(products.viewingAngleVertical, `%${viewingAngleVertical}%`));
         }
 
         // Power Consumption Max filter (integer match)
@@ -176,6 +197,11 @@ export async function GET(req) {
             if (!isNaN(warrantyNum)) {
                 conditions.push(eq(products.warrantyPeriod, warrantyNum));
             }
+        }
+
+        // Support During Warranty filter (ENUM: yes/no)
+        if (supportDuringWarrantyEn !== "") {
+            conditions.push(ilike(products.supportDuringWarrantyEn, `%${supportDuringWarrantyEn}%`));
         }
 
         // Build final where clause

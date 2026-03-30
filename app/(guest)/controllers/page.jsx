@@ -163,13 +163,12 @@ export default function ControllersPage() {
                                             )}
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="font-semibold text-lg mb-1">
-                                                {controller.interfaceName || "N/A"}
-                                            </h3>
-                                            <p className="text-sm bg-secondary text-white rounded-md px-2 py-1 w-fit">
-                                                {controller.brandDisplay || "N/A"}
-                                            </p>
-                                        </div>
+                                                <h3 className="font-bold font-open-sans text-lg mb-1">
+                                                    {controller.interfaceName}
+                                                </h3>
+                                                <p className="text-xl mb-1">{controller.controllerNumber}</p>
+                                                <p className="text-lg bg-secondary text-white rounded-md px-4 py-1 w-fit">{controller.brandDisplay || "N/A"}</p>
+                                            </div>
                                     </Link>
                                 );
                             })}
