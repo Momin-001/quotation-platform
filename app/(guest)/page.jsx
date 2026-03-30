@@ -1,6 +1,7 @@
 import HeroSection from "@/components/guest/HeroSection";
 import ValueBlocksSection from "@/components/guest/ValueBlocksSection";
 import HowItWorksSection from "@/components/guest/HowItWorksSection";
+import LatestProjectsSection from "@/components/guest/LatestProjectsSection";
 import FAQSection from "@/components/guest/FAQSection";
 import PartnersSection from "@/components/guest/PartnersSection";
 import MarketingPartnersSection from "@/components/guest/MarketingPartnersSection";
@@ -171,6 +172,7 @@ async function getHomeData() {
         {marketingPartners.length > 0 && (
           <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} />
         )}
+        <LatestProjectsSection />
         <BlogsSection homepageData={homepageData} blogs={blogs} />
         <FAQSection homepageData={homepageData} faqsData={faqs} />
       </div>

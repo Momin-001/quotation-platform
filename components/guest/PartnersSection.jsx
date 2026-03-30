@@ -53,7 +53,7 @@ export default function PartnersSection({ homepageData, partners = [] }) {
                             {partners.map((partner) => (
                                 <div
                                     key={partner.id}
-                                    className="flex-shrink-0 bg-gray-100 rounded-lg py-6 px-14 hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4"
+                                    className="shrink-0 bg-gray-100 rounded-lg py-6 px-14 hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4"
                                     onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
                                     onMouseEnter={() => setPauseOnHover(true)}
                                 >

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
-import { Search, ChevronDown, ChevronUp, FilterIcon, X, Lock } from "lucide-react";
+import { Suspense, useEffect, useState, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { Search, FilterIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -317,7 +318,9 @@ function FiltersAccordion({
     );
 }
 
-export default function ProductsPage() {
+function ProductsPageContent() {
+    const searchParams = useSearchParams();
+    const urlCategoryAppliedRef = useRef(false);
     const [products, setProducts] = useState([]);
     const { language } = useLanguage();
     const { isAuthenticated } = useAuth();
@@ -326,7 +329,9 @@ export default function ProductsPage() {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [search, setSearch] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
+    // Initialize directly from URL to avoid the "All" fetch + second filtered fetch.
+    const initialUrlCategoryId = searchParams.get("categoryId") || "";
+    const [selectedCategory, setSelectedCategory] = useState(initialUrlCategoryId);
 
     // Filter states
     const [productType, setProductType] = useState("");
@@ -374,6 +379,33 @@ export default function ProductsPage() {
         };
         fetchCategories();
     }, []);
+
+    // Apply `categoryId` from URL query params to the existing category filter UI/API.
+    // This is needed for the homepage "preset filter" CTA.
+    useEffect(() => {
+        if (categories.length === 0) return;
+        if (urlCategoryAppliedRef.current) return;
+
+        const urlCategoryId = searchParams.get("categoryId") || "";
+
+        // If URL doesn't provide categoryId, show "All" (empty selection).
+        if (!urlCategoryId) {
+            if (selectedCategory !== "") setSelectedCategory("");
+            urlCategoryAppliedRef.current = true;
+            return;
+        }
+
+        // Only apply when the category exists in our loaded list.
+        const exists = categories.some((c) => c.id === urlCategoryId);
+        if (exists) {
+            if (selectedCategory !== urlCategoryId) setSelectedCategory(urlCategoryId);
+            urlCategoryAppliedRef.current = true;
+        } else {
+            // Unknown categoryId -> fallback to "All"
+            if (selectedCategory !== "") setSelectedCategory("");
+            urlCategoryAppliedRef.current = true;
+        }
+    }, [searchParams, categories]);
 
     // Build query params
     const buildQueryParams = useCallback((pageNum = page) => {
@@ -723,6 +755,20 @@ export default function ProductsPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function ProductsPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                    <Spinner className="h-8 w-8" />
+                </div>
+            }
+        >
+            <ProductsPageContent />
+        </Suspense>
     );
 }
 
