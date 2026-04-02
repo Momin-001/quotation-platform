@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { MoveRightIcon } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HowItWorksSection({ homepageData }) {
@@ -53,22 +53,22 @@ export default function HowItWorksSection({ homepageData }) {
             <div className="container mx-auto px-4">
                 {/* Header Section */}
                 <div className="text-center mb-12 lg:mb-16">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-archivo">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 font-archivo">
                         {getText("howItWorksTitle")}
                     </h2>
-                    <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto font-open-sans">
+                    <p className="text-lg md:text-xl text-primary-foreground/90 max-w-3xl mx-auto font-open-sans">
                         {getText("howItWorksSubtitle")}
                     </p>
                 </div>
 
                 {/* Steps Grid - 3 columns layout */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     {/* Step Boxes 1-5 */}
                     {steps.map((step, index) => {
                         return (
                             <div
                                 key={index}
-                                className="bg-white rounded-lg p-6 lg:px-10 pt-30 pb-22 relative border border-gray-200 shadow-sm"
+                                className="bg-primary-foreground rounded-lg p-6 lg:px-10 pt-30 pb-14 relative border border-gray-200 shadow-sm"
                             >
                                 {/* Large Number - Top Left */}
                                 <div className="absolute top-10 left-8 text-8xl lg:text-9xl font-bold text-[#00A8CC33] leading-none font-open-sans">
@@ -76,18 +76,18 @@ export default function HowItWorksSection({ homepageData }) {
                                 </div>
 
                                 {/* Title */}
-                                <h3 className="text-xl font-bold text-secondary mb-4 font-archivo relative z-10 pt-14">
+                                <h3 className="text-xl font-bold font-archivo text-secondary mb-4 relative z-10 pt-14">
                                     {step.title}
                                 </h3>
 
                                 {/* Bullet Points */}
-                                <ul className="space-y-2 relative z-10 w-xs">
-                                    <li className="font-archivo text-xl flex items-start">
-                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRightIcon className="h-4 w-4" /></span>
+                                <ul className="space-y-2 relative z-10 w-xs font-archivo">
+                                    <li className="text-lg flex items-start">
+                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRight className="h-5 w-6" strokeWidth={1.5} /></span>
                                         <span>{step.description1}</span>
                                     </li>
-                                    <li className="font-archivo text-xl flex items-start">
-                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRightIcon className="h-4 w-4" /></span>
+                                    <li className="text-lg flex items-start">
+                                        <span className="mr-2 text-primary mt-1 shrink-0"><MoveRight className="h-5 w-6" strokeWidth={1.5} /></span>
                                         <span>{step.description2}</span>
                                     </li>
                                 </ul>

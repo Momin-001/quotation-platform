@@ -64,10 +64,10 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     {/* Left Section - Heading */}
                     <div className="space-y-4">
-                        <p className="text-md font-medium text-blue-600 uppercase tracking-wide font-open-sans">
+                        <p className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-archivo">
                             {getText("faqTitle")}
                         </p>
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 font-archivo leading-tight">
+                        <h2 className="text-lg md:text-xl max-w-3xl mx-auto font-open-sans">
                             {getText("faqSubtitle")}
                         </h2>
                     </div>
@@ -97,21 +97,21 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                             <AccordionItem
                                                 key={index}
                                                 value={index.toString()}
-                                                className={`bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-300 ${
+                                                className={`bg-white rounded-sm border border-gray-300 overflow-hidden transition-all duration-300 ${
                                                     isOpen ? "shadow-lg border-primary" : "shadow-sm"
                                                 }`}
                                             >
                                                 <AccordionTrigger
                                                     className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
                                                 >
-                                                    <h3 className="text-lg font-semibold text-gray-900 font-archivo pr-4">
+                                                    <h3 className={`text-lg font-open-sans pr-4 ${isOpen ? "font-semibold" : ""}`}>
                                                         {faq.title}
                                                     </h3>
                                                     <div
-                                                        className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
+                                                        className={`shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
                                                             isOpen
-                                                                ? "bg-primary text-white"
-                                                                : "bg-gray-200 text-gray-600"
+                                                                ? "bg-primary text-primary-foreground"
+                                                                : "bg-gray-300 text-primary-foreground"
                                                         }`}
                                                     >
                                                         {isOpen ? (

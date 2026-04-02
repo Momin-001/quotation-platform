@@ -40,7 +40,7 @@ export default function Navbar({ navbarData }) {
                 <Link href="/" className="shrink-0">
                     <Image className="" src="/logo.png" alt="Logo" width={40} height={40} />
                 </Link>
-                <div className="hidden lg:flex px-8 items-center gap-8 text-sm font-bold text-[#0F2E4A]">
+                <div className="hidden lg:flex px-8 items-center gap-8 text-sm font-medium text-gray-800">
                     <Link href="/" className="hover:text-primary transition-colors">
                         {getNavText(1)}
                     </Link>
@@ -122,19 +122,19 @@ export default function Navbar({ navbarData }) {
                         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="icon" className="border-gray-300">
-                                    <Menu className="h-5 w-5 text-[#0F2E4A]" />
+                                    <Menu className="h-5 w-5 text-gray-800" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="right" className="w-72 flex flex-col p-0">
                                 <SheetHeader className="shrink-0 p-4 border-b">
                                     <SheetTitle className="flex items-center gap-2">
                                         <Image src="/logo.png" alt="Logo" width={32} height={32} />
-                                        <span className="font-archivo text-base text-[#0F2E4A]">Menu</span>
+                                        <span className="font-archivo text-base text-gray-800">Menu</span>
                                     </SheetTitle>
                                 </SheetHeader>
 
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                    <div className="space-y-2 text-sm font-bold text-[#0F2E4A]">
+                                    <div className="space-y-2 text-sm font-medium text-gray-800">
                                         <Link href="/" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
                                             {getNavText(1)}
                                         </Link>

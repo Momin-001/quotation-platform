@@ -33,10 +33,10 @@ export default function MarketingPartnersSection({ homepageData, partners = [] }
         <section className="w-full bg-white py-14 lg:py-16">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12 lg:mb-16">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 font-archivo">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-archivo">
                         {getText("marketingPartnersTitle")}
                     </h2>
-                    <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-open-sans">
+                    <p className="text-lg md:text-xl max-w-3xl mx-auto font-open-sans">
                         {getText("marketingPartnersSubtitle")}
                     </p>
                 </div>

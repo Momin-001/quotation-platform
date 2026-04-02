@@ -45,7 +45,7 @@ export default function ValueBlocksSection({ homepageData }) {
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-archivo">
                         {getText("valueBlocksTitle")}
                     </h2>
-                    <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto font-open-sans">
+                    <p className="text-lg md:text-xl max-w-3xl mx-auto font-open-sans">
                         {getText("valueBlocksSubtitle")}
                     </p>
                 </div>
@@ -61,7 +61,7 @@ export default function ValueBlocksSection({ homepageData }) {
                             >
                                 {/* Icon */}
                                 <div className="text-secondary mb-2">
-                                    <IconComponent className="h-10 w-10" strokeWidth={1.5} />
+                                    <IconComponent className="h-10 w-10" strokeWidth={1} />
                                 </div>
 
                                 {/* Title */}
@@ -70,10 +70,10 @@ export default function ValueBlocksSection({ homepageData }) {
                                 </h3>
 
                                 {/* Separator Line */}
-                                <div className="w-10 h-0.5 bg-primary"></div>
+                                <div className="w-8 rounded-full h-1 bg-[#4BA3FF]"></div>
 
                                 {/* Description */}
-                                <p className="text-gray-800 leading-relaxed font-open-sans flex-grow">
+                                <p className="text-[#2C2C2C] leading-relaxed font-open-sans grow">
                                     {block.description}
                                 </p>
                             </div>

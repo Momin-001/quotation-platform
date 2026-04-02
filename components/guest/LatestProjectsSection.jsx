@@ -10,6 +10,8 @@ import {
     Truck,
     ArrowRight,
     ArrowLeft,
+    MoveLeft,
+    MoveRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,11 +23,10 @@ import {
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 
 const COPY = {
     en: {
-        title: "Latest Projects",
+        title: "Pre-Selected Filters",
         description:
             "Explore our newest LED installations across indoor, outdoor, and mobile applications—precision-built displays engineered for lasting performance.",
         allProjects: "All Projects",
@@ -33,7 +34,7 @@ const COPY = {
         presetPrefix: "PRESET FILTER",
     },
     de: {
-        title: "Neueste Projekte",
+        title: "Vorausgewählte Filter",
         description:
             "Entdecken Sie unsere neuesten LED-Installationen für Innen-, Außen- und mobile Anwendungen—präzise gefertigte Displays für dauerhafte Leistung.",
         allProjects: "Alle Projekte",
@@ -74,14 +75,14 @@ function ProjectCard({ product, presetLabel }) {
             </div>
 
             <div className="relative z-10 flex flex-col h-full p-5 lg:p-6 pt-8">
-               
+
 
                 <div className="mt-auto space-y-3 text-white">
-                    
+
                     <span className="self-start bg-primary text-primary-foreground font-open-sans text-xs font-semibold tracking-wide px-3 py-1.5 rounded-sm">
                         {badge}
                     </span>
-                    
+
                     <h3 className="text-xl mt-6 font-bold font-open-sans leading-tight line-clamp-2">
                         {product.productName}
                     </h3>
@@ -105,7 +106,7 @@ function ProjectCard({ product, presetLabel }) {
                             asChild
                             size="lg"
                             variant="secondary"
-                            className="font-semibold font-archivo"
+                            className="font-archivo"
                         >
                             <Link href={href}>
                                 {presetLabel} →
@@ -198,7 +199,7 @@ export default function LatestProjectsSection() {
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-archivo mb-4">
                             {t.title}
                         </h2>
-                        <p className="text-sm md:text-md text-gray-600 max-w-3xl mx-auto font-open-sans">
+                        <p className="text-md md:text-lg max-w-3xl mx-auto font-open-sans">
                             {t.description}
                         </p>
                     </div>
@@ -210,7 +211,7 @@ export default function LatestProjectsSection() {
                             disabled={!canPrev}
                             onClick={() => api?.scrollPrev()}
                         >
-                            <ArrowLeft className="h-5 w-5" />
+                            <MoveLeft className="h-5 w-5" />
                         </Button>
                         <Button
                             type="button"
@@ -218,7 +219,7 @@ export default function LatestProjectsSection() {
                             disabled={!canNext}
                             onClick={() => api?.scrollNext()}
                         >
-                            <ArrowRight className="h-5 w-5" />
+                            <MoveRight className="h-5 w-5" />
                         </Button>
                     </div>
                 </div>
@@ -230,21 +231,26 @@ export default function LatestProjectsSection() {
                                 onClick={() => setSelectedCategoryId(null)}
                                 className={`w-full flex items-center gap-3 font-open-sans font-semibold px-3 py-3 rounded-lg text-left text-sm lg:text-base transition-colors ${isAll ? "text-primary" : ""}`}
                             >
-                                <Globe className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
+                                <div className={`bg-primary-foreground p-2 border ${isAll ? "border-primary" : "border-gray-400"} rounded-full`}>
+                                    <Globe className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
+                                </div>
                                 {t.allProjects}
                             </button>
                             {categories.map((cat) => {
                                 const Icon = categoryIconForName(cat.name);
                                 const active = selectedCategoryId === cat.id;
                                 return (
+
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => setSelectedCategoryId(cat.id)}
                                         className=
-                                            {`w-full flex items-center font-open-sans font-semibold gap-3 px-3 py-3 rounded-lg text-left text-sm lg:text-base transition-colors uppercase tracking-wide" ${active ? "text-primary" : ""}`}
+                                        {`w-full flex items-center font-open-sans font-semibold gap-3 px-3 py-3 rounded-lg text-left text-sm lg:text-base transition-colors uppercase tracking-wide" ${active ? "text-primary" : ""}`}
                                     >
-                                        <Icon className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
+                                        <div className={`bg-primary-foreground p-2 border ${active ? "border-primary" : "border-gray-400"} rounded-full`}>
+                                            <Icon className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
+                                        </div>
                                         {cat.name}
                                     </button>
                                 );
