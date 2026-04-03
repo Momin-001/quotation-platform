@@ -41,7 +41,7 @@ export default function Footer({ footerData }) {
                     {/* Brand & Description */}
                     <div className="space-y-4">
                         <Image src="/logo.png" alt="Logo" width={40} height={40} />
-                        <p className="text-sm text-gray-200 leading-relaxed max-w-64">
+                        <p className="text-lg font-normal leading-relaxed max-w-md">
                             {getText("description") || "PROLEDALL is a platform that allows you to get quotes for your LED products. We are a team of experts who are dedicated to providing the best possible service to our clients."}
                         </p>
                         <div className="flex items-center gap-4 pt-4">
@@ -54,10 +54,10 @@ export default function Footer({ footerData }) {
 
                     {/* Our Address */}
                     <div>
-                        <h3 className="font-bold text-lg mb-6">
+                        <h3 className="font-bold text-2xl mb-6">
                             {getText("ourAddressTitle") || "Our Address"}
                         </h3>
-                        <ul className="space-y-4 text-sm text-gray-200">
+                        <ul className="space-y-4 text-lg font-normal text-gray-200">
                             <li className="flex items-center gap-2">
                                 <span><Phone size={16} /></span> +49 000 000 0000
                             </li>
@@ -73,10 +73,10 @@ export default function Footer({ footerData }) {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="font-bold text-lg mb-6">
+                        <h3 className="font-bold text-2xl mb-6">
                             {getText("quickLinksTitle") || "Quick Links"}
                         </h3>
-                        <ul className="space-y-2 text-sm text-gray-200">
+                        <ul className="space-y-2 text-lg font-normal text-gray-200">
                             
                             {getQuickLinks().length > 0 ? (
                                 <>
@@ -100,12 +100,13 @@ export default function Footer({ footerData }) {
 
                     {/* Newsletter */}
                     <div>
-                        <h3 className="font-bold text-lg mb-6">
+                        <h3 className="font-bold text-2xl mb-6">
                             {getText("newsletterTitle") || "Newsletter"}
                         </h3>
-                        <div className="flex flex-col gap-4 font-archivo">
+                        <div className="flex flex-col gap-4">
                             <Input
                                 placeholder={getText("emailPlaceholder") || "Your Email Address"}
+                                className="h-16"
                             />
                             <Button variant="secondary" size="lg" className="w-fit">
                                 {getText("subscribeButton") || "Subscribe"}
@@ -116,7 +117,7 @@ export default function Footer({ footerData }) {
 
                 <div className="border-t border-gray-700 pt-8 flex items-center justify-between">
                     <p></p>
-                    <p className="text-sm text-gray-200">
+                    <p className="text-lg font-normal font-open-sans">
                         {getText("copyrightText") || "© Copyright Quotation Platform. All Right Reserved"}
                     </p>
                     <div 

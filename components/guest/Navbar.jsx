@@ -40,7 +40,7 @@ export default function Navbar({ navbarData }) {
                 <Link href="/" className="shrink-0">
                     <Image className="" src="/logo.png" alt="Logo" width={40} height={40} />
                 </Link>
-                <div className="hidden lg:flex px-8 items-center gap-8 text-sm font-medium text-gray-800">
+                <div className="hidden lg:flex px-8 items-center gap-8 text-lg font-medium text-gray-800">
                     <Link href="/" className="hover:text-primary transition-colors">
                         {getNavText(1)}
                     </Link>
@@ -70,12 +70,12 @@ export default function Navbar({ navbarData }) {
                         ) : !isAuthenticated ? (
                             <>
                                 <Link href="/register">
-                                    <Button className="bg-primary hover:bg-primary/90 text-white px-6">
+                                    <Button variant="default">
                                         REGISTER
                                     </Button>
                                 </Link>
                                 <Link href="/login">
-                                    <Button variant="outline" className="text-primary border-primary hover:bg-primary/5 px-6">
+                                    <Button variant="outline" size="default" className="text-primary border-primary hover:bg-primary/5">
                                         LOGIN
                                     </Button>
                                 </Link>

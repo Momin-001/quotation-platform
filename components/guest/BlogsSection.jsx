@@ -33,12 +33,12 @@ function BlogCard({ blog }) {
                         <span className="text-gray-400">No image</span>
                     </div>
                 )}
-                <div className="absolute top-4 left-4 font-archivo bg-secondary text-primary-foreground rounded-sm px-2.5 py-1.5 text-center leading-tight min-w-[56px]">
-                    <div className="text-[10px] font-medium tracking-wider">{month}</div>
-                    <div className="text-2xl font-bold -mt-0.5">{day}</div>
+                <div className="absolute top-4 left-4 font-archivo bg-secondary text-primary-foreground rounded-sm px-4 py-1.5 text-center leading-tight min-w-[56px]">
+                    <div className="text-sm lg:text-md font-medium tracking-wider">{month}</div>
+                    <div className="text-3xl font-bold -mt-0.5">{day}</div>
                 </div>
             </div>
-            <h3 className="mt-3 text-md md:text-lg font-bold font-archivo leading-snug group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="mt-3 text-xl lg:text-2xl font-bold font-archivo leading-snug group-hover:text-primary transition-colors line-clamp-2">
                 {blog.title}
             </h3>
         </Link>
@@ -59,10 +59,10 @@ export default function BlogsSection({ homepageData, blogs }) {
         <section className="w-full bg-primary-foreground py-16 lg:py-24">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 font-archivo">
+                    <h2 className="text-3xl md:text-4xl lg:text-[55px] text-black font-bold mb-3 font-archivo">
                         {getText("blogsSectionTitle") || "Blogs & Insights"}
                     </h2>
-                    <p className="text-md md:text-lg max-w-3xl mx-auto font-open-sans">
+                    <p className="text-md md:text-lg max-w-3xl mx-auto font-normal font-open-sans">
                         {getText("blogsSectionSubtitle") || "Expert Knowledge to Help You Make Informed Decisions"}
                     </p>
                 </div>
@@ -79,14 +79,14 @@ export default function BlogsSection({ homepageData, blogs }) {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="-left-2 md:-left-16 rounded-full h-12 w-12 border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
-                        <CarouselNext className="-right-2 md:-right-16 rounded-full h-12 w-12 border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                        <CarouselPrevious className="-left-2 md:-left-22 rounded-full p-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
+                        <CarouselNext className="-right-2 md:-right-22 rounded-full p-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground" />
                     </Carousel>
                 </div>
 
                 <div className="text-center mt-10">
                     <Link href="/blogs">
-                        <Button size="lg" className="font-archivo text-xs">
+                        <Button variant="default" size="lg">
                             {language === "en" ? "VIEW ALL" : "ALLE ANSEHEN"} <MoveRight className="h-4 w-4" />
                         </Button>
                     </Link>

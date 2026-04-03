@@ -16,93 +16,76 @@ export default function HeroSection({ homepageData }) {
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 
-    return (
-        <section className="relative w-full flex items-center justify-center max-w-[1500px] mx-auto">
-            <div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                    {/* Left Section - Content */}
-                    <div className="space-y-6 z-10 p-10">
-                        {/* Small Label */}
-                        <div>
-                            <p className="text-md font-semibold text-[#1A73E8] tracking-wide font-open-sans">
-                                {getText("heroSmallLabel")}
-                            </p>
+return (
+    <section className="relative w-full overflow-hidden">
+        <div className="flex flex-col lg:flex-row min-h-[700px] lg:min-h-[850px]">
 
-                            {/* Main Title */}
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-archivo leading-tight">
-                                {getText("heroTitle")}
-                            </h1>
-                        </div>
-
-                        <div className="space-y-2">
-                            {/* Description */}
-                            <p className="text-[#6F7A8A] font-normal font-open-sans">
-                                {getText("heroDescription")}
-                            </p>
-
-                            {/* Short Description */}
-                            <p className="text-[#6F7A8A] font-bold font-open-sans">
-                                {getText("heroShortDescription")}
-                            </p>
-                        </div>
-
-
-                        {/* Search Bar */}
-                        {/* <div className="relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                            <Input
-                                type="text"
-                                placeholder={getText("heroInputPlaceholder")}
-                                className="pl-12 pr-4 py-6 text-base border-2 border-gray-300 rounded-lg focus:border-primary font-open-sans"
-                            />
-                        </div> */}
-
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <Button size="lg">
-                                {getText("heroPrimaryButton")}
-                            </Button>
-                            <Button size='lg' variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
-                                {getText("heroSecondaryButton")}
-                            </Button>
-                        </div>
+            {/* Left Section - content pushed from center leftward */}
+            <div className="flex-1 flex items-center justify-end">
+                <div className="w-full lg:max-w-[750px] space-y-6 px-8 lg:pr-16 lg:pl-8 py-16">
+                    {/* Small Label */}
+                    <div>
+                        <p className="text-lg font-medium font-open-sans text-[#1A73E8] tracking-wide">
+                            {getText("heroSmallLabel")}
+                        </p>
+                        <h1 className="text-4xl md:text-5xl lg:text-[58px] font-bold font-archivo leading-tight">
+                            {getText("heroTitle")}
+                        </h1>
                     </div>
 
-                    {/* Right Section - Image with Overlays */}
-                    <div className="relative h-[700px] overflow-hidden">
-                        <Image
-                            src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
-                            alt="LED Display"
-                            fill
-                            className="object-cover"
-                            priority
-                        />
+                    <div className="space-y-2">
+                        <p className="text-[#6F7A8A] font-normal text-lg font-open-sans">
+                            {getText("heroDescription")}
+                        </p>
+                        <p className="text-[#6F7A8A] text-lg font-bold font-open-sans">
+                            {getText("heroShortDescription")}
+                        </p>
+                    </div>
 
-
-                        {/* Bottom Actions */}
-                        <div className="absolute bottom-0 left-0 w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 p-4 sm:p-0 z-10">
-
-                            {/* Hotline CTA */}
-                            <div className="bg-secondary rounded-tr-xl text-primary-foreground px-6 py-7 flex items-center gap-3 shadow-lg max-w-1/2">
-                                <div className="bg-[#018C85] rounded-full p-4">
-                                    <PhoneCall className="h-5 w-5 shrink-0" />
-                                </div>
-                                <p className="text-sm font-bold font-open-sans">
-                                    {getText("heroHotlineCta")}
-                                </p>
-                            </div>
-
-                            {/* Request for Offer Button */}
-                            <Button variant="secondary" className="sm:mr-16 sm:mb-6 font-semibold font-open-sans px-4! rounded-full">
-                                <Pencil className="h-5 w-5 shrink-0" />
-                                {getText("heroRequestButton")}
-                            </Button>
-
-                        </div>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button size="lg">
+                            {getText("heroPrimaryButton")}
+                        </Button>
+                        <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
+                            {getText("heroSecondaryButton")}
+                        </Button>
                     </div>
                 </div>
             </div>
-        </section>
-    );
+
+            {/* Right Section - flush to right edge, no margin/padding on right */}
+            <div className="relative h-[700px] lg:h-auto w-full lg:w-[50%] shrink-0">
+                <Image
+                    src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
+                    alt="LED Display"
+                    fill
+                    className="object-cover"
+                    priority
+                />
+
+                {/* Bottom Actions */}
+                <div className="absolute bottom-0 left-0 w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 p-4 sm:p-0 z-10">
+                    {/* Hotline CTA */}
+                    <div className="bg-secondary rounded-tr-xl text-primary-foreground px-6 py-7 flex items-center gap-3 shadow-lg max-w-[450px]">
+                        <div className="bg-[#018C85] rounded-full p-5">
+                            <PhoneCall className="h-5 w-5 shrink-0" />
+                        </div>
+                        <p className="text-2xl font-bold font-open-sans">
+                            {getText("heroHotlineCta")}
+                        </p>
+                    </div>
+
+                    {/* Request for Offer Button */}
+                    <Button variant="secondary" className="sm:mr-16 sm:mb-6 text-xl font-bold font-open-sans px-4! rounded-full">
+                        <Pencil className="h-6 w-6 shrink-0" />
+                        {getText("heroRequestButton")}
+                    </Button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+);
 }
 

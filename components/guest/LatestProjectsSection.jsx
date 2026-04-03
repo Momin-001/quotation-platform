@@ -8,8 +8,6 @@ import {
     Monitor,
     PanelTop,
     Truck,
-    ArrowRight,
-    ArrowLeft,
     MoveLeft,
     MoveRight,
 } from "lucide-react";
@@ -58,7 +56,7 @@ function ProjectCard({ product, presetLabel }) {
     const badge = (product.areaOfUseName || "").toUpperCase();
 
     return (
-        <div className="relative h-full min-h-[500px] lg:min-h-[560px] rounded-xl overflow-hidden shadow-xl flex flex-col">
+        <div className="relative h-full min-h-[600px] lg:min-h-[740px] rounded-xl overflow-hidden shadow-xl flex flex-col">
             <div className="absolute inset-0 z-0">
                 {product.imageUrl ? (
                     <Image
@@ -74,25 +72,23 @@ function ProjectCard({ product, presetLabel }) {
                 <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/55 to-black/20" />
             </div>
 
-            <div className="relative z-10 flex flex-col h-full p-5 lg:p-6 pt-8">
-
-
+            <div className="relative z-10 flex flex-col h-full p-8 lg:p-10 pt-8">
                 <div className="mt-auto space-y-3 text-white">
 
-                    <span className="self-start bg-primary text-primary-foreground font-open-sans text-xs font-semibold tracking-wide px-3 py-1.5 rounded-sm">
+                    <span className="self-start bg-primary text-primary-foreground font-open-sans text-lg font-semibold tracking-wide px-5 py-1.5 rounded-sm">
                         {badge}
                     </span>
 
-                    <h3 className="text-xl mt-6 font-bold font-open-sans leading-tight line-clamp-2">
+                    <h3 className="text-2xl mt-6 font-bold font-open-sans leading-tight line-clamp-2">
                         {product.productName}
                     </h3>
                     {product.productDescription ? (
-                        <p className="text-xs text-white/80 font-open-sans line-clamp-3 leading-relaxed">
+                        <p className="text-lg text-white/80 font-normal font-open-sans line-clamp-3 leading-relaxed">
                             {product.productDescription}
                         </p>
                     ) : null}
                     {product.features?.length > 0 ? (
-                        <ul className="text-xs text-white/80 font-open-sans space-y-1.5 list-disc pl-4 marker:text-primary">
+                        <ul className="text-lg text-white/80 font-normal font-open-sans space-y-1.5 list-disc pl-4 marker:text-primary">
                             {product.features.map((f, i) => (
                                 <li key={i} className="leading-snug">
                                     {f}
@@ -196,10 +192,10 @@ export default function LatestProjectsSection() {
             <div className="container mx-auto px-4">
                 <div className="relative mb-10">
                     <div className="text-center">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-archivo mb-4">
+                        <h2 className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold font-archivo mb-4">
                             {t.title}
                         </h2>
-                        <p className="text-md md:text-lg max-w-3xl mx-auto font-open-sans">
+                        <p className="text-md md:text-lg mx-auto max-w-6xl font-normal font-open-sans">
                             {t.description}
                         </p>
                     </div>
@@ -225,11 +221,11 @@ export default function LatestProjectsSection() {
                 </div>
                 <div className="flex flex-col lg:flex-row gap-12 lg:gap-14 lg:items-start">
                     <aside className="shrink-0 lg:w-[260px] xl:w-[280px]">
-                        <nav className="space-y-1 font-open-sans">
+                        <nav className="space-y-1 font-open-sans font-semibold  text-md lg:text-lg">
                             <button
                                 type="button"
                                 onClick={() => setSelectedCategoryId(null)}
-                                className={`w-full flex items-center gap-3 font-open-sans font-semibold px-3 py-3 rounded-lg text-left text-sm lg:text-base transition-colors ${isAll ? "text-primary" : ""}`}
+                                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors ${isAll ? "text-primary" : ""}`}
                             >
                                 <div className={`bg-primary-foreground p-2 border ${isAll ? "border-primary" : "border-gray-400"} rounded-full`}>
                                     <Globe className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
@@ -246,7 +242,7 @@ export default function LatestProjectsSection() {
                                         type="button"
                                         onClick={() => setSelectedCategoryId(cat.id)}
                                         className=
-                                        {`w-full flex items-center font-open-sans font-semibold gap-3 px-3 py-3 rounded-lg text-left text-sm lg:text-base transition-colors uppercase tracking-wide" ${active ? "text-primary" : ""}`}
+                                        {`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors uppercase tracking-wide" ${active ? "text-primary" : ""}`}
                                     >
                                         <div className={`bg-primary-foreground p-2 border ${active ? "border-primary" : "border-gray-400"} rounded-full`}>
                                             <Icon className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
@@ -257,9 +253,9 @@ export default function LatestProjectsSection() {
                             })}
                         </nav>
                         <Link href="/become-partner" className="mt-8 block">
-                            <Button className="w-full rounded-md font-semibold tracking-wide uppercase text-sm h-12 bg-primary text-primary-foreground hover:bg-primary/90">
+                            <Button variant="default" size="lg" className="w-full uppercase">
                                 {t.aboutUs}
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                <MoveRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
                     </aside>

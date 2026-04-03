@@ -64,10 +64,10 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     {/* Left Section - Heading */}
                     <div className="space-y-4">
-                        <p className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 font-archivo">
+                        <p className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold mb-4 font-archivo">
                             {getText("faqTitle")}
                         </p>
-                        <h2 className="text-lg md:text-xl max-w-3xl mx-auto font-open-sans">
+                        <h2 className="text-lg md:text-xl max-w-3xl mx-auto font-normal font-open-sans">
                             {getText("faqSubtitle")}
                         </h2>
                     </div>
@@ -104,7 +104,7 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                                 <AccordionTrigger
                                                     className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
                                                 >
-                                                    <h3 className={`text-lg font-open-sans pr-4 ${isOpen ? "font-semibold" : ""}`}>
+                                                    <h3 className={`text-[21px] font-open-sans pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}>
                                                         {faq.title}
                                                     </h3>
                                                     <div
@@ -122,7 +122,7 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                                     </div>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="p-6 pt-0">
-                                                    <p className="text-gray-700 leading-relaxed font-open-sans">
+                                                    <p className="leading-relaxed font-open-sans font-normal text-[19px]">
                                                         {faq.description}
                                                     </p>
                                                 </AccordionContent>
