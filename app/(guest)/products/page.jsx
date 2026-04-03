@@ -27,7 +27,16 @@ import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
+import { ProductsRangeFilter } from "@/components/guest/ProductsRangeFilter";
 
+const FALLBACK_FILTER_BOUNDS = {
+    pixelPitchMin: "0.10",
+    pixelPitchMax: "30.00",
+    powerConsumptionMaxMin: 0,
+    powerConsumptionMaxMax: 20000,
+    powerConsumptionTypicalMin: 0,
+    powerConsumptionTypicalMax: 20000,
+};
 
 // ---------------------------------------------------------------------------
 // Debounce hook
@@ -45,13 +54,34 @@ function useDebounce(value, delay = 400) {
     return debouncedValue;
 }
 
+function pixelRangeIsActive(range, bounds) {
+    if (!bounds || !range?.min || !range?.max) return false;
+    const a = parseFloat(range.min);
+    const b = parseFloat(range.max);
+    const x = parseFloat(bounds.pixelPitchMin);
+    const y = parseFloat(bounds.pixelPitchMax);
+    if ([a, b, x, y].some((n) => Number.isNaN(n))) return false;
+    return Math.abs(a - x) > 1e-3 || Math.abs(b - y) > 1e-3;
+}
+
+function intRangeIsActive(range, bMin, bMax) {
+    if (!range?.min || !range?.max) return false;
+    const a = parseInt(range.min, 10);
+    const b = parseInt(range.max, 10);
+    if (Number.isNaN(a) || Number.isNaN(b)) return false;
+    return a !== bMin || b !== bMax;
+}
+
 
 function FiltersAccordion({
     productType, setProductType,
     design, setDesign,
     specialTypes, setSpecialTypes,
     application, setApplication,
-    pixelPitch, setPixelPitch,
+    filterBounds,
+    pixelPitchRange, setPixelPitchRange,
+    powerMaxRange, setPowerMaxRange,
+    powerTypicalRange, setPowerTypicalRange,
     ledTechnology, setLedTechnology,
     ledLifespan, setLedLifespan,
     chipBonding, setChipBonding,
@@ -59,8 +89,6 @@ function FiltersAccordion({
     contrastRatio, setContrastRatio,
     viewingAngleHorizontal, setViewingAngleHorizontal,
     viewingAngleVertical, setViewingAngleVertical,
-    powerConsumptionMax, setPowerConsumptionMax,
-    powerConsumptionTypical, setPowerConsumptionTypical,
     refreshRate, setRefreshRate,
     powerRedundancy, setPowerRedundancy,
     memoryOnModule, setMemoryOnModule,
@@ -146,10 +174,23 @@ function FiltersAccordion({
                     {language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
-                    <div>
-                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
-                        <Input type="number" step="0.01" value={pixelPitch} onChange={(e) => setPixelPitch(e.target.value)} placeholder="e.g., 1.2" />
-                    </div>
+                    {filterBounds ? (
+                        <ProductsRangeFilter
+                            label={language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}
+                            unit="mm"
+                            boundMin={filterBounds.pixelPitchMin}
+                            boundMax={filterBounds.pixelPitchMax}
+                            step={0.01}
+                            integer={false}
+                            value={pixelPitchRange}
+                            onChange={setPixelPitchRange}
+                            disabled={false}
+                        />
+                    ) : (
+                        <p className="text-sm text-muted-foreground">
+                            {language === "en" ? "Loading filter bounds…" : "Filtergrenzen werden geladen…"}
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -235,14 +276,36 @@ function FiltersAccordion({
                             <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
-                            <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
-                                <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
-                            </div>
-                            <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
-                                <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
-                            </div>
+                            {filterBounds ? (
+                                <>
+                                    <ProductsRangeFilter
+                                        label={language === "en" ? "Power Consumption Max (W)" : "Maximale Leistung (W)"}
+                                        unit="W"
+                                        boundMin={filterBounds.powerConsumptionMaxMin}
+                                        boundMax={filterBounds.powerConsumptionMaxMax}
+                                        step={1}
+                                        integer
+                                        value={powerMaxRange}
+                                        onChange={setPowerMaxRange}
+                                        disabled={false}
+                                    />
+                                    <ProductsRangeFilter
+                                        label={language === "en" ? "Power Consumption Typical (W)" : "Typische Leistung (W)"}
+                                        unit="W"
+                                        boundMin={filterBounds.powerConsumptionTypicalMin}
+                                        boundMax={filterBounds.powerConsumptionTypicalMax}
+                                        step={1}
+                                        integer
+                                        value={powerTypicalRange}
+                                        onChange={setPowerTypicalRange}
+                                        disabled={false}
+                                    />
+                                </>
+                            ) : (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    {language === "en" ? "Loading filter bounds…" : "Filtergrenzen werden geladen…"}
+                                </p>
+                            )}
                             <div>
                                 <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
@@ -353,7 +416,11 @@ function ProductsPageContent() {
     const [design, setDesign] = useState("");
     const [specialTypes, setSpecialTypes] = useState("");
     const [application, setApplication] = useState("");
-    const [pixelPitch, setPixelPitch] = useState("");
+    const [filterBounds, setFilterBounds] = useState(null);
+    const [filterBoundsReady, setFilterBoundsReady] = useState(false);
+    const [pixelPitchRange, setPixelPitchRange] = useState({ min: "", max: "" });
+    const [powerMaxRange, setPowerMaxRange] = useState({ min: "", max: "" });
+    const [powerTypicalRange, setPowerTypicalRange] = useState({ min: "", max: "" });
     const [ledTechnology, setLedTechnology] = useState("");
     const [ledLifespan, setLedLifespan] = useState("");
     const [chipBonding, setChipBonding] = useState("");
@@ -361,8 +428,6 @@ function ProductsPageContent() {
     const [contrastRatio, setContrastRatio] = useState("");
     const [viewingAngleHorizontal, setViewingAngleHorizontal] = useState("");
     const [viewingAngleVertical, setViewingAngleVertical] = useState("");
-    const [powerConsumptionMax, setPowerConsumptionMax] = useState("");
-    const [powerConsumptionTypical, setPowerConsumptionTypical] = useState("");
     const [refreshRate, setRefreshRate] = useState("");
     const [powerRedundancy, setPowerRedundancy] = useState("");
     const [memoryOnModule, setMemoryOnModule] = useState("");
@@ -384,7 +449,9 @@ function ProductsPageContent() {
     const debouncedDesign               = useDebounce(design, 150);
     const debouncedSpecialTypes         = useDebounce(specialTypes, 150);
     const debouncedApplication          = useDebounce(application, 150);
-    const debouncedPixelPitch           = useDebounce(pixelPitch, 400);
+    const debouncedPixelPitchRange      = useDebounce(pixelPitchRange, 400);
+    const debouncedPowerMaxRange        = useDebounce(powerMaxRange, 400);
+    const debouncedPowerTypicalRange    = useDebounce(powerTypicalRange, 400);
     const debouncedLedTechnology        = useDebounce(ledTechnology, 150);
     const debouncedLedLifespan          = useDebounce(ledLifespan, 400);
     const debouncedChipBonding          = useDebounce(chipBonding, 150);
@@ -392,8 +459,6 @@ function ProductsPageContent() {
     const debouncedContrastRatio        = useDebounce(contrastRatio, 400);
     const debouncedViewingAngleH        = useDebounce(viewingAngleHorizontal, 400);
     const debouncedViewingAngleV        = useDebounce(viewingAngleVertical, 400);
-    const debouncedPowerConsMax         = useDebounce(powerConsumptionMax, 400);
-    const debouncedPowerConsTypical     = useDebounce(powerConsumptionTypical, 400);
     const debouncedRefreshRate          = useDebounce(refreshRate, 400);
     const debouncedPowerRedundancy      = useDebounce(powerRedundancy, 150);
     const debouncedMemoryOnModule       = useDebounce(memoryOnModule, 150);
@@ -404,8 +469,6 @@ function ProductsPageContent() {
     const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 400);
     const debouncedSupportDuringWarranty = useDebounce(supportDuringWarrantyEn, 400);
 
-    // Accordion state - all sections open by default
-    const [accordionValue, setAccordionValue] = useState([]);
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const observer = useRef();
@@ -425,6 +488,57 @@ function ProductsPageContent() {
             }
         };
         fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        const loadBounds = async () => {
+            try {
+                const res = await fetch("/api/product-filter-bounds");
+                const json = await res.json();
+                if (!json.success || !json.data) {
+                    const d = FALLBACK_FILTER_BOUNDS;
+                    setFilterBounds(d);
+                    setPixelPitchRange({ min: String(d.pixelPitchMin), max: String(d.pixelPitchMax) });
+                    setPowerMaxRange({
+                        min: String(d.powerConsumptionMaxMin),
+                        max: String(d.powerConsumptionMaxMax),
+                    });
+                    setPowerTypicalRange({
+                        min: String(d.powerConsumptionTypicalMin),
+                        max: String(d.powerConsumptionTypicalMax),
+                    });
+                    setFilterBoundsReady(true);
+                    return;
+                }
+                const d = json.data;
+                setFilterBounds(d);
+                setPixelPitchRange({ min: String(d.pixelPitchMin), max: String(d.pixelPitchMax) });
+                setPowerMaxRange({
+                    min: String(d.powerConsumptionMaxMin),
+                    max: String(d.powerConsumptionMaxMax),
+                });
+                setPowerTypicalRange({
+                    min: String(d.powerConsumptionTypicalMin),
+                    max: String(d.powerConsumptionTypicalMax),
+                });
+                setFilterBoundsReady(true);
+            } catch {
+                toast.error("Failed to load filter bounds; using default ranges");
+                const d = FALLBACK_FILTER_BOUNDS;
+                setFilterBounds(d);
+                setPixelPitchRange({ min: d.pixelPitchMin, max: d.pixelPitchMax });
+                setPowerMaxRange({
+                    min: String(d.powerConsumptionMaxMin),
+                    max: String(d.powerConsumptionMaxMax),
+                });
+                setPowerTypicalRange({
+                    min: String(d.powerConsumptionTypicalMin),
+                    max: String(d.powerConsumptionTypicalMax),
+                });
+                setFilterBoundsReady(true);
+            }
+        };
+        loadBounds();
     }, []);
 
     // Apply `categoryId` from URL query params to the existing category filter UI/API.
@@ -461,7 +575,17 @@ function ProductsPageContent() {
         if (debouncedDesign)                params.append("design", debouncedDesign);
         if (debouncedSpecialTypes)          params.append("specialTypes", debouncedSpecialTypes);
         if (debouncedApplication)           params.append("application", debouncedApplication);
-        if (debouncedPixelPitch)            params.append("pixelPitch", debouncedPixelPitch);
+        if (
+            filterBounds &&
+            pixelRangeIsActive(debouncedPixelPitchRange, filterBounds)
+        ) {
+            const pMin = parseFloat(debouncedPixelPitchRange.min);
+            const pMax = parseFloat(debouncedPixelPitchRange.max);
+            if (Number.isFinite(pMin) && Number.isFinite(pMax) && pMin <= pMax) {
+                params.append("pixelPitchMin", pMin.toFixed(2));
+                params.append("pixelPitchMax", pMax.toFixed(2));
+            }
+        }
         if (debouncedLedTechnology)         params.append("ledTechnology", debouncedLedTechnology);
         if (debouncedLedLifespan)           params.append("ledLifespan", debouncedLedLifespan);
         if (debouncedChipBonding)           params.append("chipBonding", debouncedChipBonding);
@@ -469,8 +593,36 @@ function ProductsPageContent() {
         if (debouncedContrastRatio)         params.append("contrastRatio", debouncedContrastRatio);
         if (debouncedViewingAngleH)         params.append("viewingAngleHorizontal", debouncedViewingAngleH);
         if (debouncedViewingAngleV)         params.append("viewingAngleVertical", debouncedViewingAngleV);
-        if (debouncedPowerConsMax)          params.append("powerConsumptionMax", debouncedPowerConsMax);
-        if (debouncedPowerConsTypical)      params.append("powerConsumptionTypical", debouncedPowerConsTypical);
+        if (
+            filterBounds &&
+            intRangeIsActive(
+                debouncedPowerMaxRange,
+                filterBounds.powerConsumptionMaxMin,
+                filterBounds.powerConsumptionMaxMax
+            )
+        ) {
+            const pMin = parseInt(debouncedPowerMaxRange.min, 10);
+            const pMax = parseInt(debouncedPowerMaxRange.max, 10);
+            if (!Number.isNaN(pMin) && !Number.isNaN(pMax) && pMin <= pMax) {
+                params.append("powerConsumptionMaxMin", String(pMin));
+                params.append("powerConsumptionMaxMax", String(pMax));
+            }
+        }
+        if (
+            filterBounds &&
+            intRangeIsActive(
+                debouncedPowerTypicalRange,
+                filterBounds.powerConsumptionTypicalMin,
+                filterBounds.powerConsumptionTypicalMax
+            )
+        ) {
+            const pMin = parseInt(debouncedPowerTypicalRange.min, 10);
+            const pMax = parseInt(debouncedPowerTypicalRange.max, 10);
+            if (!Number.isNaN(pMin) && !Number.isNaN(pMax) && pMin <= pMax) {
+                params.append("powerConsumptionTypicalMin", String(pMin));
+                params.append("powerConsumptionTypicalMax", String(pMax));
+            }
+        }
         if (debouncedRefreshRate)           params.append("refreshRate", debouncedRefreshRate);
         if (debouncedPowerRedundancy !== "") params.append("powerRedundancy", debouncedPowerRedundancy);
         if (debouncedMemoryOnModule !== "")  params.append("memoryOnModule", debouncedMemoryOnModule);
@@ -483,10 +635,11 @@ function ProductsPageContent() {
         return params.toString();
     }, [
         page,
+        filterBounds,
         debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
-        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitch, debouncedLedTechnology,
+        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitchRange, debouncedLedTechnology,
         debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
-        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerConsMax, debouncedPowerConsTypical,
+        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerMaxRange, debouncedPowerTypicalRange,
         debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
         debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
         debouncedSupportDuringWarranty,
@@ -516,17 +669,19 @@ function ProductsPageContent() {
         }
     }, [buildQueryParams]);
 
-    // Reset and fetch when DEBOUNCED filters change
+    // Reset and fetch when DEBOUNCED filters change (after CMS bounds are loaded)
     useEffect(() => {
+        if (!filterBoundsReady) return;
         setPage(1);
         setProducts([]);
         fetchProducts(1, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
+        filterBoundsReady,
         debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
-        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitch, debouncedLedTechnology,
+        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitchRange, debouncedLedTechnology,
         debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
-        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerConsMax, debouncedPowerConsTypical,
+        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerMaxRange, debouncedPowerTypicalRange,
         debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
         debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
         debouncedSupportDuringWarranty,
@@ -560,7 +715,20 @@ function ProductsPageContent() {
         setDesign("");
         setSpecialTypes("");
         setApplication("");
-        setPixelPitch("");
+        if (filterBounds) {
+            setPixelPitchRange({
+                min: String(filterBounds.pixelPitchMin),
+                max: String(filterBounds.pixelPitchMax),
+            });
+            setPowerMaxRange({
+                min: String(filterBounds.powerConsumptionMaxMin),
+                max: String(filterBounds.powerConsumptionMaxMax),
+            });
+            setPowerTypicalRange({
+                min: String(filterBounds.powerConsumptionTypicalMin),
+                max: String(filterBounds.powerConsumptionTypicalMax),
+            });
+        }
         setLedTechnology("");
         setLedLifespan("");
         setChipBonding("");
@@ -568,8 +736,6 @@ function ProductsPageContent() {
         setContrastRatio("");
         setViewingAngleHorizontal("");
         setViewingAngleVertical("");
-        setPowerConsumptionMax("");
-        setPowerConsumptionTypical("");
         setRefreshRate("");
         setPowerRedundancy("");
         setMemoryOnModule("");
@@ -651,13 +817,14 @@ function ProductsPageContent() {
                         </SheetHeader>
                         <div className="flex-1 overflow-y-auto px-5 py-4">
                             <FiltersAccordion
-                                accordionValue={accordionValue}
-                                setAccordionValue={setAccordionValue}
                                 productType={productType} setProductType={setProductType}
                                 design={design} setDesign={setDesign}
                                 specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
                                 application={application} setApplication={setApplication}
-                                pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
+                                filterBounds={filterBounds}
+                                pixelPitchRange={pixelPitchRange} setPixelPitchRange={setPixelPitchRange}
+                                powerMaxRange={powerMaxRange} setPowerMaxRange={setPowerMaxRange}
+                                powerTypicalRange={powerTypicalRange} setPowerTypicalRange={setPowerTypicalRange}
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
                                 ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
@@ -665,8 +832,6 @@ function ProductsPageContent() {
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
                                 viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
                                 viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
-                                powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
-                                powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
                                 powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
                                 memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
@@ -702,13 +867,14 @@ function ProductsPageContent() {
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(100vh-100px)]">
                             <FiltersAccordion
-                                accordionValue={accordionValue}
-                                setAccordionValue={setAccordionValue}
                                 productType={productType} setProductType={setProductType}
                                 design={design} setDesign={setDesign}
                                 specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
                                 application={application} setApplication={setApplication}
-                                pixelPitch={pixelPitch} setPixelPitch={setPixelPitch}
+                                filterBounds={filterBounds}
+                                pixelPitchRange={pixelPitchRange} setPixelPitchRange={setPixelPitchRange}
+                                powerMaxRange={powerMaxRange} setPowerMaxRange={setPowerMaxRange}
+                                powerTypicalRange={powerTypicalRange} setPowerTypicalRange={setPowerTypicalRange}
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
                                 ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
@@ -716,8 +882,6 @@ function ProductsPageContent() {
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
                                 viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
                                 viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
-                                powerConsumptionMax={powerConsumptionMax} setPowerConsumptionMax={setPowerConsumptionMax}
-                                powerConsumptionTypical={powerConsumptionTypical} setPowerConsumptionTypical={setPowerConsumptionTypical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
                                 powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
                                 memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
@@ -734,7 +898,14 @@ function ProductsPageContent() {
 
                     {/* Right Side - Product Grid */}
                     <div className="flex-1">
-                        {loading && products.length === 0 ? (
+                        {!filterBoundsReady ? (
+                            <div className="flex items-center justify-center h-64">
+                                <div className="flex items-center gap-2">
+                                    <Spinner className="h-6 w-6" />
+                                    <span>Loading…</span>
+                                </div>
+                            </div>
+                        ) : loading && products.length === 0 ? (
                             <div className="flex items-center justify-center h-64">
                                 <div className="flex items-center gap-2">
                                     <Spinner className="h-6 w-6" />

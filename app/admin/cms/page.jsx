@@ -9,6 +9,7 @@ import HomepageTab from "./components/HomepageTab";
 import FooterTab from "./components/FooterTab";
 import QuotationPdfTab from "./components/QuotationPdfTab";
 import UserHeaderTab from "./components/UserHeaderTab";
+import ProductFilterBoundsTab from "./components/ProductFilterBoundsTab";
 
 export default function CMSPage() {
     const [activeTab, setActiveTab] = useState("navbar");
@@ -20,6 +21,7 @@ export default function CMSPage() {
     const footerSaveHandlerRef = useRef(null);
     const quotationPdfSaveHandlerRef = useRef(null);
     const userHeaderSaveHandlerRef = useRef(null);
+    const productFilterBoundsSaveHandlerRef = useRef(null);
     // Handle data change from child components
     const handleDataChange = (data) => {
         // Store the data if needed, but validation is handled in child components
@@ -57,6 +59,12 @@ export default function CMSPage() {
             } else if (activeTab === "user-header") {
                 if (userHeaderSaveHandlerRef.current) {
                     result = await userHeaderSaveHandlerRef.current();
+                } else {
+                    return;
+                }
+            } else if (activeTab === "product-filters") {
+                if (productFilterBoundsSaveHandlerRef.current) {
+                    result = await productFilterBoundsSaveHandlerRef.current();
                 } else {
                     return;
                 }
@@ -115,6 +123,12 @@ export default function CMSPage() {
                         >
                             USER HEADER
                         </TabsTrigger>
+                        <TabsTrigger
+                            value="product-filters"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
+                        >
+                            PRODUCT FILTERS
+                        </TabsTrigger>
                     </TabsList>
 
                 </div>
@@ -158,6 +172,14 @@ export default function CMSPage() {
                     <UserHeaderTab
                         onSaveHandlerReady={(handler) => {
                             userHeaderSaveHandlerRef.current = handler;
+                        }}
+                    />
+                </TabsContent>
+
+                <TabsContent value="product-filters" className="space-y-6">
+                    <ProductFilterBoundsTab
+                        onSaveHandlerReady={(handler) => {
+                            productFilterBoundsSaveHandlerRef.current = handler;
                         }}
                     />
                 </TabsContent>

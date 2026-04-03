@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { products, productImages, productCertificates, certificates, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { desc, ilike, or, and, eq, sql } from "drizzle-orm";
+import { desc, ilike, or, and, eq, sql, gte, lte, isNotNull } from "drizzle-orm";
 
 export async function GET(req) {
     try {
@@ -17,6 +17,8 @@ export async function GET(req) {
         const specialTypes = searchParams.get("specialTypes") || "";
         const application = searchParams.get("application") || "";
         const pixelPitch = searchParams.get("pixelPitch") || "";
+        const pixelPitchMin = searchParams.get("pixelPitchMin") || "";
+        const pixelPitchMax = searchParams.get("pixelPitchMax") || "";
         const ledTechnology = searchParams.get("ledTechnology") || "";
         const ledLifespan = searchParams.get("ledLifespan") || "";
         const chipBonding = searchParams.get("chipBonding") || "";
@@ -26,6 +28,10 @@ export async function GET(req) {
         const viewingAngleVertical = searchParams.get("viewingAngleVertical") || "";
         const powerConsumptionMax = searchParams.get("powerConsumptionMax") || "";
         const powerConsumptionTypical = searchParams.get("powerConsumptionTypical") || "";
+        const powerConsumptionMaxMin = searchParams.get("powerConsumptionMaxMin") || "";
+        const powerConsumptionMaxMax = searchParams.get("powerConsumptionMaxMax") || "";
+        const powerConsumptionTypicalMin = searchParams.get("powerConsumptionTypicalMin") || "";
+        const powerConsumptionTypicalMax = searchParams.get("powerConsumptionTypicalMax") || "";
         const refreshRate = searchParams.get("refreshRate") || "";
         const powerRedundancy = searchParams.get("powerRedundancy") || "";
         const memoryOnModule = searchParams.get("memoryOnModule") || "";
@@ -78,10 +84,24 @@ export async function GET(req) {
             conditions.push(sql`${products.application} @> ARRAY[${application}]::text[]`);
         }
 
-        // Pixel Pitch filter (decimal - exact match or range)
-        if (pixelPitch) {
+        // Pixel Pitch filter: inclusive range (preferred) or legacy exact value
+        if (pixelPitchMin && pixelPitchMax) {
+            const pMin = parseFloat(pixelPitchMin);
+            const pMax = parseFloat(pixelPitchMax);
+            if (!Number.isNaN(pMin) && !Number.isNaN(pMax) && pMin <= pMax) {
+                const lo = pMin.toFixed(2);
+                const hi = pMax.toFixed(2);
+                conditions.push(
+                    and(
+                        isNotNull(products.pixelPitch),
+                        gte(products.pixelPitch, lo),
+                        lte(products.pixelPitch, hi)
+                    )
+                );
+            }
+        } else if (pixelPitch) {
             const pitchNum = parseFloat(pixelPitch);
-            if (!isNaN(pitchNum)) {
+            if (!Number.isNaN(pitchNum)) {
                 conditions.push(eq(products.pixelPitch, pixelPitch));
             }
         }
@@ -127,18 +147,42 @@ export async function GET(req) {
             conditions.push(ilike(products.viewingAngleVertical, `%${viewingAngleVertical}%`));
         }
 
-        // Power Consumption Max filter (integer match)
-        if (powerConsumptionMax) {
-            const powerNum = parseInt(powerConsumptionMax);
-            if (!isNaN(powerNum)) {
+        // Power consumption max: inclusive integer range or legacy exact match
+        if (powerConsumptionMaxMin !== "" && powerConsumptionMaxMax !== "") {
+            const pMin = parseInt(powerConsumptionMaxMin, 10);
+            const pMax = parseInt(powerConsumptionMaxMax, 10);
+            if (!Number.isNaN(pMin) && !Number.isNaN(pMax) && pMin <= pMax) {
+                conditions.push(
+                    and(
+                        isNotNull(products.powerConsumptionMax),
+                        gte(products.powerConsumptionMax, pMin),
+                        lte(products.powerConsumptionMax, pMax)
+                    )
+                );
+            }
+        } else if (powerConsumptionMax) {
+            const powerNum = parseInt(powerConsumptionMax, 10);
+            if (!Number.isNaN(powerNum)) {
                 conditions.push(eq(products.powerConsumptionMax, powerNum));
             }
         }
 
-        // Power Consumption Typical filter (integer match)
-        if (powerConsumptionTypical) {
-            const powerNum = parseInt(powerConsumptionTypical);
-            if (!isNaN(powerNum)) {
+        // Power consumption typical: inclusive integer range or legacy exact match
+        if (powerConsumptionTypicalMin !== "" && powerConsumptionTypicalMax !== "") {
+            const pMin = parseInt(powerConsumptionTypicalMin, 10);
+            const pMax = parseInt(powerConsumptionTypicalMax, 10);
+            if (!Number.isNaN(pMin) && !Number.isNaN(pMax) && pMin <= pMax) {
+                conditions.push(
+                    and(
+                        isNotNull(products.powerConsumptionTypical),
+                        gte(products.powerConsumptionTypical, pMin),
+                        lte(products.powerConsumptionTypical, pMax)
+                    )
+                );
+            }
+        } else if (powerConsumptionTypical) {
+            const powerNum = parseInt(powerConsumptionTypical, 10);
+            if (!Number.isNaN(powerNum)) {
                 conditions.push(eq(products.powerConsumptionTypical, powerNum));
             }
         }
