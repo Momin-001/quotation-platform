@@ -13,7 +13,7 @@ import {
       <div className="bg-secondary">
         <div className="container text-white mx-auto py-3 px-4 flex flex-wrap gap-3 items-center justify-between">
           {/* Left: Page Title */}
-          <h1 className="text-2xl font-archivo tracking-tight">
+          <h1 className="text-[32px] font-archivo tracking-tight">
             {title}
           </h1>
   
@@ -25,7 +25,7 @@ import {
                 const isLast = index === breadcrumbs.length - 1;
   
                 return (
-                  <div key={index} className="flex items-center">
+                  <div key={index} className="flex items-center font-open-sans font-normal text-md">
                     <BreadcrumbItem>
                       {isLast || !item.href ? (
                         <BreadcrumbPage className="space-x-2">{item.label}</BreadcrumbPage>

@@ -25,9 +25,9 @@ export default function UserHeader({ userHeaderData }) {
         <div className="w-full bg-primary text-primary-foreground">
             {/* Horizontal scroll container for small screens */}
             <div className="container mx-auto px-4 py-3 overflow-x-auto">
-                <div className="min-w-max flex justify-between items-center gap-6 text-sm">
+                <div className="min-w-max flex justify-between items-center gap-6 font-open-sans text-lg font-normal">
                     {/* Navigation Links */}
-                    <div className="flex items-center gap-6 font-open-sans">
+                    <div className="flex items-center gap-6">
                         <Link
                             href="/user/my-enquiries"
                             className="hover:underline whitespace-nowrap"
@@ -56,14 +56,14 @@ export default function UserHeader({ userHeaderData }) {
                         className="flex items-center gap-2 hover:underline relative whitespace-nowrap"
                     >
                         <div className="relative">
-                            <ShoppingCart className="h-4 w-4" />
+                            <ShoppingCart className="h-5 w-5" />
                             {getTotalItems() > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                     {getTotalItems()}
                                 </span>
                             )}
                         </div>
-                        <span className="text-sm">{getUserHeaderText("userHeaderMyCart")}</span>
+                        <span>{getUserHeaderText("userHeaderMyCart")}</span>
                     </Link>
                 </div>
             </div>

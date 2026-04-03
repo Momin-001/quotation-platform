@@ -59,7 +59,7 @@ export default function MyEnquiriesPage() {
                 { label: language === "en" ? "Enquiries" : "Anfragen" }
                 ]} />
             <div className="container mx-auto px-4 py-8">
-                <h1 className="text-xl font-bold mb-6 font-open-sans text-primary">
+                <h1 className="text-2xl font-bold mb-6 font-open-sans text-primary">
                     Active Enquiries: {activeEnquiries.length}
                 </h1>
 
@@ -80,7 +80,7 @@ export default function MyEnquiriesPage() {
                                         <div className="flex items-center justify-between w-full">
                                             <div className="flex-1 text-left">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <h3 className="text-lg font-bold font-archivo">
+                                                    <h3 className="text-2xl font-bold font-archivo">
                                                         {enquiry.items && enquiry.items.length > 0
                                                             ? enquiry.items[0]?.product?.productName ||
                                                               "Product Enquiry"
@@ -92,7 +92,7 @@ export default function MyEnquiriesPage() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm font-open-sans">
+                                                <p className="text-lg font-open-sans font-normal">
                                                     {formatEnquiryNumber(
                                                         enquiry.id,
                                                         enquiry.createdAt

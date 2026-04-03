@@ -111,7 +111,7 @@ export default function ControllersPage() {
                 <div className="mb-6 flex flex-wrap gap-2">
                     <Button
                         variant={selectedBrand === "" ? "default" : "outline"}
-                        className={selectedBrand === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}
+                        className={`font-open-sans font-semibold uppercase ${selectedBrand === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         onClick={() => setSelectedBrand("")}
                     >
                         All
@@ -121,7 +121,7 @@ export default function ControllersPage() {
                             key={brand}
                             variant={selectedBrand === brand ? "default" : "outline"}
                             onClick={() => setSelectedBrand(brand)}
-                            className={selectedBrand === brand ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}
+                            className={`font-open-sans font-semibold uppercase ${selectedBrand === brand ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         >
                             {brand}
                         </Button>
@@ -163,11 +163,11 @@ export default function ControllersPage() {
                                             )}
                                         </div>
                                         <div className="p-4">
-                                                <h3 className="font-bold font-open-sans text-lg mb-1">
-                                                    {controller.interfaceName}
+                                        <h3 className="font-bold font-open-sans text-xl mb-1">
+                                        {controller.interfaceName}
                                                 </h3>
-                                                <p className="text-xl mb-1">{controller.controllerNumber}</p>
-                                                <p className="text-lg bg-secondary text-white rounded-md px-4 py-1 w-fit">{controller.brandDisplay || "N/A"}</p>
+                                                <p className="text-lg mb-1">{controller.controllerNumber}</p>
+                                                <p className="text-sm font-semibold font-open-sans bg-secondary text-white uppercase rounded-md px-4 py-1 w-fit">{controller.brandDisplay || "N/A"}</p>
                                             </div>
                                     </Link>
                                 );

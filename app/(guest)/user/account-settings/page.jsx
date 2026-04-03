@@ -158,10 +158,10 @@ export default function AccountSettingsPage() {
             <div className="container mx-auto px-4 py-8">
                 <Tabs defaultValue="profile" className="lg:gap-6">
                     <TabsList>
-                        <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">
+                        <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6 py-5 font-open-sans font-semibold text-xl">
                             Profile
                         </TabsTrigger>
-                        <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">
+                        <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6 py-5 font-open-sans font-semibold text-xl">
                             Security
                         </TabsTrigger>
                     </TabsList>
@@ -170,7 +170,7 @@ export default function AccountSettingsPage() {
                         <TabsContent value="profile">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Profile Information</CardTitle>
+                                    <CardTitle className="text-xl font-bold font-open-sans">Profile Information</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <form onSubmit={handleProfileSubmit} className="space-y-4">
@@ -245,7 +245,7 @@ export default function AccountSettingsPage() {
                         <TabsContent value="security">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Security</CardTitle>
+                                    <CardTitle className="text-xl font-bold font-open-sans">Security</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-xl">

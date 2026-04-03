@@ -33,6 +33,7 @@ export async function GET(req) {
             .select({
                 id: controllers.id,
                 interfaceName: controllers.interfaceName,
+                controllerNumber: controllers.controllerNumber,
                 brandName: controllers.brandName,
                 brandNameOther: controllers.brandNameOther,
             })

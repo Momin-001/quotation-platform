@@ -56,7 +56,7 @@ export default function MyQuotationsPage() {
             <div className="container mx-auto px-4 py-8">
                 {/* Header Section */}
                 <div className="flex items-center justify-between mb-6">
-                <h1 className="text-xl font-bold text-primary">
+                <h1 className="text-2xl font-bold font-open-sans text-primary">
                     Active Quotations: {pendingCount}
                 </h1>
                 </div>
@@ -79,11 +79,11 @@ export default function MyQuotationsPage() {
                             >
                                 <div className="flex items-center justify-between w-full">
                                     <div>
-                                    <h3 className="text-lg font-archivo font-bold mb-1">
+                                    <h3 className="text-2xl font-archivo font-bold mb-1">
                                         Quotation {quotation.quotationNumber}
                                     </h3>
                                     {quotation.enquiryId && (
-                                        <p className="text-sm font-open-sans">
+                                        <p className="text-lg font-open-sans font-normal">
                                             {formatEnquiryNumber(
                                                 quotation.enquiryId,
                                                 quotation.createdAt

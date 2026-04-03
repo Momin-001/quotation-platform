@@ -165,10 +165,10 @@ export default function ProductDetailPage() {
     const SpecRow = ({ label, value, unit }) => {
         const displayValue = value ?? "N/A";
         return (
-            <div className="flex justify-between items-baseline gap-4 py-1">
-                <span className="text-sm shrink-0">{label}</span>
+            <div className="flex text-md font-normal justify-between items-baseline gap-4 py-1">
+                <span className="shrink-0">{label}</span>
                 <div className="flex items-baseline justify-end gap-3 min-w-0 flex-1">
-                    <span className="font-medium text-right">{String(displayValue)}</span>
+                    <span className="text-right">{String(displayValue)}</span>
                     <span className="w-10 shrink-0"> {unit ? unit : ""}</span>
                 </div>
             </div>
@@ -246,27 +246,27 @@ export default function ProductDetailPage() {
 
                         {/* Right Side - Product Info */}
                         <div className="space-y-8">
-                            <div className="space-y-2">
+                            <div className="space-y-6">
                                 <div>
                                     <h1 className="text-3xl font-bold mb-2">{product.productName}</h1>
-                                    <p className="text-lg font-semibold mb-2">{product.productNumber}</p>
+                                    <p className="text-xl font-semibold mb-2">{product.productNumber}</p>
                                     {product.areaOfUse && (
-                                        <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium mb-4">
+                                        <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-lg font-semibold mb-4">
                                             {product.areaOfUse.toUpperCase()}
                                         </span>
                                     )}
                                     {product.productDescription && (
-                                        <p className="mb-4">{product.productDescription}</p>
+                                        <p className="mb-4 font-normal text-xl">{product.productDescription}</p>
                                     )}
                                 </div>
 
                                 {/* Features */}
                                 {product.features && product.features.length > 0 && (
                                     <div>
-                                        <h2 className="text-xl font-bold mb-2">Features</h2>
+                                        <h2 className="text-2xl font-bold mb-2">Features</h2>
                                         <ul className="space-y-1 px-2">
                                             {product.features.map((feature, index) => (
-                                                <li key={index} className="flex items-start gap-2">
+                                                <li key={index} className="flex items-start gap-2 font-normal text-xl">
                                                     <span>•</span>
                                                     <span>{feature}</span>
                                                 </li>
@@ -279,16 +279,16 @@ export default function ProductDetailPage() {
                                     <div className="mt-4 space-y-1">
                                         {product.leadtimeDays && 
                                         <div className="flex items-center gap-2">
-                                            <span className="font-semibold">Stock:</span>
-                                            <span>
+                                            <span className="font-semibold text-xl">Stock:</span>
+                                            <span className="font-normal text-xl">
                                                 {product.stockPieces} pieces
                                             </span>
                                         </div>
                                         }
                                         {product.leadtimeDays && 
                                         <div className="flex items-center gap-2">
-                                            <span className="font-semibold">Lead Time:</span>
-                                            <span>
+                                            <span className="font-semibold text-xl">Lead Time:</span>
+                                            <span className="font-normal text-xl">
                                                 {product.leadtimeDays} days
                                             </span>
                                         </div>
@@ -393,7 +393,7 @@ export default function ProductDetailPage() {
                             {/* Basic Information */}
                             <Accordion type="single" defaultValue="basic-info" collapsible className="rounded-lg">
                                 <AccordionItem value="basic-info">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Basic Information
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -411,7 +411,7 @@ export default function ProductDetailPage() {
                             {/* Physical Specifications */}
                             <Accordion type="single" defaultValue="physical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="physical-specs">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Physical Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -433,7 +433,7 @@ export default function ProductDetailPage() {
                             {/* Electrical Specifications */}
                             <Accordion type="single" defaultValue="electrical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="electrical-specs">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Electrical Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -455,7 +455,7 @@ export default function ProductDetailPage() {
                             {/* Control System */}
                             <Accordion type="single" defaultValue="control-system" collapsible className="rounded-lg">
                                 <AccordionItem value="control-system">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Control System
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -473,7 +473,7 @@ export default function ProductDetailPage() {
                             {/* Operating Conditions */}
                             <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Operating Conditions
                                         </AccordionTrigger>
                                         <AccordionContent className="bg-white px-4 pb-4 pt-2">
@@ -580,7 +580,7 @@ export default function ProductDetailPage() {
                             {/* LED Specifications */}
                             <Accordion type="single" defaultValue="led-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="led-specs">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         LED Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -599,7 +599,7 @@ export default function ProductDetailPage() {
                             {/* Display Performance */}
                             <Accordion type="single" defaultValue="display-performance" collapsible className="rounded-lg">
                                 <AccordionItem value="display-performance">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Display Performance
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -632,7 +632,7 @@ export default function ProductDetailPage() {
                             {/* Calibration */}
                             <Accordion type="single" defaultValue="calibration" collapsible className="rounded-lg">
                                 <AccordionItem value="calibration">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Calibration
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -648,7 +648,7 @@ export default function ProductDetailPage() {
                             {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
                                 <Accordion type="single" defaultValue="certifications" collapsible className="rounded-lg">
                                     <AccordionItem value="certifications">
-                                        <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                        <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                             Certifications & Standards
                                         </AccordionTrigger>
                                         <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -684,7 +684,7 @@ export default function ProductDetailPage() {
                             {/* Warranty & Support */}
                             <Accordion type="single" defaultValue="warranty" collapsible className="rounded-lg">
                                 <AccordionItem value="warranty">
-                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Warranty & Support
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">

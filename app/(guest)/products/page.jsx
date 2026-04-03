@@ -79,12 +79,12 @@ function FiltersAccordion({
             
             {/* Product Information */}
             <div className="border-t pt-4 first:border-t-0 first:pt-0">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Product Information" : "Produktinformation"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
                     <div>
-                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Design" : "Design"}</label>
+                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Design" : "Design"}</label>
                         <Select value={design} onValueChange={setDesign}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -94,7 +94,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div className={`${isAuthenticated ? "" : "mb-10"}`}>
-                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
+                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
                         <Select value={application} onValueChange={setApplication}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -114,7 +114,7 @@ function FiltersAccordion({
 
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
                             <Select value={productType} onValueChange={setProductType}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -125,7 +125,7 @@ function FiltersAccordion({
                         </div>
 
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
                             <Select value={specialTypes} onValueChange={setSpecialTypes}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -142,12 +142,12 @@ function FiltersAccordion({
 
             {/* Physical Specifications */}
             <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
                     <div>
-                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
+                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
                         <Input type="number" step="0.01" value={pixelPitch} onChange={(e) => setPixelPitch(e.target.value)} placeholder="e.g., 1.2" />
                     </div>
                 </div>
@@ -155,13 +155,13 @@ function FiltersAccordion({
 
             {/* LED Specifications */}
             <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "LED Specifications" : "LED-Spezifikationen"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
                             <Select value={ledTechnology} onValueChange={setLedTechnology}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -176,12 +176,12 @@ function FiltersAccordion({
                             </Select>
                         </div>
                         <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
                             <Input type="number" value={ledLifespan} onChange={(e) => setLedLifespan(e.target.value)} placeholder="Enter number" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
                                 <Select value={chipBonding} onValueChange={setChipBonding}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -198,25 +198,25 @@ function FiltersAccordion({
 
             {/* Optical Specifications */}
             <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
                             <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
                         </div>
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
                             <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
                         </div>
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
                             <Input value={viewingAngleHorizontal} onChange={(e) => setViewingAngleHorizontal(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
                             <Input value={viewingAngleVertical} onChange={(e) => setViewingAngleVertical(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                     </div>
@@ -225,26 +225,26 @@ function FiltersAccordion({
 
             {/* Electrical Specifications */}
             <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
                             <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
                                 <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
                                 <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -254,7 +254,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
                                 <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -264,7 +264,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
                                 <Select value={smartModule} onValueChange={setSmartModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -274,7 +274,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
                                 <Select value={controlSystem} onValueChange={setControlSystem}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -287,7 +287,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
+                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
                                 <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
                             </div>
                         </RestrictedContentOverlay>
@@ -297,12 +297,12 @@ function FiltersAccordion({
 
             {/* Operating Conditions */}
             <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}
                 </h3>
                 <div className="space-y-3">
                     <div>
-                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
+                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
                         <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
                     </div>
                 </div>
@@ -310,17 +310,17 @@ function FiltersAccordion({
 
             {/* Warranty */}
             <div className="border-t pt-4 pb-10">
-                <h3 className="font-open-sans font-bold text-base mb-4">
+                <h3 className="font-open-sans font-bold text-xl mb-4">
                     {language === "en" ? "Warranty" : "Garantie"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
+                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
                         <Input value={supportDuringWarrantyEn} onChange={(e) => setSupportDuringWarrantyEn(e.target.value)} placeholder="Enter support during warranty" />
                     </div>
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
+                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
                             <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
                         </div>
                     </RestrictedContentOverlay>
@@ -606,7 +606,7 @@ function ProductsPageContent() {
                 <div className="mb-6 flex flex-wrap gap-2">
                     <Button
                         variant={selectedCategory === "" ? "default" : "outline"}
-                        className={`${selectedCategory === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                        className={`font-open-sans font-semibold uppercase ${selectedCategory === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         onClick={() => setSelectedCategory("")}
                     >
                         {language === "en" ? "All" : "Alle"}
@@ -616,7 +616,7 @@ function ProductsPageContent() {
                             key={category.id}
                             variant={selectedCategory === category.id ? "default" : "outline"}
                             onClick={() => setSelectedCategory(category.id)}
-                            className={`uppercase font-medium ${category.id === selectedCategory ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                            className={`uppercase font-open-sans font-semibold ${category.id === selectedCategory ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         >
                             {category.name}
                         </Button>
@@ -768,11 +768,11 @@ function ProductsPageContent() {
                                             </div>
                                             {/* Product Info */}
                                             <div className="p-4">
-                                                <h3 className="font-bold font-open-sans text-lg mb-1">
+                                                <h3 className="font-bold font-open-sans text-xl mb-1">
                                                     {product.productName}
                                                 </h3>
-                                                <p className="text-md font-open-sans mb-1">{product.productNumber}</p>
-                                                <p className="text-sm font-open-sans bg-secondary text-white rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
+                                                <p className="text-lg font-open-sans mb-1">{product.productNumber}</p>
+                                                <p className="text-sm font-semibold font-open-sans bg-secondary text-white uppercase rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
                                             </div>
                                         </Link>
                                     );

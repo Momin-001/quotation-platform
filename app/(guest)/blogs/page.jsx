@@ -28,12 +28,12 @@ function BlogCard({ blog }) {
                         <span className="text-gray-400">No image</span>
                     </div>
                 )}
-                <div className="absolute top-3 left-3 bg-primary text-white rounded-md px-2.5 py-1.5 text-center leading-tight min-w-[48px]">
-                    <div className="text-[10px] font-semibold tracking-wider">{month}</div>
-                    <div className="text-lg font-bold -mt-0.5">{day}</div>
+                <div className="absolute top-4 left-4 font-archivo bg-secondary text-primary-foreground rounded-sm px-4 py-1.5 text-center leading-tight min-w-[56px]">
+                <div className="text-sm lg:text-md font-medium tracking-wider">{month}</div>
+                <div className="text-3xl font-bold -mt-0.5">{day}</div>
                 </div>
             </div>
-            <h3 className="mt-3 text-sm md:text-base font-semibold text-gray-900 font-archivo leading-snug group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="mt-3 text-xl lg:text-2xl font-bold font-archivo leading-snug group-hover:text-primary transition-colors line-clamp-2">
                 {blog.title}
             </h3>
         </Link>
