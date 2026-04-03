@@ -73,7 +73,7 @@ export default function ValueBlocksSection({ homepageData }) {
                                 <div className="w-8 rounded-full h-1 bg-[#4BA3FF]"></div>
 
                                 {/* Description */}
-                                <p className="text-[#2C2C2C] leading-relaxed font-open-sans grow">
+                                <p className="text-[#2C2C2C] text-xl font-normal font-open-sans">
                                     {block.description}
                                 </p>
                             </div>

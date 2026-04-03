@@ -24,7 +24,7 @@ export default function HeroSection({ homepageData }) {
                     <div className="space-y-6 z-10 p-10">
                         {/* Small Label */}
                         <div>
-                            <p className="text-sm font-semibold text-[#1A73E8] tracking-wide font-open-sans">
+                            <p className="text-md font-semibold text-[#1A73E8] tracking-wide font-open-sans">
                                 {getText("heroSmallLabel")}
                             </p>
 
