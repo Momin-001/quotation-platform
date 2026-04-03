@@ -18,7 +18,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Spinner } from "@/components/ui/spinner";
-import { ShoppingCart } from "lucide-react";
+import { FileText, ShoppingCart } from "lucide-react";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
@@ -30,6 +30,8 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 function SpecRow({ label, value }) {
     const display = value !== null && value !== undefined && value !== "" ? String(value) : "N/A";
@@ -45,6 +47,7 @@ export default function ControllerDetailPage() {
     const params = useParams();
     const { language } = useLanguage();
     const router = useRouter();
+    const { isAuthenticated, isUser } = useAuth();
     const { cartItems, addControllerToProduct, getControllerForProduct } = useCart();
     const [controller, setController] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -145,7 +148,7 @@ export default function ControllerDetailPage() {
                     { label: title },
                 ]}
             />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 font-open-sans">
                 <div className="container mx-auto px-4 py-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                         {/* Left - Image Gallery */}
@@ -198,16 +201,38 @@ export default function ControllerDetailPage() {
 
                         {/* Right - Info & Add to Cart */}
                         <div className="space-y-8">
-                            <div className="space-y-2">
-                                <h1 className="text-3xl font-bold font-open-sans mb-2">{title}</h1>
-                                <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-semibold">
-                                    {controller.brandDisplay || "N/A"}
+                            <div>
+                                <h1 className="text-3xl font-bold mb-2">{title}</h1>
+                                <p className="text-lg font-semibold mb-2">{controller.controllerNumber}</p>
+                                <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium mb-4">
+                                    {controller.brandDisplay.toUpperCase() || "N/A"}
                                 </span>
-                            </div>
+                                <p className="mb-4">{controller.interfaceDescription}</p>
 
+                            </div>
+                            {/* Downloads */}
+                            {isAuthenticated && isUser && (
+                                <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4">
+                                    <div>
+                                        <h3 className="text-lg font-bold">Downloads</h3>
+                                        <p className="text-sm text-gray-800">Controller Manual</p>
+                                    </div>
+
+                                    <div className="mt-4 md:mt-0">
+                                        <Link
+                                            href={controller.downloadUrl}
+                                            target="_blank"
+                                            className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                        >
+                                            <FileText className="h-5 w-5 mr-2 text-red-500" />
+                                            <span>Controller Manual</span>
+
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex gap-3">
                                 <Button variant="secondary" size="lg" onClick={handleAddToCart}>
-                                    <ShoppingCart className="h-5 w-5 mr-2" />
                                     Add to Cart
                                 </Button>
                             </div>
@@ -261,7 +286,7 @@ export default function ControllerDetailPage() {
                         <div className="space-y-4">
                             <Accordion type="single" defaultValue="basic" collapsible className="rounded-lg">
                                 <AccordionItem value="basic">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Basic Information
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -277,7 +302,7 @@ export default function ControllerDetailPage() {
 
                             <Accordion type="single" defaultValue="input" collapsible className="rounded-lg">
                                 <AccordionItem value="input">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Input Ports
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -295,24 +320,9 @@ export default function ControllerDetailPage() {
                                 </AccordionItem>
                             </Accordion>
 
-                            <Accordion type="single" defaultValue="output" collapsible className="rounded-lg">
-                                <AccordionItem value="output">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
-                                        Output Ports
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <SpecRow label="Gigabit Ethernet (RJ45)" value={controller.gigabitEthernetRj45} />
-                                            <SpecRow label="10G Optical Fiber (Out)" value={controller.opticalFiberOut10g} />
-                                            <SpecRow label="5G Output Port" value={controller.output5g} />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
                             <Accordion type="single" defaultValue="monitoring" collapsible className="rounded-lg">
                                 <AccordionItem value="monitoring">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Monitoring Ports
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -323,26 +333,9 @@ export default function ControllerDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
-
-                            <Accordion type="single" defaultValue="loop" collapsible className="rounded-lg">
-                                <AccordionItem value="loop">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
-                                        Loop Ports
-                                    </AccordionTrigger>
-                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <SpecRow label="HDMI 2.0 LOOP" value={controller.hdmi20Loop} />
-                                            <SpecRow label="12G-SDI LOOP" value={controller.sdi12gLoop} />
-                                            <SpecRow label="3G-SDI LOOP" value={controller.sdi3gLoop} />
-                                            <SpecRow label="DVI LOOP" value={controller.dviLoop} />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
                             <Accordion type="single" defaultValue="audio" collapsible className="rounded-lg">
                                 <AccordionItem value="audio">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Audio & Control Ports
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -363,7 +356,7 @@ export default function ControllerDetailPage() {
                         <div className="space-y-4">
                             <Accordion type="single" defaultValue="layer" collapsible className="rounded-lg">
                                 <AccordionItem value="layer">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Layer & Image Quality
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -380,7 +373,7 @@ export default function ControllerDetailPage() {
 
                             <Accordion type="single" defaultValue="system" collapsible className="rounded-lg">
                                 <AccordionItem value="system">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         System & Special Features
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
@@ -392,6 +385,37 @@ export default function ControllerDetailPage() {
                                             <SpecRow label="Multi-Viewer (MVR)" value={controller.multiViewerMvr} />
                                             <SpecRow label="USB Playback" value={controller.usbPlayback} />
                                             <SpecRow label="3D Support" value={controller.support3d} />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+
+                            <Accordion type="single" defaultValue="loop" collapsible className="rounded-lg">
+                                <AccordionItem value="loop">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                        Loop Ports
+                                    </AccordionTrigger>
+                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <SpecRow label="HDMI 2.0 LOOP" value={controller.hdmi20Loop} />
+                                            <SpecRow label="12G-SDI LOOP" value={controller.sdi12gLoop} />
+                                            <SpecRow label="3G-SDI LOOP" value={controller.sdi3gLoop} />
+                                            <SpecRow label="DVI LOOP" value={controller.dviLoop} />
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+
+                            <Accordion type="single" defaultValue="output" collapsible className="rounded-lg">
+                                <AccordionItem value="output">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
+                                        Output Ports
+                                    </AccordionTrigger>
+                                    <AccordionContent className="space-y-3 pt-4 bg-gray-100 px-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <SpecRow label="Gigabit Ethernet (RJ45)" value={controller.gigabitEthernetRj45} />
+                                            <SpecRow label="10G Optical Fiber (Out)" value={controller.opticalFiberOut10g} />
+                                            <SpecRow label="5G Output Port" value={controller.output5g} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>

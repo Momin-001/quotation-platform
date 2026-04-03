@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Send, Wifi, WifiOff } from "lucide-react";
 
-export default function UserQuotationChat({ quotationId, chatDisabled, chatDisabledReason, currentUserId }) {
+export default function UserQuotationChat({ quotationId, chatDisabled, chatDisabledReason, currentUserId, currentUserName }) {
     const {
         isConnected,
         connectionError,
@@ -188,11 +188,20 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
         }
     };
 
+    function getInitials(name = "") {
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
+    }
+
     return (
-        <div className="bg-white rounded-lg border shadow-sm">
+        <div className="px-4">
             {/* Header with connection status */}
-            <div className="p-4 border-b flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Conversation with Admin</h3>
+            <div className="pb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold font-open-sans">Conversation with Admin</h3>
                 <div className="flex items-center gap-2">
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -216,86 +225,134 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
             )}
 
             {/* Messages Container */}
-            <div ref={messagesContainerRef} className="h-80 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                        <Spinner className="h-6 w-6" />
-                    </div>
-                ) : messages.length === 0 ? (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                        No messages yet. Start the conversation!
-                    </div>
-                ) : (
-                    messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={`flex ${msg.senderRole === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                            <div
-                                className={`max-w-[70%] rounded-lg p-3 ${msg.senderRole === "user"
-                                        ? "bg-primary text-white"
-                                        : "bg-white border shadow-sm"
-                                    }`}
-                            >
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className={`text-xs font-semibold ${msg.senderRole === "user" ? "text-white/80" : "text-gray-600"
-                                        }`}>
-                                        {msg.senderRole === "user" ? "You" : "Admin"}
-                                    </span>
-                                    <span className={`text-xs ${msg.senderRole === "user" ? "text-white/60" : "text-gray-400"
-                                        }`}>
-                                        {format(new Date(msg.createdAt), "dd MMM, yyyy HH:mm")}
-                                    </span>
-                                </div>
-                                <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
-                            </div>
-                        </div>
-                    ))
-                )}
+         <div
+  ref={messagesContainerRef}
+  className="h-80 overflow-y-auto p-6 space-y-6 rounded-lg border bg-primary-foreground/80"
+>
+  {loading ? (
+    <div className="flex items-center justify-center h-full">
+      <Spinner className="h-6 w-6" />
+    </div>
+  ) : messages.length === 0 ? (
+    <div className="flex items-center justify-center h-full text-gray-500">
+      No messages yet. Start the conversation!
+    </div>
+  ) : (
+    messages.map((msg) => {
+      const isUser = msg.senderRole === "user";
 
-                {/* Typing indicator */}
-                {typingUser && (
-                    <div className="flex justify-start">
-                        <div className="bg-gray-200 rounded-lg px-4 py-2">
-                            <div className="flex items-center gap-1">
-                                <span className="text-sm text-gray-600">Admin is typing</span>
-                                <span className="flex gap-0.5">
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                )}
+      const name = isUser ? currentUserName : "Admin"; // you can replace with real name later
+      const avatar = msg.avatar; // optional if backend sends it
+
+      return (
+        <div
+          key={msg.id}
+          className={`flex items-start gap-3 ${
+            isUser ? "justify-end text-right" : "justify-start"
+          }`}
+        >
+          {/* LEFT AVATAR (ADMIN) */}
+          {!isUser && (
+            avatar ? (
+              <img
+                src={avatar}
+                alt={name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                {getInitials(name)}
+              </div>
+            )
+          )}
+
+          {/* MESSAGE CONTENT */}
+          <div className="max-w-[70%] font-open-sans">
+            <div
+              className={`flex flex-col items-center gap-1 mb-2 ${
+                isUser ? "items-end" : "items-start"
+              }`}
+            >
+              <span className="text-sm font-bold text-gray-900">
+                {name}
+              </span>
+              <span className="text-xs">
+                {format(new Date(msg.createdAt), "dd MMM, yyyy HH:mm")}
+              </span>
             </div>
+
+            <p className="text-xs leading-relaxed whitespace-pre-wrap">
+              {msg.message}
+            </p>
+          </div>
+
+          {/* RIGHT AVATAR (USER) */}
+          {isUser && (
+            avatar ? (
+              <img
+                src={avatar}
+                alt={name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                {getInitials(name)}
+              </div>
+            )
+          )}
+        </div>
+      );
+    })
+  )}
+
+  {/* Typing indicator */}
+  {typingUser && (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+        A
+      </div>
+
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        Admin is typing
+        <div className="flex gap-1">
+          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
+          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
+        </div>
+      </div>
+    </div>
+  )}
+</div>
 
             {/* Message Input */}
-            <div className="p-4 border-t">
-                {chatDisabled ? (
-                    <div className="text-center text-sm text-gray-500 py-2">
-                        {chatDisabledReason || "Chat is disabled for this quotation"}
-                    </div>
-                ) : (
-                    <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                        <input
-                            type="text"
-                            value={newMessage}
-                            onChange={handleInputChange}
-                            placeholder="Write your message..."
-                            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                            disabled={sending}
-                        />
-                        <Button
-                            type="submit"
-                            disabled={sending || !newMessage.trim()}
-                            className="px-4"
-                        >
-                            {sending ? <Spinner className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-                        </Button>
-                    </form>
-                )}
-            </div>
+            <div className="py-4">
+                    {chatDisabled ? (
+                        <div className="text-center text-sm text-gray-500 py-2">
+                            {chatDisabledReason || "Chat is disabled for this quotation"}
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={newMessage}
+                                onChange={handleInputChange}
+                                placeholder="Write your message..."
+                                className="flex-1 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder:font-archivo placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
+                                disabled={sending}
+                            />
+                            <Button
+                                type="submit"
+                                size="lg"
+                                disabled={sending || !newMessage.trim()}
+                                className="px-4"
+                            >
+                                {sending ? <Spinner className="h-4 w-4" /> :
+                                    <span>Send</span>
+                                }
+                            </Button>
+                        </form>
+                    )}
+                </div>
         </div>
     );
 }

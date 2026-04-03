@@ -7,27 +7,27 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Wifi, WifiOff, Send } from "lucide-react";
 
-export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisabledReason }) {
+export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisabledReason, currentUserName }) {
     const { user } = useAuth();
-    const { 
-        isConnected, 
+    const {
+        isConnected,
         connectionError,
-        joinRoom, 
-        leaveRoom, 
-        sendMessage: socketSendMessage, 
+        joinRoom,
+        leaveRoom,
+        sendMessage: socketSendMessage,
         onNewMessage,
         onUserTyping,
         startTyping,
-        stopTyping 
+        stopTyping
     } = useSocket();
-    
+
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [typingUser, setTypingUser] = useState(null);
     const [hasJoinedRoom, setHasJoinedRoom] = useState(false);
-    
+
     const messagesEndRef = useRef(null);
     const typingTimeoutRef = useRef(null);
     const lastTypingRef = useRef(false);
@@ -188,11 +188,20 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
         }
     };
 
+    function getInitials(name = "") {
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
+    }
+
     return (
-        <div className="bg-white rounded-lg border shadow-sm">
+        <div className="bg-white rounded-lg border shadow-sm p-4">
             {/* Header with connection status */}
-            <div className="p-4 border-b flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Conversation with Customer</h3>
+            <div className="pb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold font-open-sans">Conversation with Customer</h3>
                 <div className="flex items-center gap-2">
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -214,9 +223,9 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                     {connectionError}
                 </div>
             )}
-            
+
             {/* Messages Container */}
-            <div className="h-80 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="h-80 overflow-y-auto p-6 space-y-6 rounded-lg border shadow-sm bg-primary-foreground/80">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
                         <Spinner className="h-6 w-6" />
@@ -226,57 +235,95 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                         No messages yet. Start the conversation!
                     </div>
                 ) : (
-                    messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={`flex ${msg.senderRole === "admin" ? "justify-end" : "justify-start"}`}
-                        >
+                    messages.map((msg) => {
+                        const isAdmin = msg.senderRole === "admin";
+
+                        const name = isAdmin ? `${currentUserName} (You)` : "Customer";
+                        const avatar = msg.avatar;
+
+                        return (
                             <div
-                                className={`max-w-[70%] rounded-lg p-3 ${
-                                    msg.senderRole === "admin"
-                                        ? "bg-primary text-white"
-                                        : "bg-white border shadow-sm"
-                                }`}
+                                key={msg.id}
+                                className={`flex items-start gap-3 ${isAdmin ? "justify-end text-right" : "justify-start"
+                                    }`}
                             >
-                                <div className="flex items-center gap-2 mb-1">
-                                    <span className={`text-xs font-semibold ${
-                                        msg.senderRole === "admin" ? "text-white/80" : "text-gray-600"
-                                    }`}>
-                                        {msg.senderRole === "admin" ? "You (Admin)" : "Customer"}
-                                    </span>
-                                    <span className={`text-xs ${
-                                        msg.senderRole === "admin" ? "text-white/60" : "text-gray-400"
-                                    }`}>
-                                        {format(new Date(msg.createdAt), "dd MMM, yyyy HH:mm")}
-                                    </span>
+                                {/* LEFT (CUSTOMER) */}
+                                {!isAdmin && (
+                                    avatar ? (
+                                        <img
+                                            src={avatar}
+                                            alt={name}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                                            {getInitials(name)}
+                                        </div>
+                                    )
+                                )}
+
+                                {/* MESSAGE */}
+                                <div className="max-w-[70%] font-open-sans">
+                                    <div
+                                        className={`flex flex-col items-center gap-1 mb-2 ${isAdmin ? "items-end" : "items-start"
+                                            }`}
+                                    >
+                                        <span className="text-sm font-bold text-gray-900">
+                                            {name}
+                                        </span>
+
+                                        <span className="text-xs">
+                                            {format(new Date(msg.createdAt), "dd MMM, yyyy HH:mm")}
+                                        </span>
+                                    </div>
+
+                                    <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                                        {msg.message}
+                                    </p>
                                 </div>
-                                <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+
+                                {/* RIGHT (ADMIN) */}
+                                {isAdmin && (
+                                    avatar ? (
+                                        <img
+                                            src={avatar}
+                                            alt={name}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                                            {getInitials(name)}
+                                        </div>
+                                    )
+                                )}
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
-                
+
                 {/* Typing indicator */}
                 {typingUser && (
-                    <div className="flex justify-start">
-                        <div className="bg-gray-200 rounded-lg px-4 py-2">
-                            <div className="flex items-center gap-1">
-                                <span className="text-sm text-gray-600">Customer is typing</span>
-                                <span className="flex gap-0.5">
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                                    <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-                                </span>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                            C
+                        </div>
+
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            Customer is typing
+                            <div className="flex gap-1">
+                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
                             </div>
                         </div>
                     </div>
                 )}
-                
+
                 <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input */}
-            <div className="p-4 border-t">
+            <div className="py-4">
                 {chatDisabled ? (
                     <div className="text-center text-sm text-gray-500 py-2">
                         {chatDisabledReason || "Chat is disabled for this quotation"}
@@ -288,15 +335,16 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                             value={newMessage}
                             onChange={handleInputChange}
                             placeholder="Write your message..."
-                            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="flex-1 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder:font-archivo placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
                             disabled={sending}
                         />
                         <Button
                             type="submit"
                             disabled={sending || !newMessage.trim()}
                             className="px-4"
+                            size="lg"
                         >
-                            {sending ? <Spinner className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+                            {sending ? <Spinner className="h-4 w-4" /> : <span>Send</span>}
                         </Button>
                     </form>
                 )}

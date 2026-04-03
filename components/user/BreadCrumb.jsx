@@ -13,7 +13,7 @@ import {
       <div className="bg-secondary">
         <div className="container text-white mx-auto py-3 px-4 flex flex-wrap gap-3 items-center justify-between">
           {/* Left: Page Title */}
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-archivo tracking-tight">
             {title}
           </h1>
   

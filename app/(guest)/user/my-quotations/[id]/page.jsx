@@ -169,11 +169,12 @@ export default function QuotationDetailPage() {
                 </Button>
 
                 {/* Header Info */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                    <p className="text-primary font-medium">
+                <div className="container mx-auto space-y-6 bg-gray-100 rounded-lg border shadow-sm p-4">
+                <div className="p-2">
+                    <p className="text-primary text-lg underline font-archivo font-bold">
                         {formatEnquiryNumber(quotation.enquiry?.id || "", quotation.createdAt)}
                     </p>
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-xl font-bold font-archivo text-gray-900">
                         Quotation {quotation.quotationNumber}
                     </h1>
                     {quotation.description && (
@@ -182,7 +183,7 @@ export default function QuotationDetailPage() {
                 </div>
 
                 {/* Project Info */}
-                <div className="grid grid-cols-3 gap-4 bg-white rounded-lg border p-4">
+                <div className="grid grid-cols-3 gap-4 px-6 py-2">
                     <div>
                         <p className="text-sm text-gray-500">Project</p>
                         <p className="font-medium">{mainProduct?.product?.productName || "N/A"}</p>
@@ -195,7 +196,7 @@ export default function QuotationDetailPage() {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                <div className="bg-primary-foreground/80 rounded-lg border shadow-sm overflow-hidden">
                     {/* Main Product Section */}
                     <div className="p-6 border-b">
                         <h3 className="text-xl font-semibold text-blue-700 mb-4">Main Product</h3>
@@ -350,8 +351,8 @@ export default function QuotationDetailPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="bg-white rounded-lg border shadow-sm p-4">
-                    <h3 className="text-lg font-semibold mb-4">Actions</h3>
+                <div className="p-4 border-b border-black/20">
+                    <h3 className="text-xl font-bold font-open-sans mb-4">Actions</h3>
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Show action buttons if not disabled */}
                         {!quotation.buttonsDisabled ? (
@@ -377,7 +378,7 @@ export default function QuotationDetailPage() {
                                 <Button
                                     onClick={() => openConfirmDialog("request_revision")}
                                     disabled={actionLoading !== null || pdfLoading}
-                                    className="bg-yellow-500 hover:bg-yellow-600"
+                                    className="bg-[#FFE62E] text-black hover:bg-[#FFE62E]/90"
                                     size="lg"
                                 >
                                     {actionLoading === "request_revision" ? <Spinner className="h-4 w-4 mr-2" /> : null}
@@ -431,10 +432,12 @@ export default function QuotationDetailPage() {
                 {/* Chat Section */}
                 <UserQuotationChat
                     quotationId={params.id}
+                    currentUserName={user?.fullName}
                     chatDisabled={quotation.chatDisabled}
                     chatDisabledReason={quotation.chatDisabledReason}
                     currentUserId={user?.id}
                 />
+            </div>
             </div>
         </div>
     );

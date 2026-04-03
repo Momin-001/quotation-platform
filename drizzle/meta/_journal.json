@@ -57,6 +57,13 @@
       "when": 1774577053834,
       "tag": "0007_slippery_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775176956262,
+      "tag": "0008_known_lake",
+      "breakpoints": true
     }
   ]
 }

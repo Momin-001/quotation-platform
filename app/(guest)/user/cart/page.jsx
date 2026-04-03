@@ -96,7 +96,7 @@ export default function CartPage() {
         if (itemType === "main") {
             return {
                 label: "Main Product",
-                bgColor: "bg-blue-600",
+                bgColor: "bg-primary",
                 borderColor: "border-blue-200",
             };
         }
@@ -133,11 +133,24 @@ export default function CartPage() {
                 ]} 
             />
             <div className="container mx-auto px-4 py-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold">Cart</h1>
+
+                {/* Cart limit info */}
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-primary">
+                        <strong>Cart Limit:</strong> You can add up to 2 products - 
+                        a <span className="font-semibold">Main Product</span> (the product you want a quotation for) 
+                        and an <span className="font-semibold">Alternative Product</span> (an alternative option).
+                        {!canAddToCart() && (
+                            <span className="block mt-1 text-primary">
+                                Your cart is full. Remove a product to add a different one.
+                            </span>
+                        )}
+                    </p>
+                </div>
+                <div className="flex items-center justify-end mb-8">
                     {cartItems.length === 2 && (
                         <Button 
-                            variant="outline" 
+                            variant="secondary" 
                             onClick={swapProducts}
                             className="flex items-center gap-2"
                         >
@@ -146,21 +159,6 @@ export default function CartPage() {
                         </Button>
                     )}
                 </div>
-
-                {/* Cart limit info */}
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                        <strong>Cart Limit:</strong> You can add up to 2 products - 
-                        a <span className="font-semibold">Main Product</span> (the product you want a quotation for) 
-                        and an <span className="font-semibold">Alternative Product</span> (an alternative option).
-                        {!canAddToCart() && (
-                            <span className="block mt-1 text-blue-600">
-                                Your cart is full. Remove a product to add a different one.
-                            </span>
-                        )}
-                    </p>
-                </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Side - Selected Products */}
                     <div className="space-y-4">
@@ -359,7 +357,7 @@ export default function CartPage() {
                                     htmlFor="privacy"
                                     className="text-sm cursor-pointer"
                                 >
-                                    I agree to the Privacy Policy and Terms & Conditions.
+                                    I agree to the <Link href="/privacy-policy" target="_blank" className="font-bold hover:underline">Privacy Policy</Link> and <Link href="/terms-and-conditions" target="_blank" className="font-bold hover:underline">Terms & Conditions.</Link>
                                 </Label>
                             </div>
 
@@ -374,10 +372,10 @@ export default function CartPage() {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="w-full bg-primary hover:bg-primary/90"
+                                size="lg"
                                 disabled={loading}
                             >
-                                {loading ? "Submitting..." : "Submit Enquiry"}
+                                {loading ? "Submitting..." : "Submit"}
                             </Button>
                         </form>
                     </div>

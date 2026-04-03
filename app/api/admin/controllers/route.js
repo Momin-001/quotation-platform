@@ -23,6 +23,7 @@ function parseControllerBody(body) {
         brandName: body.brandName?.trim() || null,
         brandNameOther: body.brandNameOther?.trim() || null,
         interfaceName: body.interfaceName?.trim() || null,
+        interfaceDescription: body.interfaceDescription?.trim() || null,
         pixelCapacity: body.pixelCapacity ? parseInt(body.pixelCapacity) : null,
         maxWidthHeight: body.maxWidthHeight ? parseInt(body.maxWidthHeight) : null,
         dp12: body.dp12 ? parseInt(body.dp12) : 0,

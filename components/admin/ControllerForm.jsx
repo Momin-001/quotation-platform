@@ -26,6 +26,7 @@ const controllerSchema = z.object({
     brandName: z.string().optional(),
     brandNameOther: z.string().optional(),
     interfaceName: z.string().optional(),
+    interfaceDescription: z.string().optional(),
     controllerNumber: z.string().optional(),
     pixelCapacity: z.union([z.string(), z.number()]).optional(),
     maxWidthHeight: z.union([z.string(), z.number()]).optional(),
@@ -75,6 +76,7 @@ const defaultValues = {
     brandName: "",
     brandNameOther: "",
     interfaceName: "",
+    interfaceDescription: "",
     controllerNumber: "",
     pixelCapacity: "",
     maxWidthHeight: "",
@@ -128,6 +130,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
         interfaceName: initialData.interfaceName || "",
         brandName: initialData.brandName || "",
         brandNameOther: initialData.brandNameOther || "",
+        interfaceDescription: initialData.interfaceDescription || "",
         controllerNumber: initialData.controllerNumber || "",
         pixelCapacity: initialData.pixelCapacity?.toString() || "",
         maxWidthHeight: initialData.maxWidthHeight?.toString() || "",
@@ -279,6 +282,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     {renderInput("Interface Name", "interfaceName", "text", { placeholder: "e.g. VX2000 Pro Max" })}
                     {renderSelect("Brand Name", "brandName", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"])}
                     {brandName === "Other" && renderInput("Brand Name Other", "brandNameOther", "text", { placeholder: "Enter brand name" })}
+                    {renderInput("Interface Description", "interfaceDescription", "text", { placeholder: "Enter interface description" })}
                     {renderInput("Controller Number", "controllerNumber", "text", { placeholder: "e.g. 1234567890" })}
                     {renderInput("Max. Pixel Capacity", "pixelCapacity", "number", { placeholder: "e.g. 13000000" })}
                     {renderInput("Max. Width/Height (px)", "maxWidthHeight", "number", { placeholder: "e.g. 10240" })}

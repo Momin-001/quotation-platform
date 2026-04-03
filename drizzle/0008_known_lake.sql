@@ -1,0 +1,1 @@
+ALTER TABLE "controllers" ADD COLUMN "interface_description" text;

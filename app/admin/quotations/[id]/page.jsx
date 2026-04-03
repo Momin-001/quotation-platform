@@ -11,12 +11,13 @@ import Link from "next/link";
 import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
 import AdminQuotationChat from "@/components/admin/Quotation/AdminQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
-
+import { useAuth } from "@/context/AuthContext";
 const RichTextEditor = lazy(() => import("@/components/admin/RichTextEditor"));
 
 export default function AdminQuotationDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const { user } = useAuth();
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [pdfLoading, setPdfLoading] = useState(false);
@@ -348,8 +349,8 @@ export default function AdminQuotationDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg border shadow-sm p-4">
-            <h3 className="text-lg font-semibold mb-4">Actions</h3>
+            <div className="bg-primary-foreground/80 rounded-lg border shadow-sm p-4">
+            <h3 className="text-xl font-bold font-open-sans mb-4">Actions</h3>
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={handleDownloadPDF}
@@ -374,7 +375,7 @@ export default function AdminQuotationDetailPage() {
                     onClick={handleToggleSections}
                     className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                 >
-                    <h3 className="text-lg font-semibold">Edit PDF Sections</h3>
+                    <h3 className="text-xl font-bold font-open-sans">Edit PDF Sections</h3>
                     {sectionsOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
                 </button>
                 {sectionsOpen && (
@@ -442,6 +443,7 @@ export default function AdminQuotationDetailPage() {
 
             {/* Chat Section */}
             <AdminQuotationChat
+                currentUserName={user?.fullName}
                 quotationId={params.id}
                 chatDisabled={quotation.chatDisabled}
                 chatDisabledReason={quotation.chatDisabledReason}

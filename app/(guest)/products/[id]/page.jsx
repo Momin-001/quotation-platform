@@ -166,10 +166,10 @@ export default function ProductDetailPage() {
         const displayValue = value ?? "N/A";
         return (
             <div className="flex justify-between items-baseline gap-4 py-1">
-                <span className="text-sm text-gray-600 shrink-0">{label}</span>
+                <span className="text-sm shrink-0">{label}</span>
                 <div className="flex items-baseline justify-end gap-3 min-w-0 flex-1">
                     <span className="font-medium text-right">{String(displayValue)}</span>
-                    <span className="text-gray-600 w-10 shrink-0"> {unit ? unit : ""}</span>
+                    <span className="w-10 shrink-0"> {unit ? unit : ""}</span>
                 </div>
             </div>
         );
@@ -183,14 +183,14 @@ export default function ProductDetailPage() {
                     { label: language === "en" ? "Products" : "Produkte", href: "/products" },
                     { label: product.productName }
                 ]} />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 font-open-sans">
                 <div className="container mx-auto px-4 py-8">
                     {/* Make the left grid take less width then the right grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                         {/* Left Side - Image Gallery */}
                         <div className="space-y-4">
                             {/* Main Selected Image */}
-                            <div className="relative aspect-video overflow-hidden rounded-lg">
+                            <div className="relative aspect-square overflow-hidden rounded-lg">
                                 {selectedImage ? (
                                     <Image
                                         src={selectedImage}
@@ -248,11 +248,11 @@ export default function ProductDetailPage() {
                         <div className="space-y-8">
                             <div className="space-y-2">
                                 <div>
-                                    <h1 className="text-3xl font-bold font-open-sans mb-2">{product.productName}</h1>
-                                    <p className="text-lg text-gray-600 mb-2">{product.productNumber}</p>
-                                    {product.categoryName && (
-                                        <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-semibold mb-4">
-                                            {product.categoryName.toUpperCase()}
+                                    <h1 className="text-3xl font-bold mb-2">{product.productName}</h1>
+                                    <p className="text-lg font-semibold mb-2">{product.productNumber}</p>
+                                    {product.areaOfUse && (
+                                        <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium mb-4">
+                                            {product.areaOfUse.toUpperCase()}
                                         </span>
                                     )}
                                     {product.productDescription && (
@@ -309,7 +309,7 @@ export default function ProductDetailPage() {
                                     <button
                                         onClick={handleDownloadDatasheet}
                                         disabled={datasheetLoading}
-                                        className="flex items-center cursor-pointer text-blue-600 hover:text-blue-700 font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                         {datasheetLoading ? (
                                             <>
@@ -346,7 +346,6 @@ export default function ProductDetailPage() {
                                         }
                                     }}
                                 >
-                                    <ShoppingCart className="h-5 w-5" />
                                     Add to Cart
                                 </Button>
                                 <Button variant="default" size="lg">
@@ -394,7 +393,7 @@ export default function ProductDetailPage() {
                             {/* Basic Information */}
                             <Accordion type="single" defaultValue="basic-info" collapsible className="rounded-lg">
                                 <AccordionItem value="basic-info">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Basic Information
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -412,7 +411,7 @@ export default function ProductDetailPage() {
                             {/* Physical Specifications */}
                             <Accordion type="single" defaultValue="physical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="physical-specs">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Physical Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -434,7 +433,7 @@ export default function ProductDetailPage() {
                             {/* Electrical Specifications */}
                             <Accordion type="single" defaultValue="electrical-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="electrical-specs">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Electrical Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -456,7 +455,7 @@ export default function ProductDetailPage() {
                             {/* Control System */}
                             <Accordion type="single" defaultValue="control-system" collapsible className="rounded-lg">
                                 <AccordionItem value="control-system">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Control System
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -474,7 +473,7 @@ export default function ProductDetailPage() {
                             {/* Operating Conditions */}
                             <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Operating Conditions
                                         </AccordionTrigger>
                                         <AccordionContent className="bg-white px-4 pb-4 pt-2">
@@ -485,7 +484,7 @@ export default function ProductDetailPage() {
                                                 <button
                                                     onClick={handleDownloadDatasheet}
                                                     disabled={datasheetLoading}
-                                                    className="flex items-center cursor-pointer text-blue-600 hover:text-blue-700 font-medium underline disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+                                                    className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
                                                 >
                                                     {datasheetLoading ? (
                                                         <>
@@ -581,7 +580,7 @@ export default function ProductDetailPage() {
                             {/* LED Specifications */}
                             <Accordion type="single" defaultValue="led-specs" collapsible className="rounded-lg">
                                 <AccordionItem value="led-specs">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         LED Specifications
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -600,7 +599,7 @@ export default function ProductDetailPage() {
                             {/* Display Performance */}
                             <Accordion type="single" defaultValue="display-performance" collapsible className="rounded-lg">
                                 <AccordionItem value="display-performance">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Display Performance
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -633,7 +632,7 @@ export default function ProductDetailPage() {
                             {/* Calibration */}
                             <Accordion type="single" defaultValue="calibration" collapsible className="rounded-lg">
                                 <AccordionItem value="calibration">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Calibration
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -649,7 +648,7 @@ export default function ProductDetailPage() {
                             {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
                                 <Accordion type="single" defaultValue="certifications" collapsible className="rounded-lg">
                                     <AccordionItem value="certifications">
-                                        <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                        <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                             Certifications & Standards
                                         </AccordionTrigger>
                                         <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
@@ -685,7 +684,7 @@ export default function ProductDetailPage() {
                             {/* Warranty & Support */}
                             <Accordion type="single" defaultValue="warranty" collapsible className="rounded-lg">
                                 <AccordionItem value="warranty">
-                                    <AccordionTrigger className="font-semibold bg-blue-100 px-4">
+                                    <AccordionTrigger className="font-bold text-xl bg-blue-100 px-4">
                                         Warranty & Support
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">

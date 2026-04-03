@@ -13,12 +13,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
     Sheet,
     SheetContent,
     SheetHeader,
@@ -35,8 +29,24 @@ import { useAuth } from "@/context/AuthContext";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
 
 
+// ---------------------------------------------------------------------------
+// Debounce hook
+// Returns a debounced copy of `value` that only updates after `delay` ms of
+// inactivity.  Default delay is 400 ms – feel free to tune it.
+// ---------------------------------------------------------------------------
+function useDebounce(value, delay = 400) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(timer);
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
+
 function FiltersAccordion({
-    accordionValue, setAccordionValue,
     productType, setProductType,
     design, setDesign,
     specialTypes, setSpecialTypes,
@@ -63,20 +73,18 @@ function FiltersAccordion({
     isAuthenticated,
 }) {
     const { language } = useLanguage();
+    
     return (
-        <Accordion
-            type="multiple"
-            value={accordionValue}
-            onValueChange={setAccordionValue}
-            className="space-y-0"
-        >
-            <AccordionItem value="productInfo" className="border-t pt-4 border-b-0 first:border-t-0 first:pt-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Product Information" : "Produktinformation"}</span>
-                </AccordionTrigger>
-                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
+        <div className="space-y-6">
+            
+            {/* Product Information */}
+            <div className="border-t pt-4 first:border-t-0 first:pt-0">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Product Information" : "Produktinformation"}
+                </h3>
+                <div className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
                     <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Design" : "Design"}</label>
+                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Design" : "Design"}</label>
                         <Select value={design} onValueChange={setDesign}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -86,7 +94,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div className={`${isAuthenticated ? "" : "mb-10"}`}>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
+                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
                         <Select value={application} onValueChange={setApplication}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -106,7 +114,7 @@ function FiltersAccordion({
 
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
                             <Select value={productType} onValueChange={setProductType}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -117,7 +125,7 @@ function FiltersAccordion({
                         </div>
 
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
                             <Select value={specialTypes} onValueChange={setSpecialTypes}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -129,29 +137,31 @@ function FiltersAccordion({
                             </Select>
                         </div>
                     </RestrictedContentOverlay>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="physicalSpecs" className="border-t pt-4 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}</span>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+            {/* Physical Specifications */}
+            <div className="border-t pt-4">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}
+                </h3>
+                <div className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
+                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Pixel Pitch (mm)" : "Pixelabstand (mm)"}</label>
                         <Input type="number" step="0.01" value={pixelPitch} onChange={(e) => setPixelPitch(e.target.value)} placeholder="e.g., 1.2" />
                     </div>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="ledSpecs" className="border-t pt-4 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "LED Specifications" : "LED-Spezifikationen"}</span>
-                </AccordionTrigger>
-                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
+            {/* LED Specifications */}
+            <div className="border-t pt-4">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "LED Specifications" : "LED-Spezifikationen"}
+                </h3>
+                <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
                             <Select value={ledTechnology} onValueChange={setLedTechnology}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -166,74 +176,75 @@ function FiltersAccordion({
                             </Select>
                         </div>
                         <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
                             <Input type="number" value={ledLifespan} onChange={(e) => setLedLifespan(e.target.value)} placeholder="Enter number" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
                                 <Select value={chipBonding} onValueChange={setChipBonding}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Gold Wire">Gold Wire</SelectItem>
-                                        <SelectItem value="Cooper Wire">Cooper Wire</SelectItem>
+                                        <SelectItem value="Copper Wire">Copper Wire</SelectItem>
                                         <SelectItem value="Flip-Chip">Flip-Chip</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                         </RestrictedContentOverlay>
                     </div>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="opticalSpecs" className="border-t pt-4 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}</span>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+            {/* Optical Specifications */}
+            <div className="border-t pt-4">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}
+                </h3>
+                <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
                             <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
                         </div>
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
                             <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
                         </div>
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
                             <Input value={viewingAngleHorizontal} onChange={(e) => setViewingAngleHorizontal(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
                             <Input value={viewingAngleVertical} onChange={(e) => setViewingAngleVertical(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                     </div>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="electricalSpecs" className="border-t pt-4 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}</span>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+            {/* Electrical Specifications */}
+            <div className="border-t pt-4">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}
+                </h3>
+                <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
                             <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Consumption Max" : "Maximale Leistung"}</label>
                                 <Input type="number" value={powerConsumptionMax} onChange={(e) => setPowerConsumptionMax(e.target.value)} placeholder="Enter number" />
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Consumption Typical" : "Typische Leistung"}</label>
                                 <Input type="number" value={powerConsumptionTypical} onChange={(e) => setPowerConsumptionTypical(e.target.value)} placeholder="Enter number" />
                             </div>
-
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -243,7 +254,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
                                 <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -253,7 +264,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
                                 <Select value={smartModule} onValueChange={setSmartModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -263,7 +274,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
                                 <Select value={controlSystem} onValueChange={setControlSystem}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -276,45 +287,47 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
+                                <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
                                 <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
                             </div>
                         </RestrictedContentOverlay>
                     </div>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="operatingConditions" className="border-t pt-4 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}</span>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3">
+            {/* Operating Conditions */}
+            <div className="border-t pt-4">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}
+                </h3>
+                <div className="space-y-3">
                     <div>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
+                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
                         <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
                     </div>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-            <AccordionItem value="warranty" className="border-t pt-4 pb-10 border-b-0">
-                <AccordionTrigger className="w-full flex items-center justify-between font-medium">
-                    <span className="font-open-sans font-bold text-base">{language === "en" ? "Warranty" : "Garantie"}</span>
-                </AccordionTrigger>
-                <AccordionContent className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
+            {/* Warranty */}
+            <div className="border-t pt-4 pb-10">
+                <h3 className="font-open-sans font-bold text-base mb-4">
+                    {language === "en" ? "Warranty" : "Garantie"}
+                </h3>
+                <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                        <label className="text-sm font-medium mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
+                        <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
                         <Input value={supportDuringWarrantyEn} onChange={(e) => setSupportDuringWarrantyEn(e.target.value)} placeholder="Enter support during warranty" />
                     </div>
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-sm font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
+                            <label className="text-sm font-open-sans font-medium mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
                             <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
                         </div>
                     </RestrictedContentOverlay>
-                </AccordionContent>
-            </AccordionItem>
+                </div>
+            </div>
 
-        </Accordion>
+        </div>
     );
 }
 
@@ -333,7 +346,9 @@ function ProductsPageContent() {
     const initialUrlCategoryId = searchParams.get("categoryId") || "";
     const [selectedCategory, setSelectedCategory] = useState(initialUrlCategoryId);
 
-    // Filter states
+    // ---------------------------------------------------------------------------
+    // Raw filter states  (bound to inputs – update immediately for a responsive UI)
+    // ---------------------------------------------------------------------------
     const [productType, setProductType] = useState("");
     const [design, setDesign] = useState("");
     const [specialTypes, setSpecialTypes] = useState("");
@@ -357,6 +372,38 @@ function ProductsPageContent() {
     const [ipRating, setIpRating] = useState("");
     const [warrantyPeriod, setWarrantyPeriod] = useState("");
     const [supportDuringWarrantyEn, setSupportDuringWarrantyEn] = useState("");
+
+    // ---------------------------------------------------------------------------
+    // Debounced filter values  (used for the actual API call – 400 ms delay)
+    // Select / category filters use a shorter 150 ms delay since the user has
+    // already made a deliberate choice; text / number inputs use the full 400 ms.
+    // ---------------------------------------------------------------------------
+    const debouncedSearch               = useDebounce(search, 400);
+    const debouncedSelectedCategory     = useDebounce(selectedCategory, 150);
+    const debouncedProductType          = useDebounce(productType, 150);
+    const debouncedDesign               = useDebounce(design, 150);
+    const debouncedSpecialTypes         = useDebounce(specialTypes, 150);
+    const debouncedApplication          = useDebounce(application, 150);
+    const debouncedPixelPitch           = useDebounce(pixelPitch, 400);
+    const debouncedLedTechnology        = useDebounce(ledTechnology, 150);
+    const debouncedLedLifespan          = useDebounce(ledLifespan, 400);
+    const debouncedChipBonding          = useDebounce(chipBonding, 150);
+    const debouncedBrightnessControl    = useDebounce(brightnessControl, 400);
+    const debouncedContrastRatio        = useDebounce(contrastRatio, 400);
+    const debouncedViewingAngleH        = useDebounce(viewingAngleHorizontal, 400);
+    const debouncedViewingAngleV        = useDebounce(viewingAngleVertical, 400);
+    const debouncedPowerConsMax         = useDebounce(powerConsumptionMax, 400);
+    const debouncedPowerConsTypical     = useDebounce(powerConsumptionTypical, 400);
+    const debouncedRefreshRate          = useDebounce(refreshRate, 400);
+    const debouncedPowerRedundancy      = useDebounce(powerRedundancy, 150);
+    const debouncedMemoryOnModule       = useDebounce(memoryOnModule, 150);
+    const debouncedSmartModule          = useDebounce(smartModule, 150);
+    const debouncedControlSystem        = useDebounce(controlSystem, 150);
+    const debouncedReceivingCard        = useDebounce(receivingCard, 400);
+    const debouncedIpRating             = useDebounce(ipRating, 400);
+    const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 400);
+    const debouncedSupportDuringWarranty = useDebounce(supportDuringWarrantyEn, 400);
+
     // Accordion state - all sections open by default
     const [accordionValue, setAccordionValue] = useState([]);
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -381,64 +428,69 @@ function ProductsPageContent() {
     }, []);
 
     // Apply `categoryId` from URL query params to the existing category filter UI/API.
-    // This is needed for the homepage "preset filter" CTA.
     useEffect(() => {
         if (categories.length === 0) return;
         if (urlCategoryAppliedRef.current) return;
 
         const urlCategoryId = searchParams.get("categoryId") || "";
 
-        // If URL doesn't provide categoryId, show "All" (empty selection).
         if (!urlCategoryId) {
             if (selectedCategory !== "") setSelectedCategory("");
             urlCategoryAppliedRef.current = true;
             return;
         }
 
-        // Only apply when the category exists in our loaded list.
         const exists = categories.some((c) => c.id === urlCategoryId);
         if (exists) {
             if (selectedCategory !== urlCategoryId) setSelectedCategory(urlCategoryId);
             urlCategoryAppliedRef.current = true;
         } else {
-            // Unknown categoryId -> fallback to "All"
             if (selectedCategory !== "") setSelectedCategory("");
             urlCategoryAppliedRef.current = true;
         }
     }, [searchParams, categories]);
 
-    // Build query params
+    // Build query params – uses the DEBOUNCED values
     const buildQueryParams = useCallback((pageNum = page) => {
         const params = new URLSearchParams();
         params.append("page", pageNum.toString());
         params.append("limit", "10");
-        if (search) params.append("search", search);
-        if (selectedCategory) params.append("categoryId", selectedCategory);
-        if (productType) params.append("productType", productType);
-        if (design) params.append("design", design);
-        if (specialTypes) params.append("specialTypes", specialTypes);
-        if (application) params.append("application", application);
-        if (pixelPitch) params.append("pixelPitch", pixelPitch);
-        if (ledTechnology) params.append("ledTechnology", ledTechnology);
-        if (ledLifespan) params.append("ledLifespan", ledLifespan);
-        if (chipBonding) params.append("chipBonding", chipBonding);
-        if (brightnessControl) params.append("brightnessControl", brightnessControl);
-        if (contrastRatio) params.append("contrastRatio", contrastRatio);
-        if (viewingAngleHorizontal) params.append("viewingAngleHorizontal", viewingAngleHorizontal);
-        if (viewingAngleVertical) params.append("viewingAngleVertical", viewingAngleVertical);
-        if (powerConsumptionMax) params.append("powerConsumptionMax", powerConsumptionMax);
-        if (powerConsumptionTypical) params.append("powerConsumptionTypical", powerConsumptionTypical);
-        if (refreshRate) params.append("refreshRate", refreshRate);
-        if (powerRedundancy !== "") params.append("powerRedundancy", powerRedundancy);
-        if (memoryOnModule !== "") params.append("memoryOnModule", memoryOnModule);
-        if (smartModule !== "") params.append("smartModule", smartModule);
-        if (controlSystem) params.append("controlSystem", controlSystem);
-        if (receivingCard) params.append("receivingCard", receivingCard);
-        if (ipRating) params.append("ipRating", ipRating);
-        if (warrantyPeriod) params.append("warrantyPeriod", warrantyPeriod);
-        if (supportDuringWarrantyEn !== "") params.append("supportDuringWarrantyEn", supportDuringWarrantyEn);
+        if (debouncedSearch)                params.append("search", debouncedSearch);
+        if (debouncedSelectedCategory)      params.append("categoryId", debouncedSelectedCategory);
+        if (debouncedProductType)           params.append("productType", debouncedProductType);
+        if (debouncedDesign)                params.append("design", debouncedDesign);
+        if (debouncedSpecialTypes)          params.append("specialTypes", debouncedSpecialTypes);
+        if (debouncedApplication)           params.append("application", debouncedApplication);
+        if (debouncedPixelPitch)            params.append("pixelPitch", debouncedPixelPitch);
+        if (debouncedLedTechnology)         params.append("ledTechnology", debouncedLedTechnology);
+        if (debouncedLedLifespan)           params.append("ledLifespan", debouncedLedLifespan);
+        if (debouncedChipBonding)           params.append("chipBonding", debouncedChipBonding);
+        if (debouncedBrightnessControl)     params.append("brightnessControl", debouncedBrightnessControl);
+        if (debouncedContrastRatio)         params.append("contrastRatio", debouncedContrastRatio);
+        if (debouncedViewingAngleH)         params.append("viewingAngleHorizontal", debouncedViewingAngleH);
+        if (debouncedViewingAngleV)         params.append("viewingAngleVertical", debouncedViewingAngleV);
+        if (debouncedPowerConsMax)          params.append("powerConsumptionMax", debouncedPowerConsMax);
+        if (debouncedPowerConsTypical)      params.append("powerConsumptionTypical", debouncedPowerConsTypical);
+        if (debouncedRefreshRate)           params.append("refreshRate", debouncedRefreshRate);
+        if (debouncedPowerRedundancy !== "") params.append("powerRedundancy", debouncedPowerRedundancy);
+        if (debouncedMemoryOnModule !== "")  params.append("memoryOnModule", debouncedMemoryOnModule);
+        if (debouncedSmartModule !== "")     params.append("smartModule", debouncedSmartModule);
+        if (debouncedControlSystem)         params.append("controlSystem", debouncedControlSystem);
+        if (debouncedReceivingCard)         params.append("receivingCard", debouncedReceivingCard);
+        if (debouncedIpRating)              params.append("ipRating", debouncedIpRating);
+        if (debouncedWarrantyPeriod)        params.append("warrantyPeriod", debouncedWarrantyPeriod);
+        if (debouncedSupportDuringWarranty !== "") params.append("supportDuringWarrantyEn", debouncedSupportDuringWarranty);
         return params.toString();
-    }, [page, search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, ledLifespan, chipBonding, brightnessControl, contrastRatio, viewingAngleHorizontal, viewingAngleVertical, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod, supportDuringWarrantyEn]);
+    }, [
+        page,
+        debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
+        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitch, debouncedLedTechnology,
+        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
+        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerConsMax, debouncedPowerConsTypical,
+        debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
+        debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
+        debouncedSupportDuringWarranty,
+    ]);
 
     // Fetch products
     const fetchProducts = useCallback(async (pageNum, reset = false) => {
@@ -464,13 +516,21 @@ function ProductsPageContent() {
         }
     }, [buildQueryParams]);
 
-    // Reset and fetch when filters change
+    // Reset and fetch when DEBOUNCED filters change
     useEffect(() => {
         setPage(1);
         setProducts([]);
         fetchProducts(1, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, selectedCategory, productType, design, specialTypes, application, pixelPitch, ledTechnology, ledLifespan, chipBonding, brightnessControl, contrastRatio, viewingAngleHorizontal, viewingAngleVertical, powerConsumptionMax, powerConsumptionTypical, refreshRate, powerRedundancy, memoryOnModule, smartModule, controlSystem, receivingCard, ipRating, warrantyPeriod, supportDuringWarrantyEn]);
+    }, [
+        debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
+        debouncedSpecialTypes, debouncedApplication, debouncedPixelPitch, debouncedLedTechnology,
+        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
+        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerConsMax, debouncedPowerConsTypical,
+        debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
+        debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
+        debouncedSupportDuringWarranty,
+    ]);
 
     // Infinite scroll
     const loadMore = useCallback(() => {
@@ -532,12 +592,12 @@ function ProductsPageContent() {
                 {/* Search Bar */}
                 <div className="mb-6">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-800" />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={language === "en" ? "Search Products by Name or Product Number" : "Produkte nach Name oder Produktnummer suchen"}
-                            className="pl-10"
+                            className="pl-12 placeholder:text-gray-700"
                         />
                     </div>
                 </div>
@@ -548,7 +608,6 @@ function ProductsPageContent() {
                         variant={selectedCategory === "" ? "default" : "outline"}
                         className={`${selectedCategory === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         onClick={() => setSelectedCategory("")}
-
                     >
                         {language === "en" ? "All" : "Alle"}
                     </Button>
@@ -557,7 +616,7 @@ function ProductsPageContent() {
                             key={category.id}
                             variant={selectedCategory === category.id ? "default" : "outline"}
                             onClick={() => setSelectedCategory(category.id)}
-                            className={`${category.id === selectedCategory ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                            className={`uppercase font-medium ${category.id === selectedCategory ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                         >
                             {category.name}
                         </Button>
@@ -706,33 +765,14 @@ function ProductsPageContent() {
                                                         No Image
                                                     </div>
                                                 )}
-                                                {/* Certificates */}
-                                                {/* {product.productCertificates && product.productCertificates.length > 0 && (
-                                                    <div className="absolute top-2 right-2 flex gap-1 flex-col flex-wrap justify-end">
-                                                        {product.productCertificates.map((cert) => (
-                                                            <div
-                                                                key={cert.id}
-                                                                className="bg-white rounded-full p-2 shadow-sm"
-                                                            >
-                                                                <Image
-                                                                    src={cert.imageUrl}
-                                                                    alt={cert.name}
-                                                                    width={22}
-                                                                    height={22}
-                                                                    className="object-contain"
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )} */}
                                             </div>
                                             {/* Product Info */}
                                             <div className="p-4">
                                                 <h3 className="font-bold font-open-sans text-lg mb-1">
                                                     {product.productName}
                                                 </h3>
-                                                <p className="text-md mb-1">{product.productNumber}</p>
-                                                <p className="text-md bg-secondary text-white rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
+                                                <p className="text-md font-open-sans mb-1">{product.productNumber}</p>
+                                                <p className="text-sm font-open-sans bg-secondary text-white rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
                                             </div>
                                         </Link>
                                     );
@@ -771,4 +811,3 @@ export default function ProductsPage() {
         </Suspense>
     );
 }
-
