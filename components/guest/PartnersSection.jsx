@@ -42,37 +42,37 @@ export default function PartnersSection({ homepageData, partners = [] }) {
 
                 {/* Marquee Container */}
                 {partners.length > 0 ? (
-                    <div className="overflow-hidden relative">
-                        <Marquee
-                            speed={speed}
-                            pauseOnHover={pauseOnHover}
-                            pauseOnClick={false}
-                            gradient={false}
-                            className="py-4"
-                        >
-                            {partners.map((partner) => (
-                                <div
-                                    key={partner.id}
-                                    className="shrink-0 bg-gray-100 rounded-lg py-6 px-14 hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4"
-                                    onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
-                                    onMouseEnter={() => setPauseOnHover(true)}
-                                >
-                                    <Image
-                                        src={partner.logoUrl}
-                                        alt={partner.name}
-                                        width={100}
-                                        height={100}
-                                        className="object-contain w-[120px] h-[30px]"
-                                    />
-                                </div>
-                            ))}
-                        </Marquee>
-                    </div>
-                ) : (
-                    <div className="text-center text-gray-500 py-12">
-                        <p>No partners available</p>
-                    </div>
-                )}
+    <div className="overflow-hidden relative">
+        <Marquee
+            speed={speed}
+            pauseOnHover={pauseOnHover}
+            pauseOnClick={false}
+            gradient={false}
+            className="py-4"
+        >
+            {partners.map((partner) => (
+                <div
+                    key={partner.id}
+                    className="shrink-0 bg-gray-100 rounded-lg hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4 w-[200px] h-[80px]"
+                    onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
+                    onMouseEnter={() => setPauseOnHover(true)}
+                >
+                    <Image
+                        src={partner.logoUrl}
+                        alt={partner.name}
+                        width={160}
+                        height={60}
+                        className="object-contain w-[130px] h-[60px]"
+                    />
+                </div>
+            ))}
+        </Marquee>
+    </div>
+) : (
+    <div className="text-center text-gray-500 py-12">
+        <p>No partners available</p>
+    </div>
+)}
             </div>
         </section>
     );

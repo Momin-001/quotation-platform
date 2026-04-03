@@ -42,31 +42,31 @@ export default function MarketingPartnersSection({ homepageData, partners = [] }
                 </div>
 
                 <div className="overflow-hidden relative">
-                    <Marquee
-                        speed={speed}
-                        pauseOnHover={pauseOnHover}
-                        pauseOnClick={false}
-                        gradient={false}
-                        className="py-4"
-                    >
-                        {partners.map((partner) => (
-                            <div
-                                key={partner.id}
-                                className="shrink-0 bg-gray-100 rounded-lg py-6 px-14 hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4"
-                                onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
-                                onMouseEnter={() => setPauseOnHover(true)}
-                            >
-                                <Image
-                                    src={partner.logoUrl}
-                                    alt={partner.name}
-                                    width={100}
-                                    height={100}
-                                    className="object-contain w-[120px] h-[30px]"
-                                />
-                            </div>
-                        ))}
-                    </Marquee>
-                </div>
+  <Marquee
+    speed={speed}
+    pauseOnHover={pauseOnHover}
+    pauseOnClick={false}
+    gradient={false}
+    className="py-4"
+  >
+    {partners.map((partner) => (
+      <div
+        key={partner.id}
+        className="shrink-0 bg-gray-100 rounded-lg hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4 w-[200px] h-[80px]"
+        onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
+        onMouseEnter={() => setPauseOnHover(true)}
+      >
+        <Image
+          src={partner.logoUrl}
+          alt={partner.name}
+          width={160}
+          height={60}
+          className="object-contain w-[160px] h-[60px]"
+        />
+      </div>
+    ))}
+  </Marquee>
+</div>
             </div>
         </section>
     );
