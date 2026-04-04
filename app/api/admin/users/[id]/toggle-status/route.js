@@ -41,8 +41,10 @@ export async function PATCH(req, { params }) {
             isActive === true &&
             !existingUser.password;
 
+        let transporter = null;
+
         if (activatingFirstTime) {
-            const transporter = createEmailTransporter();
+            transporter = createEmailTransporter();
             if (!transporter || !SMTP_USER) {
                 return errorResponse("Email service is not configured. Please contact the administrator.", 500);
             }
