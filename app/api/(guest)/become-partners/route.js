@@ -1,7 +1,6 @@
 import { errorResponse, successResponse } from "@/lib/api-response";
-import nodemailer from "nodemailer";
-import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, ADMIN_EMAIL } from "@/lib/constants";
-
+import { SMTP_USER, ADMIN_EMAIL } from "@/lib/constants";
+import { createEmailTransporter } from "@/lib/email-transporter";
 export async function POST(req) {
     try {
         const body = await req.json();
@@ -18,24 +17,13 @@ export async function POST(req) {
             return errorResponse("Invalid email format", 400);
         }
 
-        // Check if email configuration is set
-        if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD || !ADMIN_EMAIL) {
+        // Create transporter
+        const transporter = createEmailTransporter();
+        if (!transporter || !SMTP_USER) {
             return errorResponse("Email service is not configured. Please contact the administrator.", 500);
         }
-
-        // Create transporter
-        const transporter = nodemailer.createTransport({
-            host: SMTP_HOST,
-            port: parseInt(SMTP_PORT),
-            secure: parseInt(SMTP_PORT) === 465, // true for 465, false for other ports
-            auth: {
-                user: SMTP_USER,
-                pass: SMTP_PASSWORD,
-            },
-        });
-
         // Email content
-        const mailOptions = {
+        await transporter.sendMail({
             from: SMTP_USER,
             to: ADMIN_EMAIL,
             subject: "New Partner Application",
@@ -49,10 +37,7 @@ export async function POST(req) {
                 </ul>
                 <p>Please review and respond to this application.</p>
             `,
-        };
-
-        // Send email
-        await transporter.sendMail(mailOptions);
+        });
 
         return successResponse("Partner application submitted successfully. We will contact you soon.");
     } catch (error) {

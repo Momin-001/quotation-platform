@@ -3,8 +3,8 @@ import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
-import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD } from "@/lib/constants";
+import { SMTP_USER } from "@/lib/constants";
+import { createEmailTransporter } from "@/lib/email-transporter";
 
 function generateInitialPassword(length = 10) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
@@ -41,8 +41,11 @@ export async function PATCH(req, { params }) {
             isActive === true &&
             !existingUser.password;
 
-        if (activatingFirstTime && (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD)) {
-            return errorResponse("Email service is not configured. Configure SMTP before approving users.", 500);
+        if (activatingFirstTime) {
+            const transporter = createEmailTransporter();
+            if (!transporter || !SMTP_USER) {
+                return errorResponse("Email service is not configured. Please contact the administrator.", 500);
+            }
         }
 
         const updatePayload = { isActive };
@@ -64,16 +67,6 @@ export async function PATCH(req, { params }) {
         }
 
         if (activatingFirstTime) {
-            const transporter = nodemailer.createTransport({
-                host: SMTP_HOST,
-                port: parseInt(SMTP_PORT, 10),
-                secure: parseInt(SMTP_PORT, 10) === 465,
-                auth: {
-                    user: SMTP_USER,
-                    pass: SMTP_PASSWORD,
-                },
-            });
-
             await transporter.sendMail({
                 from: SMTP_USER,
                 to: updatedUser[0].email,
