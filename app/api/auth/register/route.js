@@ -49,7 +49,7 @@ export async function POST(req) {
             })
             .returning();
 
-        return successResponse("User created successfully", newUser[0]);
+        return successResponse("User created successfully, please wait for admin approval", newUser[0]);
     } catch (error) {
         return errorResponse(error.message || "Failed to create user");
     }
