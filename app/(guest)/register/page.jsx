@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -37,7 +38,7 @@ export default function RegisterPage() {
     const { language } = useLanguage();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [success, setSuccess] = useState(false);
     const {
         register,
         handleSubmit,
@@ -65,7 +66,7 @@ export default function RegisterPage() {
             if (!response.success) {
                 throw new Error(response.message || "Registration failed");
             }
-            toast.success(response.message || "Registration successful! Please login.");
+            setSuccess(true);
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -82,6 +83,24 @@ export default function RegisterPage() {
                 { label: language === "en" ? "Register" : "Registrieren" }
                 ]} />
             {/* Main Content */}
+            {success && (
+                <Dialog
+                    open={success}
+                    onOpenChange={setSuccess}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Registration successful!</DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription>
+                        Thank you for registering! Your account is currently pending admin approval. You’ll receive an email once your account has been approved, along with instructions to log in. We appreciate your patience.
+                        </DialogDescription>
+                        <DialogFooter>
+                            <Button onClick={() => setSuccess(false)}>OK</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
             <main className="grow relative">
                 <div className="absolute inset-0 z-0">
                     <div className="w-full h-full  bg-cover bg-center" style={{ backgroundImage: "url('/placeholder-bg.jpg')" }}></div>
@@ -182,8 +201,6 @@ export default function RegisterPage() {
                     </Card>
                 </div>
             </main>
-
-           
         </div>
     );
 }

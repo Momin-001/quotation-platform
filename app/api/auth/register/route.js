@@ -31,7 +31,7 @@ export async function POST(req) {
             .then((res) => res[0]);
 
         if (existingUser) {
-            return errorResponse("User already exists", 409);
+            return errorResponse("User with this email already exists", 409);
         }
 
         const newUser = await db
@@ -49,7 +49,7 @@ export async function POST(req) {
             })
             .returning();
 
-        return successResponse("User created successfully, please wait for admin approval", newUser[0]);
+        return successResponse("Registration successful! Please wait for admin approval.", newUser[0]);
     } catch (error) {
         return errorResponse(error.message || "Failed to create user");
     }
