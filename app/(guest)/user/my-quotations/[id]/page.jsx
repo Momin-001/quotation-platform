@@ -50,8 +50,6 @@ export default function QuotationDetailPage() {
             }
             setQuotation(response.data);
         } catch (error) {
-            toast.error(error.message);
-            router.push("/user/my-quotations");
         } finally {
             setLoading(false);
         }

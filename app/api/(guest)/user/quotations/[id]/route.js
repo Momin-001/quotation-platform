@@ -131,7 +131,7 @@ export async function GET(req, { params }) {
         const quotation = await db
             .select()
             .from(quotations)
-            .where(eq(quotations.id, id))
+            .where(and(eq(quotations.id, id), ne(quotations.status, "draft")))
             .limit(1)
             .then((res) => res[0]);
 

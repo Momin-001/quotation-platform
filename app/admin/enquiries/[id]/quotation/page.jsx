@@ -60,23 +60,6 @@ export default function QuotationBuilderPage() {
 
             const items = response.data.items || [];
 
-            const buildOptionalItems = (item) => {
-                if (!item.accessories || item.accessories.length === 0) return [];
-                return item.accessories.map((acc) => ({
-                    product: {
-                        id: acc.id,
-                        productName: acc.productName,
-                        productNumber: acc.productNumber,
-                        sourceType: "accessory",
-                    },
-                    quantity: acc.quantity || 1,
-                    unitPrice: "",
-                    taxPercentage: "",
-                    discountPercentage: "",
-                    description: "",
-                }));
-            };
-
             // First item is always the main product
             if (items[0]) {
                 const mainAdditionalItems = items[0].controller
@@ -102,7 +85,7 @@ export default function QuotationBuilderPage() {
                     taxPercentage: "",
                     discountPercentage: "",
                     description: "",
-                    optionalItems: buildOptionalItems(items[0]),
+                    optionalItems: [],
                     additionalItems: mainAdditionalItems,
                 });
             }
@@ -132,7 +115,7 @@ export default function QuotationBuilderPage() {
                     taxPercentage: "",
                     discountPercentage: "",
                     description: "",
-                    optionalItems: buildOptionalItems(items[1]),
+                    optionalItems: [],
                     additionalItems: altAdditionalItems,
                 });
                 setAlternativeFromEnquiry(true);
@@ -314,6 +297,12 @@ export default function QuotationBuilderPage() {
             optionalItems: [],
             additionalItems: [],
         });
+        setAlternativeFromEnquiry(false);
+    };
+
+    const handleRemoveAlternativeSection = () => {
+        setAlternativeProduct(null);
+        setAlternativeFromEnquiry(false);
     };
 
     const handleUpdateAlternativeProduct = (updated) => {
@@ -645,6 +634,7 @@ export default function QuotationBuilderPage() {
                 productFromEnquiry={alternativeFromEnquiry}
                 onAddAlternative={handleAddAlternative}
                 showAddAlternativeButton={!alternativeProduct}
+                onRemoveSection={handleRemoveAlternativeSection}
             />
 
             {/* Action Buttons */}

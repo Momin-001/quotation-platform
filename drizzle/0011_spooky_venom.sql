@@ -1,0 +1,1 @@
+ALTER TABLE "enquiry_items" ADD COLUMN "custom_service_access" jsonb;

@@ -45,6 +45,7 @@ export default function RegisterPage() {
         handleSubmit,
         setValue,
         control,
+        reset,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(formSchema),
@@ -68,6 +69,7 @@ export default function RegisterPage() {
                 throw new Error(response.message || "Registration failed");
             }
             setSuccess(true);
+            reset();
         } catch (error) {
             toast.error(error.message);
         } finally {

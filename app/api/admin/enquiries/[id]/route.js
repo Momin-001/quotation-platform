@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, enquiryItemAccessories, enquiryFiles, users, products, productImages, quotations, controllers, accessories } from "@/db/schema";
+import { enquiries, enquiryItems, enquiryFiles, users, products, productImages, quotations, controllers } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
@@ -85,6 +85,16 @@ export async function GET(req, { params }) {
                 customOperatingHours: enquiryItems.customOperatingHours,
                 customPowerRedundancy: enquiryItems.customPowerRedundancy,
                 customIpRating: enquiryItems.customIpRating,
+                customInstallationAndService: enquiryItems.customInstallationAndService,
+                customStructuralWidth: enquiryItems.customStructuralWidth,
+                customStructuralHeight: enquiryItems.customStructuralHeight,
+                customStructuralDepth: enquiryItems.customStructuralDepth,
+                customViewingDistanceMin: enquiryItems.customViewingDistanceMin,
+                customViewingDistanceMax: enquiryItems.customViewingDistanceMax,
+                customControllerConfig: enquiryItems.customControllerConfig,
+                customNetworkConnection: enquiryItems.customNetworkConnection,
+                customSignalSourceInputs: enquiryItems.customSignalSourceInputs,
+                customAdditionalServices: enquiryItems.customAdditionalServices,
                 productName: products.productName,
                 productNumber: products.productNumber,
                 pixelPitch: products.pixelPitch,
@@ -126,25 +136,11 @@ export async function GET(req, { params }) {
                         };
                     }
                 }
-                
-                // Fetch accessories linked to this enquiry item
-                const itemAccessories = await db
-                    .select({
-                        id: accessories.id,
-                        productName: accessories.productName,
-                        productNumber: accessories.productNumber,
-                        productGroup: accessories.productGroup,
-                        quantity: enquiryItemAccessories.quantity,
-                    })
-                    .from(enquiryItemAccessories)
-                    .innerJoin(accessories, eq(enquiryItemAccessories.accessoryId, accessories.id))
-                    .where(eq(enquiryItemAccessories.enquiryItemId, item.id));
 
                 return {
                     ...item,
                     imageUrl: images[0]?.imageUrl || null,
                     controller,
-                    accessories: itemAccessories,
                 };
             })
         );

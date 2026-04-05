@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { products, productImages, controllers, accessories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { desc, ilike, or, sql, eq } from "drizzle-orm";
+import { desc, ilike, or, eq, and, sql } from "drizzle-orm";
 
 // GET /api/admin/products/search-all - Search across all product types (LED, controllers, accessories)
 export async function GET(request) {
@@ -14,15 +14,16 @@ export async function GET(request) {
         const offset = (page - 1) * limit;
 
         // Search LED products (skip if typeFilter is controller or accessory only)
-        let productConditions = [];
-        if (search.trim()) {
-            productConditions = [
-                or(
-                    ilike(products.productName, `%${search}%`),
-                    ilike(products.productNumber, `%${search}%`)
-                )
-            ];
-        }
+        const productActive = eq(products.isActive, true);
+        const productWhereClause = search.trim()
+            ? and(
+                  productActive,
+                  or(
+                      ilike(products.productName, `%${search}%`),
+                      ilike(products.productNumber, `%${search}%`)
+                  )
+              )
+            : productActive;
 
         let productsWithMeta = [];
         if (typeFilter === "" || typeFilter === "product") {
@@ -35,11 +36,10 @@ export async function GET(request) {
                     pixelPitch: products.pixelPitch,
                 })
                 .from(products)
+                .where(productWhereClause)
                 .orderBy(desc(products.createdAt));
 
-            const productsList = productConditions.length > 0
-                ? await productsQuery.where(productConditions[0])
-                : await productsQuery;
+            const productsList = await productsQuery;
 
             productsWithMeta = await Promise.all(
                 productsList.map(async (product) => {
@@ -62,15 +62,20 @@ export async function GET(request) {
         }
 
         // Search controllers (skip if typeFilter is product or accessory only)
-        let controllerConditions = [];
-        if (search.trim()) {
-            controllerConditions = [
-                or(
-                    ilike(controllers.interfaceName, `%${search}%`),
-                    ilike(controllers.brandName, `%${search}%`)
-                )
-            ];
-        }
+        // brandName is a PostgreSQL enum — ilike() on enums is invalid / unreliable; cast to text.
+        const controllerActive = eq(controllers.isActive, true);
+        const controllerSearchPattern = `%${search.trim()}%`;
+        const controllerSearchOr = search.trim()
+            ? or(
+                  ilike(controllers.interfaceName, controllerSearchPattern),
+                  ilike(controllers.controllerNumber, controllerSearchPattern),
+                  ilike(controllers.brandNameOther, controllerSearchPattern),
+                  sql`(${controllers.brandName})::text ILIKE ${controllerSearchPattern}`
+              )
+            : undefined;
+        const controllerWhereClause = controllerSearchOr
+            ? and(controllerActive, controllerSearchOr)
+            : controllerActive;
 
         let controllersWithMeta = [];
         if (typeFilter === "" || typeFilter === "controller") {
@@ -81,11 +86,10 @@ export async function GET(request) {
                     brandName: controllers.brandName,
                 })
                 .from(controllers)
+                .where(controllerWhereClause)
                 .orderBy(desc(controllers.createdAt));
 
-            const controllersList = controllerConditions.length > 0
-                ? await controllersQuery.where(controllerConditions[0])
-                : await controllersQuery;
+            const controllersList = await controllersQuery;
 
             controllersWithMeta = controllersList.map((c) => ({
                 ...c,
@@ -98,15 +102,16 @@ export async function GET(request) {
         }
 
         // Search accessories (skip if typeFilter is product or controller only)
-        let accessoryConditions = [];
-        if (search.trim()) {
-            accessoryConditions = [
-                or(
-                    ilike(accessories.productName, `%${search}%`),
-                    ilike(accessories.productNumber, `%${search}%`)
-                )
-            ];
-        }
+        const accessoryActive = eq(accessories.isActive, true);
+        const accessoryWhereClause = search.trim()
+            ? and(
+                  accessoryActive,
+                  or(
+                      ilike(accessories.productName, `%${search}%`),
+                      ilike(accessories.productNumber, `%${search}%`)
+                  )
+              )
+            : accessoryActive;
 
         let accessoriesWithMeta = [];
         if (typeFilter === "" || typeFilter === "accessory") {
@@ -118,11 +123,10 @@ export async function GET(request) {
                     productGroup: accessories.productGroup,
                 })
                 .from(accessories)
+                .where(accessoryWhereClause)
                 .orderBy(desc(accessories.createdAt));
 
-            const accessoriesList = accessoryConditions.length > 0
-                ? await accessoriesQuery.where(accessoryConditions[0])
-                : await accessoriesQuery;
+            const accessoriesList = await accessoriesQuery;
 
             accessoriesWithMeta = accessoriesList.map((a) => ({
                 ...a,

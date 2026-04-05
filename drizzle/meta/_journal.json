@@ -71,6 +71,20 @@
       "when": 1775241619504,
       "tag": "0009_graceful_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1775423145432,
+      "tag": "0010_pale_mikhail_rasputin",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1775423160950,
+      "tag": "0011_spooky_venom",
+      "breakpoints": true
     }
   ]
 }

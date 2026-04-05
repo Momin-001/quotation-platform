@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft, Eye, Pencil, Monitor, Wrench, Package, Upload, StickyNote } from "lucide-react";
+import { FileText, ArrowLeft, Eye, Pencil, Monitor, Wrench, Package, Upload, Settings2 } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -16,6 +16,11 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+
+function JsonArrayDisplay({ value }) {
+    if (!value || !Array.isArray(value) || value.length === 0) return <span className="font-semibold">N/A</span>;
+    return <span className="font-semibold">{value.join(", ")}</span>;
+}
 
 export default function EnquiryDetailPage() {
     const params = useParams();
@@ -188,6 +193,7 @@ export default function EnquiryDetailPage() {
                                     <TableHead className="p-4 text-white whitespace-nowrap">Quantity</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Cabinet Resolution (H)</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Cabinet Resolution (V)</TableHead>
+                                    <TableHead className="p-4 text-white whitespace-nowrap">Controller</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Download Datasheet</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -213,6 +219,13 @@ export default function EnquiryDetailPage() {
                                             {item.cabinetResolutionVertical
                                                 ? `${item.cabinetResolutionVertical}px`
                                                 : "N/A"}
+                                        </TableCell>
+                                        <TableCell className="p-4">
+                                            {item.controller ? (
+                                                <span className="text-sm font-medium text-blue-700">
+                                                    {item.controller.productName}
+                                                </span>
+                                            ) : "N/A"}
                                         </TableCell>
                                         <TableCell className="p-4">
                                             <button
@@ -358,11 +371,15 @@ export default function EnquiryDetailPage() {
                         <h2 className="text-xl font-bold font-archivo">Installation & Service</h2>
                     </div>
                     {items.filter((item) => item.isCustom).map((item) => (
-                        <div key={`install-${item.id}`} className="bg-gray-50 border rounded-lg p-5">
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div key={`install-${item.id}`} className="bg-gray-50 border rounded-lg p-5 space-y-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Installation and Service</p>
+                                    <JsonArrayDisplay value={item.customInstallationAndService} />
+                                </div>
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase tracking-wide">Service Access</p>
-                                    <p className="font-semibold">{item.customServiceAccess || "N/A"}</p>
+                                    <JsonArrayDisplay value={item.customServiceAccess} />
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-500 uppercase tracking-wide">Mounting Method</p>
@@ -380,29 +397,80 @@ export default function EnquiryDetailPage() {
                                     <p className="text-xs text-gray-500 uppercase tracking-wide">IP Rating</p>
                                     <p className="font-semibold">{item.customIpRating || "N/A"}</p>
                                 </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Structural Constraints</p>
+                                    <p className="font-semibold">
+                                        {item.customStructuralWidth || item.customStructuralHeight || item.customStructuralDepth
+                                            ? `${item.customStructuralWidth || "—"} × ${item.customStructuralHeight || "—"} × ${item.customStructuralDepth || "—"} mm`
+                                            : "N/A"}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Viewing Distance</p>
+                                    <p className="font-semibold">
+                                        {item.customViewingDistanceMin || item.customViewingDistanceMax
+                                            ? `${item.customViewingDistanceMin || "—"} m – ${item.customViewingDistanceMax || "—"} m`
+                                            : "N/A"}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* Optional Services / Accessories (Leditor) */}
-            {items.some((item) => item.accessories && item.accessories.length > 0) && (
+            {/* Additional Configuration (Leditor) */}
+            {items.some((item) => item.isCustom && (
+                (item.customControllerConfig && item.customControllerConfig.length > 0) ||
+                (item.customNetworkConnection && item.customNetworkConnection.length > 0) ||
+                (item.customSignalSourceInputs && item.customSignalSourceInputs.length > 0) ||
+                (item.customAdditionalServices && item.customAdditionalServices.length > 0)
+            )) && (
+                <div className="bg-white rounded-lg border shadow-sm p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Settings2 className="h-5 w-5 text-teal-600" />
+                        <h2 className="text-xl font-bold font-archivo">Additional Configuration</h2>
+                    </div>
+                    {items.filter((item) => item.isCustom).map((item) => (
+                        <div key={`config-${item.id}`} className="bg-gray-50 border rounded-lg p-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Controller Configuration</p>
+                                    <JsonArrayDisplay value={item.customControllerConfig} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Network Connection</p>
+                                    <JsonArrayDisplay value={item.customNetworkConnection} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Signal Source Inputs</p>
+                                    <JsonArrayDisplay value={item.customSignalSourceInputs} />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Additional Services</p>
+                                    <JsonArrayDisplay value={item.customAdditionalServices} />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Controller Selection (Leditor) */}
+            {items.some((item) => item.isCustom && item.controller) && (
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Package className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-xl font-bold font-archivo">Requested Optional Services</h2>
+                        <h2 className="text-xl font-bold font-archivo">Selected Controller</h2>
                     </div>
-                    {items.filter((item) => item.accessories && item.accessories.length > 0).map((item) => (
-                        <div key={`acc-${item.id}`} className="space-y-2">
-                            {item.accessories.map((acc) => (
-                                <div key={acc.id} className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-3">
-                                    <div className="flex-1">
-                                        <p className="font-semibold text-sm">{acc.productName}</p>
-                                        <p className="text-xs text-gray-500">{acc.productNumber} · {acc.productGroup}</p>
-                                    </div>
+                    {items.filter((item) => item.isCustom && item.controller).map((item) => (
+                        <div key={`ctrl-${item.id}`} className="space-y-2">
+                            <div className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-3">
+                                <div className="flex-1">
+                                    <p className="font-semibold text-sm">{item.controller.productName}</p>
+                                    <p className="text-xs text-gray-500">{item.controller.brandName}</p>
                                 </div>
-                            ))}
+                            </div>
                         </div>
                     ))}
                 </div>

@@ -1,5 +1,6 @@
 import QuotationForm from "@/components/admin/Quotation/QuotationForm";
-import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react";
 
 export default function QuotationBuilderSection({
     title,
@@ -20,10 +21,27 @@ export default function QuotationBuilderSection({
     productFromEnquiry = false,
     onAddAlternative,
     showAddAlternativeButton = false,
+    /** When set, shows a trash control to remove the whole section (e.g. Alternative Product). */
+    onRemoveSection = null,
 }) {
     return (
         <div className={`${bgColor} rounded-xl p-6 border-2 ${borderColor}`}>
-            <h2 className={`text-xl font-bold font-archivo mb-4 ${titleColor}`}>{title}</h2>
+            <div className="flex items-center justify-between gap-3 mb-4">
+                <h2 className={`text-xl font-bold font-archivo ${titleColor}`}>{title}</h2>
+                {productData && onRemoveSection ? (
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={onRemoveSection}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0"
+                        title="Remove this section"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove section</span>
+                    </Button>
+                ) : null}
+            </div>
             
             {productData ? (
                 <div className="space-y-4">

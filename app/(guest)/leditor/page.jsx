@@ -47,6 +47,32 @@ const enquirySchema = z.object({
     captcha: z.union([z.string(), z.any()]).refine((val) => !!val, "Please complete the captcha"),
 });
 
+function MultiCheckbox({ label, options, value = [], onChange }) {
+    const toggle = (opt) => {
+        if (value.includes(opt)) {
+            onChange(value.filter((v) => v !== opt));
+        } else {
+            onChange([...value, opt]);
+        }
+    };
+    return (
+        <div className="space-y-2">
+            <Label>{label}</Label>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1">
+                {options.map((opt) => (
+                    <Label key={opt} className="cursor-pointer font-normal mb-0 flex items-center gap-2">
+                        <Checkbox
+                            checked={value.includes(opt)}
+                            onCheckedChange={() => toggle(opt)}
+                        />
+                        <span>{opt}</span>
+                    </Label>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
@@ -101,36 +127,42 @@ export default function LeditorPage() {
 
     // Installation & Service state
     const [installationData, setInstallationData] = useState({
-        serviceAccess: "Front Service",
+        serviceAccess: [],
         mountingMethod: "Wall Mount",
         operatingHours: "Standard (8-12 hours/day)",
         powerRedundancy: "Required",
         ipRating: "",
+        installationAndService: [],
     });
 
-    // Optional accessories state
-    const [selectedAccessories, setSelectedAccessories] = useState([]);
-    const [accessorySearch, setAccessorySearch] = useState("");
-    const [accessoryResults, setAccessoryResults] = useState([]);
-    const [accessoryDropdownOpen, setAccessoryDropdownOpen] = useState(false);
-    const [accessoryLoading, setAccessoryLoading] = useState(false);
-    const [accessoryDropdownRect, setAccessoryDropdownRect] = useState(null);
-    const accessorySearchRef = useRef(null);
-    const accessoryTriggerRef = useRef(null);
+    // Additional fields state
+    const [structuralConstraints, setStructuralConstraints] = useState({ width: "", height: "", depth: "" });
+    const [viewingDistance, setViewingDistance] = useState({ min: "", max: "" });
+    const [controllerConfig, setControllerConfig] = useState([]);
+    const [networkConnection, setNetworkConnection] = useState([]);
+    const [signalSourceInputs, setSignalSourceInputs] = useState([]);
+    const [additionalServices, setAdditionalServices] = useState([]);
+
+    // Controller selection state (replaces accessories)
+    const [selectedController, setSelectedController] = useState(null);
+    const [controllerSearch, setControllerSearch] = useState("");
+    const [controllerResults, setControllerResults] = useState([]);
+    const [controllerDropdownOpen, setControllerDropdownOpen] = useState(false);
+    const [controllerLoading, setControllerLoading] = useState(false);
+    const [controllerDropdownRect, setControllerDropdownRect] = useState(null);
+    const controllerSearchRef = useRef(null);
+    const controllerTriggerRef = useRef(null);
 
     // File upload state
     const [uploadedFiles, setUploadedFiles] = useState([]);
 
-    // Notes state
-
     // Canvas ref
     const canvasRef = useRef(null);
-    // Pre-load images for canvas
     const leditorImgRef = useRef(null);
     const personImgRef = useRef(null);
     const [imagesLoaded, setImagesLoaded] = useState(false);
 
-    // User's own image for preview (local state only, cleared on refresh)
+    // User's own image for preview
     const [userPreviewImageUrl, setUserPreviewImageUrl] = useState(null);
     const userPreviewImageRef = useRef(null);
     const [userPreviewImageLoaded, setUserPreviewImageLoaded] = useState(false);
@@ -155,7 +187,6 @@ export default function LeditorPage() {
         personImgRef.current = personImg;
     }, []);
 
-    // Load user's preview image when they select a file
     useEffect(() => {
         if (!userPreviewImageUrl) {
             userPreviewImageRef.current = null;
@@ -185,7 +216,8 @@ export default function LeditorPage() {
         "selection",
         "screen-info",
         "installation-service",
-        "optional-services",
+        "additional-config",
+        "controller-selection",
         "file-upload",
         "notes-submission",
         "submit-enquiry",
@@ -240,17 +272,14 @@ export default function LeditorPage() {
         );
     };
 
-    // Handle category change
     const handleCategoryChange = (categoryId) => {
         setSelectedCategory(categoryId);
         setPage(1);
     };
 
-    // Handle product selection
     const handleSelectProduct = (product) => {
         setSelectedProduct(product);
 
-        // Convert cabinet dimensions from mm to meters for display
         const cabWidthM = product.cabinetWidth
             ? parseFloat(product.cabinetWidth) / 1000
             : 0.5;
@@ -258,7 +287,6 @@ export default function LeditorPage() {
             ? parseFloat(product.cabinetHeight) / 1000
             : 0.5;
 
-        // Set initial screen to 1 cabinet
         const initialScreenW = parseFloat(cabWidthM.toFixed(3));
         const initialScreenH = parseFloat(cabHeightM.toFixed(3));
 
@@ -293,30 +321,24 @@ export default function LeditorPage() {
         return { countH, countV };
     }, [config.cabinetWidth, config.cabinetHeight, config.screenWidth, config.screenHeight]);
 
-    // ─── Computed / Derived values ───
     const computed = useMemo(() => {
         const cabInfo = getCabinetsInfo();
         const totalCabinets = cabInfo.countH * cabInfo.countV;
 
-        // 1) Total Resolution
         const cabinetResH = selectedProduct?.cabinetResolutionHorizontal || 0;
         const cabinetResV = selectedProduct?.cabinetResolutionVertical || 0;
         const totalResH = cabinetResH * cabInfo.countH;
         const totalResV = cabinetResV * cabInfo.countV;
 
-        // 2) Weight
         const cabinetWeight = selectedProduct?.weightWithoutPackaging
             ? parseFloat(selectedProduct.weightWithoutPackaging)
             : 0;
         const totalWeight = parseFloat((cabinetWeight * totalCabinets).toFixed(2));
 
-        // 3) Display Area (m²) — screenWidth and screenHeight are already in meters
         const displayArea = parseFloat((config.screenWidth * config.screenHeight).toFixed(4));
 
-        // 4) Dimension string
         const dimension = `${config.screenWidth.toFixed(3)}m × ${config.screenHeight.toFixed(3)}m`;
 
-        // 5) Power Consumption (per m² × display area)
         const pcMax = selectedProduct?.powerConsumptionMax || 0;
         const pcTyp = selectedProduct?.powerConsumptionTypical || 0;
         const powerMax = parseFloat((pcMax * displayArea).toFixed(2));
@@ -335,7 +357,6 @@ export default function LeditorPage() {
         };
     }, [getCabinetsInfo, selectedProduct, config.screenWidth, config.screenHeight]);
 
-    // Adjust screen width/height by one cabinet
     const adjustScreenWidth = (delta) => {
         const cabWidthM = config.cabinetWidth
             ? parseFloat(config.cabinetWidth) / 1000
@@ -369,10 +390,9 @@ export default function LeditorPage() {
         const PERSON_HEIGHT_M = 1.6;
         const showPerson = config.screenHeight >= PERSON_HEIGHT_M;
 
-        // Reserve space: person on the left, labels on top/right/bottom
-        const personReserveW = showPerson ? 80 : 0; // pixels reserved for person column
+        const personReserveW = showPerson ? 80 : 0;
         const maxW = Math.min(containerWidth - 32, 900);
-        const ledMaxW = maxW - personReserveW - 40; // 40 for right label
+        const ledMaxW = maxW - personReserveW - 40;
         const maxH = 450;
 
         const screenRatio = config.screenWidth / config.screenHeight;
@@ -386,18 +406,15 @@ export default function LeditorPage() {
             drawW = maxH * screenRatio;
         }
 
-        // Person height in pixels (relative to LED height)
         const personDrawH = showPerson ? (PERSON_HEIGHT_M / config.screenHeight) * drawH : 0;
-        // Person aspect ratio ~0.35 (typical silhouette)
         const personDrawW = personImgRef.current?.naturalWidth && personImgRef.current?.naturalHeight
             ? personDrawH * (personImgRef.current.naturalWidth / personImgRef.current.naturalHeight)
             : personDrawH * 0.35;
 
         const actualPersonReserve = showPerson ? Math.max(personReserveW, personDrawW + 16) : 0;
 
-        // Canvas total dimensions
-        const totalW = actualPersonReserve + drawW + 40; // 40 for right label
-        const totalH = Math.max(drawH, personDrawH) + 80; // 80 for top/bottom labels
+        const totalW = actualPersonReserve + drawW + 40;
+        const totalH = Math.max(drawH, personDrawH) + 80;
 
         const dpr = window.devicePixelRatio || 1;
         canvas.width = totalW * dpr;
@@ -408,31 +425,26 @@ export default function LeditorPage() {
 
         ctx.clearRect(0, 0, totalW, totalH);
 
-        // LED screen position: after person area, centered vertically with bottom alignment
         const ledX = actualPersonReserve;
-        const ledBottomY = totalH - 30; // 30px bottom margin for cabinets label
+        const ledBottomY = totalH - 30;
         const ledY = ledBottomY - drawH;
 
         const cabInfo = computed.cabInfo;
 
-        // ── Draw leditor image inside the LED area (user's image or default) ──
         const imgToDraw = userPreviewImageRef.current?.complete && userPreviewImageRef.current?.naturalWidth
             ? userPreviewImageRef.current
             : leditorImgRef.current;
         if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth) {
-            // Draw image to fill LED area (cover)
             const img = imgToDraw;
             const imgRatio = img.naturalWidth / img.naturalHeight;
             const ledRatio = drawW / drawH;
             let sx, sy, sw, sh;
             if (imgRatio > ledRatio) {
-                // Image is wider — crop sides
                 sh = img.naturalHeight;
                 sw = sh * ledRatio;
                 sx = (img.naturalWidth - sw) / 2;
                 sy = 0;
             } else {
-                // Image is taller — crop top/bottom
                 sw = img.naturalWidth;
                 sh = sw / ledRatio;
                 sx = 0;
@@ -440,12 +452,10 @@ export default function LeditorPage() {
             }
             ctx.drawImage(img, sx, sy, sw, sh, ledX, ledY, drawW, drawH);
         } else {
-            // Fallback solid dark color
             ctx.fillStyle = "#1a2d4a";
             ctx.fillRect(ledX, ledY, drawW, drawH);
         }
 
-        // ── Draw cabinet grid lines on top of image ──
         const cellW = drawW / cabInfo.countH;
         const cellH = drawH / cabInfo.countV;
 
@@ -468,35 +478,29 @@ export default function LeditorPage() {
             ctx.stroke();
         }
 
-        // ── Draw screen border ──
         ctx.strokeStyle = "#3b82f6";
         ctx.lineWidth = 2;
         ctx.strokeRect(ledX, ledY, drawW, drawH);
 
-        // ── Draw person image (bottom-left, aligned to LED bottom) ──
         if (showPerson && personImgRef.current && personImgRef.current.complete && personImgRef.current.naturalWidth) {
-            const personX = actualPersonReserve - personDrawW - 8; // 8px gap from LED
-            const personY = ledBottomY - personDrawH; // bottom-aligned with LED
+            const personX = actualPersonReserve - personDrawW - 8;
+            const personY = ledBottomY - personDrawH;
 
             ctx.drawImage(personImgRef.current, personX, personY, personDrawW, personDrawH);
 
-            // Draw person height label
             ctx.fillStyle = "#64748b";
             ctx.font = "11px Inter, sans-serif";
             ctx.textAlign = "center";
             ctx.fillText("1.6m", personX + personDrawW / 2, personY - 5);
         }
 
-        // ── Draw dimension labels ──
         ctx.fillStyle = "#3b82f6";
         ctx.font = "bold 13px Inter, sans-serif";
         ctx.textAlign = "center";
 
-        // Width label (top)
         const widthLabel = `Screen Width: ${config.screenWidth.toFixed(2)}m`;
         ctx.fillText(widthLabel, ledX + drawW / 2, ledY - 12);
 
-        // Width arrow line
         ctx.strokeStyle = "#3b82f6";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -504,7 +508,6 @@ export default function LeditorPage() {
         ctx.lineTo(ledX + drawW - 10, ledY - 6);
         ctx.stroke();
 
-        // Height label (right side, rotated)
         ctx.save();
         ctx.translate(ledX + drawW + 18, ledY + drawH / 2);
         ctx.rotate(Math.PI / 2);
@@ -512,7 +515,6 @@ export default function LeditorPage() {
         ctx.fillText(heightLabel, 0, 0);
         ctx.restore();
 
-        // Cabinets info (bottom center)
         ctx.fillStyle = "#64748b";
         ctx.font = "12px font-open-sans";
         ctx.textAlign = "center";
@@ -520,40 +522,37 @@ export default function LeditorPage() {
         ctx.fillText(cabLabel, ledX + drawW / 2, ledBottomY + 18);
     }, [config, computed.cabInfo, imagesLoaded, userPreviewImageLoaded]);
 
-    // Fetch accessories when dropdown opens (show list by default) and when search changes (filter)
+    // Fetch controllers when dropdown opens and when search changes
     useEffect(() => {
-        if (!accessoryDropdownOpen) return;
+        if (!controllerDropdownOpen) return;
         const timer = setTimeout(async () => {
-            setAccessoryLoading(true);
+            setControllerLoading(true);
             try {
                 const params = new URLSearchParams();
-                if (accessorySearch.trim()) params.set("search", accessorySearch.trim());
-                const res = await fetch(`/api/accessories?${params.toString()}`);
+                if (controllerSearch.trim()) params.set("search", controllerSearch.trim());
+                const res = await fetch(`/api/controllers?${params.toString()}`);
                 const json = await res.json();
                 if (json.success) {
-                    const filtered = (json.data || []).filter(
-                        (a) => !selectedAccessories.some((s) => s.id === a.id)
-                    );
-                    setAccessoryResults(filtered);
+                    setControllerResults(json.data || []);
                 }
             } catch (e) {
-                console.error("Failed to fetch accessories:", e);
+                console.error("Failed to fetch controllers:", e);
             } finally {
-                setAccessoryLoading(false);
+                setControllerLoading(false);
             }
-        }, accessorySearch.trim() ? 300 : 0);
+        }, controllerSearch.trim() ? 300 : 0);
         return () => clearTimeout(timer);
-    }, [accessoryDropdownOpen, accessorySearch, selectedAccessories]);
+    }, [controllerDropdownOpen, controllerSearch]);
 
-    // Measure trigger position when dropdown opens; clear when closes
+    // Measure trigger position when dropdown opens
     useEffect(() => {
-        if (!accessoryDropdownOpen) {
-            setAccessoryDropdownRect(null);
+        if (!controllerDropdownOpen) {
+            setControllerDropdownRect(null);
             return;
         }
         const updateRect = () => {
-            if (accessoryTriggerRef.current) {
-                setAccessoryDropdownRect(accessoryTriggerRef.current.getBoundingClientRect());
+            if (controllerTriggerRef.current) {
+                setControllerDropdownRect(controllerTriggerRef.current.getBoundingClientRect());
             }
         };
         updateRect();
@@ -563,17 +562,17 @@ export default function LeditorPage() {
             window.removeEventListener("scroll", updateRect, true);
             window.removeEventListener("resize", updateRect);
         };
-    }, [accessoryDropdownOpen]);
+    }, [controllerDropdownOpen]);
 
-    const handleAddAccessory = (accessory) => {
-        setSelectedAccessories((prev) => [...prev, accessory]);
-        setAccessorySearch("");
-        setAccessoryResults([]);
-        setAccessoryDropdownOpen(false);
+    const handleSelectController = (controller) => {
+        setSelectedController(controller);
+        setControllerSearch("");
+        setControllerResults([]);
+        setControllerDropdownOpen(false);
     };
 
-    const handleRemoveAccessory = (id) => {
-        setSelectedAccessories((prev) => prev.filter((a) => a.id !== id));
+    const handleRemoveController = () => {
+        setSelectedController(null);
     };
 
     const handleFileChange = (e) => {
@@ -609,6 +608,7 @@ export default function LeditorPage() {
                         productId: selectedProduct.id,
                         quantity: 1,
                         isCustom: true,
+                        controllerId: selectedController?.id || null,
                         customLedTechnology: config.ledTechnology,
                         customBrightnessValue: config.brightnessValue,
                         customPixelPitch: config.pixelPitch,
@@ -633,8 +633,17 @@ export default function LeditorPage() {
                         customOperatingHours: installationData.operatingHours,
                         customPowerRedundancy: installationData.powerRedundancy,
                         customIpRating: installationData.ipRating || null,
-                        // Selected accessories
-                        accessoryIds: selectedAccessories.map((a) => a.id),
+                        customInstallationAndService: installationData.installationAndService,
+                        // Additional fields
+                        customStructuralWidth: structuralConstraints.width || null,
+                        customStructuralHeight: structuralConstraints.height || null,
+                        customStructuralDepth: structuralConstraints.depth || null,
+                        customViewingDistanceMin: viewingDistance.min || null,
+                        customViewingDistanceMax: viewingDistance.max || null,
+                        customControllerConfig: controllerConfig,
+                        customNetworkConnection: networkConnection,
+                        customSignalSourceInputs: signalSourceInputs,
+                        customAdditionalServices: additionalServices,
                     },
                 ],
             };
@@ -693,14 +702,12 @@ export default function LeditorPage() {
                             <AccordionContent>
                                 <div className="px-6 pb-6">
                                     <div className="flex flex-col lg:flex-row gap-6 items-start">
-                                        {/* LED Preview canvas */}
                                         <div className="flex-1 w-full flex items-center justify-center rounded-lg bg-gray-50 border p-4 min-h-[360px]">
                                             <canvas
                                                 ref={canvasRef}
                                                 className="max-w-full"
                                             />
                                         </div>
-                                        {/* Screen size controls - right of preview (or below on mobile) for live feedback */}
                                         {selectedProduct && (
                                             <div className="w-full lg:w-72 shrink-0 rounded-lg border bg-white p-4 space-y-4">
                                                 <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Screen Size</h3>
@@ -779,7 +786,6 @@ export default function LeditorPage() {
                                                 <p className="text-sm text-gray-500">
                                                     Change width/height to see the LED preview update live.
                                                 </p>
-                                                {/* Preview with your own image (local only, cleared on refresh) */}
                                                 <div className="space-y-2 pt-2 border-t">
                                                     <Label className="text-sm">Preview with your own image</Label>
                                                     <p className="text-sm text-gray-500">
@@ -837,7 +843,6 @@ export default function LeditorPage() {
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-4">
-                                    {/* Category Tabs */}
                                     <div className="flex flex-wrap justify-center items-center gap-2">
                                         <Button
                                             onClick={() => handleCategoryChange("all")}
@@ -858,7 +863,6 @@ export default function LeditorPage() {
                                         ))}
                                     </div>
 
-                                    {/* Search Bar */}
                                     <div className="relative max-w-md">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-700" />
                                         <Input
@@ -870,7 +874,6 @@ export default function LeditorPage() {
                                         />
                                     </div>
 
-                                    {/* Products Table */}
                                     {loading ? (
                                         <div className="flex items-center justify-center py-12">
                                             <Spinner className="h-8 w-8" />
@@ -936,7 +939,6 @@ export default function LeditorPage() {
                                         </div>
                                     )}
 
-                                    {/* Pagination */}
                                     {pagination.totalPages > 1 && (
                                         <div className="flex items-center justify-center gap-4 pt-2">
                                             <Button
@@ -991,7 +993,6 @@ export default function LeditorPage() {
                                         </div>
                                     ) : (
                                         <>
-                                            {/* Product Info - Disabled Fields */}
                                             <div className="space-y-2">
                                                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Cabinet Specifications</h3>
                                             </div>
@@ -1006,54 +1007,26 @@ export default function LeditorPage() {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Brightness (nits)</Label>
-                                                    <Input
-                                                        value={config.brightnessValue}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={config.brightnessValue} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Pixel Pitch (mm)</Label>
-                                                    <Input
-                                                        value={config.pixelPitch}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={config.pixelPitch} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Refresh Rate (Hz)</Label>
-                                                    <Input
-                                                        value={config.refreshRate}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={config.refreshRate} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Cabinet Width (mm)</Label>
-                                                    <Input
-                                                        value={config.cabinetWidth}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={config.cabinetWidth} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Cabinet Height (mm)</Label>
-                                                    <Input
-                                                        value={config.cabinetHeight}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={config.cabinetHeight} readOnly className="bg-gray-100" />
                                                 </div>
                                             </div>
 
-                                            {/* Screen size controls are in the Preview section for live feedback */}
-
-                                            {/* Calculated Fields */}
                                             <div className="space-y-2 pt-4">
                                                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Custom LED Summary</h3>
                                             </div>
@@ -1066,7 +1039,6 @@ export default function LeditorPage() {
                                                                 ? `${computed.totalResH} × ${computed.totalResV} px`
                                                                 : "N/A"
                                                         }
-
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1074,12 +1046,7 @@ export default function LeditorPage() {
                                                 <div className="space-y-2">
                                                     <Label>Total Weight</Label>
                                                     <Input
-                                                        value={
-                                                            computed.totalWeight
-                                                                ? `${computed.totalWeight} kg`
-                                                                : "N/A"
-                                                        }
-
+                                                        value={computed.totalWeight ? `${computed.totalWeight} kg` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1087,34 +1054,19 @@ export default function LeditorPage() {
                                                 <div className="space-y-2">
                                                     <Label>Display Area</Label>
                                                     <Input
-                                                        value={
-                                                            computed.displayArea
-                                                                ? `${computed.displayArea} m²`
-                                                                : "N/A"
-                                                        }
-
+                                                        value={computed.displayArea ? `${computed.displayArea} m²` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Dimension</Label>
-                                                    <Input
-                                                        value={computed.dimension}
-
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={computed.dimension} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Power Consumption Max (W)</Label>
                                                     <Input
-                                                        value={
-                                                            computed.powerMax
-                                                                ? `${computed.powerMax} W`
-                                                                : "N/A"
-                                                        }
-
+                                                        value={computed.powerMax ? `${computed.powerMax} W` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
@@ -1122,36 +1074,25 @@ export default function LeditorPage() {
                                                 <div className="space-y-2">
                                                     <Label>Power Consumption Typical (W)</Label>
                                                     <Input
-                                                        value={
-                                                            computed.powerTypical
-                                                                ? `${computed.powerTypical} W`
-                                                                : "N/A"
-                                                        }
-
+                                                        value={computed.powerTypical ? `${computed.powerTypical} W` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Total Cabinets</Label>
-                                                    <Input
-                                                        value={`${computed.totalCabinets}`}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
+                                                    <Input value={`${computed.totalCabinets}`} readOnly className="bg-gray-100" />
                                                 </div>
                                             </div>
-
-
                                         </>
                                     )}
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
                     </div>
-                    {/* Installation & Service Accordion */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
 
+                    {/* ===== SECTION 4: INSTALLATION & SERVICE ===== */}
+                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
                         <AccordionItem value="installation-service" defaultValue="installation-service" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
@@ -1162,24 +1103,20 @@ export default function LeditorPage() {
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Service Access</Label>
-                                            <div className="flex flex-wrap gap-4 pt-1">
-                                                {["Front Service", "Rear Service"].map((val) => (
-                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
-                                                        <input
-                                                            type="radio"
-                                                            name="serviceAccess"
-                                                            value={val}
-                                                            checked={installationData.serviceAccess === val}
-                                                            onChange={(e) => setInstallationData((p) => ({ ...p, serviceAccess: e.target.value }))}
-                                                            className="accent-secondary"
-                                                        />
-                                                        <span>{val}</span>
-                                                    </Label>
-                                                ))}
-                                            </div>
-                                        </div>
+                                        <MultiCheckbox
+                                            label="Installation and Service"
+                                            options={["Schedule a free consultation appointment", "Preparation of tender documents"]}
+                                            value={installationData.installationAndService}
+                                            onChange={(val) => setInstallationData((p) => ({ ...p, installationAndService: val }))}
+                                        />
+                                        <MultiCheckbox
+                                            label="Service Access"
+                                            options={["Front service", "Rear service", "Not sure"]}
+                                            value={installationData.serviceAccess}
+                                            onChange={(val) => setInstallationData((p) => ({ ...p, serviceAccess: val }))}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label>Mounting Method</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
@@ -1198,8 +1135,6 @@ export default function LeditorPage() {
                                                 ))}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="ipRating">IP Rating (Weather Protection)</Label>
                                             <Input
@@ -1209,6 +1144,8 @@ export default function LeditorPage() {
                                                 placeholder="e.g. IP65"
                                             />
                                         </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label>Power Redundancy</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
@@ -1227,66 +1164,176 @@ export default function LeditorPage() {
                                                 ))}
                                             </div>
                                         </div>
+                                        <div className="space-y-2">
+                                            <Label>Operating Hours</Label>
+                                            <div className="flex flex-wrap gap-4 pt-1">
+                                                {["Standard (8-12 hours/day)", "Extended (12-20 hours/day)", "24/7 Operation"].map((val) => (
+                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
+                                                        <input
+                                                            type="radio"
+                                                            name="operatingHours"
+                                                            value={val}
+                                                            checked={installationData.operatingHours === val}
+                                                            onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
+                                                            className="accent-secondary"
+                                                        />
+                                                        <span>{val}</span>
+                                                    </Label>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    {/* Structural Constraints */}
+                                    <div className="space-y-2 pt-2">
+                                        <Label>Structural Constraints / Installation Space</Label>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm text-gray-500">Width</span>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="mm"
+                                                value={structuralConstraints.width}
+                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, width: e.target.value }))}
+                                                className="w-28"
+                                            />
+                                            <span className="text-gray-400">×</span>
+                                            <span className="text-sm text-gray-500">Height</span>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="mm"
+                                                value={structuralConstraints.height}
+                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, height: e.target.value }))}
+                                                className="w-28"
+                                            />
+                                            <span className="text-gray-400">×</span>
+                                            <span className="text-sm text-gray-500">Depth</span>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="mm"
+                                                value={structuralConstraints.depth}
+                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, depth: e.target.value }))}
+                                                className="w-28"
+                                            />
+                                            <span className="text-sm text-gray-500">mm</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Viewing Distance */}
                                     <div className="space-y-2">
-                                        <Label>Operating Hours</Label>
-                                        <div className="flex flex-wrap gap-4 pt-1">
-                                            {["Standard (8-12 hours/day)", "Extended (12-20 hours/day)", "24/7 Operation"].map((val) => (
-                                                <Label key={val} className="cursor-pointer font-normal mb-0">
-                                                    <input
-                                                        type="radio"
-                                                        name="operatingHours"
-                                                        value={val}
-                                                        checked={installationData.operatingHours === val}
-                                                        onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
-                                                        className="accent-secondary"
-                                                    />
-                                                    <span>{val}</span>
-                                                </Label>
-                                            ))}
+                                        <Label>Viewing Distance</Label>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm text-gray-500">Min.</span>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="m"
+                                                value={viewingDistance.min}
+                                                onChange={(e) => setViewingDistance((p) => ({ ...p, min: e.target.value }))}
+                                                className="w-28"
+                                            />
+                                            <span className="text-sm text-gray-500">m</span>
+                                            <span className="text-gray-400 mx-2">—</span>
+                                            <span className="text-sm text-gray-500">Max.</span>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="m"
+                                                value={viewingDistance.max}
+                                                onChange={(e) => setViewingDistance((p) => ({ ...p, max: e.target.value }))}
+                                                className="w-28"
+                                            />
+                                            <span className="text-sm text-gray-500">m</span>
                                         </div>
                                     </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-
                     </div>
 
-                    {/* Optional Services Accordion */}
+                    {/* ===== SECTION 5: ADDITIONAL CONFIGURATION ===== */}
                     <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="optional-services" defaultValue="optional-services" className="border-0">
+                        <AccordionItem value="additional-config" defaultValue="additional-config" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Optional Services</h2>
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Additional Configuration</h2>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-6 pb-6 space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <MultiCheckbox
+                                            label="Controller Configuration"
+                                            options={["Synchronous", "Asynchronous"]}
+                                            value={controllerConfig}
+                                            onChange={setControllerConfig}
+                                        />
+                                        <MultiCheckbox
+                                            label="Network Connection"
+                                            options={["LAN", "WLAN (Wi-Fi)", "3G Mobile"]}
+                                            value={networkConnection}
+                                            onChange={setNetworkConnection}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <MultiCheckbox
+                                            label="Signal Source Inputs"
+                                            options={["HDMI", "DVI", "12G-SDI", "3G-DP", "10G Fiber"]}
+                                            value={signalSourceInputs}
+                                            onChange={setSignalSourceInputs}
+                                        />
+                                        <MultiCheckbox
+                                            label="Additional Services"
+                                            options={["Approval process", "Leasing", "Installation", "Extended warranty"]}
+                                            value={additionalServices}
+                                            onChange={setAdditionalServices}
+                                        />
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </div>
+
+                    {/* ===== SECTION 6: CONTROLLER SELECTION ===== */}
+                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                        <AccordionItem value="controller-selection" defaultValue="controller-selection" className="border-0">
+                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Controller Selection</h2>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-4">
-                                    <Label>Additional Services Needed</Label>
-                                    <div ref={accessorySearchRef} className="relative max-w-lg">
+                                    <Label>Select a Controller</Label>
+                                    <div ref={controllerSearchRef} className="relative max-w-lg">
                                         <button
-                                            ref={accessoryTriggerRef}
+                                            ref={controllerTriggerRef}
                                             type="button"
-                                            onClick={() => setAccessoryDropdownOpen((prev) => !prev)}
+                                            onClick={() => setControllerDropdownOpen((prev) => !prev)}
                                             className="w-full flex items-center justify-between px-3 py-2.5 text-sm border rounded-lg bg-white hover:border-gray-400 transition-colors text-left"
                                         >
-                                            <span className="text-gray-400">-Select</span>
+                                            <span className="text-gray-400">
+                                                {selectedController ? selectedController.interfaceName : "- Select Controller"}
+                                            </span>
                                             <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
                                         </button>
-                                        {accessoryDropdownOpen && accessoryDropdownRect && typeof document !== "undefined" && createPortal(
+                                        {controllerDropdownOpen && controllerDropdownRect && typeof document !== "undefined" && createPortal(
                                             <>
                                                 <div
                                                     className="fixed inset-0 z-100"
-                                                    onClick={() => setAccessoryDropdownOpen(false)}
+                                                    onClick={() => setControllerDropdownOpen(false)}
                                                     aria-hidden
                                                 />
                                                 <div
                                                     className="fixed z-101 bg-white border rounded-lg shadow-lg"
                                                     style={{
-                                                        top: accessoryDropdownRect.bottom + 4,
-                                                        left: accessoryDropdownRect.left,
-                                                        width: Math.max(accessoryDropdownRect.width, 280),
+                                                        top: controllerDropdownRect.bottom + 4,
+                                                        left: controllerDropdownRect.left,
+                                                        width: Math.max(controllerDropdownRect.width, 280),
                                                         minWidth: 280,
                                                     }}
                                                 >
@@ -1295,35 +1342,35 @@ export default function LeditorPage() {
                                                             <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                                             <input
                                                                 type="text"
-                                                                value={accessorySearch}
-                                                                onChange={(e) => setAccessorySearch(e.target.value)}
-                                                                placeholder="Search accessories..."
+                                                                value={controllerSearch}
+                                                                onChange={(e) => setControllerSearch(e.target.value)}
+                                                                placeholder="Search controllers..."
                                                                 className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
                                                                 autoFocus
                                                             />
                                                         </div>
                                                     </div>
                                                     <div className="max-h-60 overflow-y-auto">
-                                                        {accessoryLoading && accessoryResults.length === 0 ? (
+                                                        {controllerLoading && controllerResults.length === 0 ? (
                                                             <div className="flex items-center justify-center py-4">
                                                                 <Spinner className="h-5 w-5" />
                                                                 <span className="ml-2 text-sm text-gray-500">Loading...</span>
                                                             </div>
-                                                        ) : accessoryResults.length === 0 ? (
-                                                            <div className="px-4 py-3 text-sm text-gray-500">No accessories found</div>
+                                                        ) : controllerResults.length === 0 ? (
+                                                            <div className="px-4 py-3 text-sm text-gray-500">No controllers found</div>
                                                         ) : (
-                                                            accessoryResults.map((acc) => (
+                                                            controllerResults.map((ctrl) => (
                                                                 <button
-                                                                    key={acc.id}
+                                                                    key={ctrl.id}
                                                                     type="button"
-                                                                    onClick={() => handleAddAccessory(acc)}
+                                                                    onClick={() => handleSelectController(ctrl)}
                                                                     className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors"
                                                                 >
                                                                     <div className="flex items-center gap-2">
-                                                                        <span className="font-medium">{acc.productName}</span>
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 shrink-0">Accessory</span>
+                                                                        <span className="font-medium">{ctrl.interfaceName}</span>
+                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 shrink-0">Controller</span>
                                                                     </div>
-                                                                    <p className="text-xs text-gray-500 mt-0.5">{acc.productNumber}</p>
+                                                                    <p className="text-xs text-gray-500 mt-0.5">{ctrl.brandDisplay || ctrl.brandName}</p>
                                                                 </button>
                                                             ))
                                                         )}
@@ -1333,23 +1380,18 @@ export default function LeditorPage() {
                                             document.body
                                         )}
                                     </div>
-                                    {selectedAccessories.length > 0 && (
+                                    {selectedController && (
                                         <div className="flex flex-wrap gap-2 mt-3">
-                                            {selectedAccessories.map((acc) => (
-                                                <div
-                                                    key={acc.id}
-                                                    className="flex items-center gap-2 bg-teal-50 border border-teal-200 text-secondary px-3 py-1.5 rounded-full text-sm"
+                                            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1.5 rounded-full text-sm">
+                                                <span>{selectedController.interfaceName}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveController}
+                                                    className="hover:text-red-600 transition-colors"
                                                 >
-                                                    <span>{acc.productName}</span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveAccessory(acc.id)}
-                                                        className="hover:text-red-600 transition-colors"
-                                                    >
-                                                        <X className="h-3.5 w-3.5" />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                    <X className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -1357,7 +1399,7 @@ export default function LeditorPage() {
                         </AccordionItem>
                     </div>
 
-                    {/* File Upload Accordion */}
+                    {/* ===== SECTION 7: FILE UPLOAD ===== */}
                     <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
                         <AccordionItem value="file-upload" defaultValue="file-upload" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
@@ -1404,7 +1446,7 @@ export default function LeditorPage() {
                         </AccordionItem>
                     </div>
 
-                    {/* Notes & Submission Accordion */}
+                    {/* ===== SECTION 8: NOTES & SUBMISSION ===== */}
                     <div
                         id="submit-enquiry-section"
                         className="bg-white rounded-xl border shadow-sm overflow-hidden"

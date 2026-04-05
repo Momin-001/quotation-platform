@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, enquiryItemAccessories, enquiryFiles, quotations, products } from "@/db/schema";
+import { enquiries, enquiryItems, enquiryFiles, quotations, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import cloudinary from "@/lib/cloudinary";
 
@@ -52,7 +52,7 @@ export async function POST(req) {
             quantity: item.quantity || 1,
             itemType: item.itemType || (index === 0 ? "main" : "alternative"),
             itemOrder: index,
-            controllerId: item.additionalController?.id || null,
+            controllerId: item.controllerId || item.additionalController?.id || null,
             isCustom: item.isCustom || false,
             ...(item.isCustom && {
                 customLedTechnology: item.customLedTechnology || null,
@@ -78,23 +78,20 @@ export async function POST(req) {
                 customOperatingHours: item.customOperatingHours || null,
                 customPowerRedundancy: item.customPowerRedundancy || null,
                 customIpRating: item.customIpRating || null,
+                customInstallationAndService: item.customInstallationAndService || null,
+                customStructuralWidth: item.customStructuralWidth || null,
+                customStructuralHeight: item.customStructuralHeight || null,
+                customStructuralDepth: item.customStructuralDepth || null,
+                customViewingDistanceMin: item.customViewingDistanceMin || null,
+                customViewingDistanceMax: item.customViewingDistanceMax || null,
+                customControllerConfig: item.customControllerConfig || null,
+                customNetworkConnection: item.customNetworkConnection || null,
+                customSignalSourceInputs: item.customSignalSourceInputs || null,
+                customAdditionalServices: item.customAdditionalServices || null,
             }),
         }));
 
-        const insertedItems = await db.insert(enquiryItems).values(itemsToInsert).returning();
-
-        // Insert enquiry item accessories (junction table)
-        for (let i = 0; i < items.length; i++) {
-            const accessoryIds = items[i].accessoryIds || [];
-            if (accessoryIds.length > 0 && insertedItems[i]) {
-                const accessoriesToInsert = accessoryIds.map((accId) => ({
-                    enquiryItemId: insertedItems[i].id,
-                    accessoryId: accId,
-                    quantity: 1,
-                }));
-                await db.insert(enquiryItemAccessories).values(accessoriesToInsert);
-            }
-        }
+        await db.insert(enquiryItems).values(itemsToInsert).returning();
 
         // Upload files to Cloudinary and save references
         if (files.length > 0) {
@@ -106,7 +103,6 @@ export async function POST(req) {
 
                 const uploadResult = await cloudinary.uploader.upload(base64, {
                     folder: "QuotationPlatform/enquiry-files",
-                    // Match product document upload strategy (raw files).
                     resource_type: "raw",
                 });
 
@@ -148,6 +144,7 @@ export async function GET(req) {
             orderBy: desc(enquiries.createdAt),
             with: {
                 quotations: {
+                    where: ne(quotations.status, "draft"),
                     columns: {
                         id: true,
                         quotationNumber: true,

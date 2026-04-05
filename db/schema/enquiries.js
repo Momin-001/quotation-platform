@@ -1,5 +1,5 @@
-import { pgTable, uuid, text, timestamp, integer, decimal, boolean } from "drizzle-orm/pg-core";
-import { users, products, controllers, accessories } from "./index";
+import { pgTable, uuid, text, timestamp, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
+import { users, products, controllers } from "./index";
 import { relations } from "drizzle-orm";
 import { quotations } from "./quotations";
 
@@ -41,7 +41,7 @@ export const enquiryItems = pgTable("enquiry_items", {
     customScreenWidth: decimal("custom_screen_width", { precision: 10, scale: 2 }),
     customScreenHeight: decimal("custom_screen_height", { precision: 10, scale: 2 }),
 
-    // New calculated Leditor fields
+    // Calculated Leditor fields
     customTotalResolutionH: integer("custom_total_resolution_h"),
     customTotalResolutionV: integer("custom_total_resolution_v"),
     customWeight: decimal("custom_weight", { precision: 10, scale: 2 }),
@@ -52,27 +52,33 @@ export const enquiryItems = pgTable("enquiry_items", {
     customTotalCabinets: integer("custom_total_cabinets"),
 
     // Installation & Service fields
-    customServiceAccess: text("custom_service_access"),
+    customServiceAccess: jsonb("custom_service_access"),
     customMountingMethod: text("custom_mounting_method"),
     customOperatingHours: text("custom_operating_hours"),
     customPowerRedundancy: text("custom_power_redundancy"),
     customIpRating: text("custom_ip_rating"),
+    customInstallationAndService: jsonb("custom_installation_and_service"),
+
+    // Structural Constraints / Installation Space (mm)
+    customStructuralWidth: decimal("custom_structural_width", { precision: 10, scale: 2 }),
+    customStructuralHeight: decimal("custom_structural_height", { precision: 10, scale: 2 }),
+    customStructuralDepth: decimal("custom_structural_depth", { precision: 10, scale: 2 }),
+
+    // Viewing Distance (m)
+    customViewingDistanceMin: decimal("custom_viewing_distance_min", { precision: 10, scale: 2 }),
+    customViewingDistanceMax: decimal("custom_viewing_distance_max", { precision: 10, scale: 2 }),
+
+    // Controller Configuration
+    customControllerConfig: jsonb("custom_controller_config"),
+    // Network Connection
+    customNetworkConnection: jsonb("custom_network_connection"),
+    // Signal Source Inputs
+    customSignalSourceInputs: jsonb("custom_signal_source_inputs"),
+    // Additional Services (new block)
+    customAdditionalServices: jsonb("custom_additional_services"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Junction table: optional accessories selected by user per enquiry item
-export const enquiryItemAccessories = pgTable("enquiry_item_accessories", {
-    id: uuid("id").defaultRandom().primaryKey(),
-    enquiryItemId: uuid("enquiry_item_id")
-        .notNull()
-        .references(() => enquiryItems.id, { onDelete: "cascade" }),
-    accessoryId: uuid("accessory_id")
-        .notNull()
-        .references(() => accessories.id, { onDelete: "cascade" }),
-    quantity: integer("quantity").notNull().default(1),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Files uploaded with an enquiry
@@ -97,7 +103,7 @@ export const enquiriesRelations = relations(enquiries, ({ many, one }) => ({
     }),
 }));
 
-export const enquiryItemsRelations = relations(enquiryItems, ({ one, many }) => ({
+export const enquiryItemsRelations = relations(enquiryItems, ({ one }) => ({
     enquiry: one(enquiries, {
         fields: [enquiryItems.enquiryId],
         references: [enquiries.id],
@@ -109,18 +115,6 @@ export const enquiryItemsRelations = relations(enquiryItems, ({ one, many }) => 
     controller: one(controllers, {
         fields: [enquiryItems.controllerId],
         references: [controllers.id],
-    }),
-    accessories: many(enquiryItemAccessories),
-}));
-
-export const enquiryItemAccessoriesRelations = relations(enquiryItemAccessories, ({ one }) => ({
-    enquiryItem: one(enquiryItems, {
-        fields: [enquiryItemAccessories.enquiryItemId],
-        references: [enquiryItems.id],
-    }),
-    accessory: one(accessories, {
-        fields: [enquiryItemAccessories.accessoryId],
-        references: [accessories.id],
     }),
 }));
 
