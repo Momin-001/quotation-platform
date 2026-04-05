@@ -97,12 +97,12 @@ export default function ControllersPage() {
                 {/* Search Bar */}
                 <div className="mb-6">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-800" />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search controllers by interface or brand"
-                            className="pl-10"
+                            className="pl-12 placeholder:text-gray-700"
                         />
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function HowItWorksSection({ homepageData }) {
     const { language } = useLanguage();
@@ -97,9 +98,11 @@ export default function HowItWorksSection({ homepageData }) {
 
                     {/* CTA Box - Bottom Right (6th position) */}
                     <div className="bg-[#0F2E4A] border-6 border-secondary rounded-lg px-24 py-6 lg:py-8 lg:px-30 flex flex-col items-center justify-center space-y-4 min-h-[300px]">
+                        <Link className="w-full" href="/products">
                         <Button variant="default" size="lg" className="w-full">
                             {getText("ctaCardButton1")}
                         </Button>
+                        </Link>
                         <Button 
                             size="lg"
                             variant="ghost" 

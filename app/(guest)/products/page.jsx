@@ -28,6 +28,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
 import { ProductsRangeFilter } from "@/components/guest/ProductsRangeFilter";
+import { Label } from "@/components/ui/label";
 
 const FALLBACK_FILTER_BOUNDS = {
     pixelPitchMin: "0.10",
@@ -112,7 +113,7 @@ function FiltersAccordion({
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
                     <div>
-                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Design" : "Design"}</label>
+                        <Label className="font-normal">{language === "en" ? "Design" : "Design"}</Label>
                         <Select value={design} onValueChange={setDesign}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -122,7 +123,7 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div className={`${isAuthenticated ? "" : "mb-10"}`}>
-                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Application" : "Anwendung"}</label>
+                        <Label className="font-normal">{language === "en" ? "Application" : "Anwendung"}</Label>
                         <Select value={application} onValueChange={setApplication}>
                             <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
@@ -142,7 +143,7 @@ function FiltersAccordion({
 
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Product Type" : "Produkttyp"}</label>
+                            <Label className="font-normal">{language === "en" ? "Product Type" : "Produkttyp"}</Label>
                             <Select value={productType} onValueChange={setProductType}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -153,7 +154,7 @@ function FiltersAccordion({
                         </div>
 
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Special Types" : "Spezialtypen"}</label>
+                            <Label className="font-normal">{language === "en" ? "Special Types" : "Spezialtypen"}</Label>
                             <Select value={specialTypes} onValueChange={setSpecialTypes}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -202,7 +203,7 @@ function FiltersAccordion({
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className="space-y-3">
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "LED Technology" : "LED-Technologie"}</label>
+                            <Label className="font-normal">{language === "en" ? "LED Technology" : "LED-Technologie"}</Label>
                             <Select value={ledTechnology} onValueChange={setLedTechnology}>
                                 <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
@@ -217,12 +218,12 @@ function FiltersAccordion({
                             </Select>
                         </div>
                         <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</label>
+                            <Label className="font-normal">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</Label>
                             <Input type="number" value={ledLifespan} onChange={(e) => setLedLifespan(e.target.value)} placeholder="Enter number" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</label>
+                                <Label className="font-normal">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</Label>
                                 <Select value={chipBonding} onValueChange={setChipBonding}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -245,19 +246,19 @@ function FiltersAccordion({
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</label>
+                            <Label className="font-normal">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</Label>
                             <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
                         </div>
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</label>
+                            <Label className="font-normal">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</Label>
                             <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
                         </div>
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</label>
+                            <Label className="font-normal">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</Label>
                             <Input value={viewingAngleHorizontal} onChange={(e) => setViewingAngleHorizontal(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</label>
+                            <Label className="font-normal">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</Label>
                             <Input value={viewingAngleVertical} onChange={(e) => setViewingAngleVertical(e.target.value)} placeholder="Enter viewing angle" />
                         </div>
                     </div>
@@ -272,7 +273,7 @@ function FiltersAccordion({
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</label>
+                            <Label className="font-normal">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</Label>
                             <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
@@ -307,7 +308,7 @@ function FiltersAccordion({
                                 </p>
                             )}
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</label>
+                                <Label className="font-normal">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</Label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -317,7 +318,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</label>
+                                <Label className="font-normal">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</Label>
                                 <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -327,7 +328,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Smart Module" : "Smart Modul"}</label>
+                                <Label className="font-normal">{language === "en" ? "Smart Module" : "Smart Modul"}</Label>
                                 <Select value={smartModule} onValueChange={setSmartModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -337,7 +338,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Control System" : "Steuersystem"}</label>
+                                <Label className="font-normal">{language === "en" ? "Control System" : "Steuersystem"}</Label>
                                 <Select value={controlSystem} onValueChange={setControlSystem}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
@@ -350,7 +351,7 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</label>
+                                <Label className="font-normal">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</Label>
                                 <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
                             </div>
                         </RestrictedContentOverlay>
@@ -365,7 +366,7 @@ function FiltersAccordion({
                 </h3>
                 <div className="space-y-3">
                     <div>
-                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "IP Rating" : "IP-Rating"}</label>
+                        <Label className="font-normal">{language === "en" ? "IP Rating" : "IP-Rating"}</Label>
                         <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
                     </div>
                 </div>
@@ -378,12 +379,12 @@ function FiltersAccordion({
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                        <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</label>
+                        <Label className="font-normal">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</Label>
                         <Input value={supportDuringWarrantyEn} onChange={(e) => setSupportDuringWarrantyEn(e.target.value)} placeholder="Enter support during warranty" />
                     </div>
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <label className="text-md font-open-sans font-normal mb-1 block">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</label>
+                            <Label className="font-normal">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</Label>
                             <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
                         </div>
                     </RestrictedContentOverlay>

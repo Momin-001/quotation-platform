@@ -514,7 +514,7 @@ export default function LeditorPage() {
 
         // Cabinets info (bottom center)
         ctx.fillStyle = "#64748b";
-        ctx.font = "12px Inter, sans-serif";
+        ctx.font = "12px font-open-sans";
         ctx.textAlign = "center";
         const cabLabel = `${cabInfo.countH} × ${cabInfo.countV} Cabinets`;
         ctx.fillText(cabLabel, ledX + drawW / 2, ledBottomY + 18);
@@ -684,8 +684,8 @@ export default function LeditorPage() {
                         <AccordionItem value="preview" defaultValue="preview" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-blue-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
                                         Preview
                                     </h2>
                                 </div>
@@ -776,13 +776,13 @@ export default function LeditorPage() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-sm text-gray-500">
                                                     Change width/height to see the LED preview update live.
                                                 </p>
                                                 {/* Preview with your own image (local only, cleared on refresh) */}
                                                 <div className="space-y-2 pt-2 border-t">
                                                     <Label className="text-sm">Preview with your own image</Label>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-sm text-gray-500">
                                                         Upload an image to see how it would look on the screen.
                                                     </p>
                                                     <div className="flex items-center gap-2">
@@ -829,8 +829,8 @@ export default function LeditorPage() {
                         <AccordionItem value="selection" defaultValue="selection" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-blue-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
                                         Select a model configuration
                                     </h2>
                                 </div>
@@ -838,33 +838,29 @@ export default function LeditorPage() {
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-4">
                                     {/* Category Tabs */}
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <button
+                                    <div className="flex flex-wrap justify-center items-center gap-2">
+                                        <Button
                                             onClick={() => handleCategoryChange("all")}
-                                            className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all ${selectedCategory === "all"
-                                                    ? "bg-blue-500 text-white border-blue-500"
-                                                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                                                }`}
+                                            variant={selectedCategory === "all" ? "default" : "outline"}
+                                            className={`font-open-sans font-semibold uppercase text-xl ${selectedCategory === "all" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                                         >
                                             ALL
-                                        </button>
+                                        </Button>
                                         {categories.map((cat) => (
-                                            <button
+                                            <Button
                                                 key={cat.id}
                                                 onClick={() => handleCategoryChange(cat.id)}
-                                                className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all uppercase ${selectedCategory === cat.id
-                                                        ? "bg-blue-500 text-white border-blue-500"
-                                                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                                                    }`}
+                                                variant={selectedCategory === cat.id ? "default" : "outline"}
+                                                className={`font-open-sans font-semibold uppercase text-xl ${selectedCategory === cat.id ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
                                             >
                                                 {cat.name}
-                                            </button>
+                                            </Button>
                                         ))}
                                     </div>
 
                                     {/* Search Bar */}
                                     <div className="relative max-w-md">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-700" />
                                         <Input
                                             type="text"
                                             placeholder="Search by product name..."
@@ -887,21 +883,21 @@ export default function LeditorPage() {
                                     ) : (
                                         <div className="border rounded-lg overflow-x-auto">
                                             <Table className="min-w-full">
-                                                <TableHeader className="bg-gray-50">
+                                                <TableHeader className="bg-gray-50 font-archivo text-lg">
                                                     <TableRow>
-                                                        <TableHead className="p-4 font-semibold text-gray-700 whitespace-nowrap">
+                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
                                                             Product Name
                                                         </TableHead>
-                                                        <TableHead className="p-4 font-semibold text-gray-700 whitespace-nowrap">
+                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
                                                             Pitch
                                                         </TableHead>
-                                                        <TableHead className="p-4 font-semibold text-gray-700 whitespace-nowrap">
+                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
                                                             Brightness
                                                         </TableHead>
-                                                        <TableHead className="p-4 font-semibold text-gray-700 whitespace-nowrap">
+                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
                                                             Resolution (H x V)
                                                         </TableHead>
-                                                        <TableHead className="p-4 font-semibold text-gray-700 whitespace-nowrap">
+                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
                                                             Refresh Rate
                                                         </TableHead>
                                                     </TableRow>
@@ -911,9 +907,9 @@ export default function LeditorPage() {
                                                         <TableRow
                                                             key={product.id}
                                                             onClick={() => handleSelectProduct(product)}
-                                                            className={`cursor-pointer transition-colors ${selectedProduct?.id === product.id
-                                                                    ? "bg-blue-50 border-l-4 border-l-blue-500"
-                                                                    : "hover:bg-gray-50"
+                                                            className={`cursor-pointer font-archivo font-normal text-lg transition-colors ${selectedProduct?.id === product.id
+                                                                ? "bg-blue-50 border-l-4 border-l-blue-500"
+                                                                : "hover:bg-gray-50"
                                                                 }`}
                                                         >
                                                             <TableCell className="p-4 font-medium">
@@ -925,7 +921,7 @@ export default function LeditorPage() {
                                                             <TableCell className="p-4">
                                                                 {product.brightnessValue ? `${product.brightnessValue} nits` : "N/A"}
                                                             </TableCell>
-                                                            <TableCell className="p-4 text-sm">
+                                                            <TableCell className="p-4">
                                                                 {product.cabinetResolutionHorizontal && product.cabinetResolutionVertical
                                                                     ? `${product.cabinetResolutionHorizontal} × ${product.cabinetResolutionVertical}`
                                                                     : "N/A"}
@@ -945,19 +941,17 @@ export default function LeditorPage() {
                                         <div className="flex items-center justify-center gap-4 pt-2">
                                             <Button
                                                 variant="outline"
-                                                size="sm"
                                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                                                 disabled={page === 1}
                                             >
                                                 <ChevronLeft className="h-4 w-4" />
                                                 Previous
                                             </Button>
-                                            <span className="text-sm text-gray-600">
+                                            <span className="text-md text-gray-800">
                                                 Page {pagination.page} of {pagination.totalPages}
                                             </span>
                                             <Button
                                                 variant="outline"
-                                                size="sm"
                                                 onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
                                                 disabled={page === pagination.totalPages}
                                             >
@@ -979,8 +973,8 @@ export default function LeditorPage() {
                         <AccordionItem value="screen-info" defaultValue="screen-info" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-blue-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
                                         Screen Information
                                     </h2>
                                 </div>
@@ -1155,59 +1149,59 @@ export default function LeditorPage() {
                             </AccordionContent>
                         </AccordionItem>
                     </div>
-                {/* Installation & Service Accordion */}
-                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                    
+                    {/* Installation & Service Accordion */}
+                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+
                         <AccordionItem value="installation-service" defaultValue="installation-service" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">Installation & Service</h2>
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Installation & Service</h2>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">Service Access</Label>
+                                            <Label>Service Access</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
                                                 {["Front Service", "Rear Service"].map((val) => (
-                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
                                                         <input
                                                             type="radio"
                                                             name="serviceAccess"
                                                             value={val}
                                                             checked={installationData.serviceAccess === val}
                                                             onChange={(e) => setInstallationData((p) => ({ ...p, serviceAccess: e.target.value }))}
-                                                            className="accent-teal-500"
+                                                            className="accent-secondary"
                                                         />
-                                                        <span className="text-sm">{val}</span>
-                                                    </label>
+                                                        <span>{val}</span>
+                                                    </Label>
                                                 ))}
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">Mounting Method</Label>
+                                            <Label>Mounting Method</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
                                                 {["Wall Mount", "Hanging / Rigging", "Ground Support", "Freestanding Structure"].map((val) => (
-                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
                                                         <input
                                                             type="radio"
                                                             name="mountingMethod"
                                                             value={val}
                                                             checked={installationData.mountingMethod === val}
                                                             onChange={(e) => setInstallationData((p) => ({ ...p, mountingMethod: e.target.value }))}
-                                                            className="accent-teal-500"
+                                                            className="accent-secondary"
                                                         />
-                                                        <span className="text-sm">{val}</span>
-                                                    </label>
+                                                        <span>{val}</span>
+                                                    </Label>
                                                 ))}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="ipRating" className="font-semibold">IP Rating (Weather Protection)</Label>
+                                            <Label htmlFor="ipRating">IP Rating (Weather Protection)</Label>
                                             <Input
                                                 id="ipRating"
                                                 value={installationData.ipRating}
@@ -1216,61 +1210,60 @@ export default function LeditorPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="font-semibold">Power Redundancy</Label>
+                                            <Label>Power Redundancy</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
                                                 {["Required", "Not Required"].map((val) => (
-                                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
                                                         <input
                                                             type="radio"
                                                             name="powerRedundancy"
                                                             value={val}
                                                             checked={installationData.powerRedundancy === val}
                                                             onChange={(e) => setInstallationData((p) => ({ ...p, powerRedundancy: e.target.value }))}
-                                                            className="accent-teal-500"
+                                                            className="accent-secondary"
                                                         />
-                                                        <span className="text-sm">{val}</span>
-                                                    </label>
+                                                        <span>{val}</span>
+                                                    </Label>
                                                 ))}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="font-semibold">Operating Hours</Label>
+                                        <Label>Operating Hours</Label>
                                         <div className="flex flex-wrap gap-4 pt-1">
                                             {["Standard (8-12 hours/day)", "Extended (12-20 hours/day)", "24/7 Operation"].map((val) => (
-                                                <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                                <Label key={val} className="cursor-pointer font-normal mb-0">
                                                     <input
                                                         type="radio"
                                                         name="operatingHours"
                                                         value={val}
                                                         checked={installationData.operatingHours === val}
                                                         onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
-                                                        className="accent-teal-500"
+                                                        className="accent-secondary"
                                                     />
-                                                    <span className="text-sm">{val}</span>
-                                                </label>
+                                                    <span>{val}</span>
+                                                </Label>
                                             ))}
                                         </div>
                                     </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                    
-                </div>
 
-                {/* Optional Services Accordion */}
-                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                  
+                    </div>
+
+                    {/* Optional Services Accordion */}
+                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
                         <AccordionItem value="optional-services" defaultValue="optional-services" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">Optional Services</h2>
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Optional Services</h2>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-4">
-                                    <Label className="font-semibold">Additional Services Needed</Label>
+                                    <Label>Additional Services Needed</Label>
                                     <div ref={accessorySearchRef} className="relative max-w-lg">
                                         <button
                                             ref={accessoryTriggerRef}
@@ -1284,12 +1277,12 @@ export default function LeditorPage() {
                                         {accessoryDropdownOpen && accessoryDropdownRect && typeof document !== "undefined" && createPortal(
                                             <>
                                                 <div
-                                                    className="fixed inset-0 z-[100]"
+                                                    className="fixed inset-0 z-100"
                                                     onClick={() => setAccessoryDropdownOpen(false)}
                                                     aria-hidden
                                                 />
                                                 <div
-                                                    className="fixed z-[101] bg-white border rounded-lg shadow-lg"
+                                                    className="fixed z-101 bg-white border rounded-lg shadow-lg"
                                                     style={{
                                                         top: accessoryDropdownRect.bottom + 4,
                                                         left: accessoryDropdownRect.left,
@@ -1305,7 +1298,7 @@ export default function LeditorPage() {
                                                                 value={accessorySearch}
                                                                 onChange={(e) => setAccessorySearch(e.target.value)}
                                                                 placeholder="Search accessories..."
-                                                                className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                                                className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
                                                                 autoFocus
                                                             />
                                                         </div>
@@ -1345,7 +1338,7 @@ export default function LeditorPage() {
                                             {selectedAccessories.map((acc) => (
                                                 <div
                                                     key={acc.id}
-                                                    className="flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-800 px-3 py-1.5 rounded-full text-sm"
+                                                    className="flex items-center gap-2 bg-teal-50 border border-teal-200 text-secondary px-3 py-1.5 rounded-full text-sm"
                                                 >
                                                     <span>{acc.productName}</span>
                                                     <button
@@ -1362,21 +1355,21 @@ export default function LeditorPage() {
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                </div>
+                    </div>
 
-                {/* File Upload Accordion */}
-                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    {/* File Upload Accordion */}
+                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
                         <AccordionItem value="file-upload" defaultValue="file-upload" className="border-0">
                             <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-teal-500 rounded-full" />
-                                    <h2 className="text-lg font-bold text-gray-900">File Upload</h2>
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">File Upload</h2>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent>
                                 <div className="px-6 pb-6 space-y-4">
-                                    <Label className="font-semibold">Upload Reference Files</Label>
-                                    <label className="flex items-center gap-2 cursor-pointer border rounded-lg px-4 py-3 max-w-sm hover:bg-gray-50 transition-colors">
+                                    <Label>Upload Reference Files</Label>
+                                    <Label className="flex items-center gap-2 cursor-pointer border rounded-lg px-4 py-3 max-w-sm hover:bg-gray-50">
                                         <Upload className="h-4 w-4 text-gray-500" />
                                         <span className="text-sm text-gray-600">Attach</span>
                                         <input
@@ -1386,8 +1379,8 @@ export default function LeditorPage() {
                                             onChange={handleFileChange}
                                             className="hidden"
                                         />
-                                    </label>
-                                    <p className="text-xs text-teal-600">Accepted file types: PDF, JPG, PNG, DWG</p>
+                                    </Label>
+                                    <p className="text-sm text-secondary">Accepted file types: PDF, JPG, PNG, DWG</p>
                                     {uploadedFiles.length > 0 && (
                                         <div className="space-y-2 mt-2">
                                             {uploadedFiles.map((file, idx) => (
@@ -1409,128 +1402,128 @@ export default function LeditorPage() {
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                </div>
+                    </div>
 
-                {/* Notes & Submission Accordion */}
-                <div
-                    id="submit-enquiry-section"
-                    className="bg-white rounded-xl border shadow-sm overflow-hidden"
-                >
-                    <AccordionItem value="notes-submission" defaultValue="notes-submission" className="border-0">
-                    <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                           <div className="flex items-center gap-3">
-                                <div className="w-1 h-6 bg-teal-500 rounded-full" />
-                                <h2 className="text-lg font-bold text-gray-900">
-                                    Notes & Submission
-                                </h2>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                            <div className="px-6 pb-6 space-y-6">
-                                {isAuthenticated ? (
-                                    <form
-                                        onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
-                                        className="space-y-4 max-w-2xl"
-                                    >
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label>Your Name</Label>
-                                                <Input
-                                                    value={user?.fullName || ""}
-                                                    disabled
-                                                    className="bg-gray-100"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>Your Email</Label>
-                                                <Input
-                                                    value={user?.email || ""}
-                                                    disabled
-                                                    className="bg-gray-100"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="enquiry-message">Your Message*</Label>
-                                            <Textarea
-                                                id="enquiry-message"
-                                                {...register("message")}
-                                                placeholder="Describe your custom LED screen requirements..."
-                                                rows={4}
-                                                className={errors.message ? "border-red-500" : ""}
-                                            />
-                                            {errors.message && (
-                                                <p className="text-sm text-red-500">{errors.message.message}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Controller
-                                                name="privacy"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <Checkbox
-                                                        id="privacy-leditor"
-                                                        checked={field.value}
-                                                        onCheckedChange={field.onChange}
-                                                    />
-                                                )}
-                                            />
-                                            <Label
-                                                htmlFor="privacy-leditor"
-                                                className="text-sm cursor-pointer"
-                                            >
-                                                I agree to the Privacy Policy and Terms & Conditions.
-                                            </Label>
-                                            {errors.privacy && (
-                                                <p className="text-sm text-red-500 ml-2">{errors.privacy.message}</p>
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <ReCAPTCHA
-                                                sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                                                onChange={(val) => setValue("captcha", val || "", { shouldValidate: true })}
-                                            />
-                                            {errors.captcha && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.captcha.message}</p>
-                                            )}
-                                        </div>
-
-                                        <Button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className="w-full md:w-auto px-10"
-                                            size="lg"
+                    {/* Notes & Submission Accordion */}
+                    <div
+                        id="submit-enquiry-section"
+                        className="bg-white rounded-xl border shadow-sm overflow-hidden"
+                    >
+                        <AccordionItem value="notes-submission" defaultValue="notes-submission" className="border-0">
+                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1 h-6 bg-secondary rounded-full" />
+                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
+                                        Notes & Submission
+                                    </h2>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-6 pb-6 space-y-6">
+                                    {isAuthenticated ? (
+                                        <form
+                                            onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
+                                            className="space-y-4 max-w-2xl"
                                         >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <Spinner className="h-4 w-4 mr-2" />
-                                                    Submitting...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Send className="h-4 w-4 mr-2" />
-                                                    Submit Enquiry
-                                                </>
-                                            )}
-                                        </Button>
-                                    </form>
-                                ) : (
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                                        <p className="text-blue-800 mb-4">
-                                            Please login to submit your custom LED enquiry.
-                                        </p>
-                                        <Button onClick={() => router.push("/login")}>
-                                            Login to Continue
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>Your Name</Label>
+                                                    <Input
+                                                        value={user?.fullName || ""}
+                                                        disabled
+                                                        className="bg-gray-100"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>Your Email</Label>
+                                                    <Input
+                                                        value={user?.email || ""}
+                                                        disabled
+                                                        className="bg-gray-100"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="enquiry-message">Your Message*</Label>
+                                                <Textarea
+                                                    id="enquiry-message"
+                                                    {...register("message")}
+                                                    placeholder="Describe your custom LED screen requirements..."
+                                                    rows={4}
+                                                    className={errors.message ? "border-red-500" : ""}
+                                                />
+                                                {errors.message && (
+                                                    <p className="text-sm text-red-500">{errors.message.message}</p>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <Controller
+                                                    name="privacy"
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <Checkbox
+                                                            id="privacy-leditor"
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    )}
+                                                />
+                                                <Label
+                                                    htmlFor="privacy-leditor"
+                                                    className="text-sm cursor-pointer"
+                                                >
+                                                    I agree to the Privacy Policy and Terms & Conditions.
+                                                </Label>
+                                                {errors.privacy && (
+                                                    <p className="text-sm text-red-500 ml-2">{errors.privacy.message}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <ReCAPTCHA
+                                                    sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                                                    onChange={(val) => setValue("captcha", val || "", { shouldValidate: true })}
+                                                />
+                                                {errors.captcha && (
+                                                    <p className="text-sm text-red-500 mt-1">{errors.captcha.message}</p>
+                                                )}
+                                            </div>
+
+                                            <Button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className="w-full md:w-auto px-10"
+                                                size="lg"
+                                            >
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <Spinner className="h-4 w-4 mr-2" />
+                                                        Submitting...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Send className="h-4 w-4 mr-2" />
+                                                        Submit Enquiry
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </form>
+                                    ) : (
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                                            <p className="text-primary text-lg mb-4">
+                                                Please login to submit your custom LED enquiry.
+                                            </p>
+                                            <Button size="lg" variant="default" onClick={() => router.push("/login")}>
+                                                Login to Continue
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </div>
                 </Accordion>
             </div>
         </div>

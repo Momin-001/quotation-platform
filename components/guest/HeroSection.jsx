@@ -3,8 +3,9 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, PhoneCall, Pencil } from "lucide-react";
+import { PhoneCall, Pencil } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HeroSection({ homepageData }) {
     const { language } = useLanguage();
@@ -44,12 +45,16 @@ return (
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <Button size="lg">
-                            {getText("heroPrimaryButton")}
-                        </Button>
+                        <Link href="/leditor">
+                            <Button size="lg">
+                                {getText("heroPrimaryButton")}
+                            </Button>
+                        </Link>
+                        <Link href="/contact">
                         <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/5">
                             {getText("heroSecondaryButton")}
                         </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
