@@ -15,6 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email"),
@@ -90,9 +91,9 @@ export default function LoginPage() {
                         <CardContent>
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">
+                                    <Label htmlFor="email">
                                         Full Email<span className="text-red-500">*</span>
-                                    </label>
+                                    </Label>
                                     <Input
                                         {...register("email")}
                                         type="email"
@@ -105,9 +106,9 @@ export default function LoginPage() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">
+                                    <Label htmlFor="password">
                                         Your Password<span className="text-red-500">*</span>
-                                    </label>
+                                    </Label>
                                     <div className="relative">
                                         <Input
                                             {...register("password")}

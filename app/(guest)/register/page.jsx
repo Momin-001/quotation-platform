@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -115,31 +116,31 @@ export default function RegisterPage() {
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Full Name<span className="text-red-500">*</span></label>
+                                    <Label htmlFor="fullName">Full Name<span className="text-red-500">*</span></Label>
                                     <Input {...register("fullName")} placeholder="Full Name" className={errors.fullName ? "border-red-500" : ""} />
                                     {errors.fullName && <p className="text-xs text-red-500">{errors.fullName.message}</p>}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Company Name<span className="text-red-500">*</span></label>
+                                    <Label htmlFor="companyName">Company Name<span className="text-red-500">*</span></Label>
                                     <Input {...register("companyName")} placeholder="Company" className={errors.companyName ? "border-red-500" : ""} />
                                     {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Company Address<span className="text-red-500">*</span></label>
+                                    <Label htmlFor="companyAddress">Company Address<span className="text-red-500">*</span></Label>
                                     <Input {...register("companyAddress")} placeholder="Company Address" className={errors.companyAddress ? "border-red-500" : ""} />
                                     {errors.companyAddress && <p className="text-xs text-red-500">{errors.companyAddress.message}</p>}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Your Email<span className="text-red-500">*</span></label>
+                                    <Label htmlFor="email">Your Email<span className="text-red-500">*</span></Label>
                                     <Input {...register("email")} type="email" placeholder="Email" className={errors.email ? "border-red-500" : ""} />
                                     {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Phone Number<span className="text-red-500">*</span></label>
+                                    <Label htmlFor="phoneNumber">Phone Number<span className="text-red-500">*</span></Label>
                                     <div className={cn("phone-input-wrapper")}>
                                         <Controller
                                             name="phoneNumber"
@@ -162,13 +163,13 @@ export default function RegisterPage() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium">Commercial Register Number</label>
+                                    <Label htmlFor="commercialRegisterNumber">Commercial Register Number</Label>
                                     <Input {...register("commercialRegisterNumber")} placeholder="Commercial Register Number" />
                                 </div>
 
                                 <div className="flex items-center space-x-2 pt-2">
                                     <Checkbox id="privacyAccepted" onCheckedChange={(checked) => setValue("privacyAccepted", checked)} />
-                                    <label
+                                    <Label
                                         htmlFor="privacyAccepted"
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                     >
@@ -177,7 +178,7 @@ export default function RegisterPage() {
                                             Privacy Policy
                                         </Link>
                                         .
-                                    </label>
+                                    </Label>
                                 </div>
                                 {errors.privacyAccepted && <p className="text-xs text-red-500">{errors.privacyAccepted.message}</p>}
 

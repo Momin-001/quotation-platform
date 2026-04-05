@@ -92,12 +92,12 @@ export default function ContactPage() {
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <div className="space-y-1">
                                     <Label>
-                                        {language === "en" ? "Name" : "Name"}
+                                        Full Name
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         {...register("name")}
-                                        placeholder={language === "en" ? "Your name" : "Ihr Name"}
+                                        placeholder="Your name"
                                         className={errors.name ? "border-red-500" : ""}
                                     />
                                     {errors.name && (
@@ -107,7 +107,7 @@ export default function ContactPage() {
 
                                 <div className="space-y-1">
                                     <Label>
-                                        {language === "en" ? "Email" : "E-Mail"}
+                                        Full Email
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
@@ -123,12 +123,12 @@ export default function ContactPage() {
 
                                 <div className="space-y-1">
                                     <Label>
-                                        {language === "en" ? "Subject" : "Betreff"}
+                                        Subject
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         {...register("subject")}
-                                        placeholder={language === "en" ? "Subject" : "Betreff"}
+                                        placeholder="Subject"
                                         className={errors.subject ? "border-red-500" : ""}
                                     />
                                     {errors.subject && (
@@ -138,12 +138,12 @@ export default function ContactPage() {
 
                                 <div className="space-y-1">
                                     <Label>
-                                        {language === "en" ? "Message" : "Nachricht"}
+                                        Message
                                         <span className="text-red-500">*</span>
                                     </Label>
                                     <Textarea
                                         {...register("message")}
-                                        placeholder={language === "en" ? "Your message" : "Ihre Nachricht"}
+                                        placeholder="Your message"
                                         rows={6}
                                         className={errors.message ? "border-red-500 min-h-[140px]" : "min-h-[140px]"}
                                     />
@@ -166,12 +166,9 @@ export default function ContactPage() {
                                     disabled={loading}
                                 >
                                     {loading
-                                        ? language === "en"
-                                            ? "Sending..."
-                                            : "Wird gesendet..."
-                                        : language === "en"
-                                          ? "Send message"
-                                          : "Nachricht senden"}
+                                        ?  "Sending..."
+                                        : "Send message"
+                                        }
                                 </Button>
                             </form>
                         </CardContent>
