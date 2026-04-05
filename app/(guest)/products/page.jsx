@@ -20,13 +20,13 @@ import {
     SheetClose,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import Image from "next/image";
 import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
+import ProductCard from "@/components/guest/ProductCard";
 import { ProductsRangeFilter } from "@/components/guest/ProductsRangeFilter";
 import { Label } from "@/components/ui/label";
 
@@ -918,34 +918,13 @@ function ProductsPageContent() {
                                 {products.map((product, index) => {
                                     const isLastElement = products.length === index + 1;
                                     return (
-                                        <Link href={`/products/${product.id}`}
+                                        <Link
                                             key={product.id}
+                                            href={`/products/${product.id}`}
                                             ref={isLastElement ? lastProductElementRef : null}
-                                            className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer block"
+                                            className="block rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                                         >
-                                            {/* Product Image with Certificates */}
-                                            <div className="relative aspect-square bg-gray-100">
-                                                {product.images.length > 0 ? (
-                                                    <Image
-                                                        src={product.images[0]}
-                                                        alt={product.productName}
-                                                        fill
-                                                        className="object-contain"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                        No Image
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {/* Product Info */}
-                                            <div className="p-4">
-                                                <h3 className="font-bold font-open-sans text-xl mb-1">
-                                                    {product.productName}
-                                                </h3>
-                                                <p className="text-lg font-open-sans mb-1">{product.productNumber}</p>
-                                                <p className="text-sm font-semibold font-open-sans bg-secondary text-white uppercase rounded-md px-4 py-1 w-fit">{product.areaOfUse || "N/A"}</p>
-                                            </div>
+                                            <ProductCard product={product} />
                                         </Link>
                                     );
                                 })}

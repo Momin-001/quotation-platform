@@ -25,6 +25,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
+import RelatedProductsSection from "@/components/guest/RelatedProductsSection";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -705,6 +706,8 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
                     </RestrictedContentOverlay>
+
+                    <RelatedProductsSection productId={product.id} language={language} />
                 </div>
             </div>
         </>

@@ -58,12 +58,13 @@ function MultiCheckbox({ label, options, value = [], onChange }) {
     return (
         <div className="space-y-2">
             <Label>{label}</Label>
-            <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1">
+            <div className="flex flex-wrap gap-x-5 gap-y-3 pt-1">
                 {options.map((opt) => (
                     <Label key={opt} className="cursor-pointer font-normal mb-0 flex items-center gap-2">
                         <Checkbox
                             checked={value.includes(opt)}
                             onCheckedChange={() => toggle(opt)}
+                            className="data-[state=checked]:bg-secondary data-[state=checked]:text-primary-foreground"
                         />
                         <span>{opt}</span>
                     </Label>
