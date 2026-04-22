@@ -28,8 +28,11 @@ const openSans = Open_Sans({
 });
 
 export const metadata = {
-  title: "ProLedAll",
+  title: "ProLEDALL",
   description: "ProLedAll is a platform for buying and selling LEDs",
+  icons: {
+    icon: "/logo.svg" ,
+  },
 };
 
 export default function RootLayout({ children }) {

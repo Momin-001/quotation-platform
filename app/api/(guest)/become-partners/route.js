@@ -4,11 +4,11 @@ import { createEmailTransporter } from "@/lib/email-transporter";
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { name, email, number } = body;
+        const { name, companyName, position, website, email, number, expertise, accepted } = body;
 
         // Validate required fields
-        if (!name || !email || !number) {
-            return errorResponse("Name, email, and phone number are required", 400);
+        if (!name || !companyName || !position || !website || !email || !number || !Array.isArray(expertise) || expertise.length === 0 || !accepted) {
+            return errorResponse("All fields are required", 400);
         }
 
         // Validate email format
@@ -32,8 +32,12 @@ export async function POST(req) {
                 <p>A new partner application has been submitted:</p>
                 <ul>
                     <li><strong>Name:</strong> ${name}</li>
+                    <li><strong>Company / Organization:</strong> ${companyName}</li>
+                    <li><strong>Position:</strong> ${position}</li>
+                    <li><strong>Website:</strong> ${website}</li>
                     <li><strong>Email:</strong> ${email}</li>
                     <li><strong>Phone Number:</strong> ${number}</li>
+                    <li><strong>Expertise:</strong> ${(expertise || []).join(", ")}</li>
                 </ul>
                 <p>Please review and respond to this application.</p>
             `,

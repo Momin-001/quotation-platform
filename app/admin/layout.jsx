@@ -64,14 +64,14 @@ export default function AdminLayout({ children }) {
             {/* Desktop Sidebar: fixed, full height; scrolls only when nav overflows */}
             <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-md border-r flex-col h-screen">
                 <div className="shrink-0 p-4 border-b flex items-center gap-2">
-                    <Image src="/logo.png" alt="Logo" width={32} height={32} />
+                    <Image src="/logo-name.png" alt="Logo" width={150} height={150} />
                 </div>
                 <NavLinks pathname={pathname} />
             </aside>
 
             {/* Main: offset by sidebar width on desktop; only this area scrolls */}
             <main className="flex-1 flex flex-col overflow-hidden min-w-0 md:ml-64">
-                <header className="h-16 bg-white border-b flex items-center justify-between px-4 md:px-8">
+                <header className="py-5 bg-white border-b flex items-center justify-between px-4 md:px-8">
                     {/* Mobile Hamburger Menu */}
                     <Sheet open={open} onOpenChange={setOpen}>
                         <SheetTrigger asChild>
@@ -82,7 +82,7 @@ export default function AdminLayout({ children }) {
                         <SheetContent side="left" className="w-64 flex flex-col p-0">
                             <SheetHeader className="shrink-0 p-4 border-b">
                                 <SheetTitle className="flex items-center gap-2">
-                                    <Image src="/logo.png" alt="Logo" width={32} height={32} />
+                                    <Image src="/logo-name.png" alt="Logo" width={100} height={100} />
                                 </SheetTitle>
                             </SheetHeader>
                             <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} className="overflow-y-auto" />

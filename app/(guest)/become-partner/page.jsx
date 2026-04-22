@@ -1,171 +1,183 @@
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useState } from "react";
-import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
-import { toast } from "sonner";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
-import "react-phone-number-input/style.css";
-import { cn } from "@/lib/utils";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
-import { Label } from "@/components/ui/label";
 
-const formSchema = z.object({
-    name: z.string().min(2, "Name is too short"),
-    email: z.string().email("Invalid email"),
-    number: z
-        .string()
-        .min(1, "Phone number is required")
-        .refine((val) => isValidPhoneNumber(val), {
-            message: "Please enter a valid phone number",
-        }),
-});
+const COPY = {
+    en: {
+        title: "Become a Partner",
+        heading: "ProLEDALL Partner Program – Become a partner For LED video walls & displays",
+        ctaTitle: "Send Partner Request Now",
+        ctaSubtitle: "(Join the growing ProLEDALL partner network across Europe.)",
+        ctaButton: "Go to Application Form",
+        blocks: [
+            {
+                heading: "Setting standards together in the LED display market",
+                paragraphs: [
+                    "Maximize the success of your projects with ProLEDALL — through German engineering, curated LED systems, and comprehensive project protection for demanding display and digital signage projects.",
+                    "Whether you operate as an integrator, planner, or distributor, we provide the technical reliability and the right LED solutions for successful projects. ProLEDALL is not just a supplier, but your external specialist department for planning, evaluation, and quality assurance.",
+                ],
+            },
+            {
+                heading: "The ProLEDALL advantage — your competitive edge",
+                paragraphs: [
+                    "In the complex LED display market, technical risks and unreliable supply chains are the biggest challenges. We close this gap with a clear focus on B2B needs:",
+                ],
+            },
+        ],
+        bullets: [
+            {
+                title: "Curated LED display portfolio",
+                text: "Instead of confusing mass-market products, you gain access to technically evaluated OEM systems from qualified manufacturers.",
+            },
+            {
+                title: "Engineering Made in Germany",
+                text: "We proactively support you in technical planning — from component level to system integration:",
+                sub: [
+                    "Optoelectronic design: Coordination of all relevant components for maximum efficiency and image quality",
+                    "Construction & integration: Support in mechanical design, system architecture, and installation concepts",
+                    "Compliance & reliability: Ensuring standards compliance and long-term operational safety",
+                ],
+            },
+            {
+                title: "Real project protection & lead sharing",
+                sub: [
+                    "Exclusivity: Register your projects with us exclusively to protect against price dumping and secure special conditions",
+                    "Growth: We actively generate inquiries for LED displays and video walls and pass these qualified leads directly to our certified regional partners",
+                ],
+            },
+            {
+                title: "Support, training & demo systems",
+                sub: [
+                    "Know-how: Benefit from technical training in digital signage and video walls",
+                    "Hardware: Receive attractive conditions for demo and test systems to effectively convince your clients on-site.",
+                ],
+            },
+        ],
+    },
+    de: {
+        title: "Partner werden",
+        heading: "ProLEDALL Partnerprogramm – Werden Sie Partner für LED-Videowände & Displays",
+        ctaTitle: "Partneranfrage jetzt senden",
+        ctaSubtitle: "(Werden Sie Teil des wachsenden ProLEDALL Partnernetzwerks in Europa.)",
+        ctaButton: "Zum Bewerbungsformular",
+        blocks: [
+            {
+                heading: "Gemeinsam Standards im LED-Display-Markt setzen",
+                paragraphs: [
+                    "Maximieren Sie den Erfolg Ihrer Projekte mit ProLEDALL — durch deutsches Engineering, kuratierte LED-Systeme und umfassenden Projektschutz für anspruchsvolle Display- und Digital-Signage-Projekte.",
+                    "Ob als Integrator, Planer oder Distributor: Wir liefern technische Sicherheit und die passenden LED-Lösungen für erfolgreiche Projekte. ProLEDALL ist nicht nur Lieferant, sondern Ihre externe Fachabteilung für Planung, Evaluation und Qualitätssicherung.",
+                ],
+            },
+            {
+                heading: "Der ProLEDALL Vorteil — Ihr Wettbewerbsvorsprung",
+                paragraphs: [
+                    "Im komplexen LED-Display-Markt sind technische Risiken und unzuverlässige Lieferketten die größten Herausforderungen. Wir schließen diese Lücke mit einem klaren Fokus auf B2B-Anforderungen:",
+                ],
+            },
+        ],
+        bullets: [
+            {
+                title: "Kuratiertes LED-Display-Portfolio",
+                text: "Statt unübersichtlicher Massenmarkt-Produkte erhalten Sie Zugang zu technisch geprüften OEM-Systemen qualifizierter Hersteller.",
+            },
+            {
+                title: "Engineering Made in Germany",
+                text: "Wir unterstützen Sie proaktiv in der technischen Planung — von der Komponentenebene bis zur Systemintegration:",
+                sub: [
+                    "Optoelektronisches Design: Abstimmung aller relevanten Komponenten für maximale Effizienz und Bildqualität",
+                    "Konstruktion & Integration: Unterstützung bei Mechanik, Systemarchitektur und Installationskonzepten",
+                    "Compliance & Zuverlässigkeit: Sicherstellung von Normenkonformität und langfristiger Betriebssicherheit",
+                ],
+            },
+            {
+                title: "Echter Projektschutz & Lead-Weitergabe",
+                sub: [
+                    "Exklusivität: Registrieren Sie Ihre Projekte exklusiv bei uns, um Preisdumping zu verhindern und Sonderkonditionen zu sichern",
+                    "Wachstum: Wir generieren aktiv Anfragen für LED-Displays und Videowände und leiten qualifizierte Leads direkt an unsere zertifizierten Regionalpartner weiter",
+                ],
+            },
+            {
+                title: "Support, Training & Demo-Systeme",
+                sub: [
+                    "Know-how: Profitieren Sie von technischen Trainings zu Digital Signage und Videowänden",
+                    "Hardware: Erhalten Sie attraktive Konditionen für Demo- und Testsysteme, um Ihre Kunden vor Ort effektiv zu überzeugen.",
+                ],
+            },
+        ],
+    },
+};
 
-export default function BecomePartnersPage() {
-    const [captchaVal, setCaptchaVal] = useState(null);
-    const [loading, setLoading] = useState(false);
+export default function BecomePartnerInfoPage() {
     const { language } = useLanguage();
-    const {
-        register,
-        handleSubmit,
-        control,
-        reset,
-        formState: { errors },
-    } = useForm({
-        resolver: zodResolver(formSchema),
-    });
-
-    const onSubmit = async (data) => {
-        if (!captchaVal) {
-            toast.error("Please complete the captcha");
-            return;
-        }
-        setLoading(true);
-        try {
-            const res = await fetch("/api/become-partners", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
-            const response = await res.json();
-
-            if (!response.success) {
-                throw new Error(response.message || "Failed to submit application");
-            }
-            toast.success(response.message || "Application submitted successfully!");
-            reset();
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const copy = language === "en" ? COPY.en : COPY.de;
 
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title={language === "en" ? "Become a Partner" : "Werden Sie ein Partner"}
+            <BreadCrumb
+                title={copy.title}
                 breadcrumbs={[
                     { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: language === "en" ? "Become a Partner" : "Werden Sie ein Partner" }
-                ]} />
+                    { label: copy.title },
+                ]}
+            />
 
-            <main className="grow relative">
-                <div className="absolute inset-0 z-0">
-                    <div
-                        className="w-full h-full bg-cover bg-center"
-                        style={{ backgroundImage: "url('/placeholder-bg.jpg')" }}
-                    ></div>
-                </div>
+            <main className="container mx-auto px-4 py-10 max-w-5xl">
+                <div className="bg-white border rounded-lg p-6 md:p-10 space-y-8">
+                    <header className="space-y-3">
+                        <h1 className="text-2xl md:text-3xl font-bold">{copy.heading}</h1>
+                    </header>
 
-                <div className="relative z-10 container mx-auto px-4 py-16 flex justify-center">
-                    <Card className="w-full max-w-lg shadow-xl border-none px-6 py-10 bg-white dark:bg-card">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-medium">Partner Application</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                <div className="space-y-1">
-                                    <Label>
-                                        Full Name<span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        {...register("name")}
-                                        placeholder="Full Name"
-                                        className={errors.name ? "border-red-500" : ""}
-                                    />
-                                    {errors.name && (
-                                        <p className="text-xs text-red-500">{errors.name.message}</p>
-                                    )}
-                                </div>
+                    <div className="rounded-lg overflow-hidden border">
+                        <Image
+                            src="/become-partner.png"
+                            alt={copy.title}
+                            width={1600}
+                            height={800}
+                            className="w-full h-auto"
+                            priority
+                        />
+                    </div>
 
-                                <div className="space-y-1">
-                                    <Label>
-                                        Your Email<span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        {...register("email")}
-                                        type="email"
-                                        placeholder="Email"
-                                        className={errors.email ? "border-red-500" : ""}
-                                    />
-                                    {errors.email && (
-                                        <p className="text-xs text-red-500">{errors.email.message}</p>
-                                    )}
-                                </div>
+                    {copy.blocks.map((block) => (
+                        <section key={block.heading} className="space-y-3">
+                            <h2 className="text-lg md:text-xl font-semibold">{block.heading}</h2>
+                            <div className="space-y-3 text-sm md:text-base leading-relaxed">
+                                {block.paragraphs.map((p) => (
+                                    <p key={p}>{p}</p>
+                                ))}
+                            </div>
+                        </section>
+                    ))}
 
-                                <div className="space-y-1">
-                                    <Label>
-                                        Phone Number<span className="text-red-500">*</span>
-                                    </Label>
-                                    <div className={cn("phone-input-wrapper")}>
-                                        <Controller
-                                            name="number"
-                                            control={control}
-                                            render={({ field: { onChange, value } }) => (
-                                                <PhoneInput
-                                                    placeholder="Enter phone number"
-                                                    international
-                                                    defaultCountry="DE"
-                                                    value={value || ""}
-                                                    countryCallingCodeEditable={false}
-                                                    onChange={(val) => onChange(val || "")}
-                                                    className={`flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.number ? "border-red-500" : ""}`}
-                                                />
-                                            )}
-                                        />
-                                    </div>
-                                    {errors.number && (
-                                        <p className="text-xs text-red-500">{errors.number.message}</p>
-                                    )}
-                                </div>
+                    <section className="space-y-4">
+                        {copy.bullets.map((b) => (
+                            <div key={b.title} className="space-y-2">
+                                <h3 className="text-base font-semibold">{b.title}</h3>
+                                {b.text ? <p className="text-sm md:text-base leading-relaxed">{b.text}</p> : null}
+                                {b.sub?.length ? (
+                                    <ul className="list-disc pl-6 space-y-2 text-sm md:text-base">
+                                        {b.sub.map((s) => (
+                                            <li key={s}>{s}</li>
+                                        ))}
+                                    </ul>
+                                ) : null}
+                            </div>
+                        ))}
+                    </section>
 
-                                <div className="pt-2">
-                                    <ReCAPTCHA
-                                        sitekey={
-                                            NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "your-site-key"
-                                        }
-                                        onChange={setCaptchaVal}
-                                    />
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    size="lg"
-                                    className="w-full bg-primary hover:bg-primary/90 mt-4"
-                                    disabled={loading}
-                                >
-                                    {loading ? "Submitting..." : "Submit Application"}
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
+                    <section className="rounded-lg border bg-muted/30 p-6 md:p-8 space-y-4">
+                        <div className="space-y-1">
+                            <h2 className="text-xl font-semibold">{copy.ctaTitle}</h2>
+                            <p className="text-sm text-muted-foreground">{copy.ctaSubtitle}</p>
+                        </div>
+                        <Button asChild size="lg" className="w-full sm:w-auto">
+                            <Link href="/become-partner/submit">{copy.ctaButton}</Link>
+                        </Button>
+                    </section>
                 </div>
             </main>
         </div>

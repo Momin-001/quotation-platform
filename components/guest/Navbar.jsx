@@ -38,7 +38,12 @@ export default function Navbar({ navbarData }) {
         <nav className="w-full border-b bg-background sticky top-0 left-0 right-0 z-50 font-archivo">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 <Link href="/" className="shrink-0">
-                    <Image className="" src="/logo.png" alt="Logo" width={40} height={40} />
+                    <Image 
+                    src="/logo.svg" 
+                    alt="Logo"
+                    width={60}
+                    height={60}
+                     />
                 </Link>
                 <div className="hidden lg:flex px-8 items-center gap-8 text-lg font-medium text-gray-800">
                     <Link href="/" className="hover:text-primary transition-colors">

@@ -26,7 +26,7 @@ export default function UserAvatar() {
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-400 pl-2 pr-2 w-full rounded h-10 flex gap-2 justify-between items-center">
+                    <Button variant="outline" className="border-gray-400 pl-2 pr-2 w-full rounded h-11 flex gap-2 justify-between items-center">
                         <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                             <AvatarImage src="" /> {/* Placeholder for user image */}
