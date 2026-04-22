@@ -19,6 +19,7 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useFooter } from "@/context/FooterContext";
 
 const formSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -37,6 +38,7 @@ const formSchema = z.object({
 
 export default function RegisterPage() {
     const { language } = useLanguage();
+    const { privacyPolicyPdfUrl } = useFooter();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -176,7 +178,11 @@ export default function RegisterPage() {
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                     >
                                         I accept the{" "}
-                                        <Link href="/privacy-policy" target="_blank" className="underline">
+                                        <Link
+                                            href={privacyPolicyPdfUrl || "#"}
+                                            target="_blank"
+                                            className={`underline ${privacyPolicyPdfUrl ? "" : "pointer-events-none opacity-60"}`}
+                                        >
                                             Privacy Policy
                                         </Link>
                                         .

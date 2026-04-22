@@ -21,6 +21,9 @@ export const footer = pgTable("footer", {
     quickLink4De: text("quick_link_4_de").notNull().default(""),
     quickLink5En: text("quick_link_5_en").notNull().default(""),
     quickLink5De: text("quick_link_5_de").notNull().default(""),
+    /** Cloudinary secure_url; PDF uploaded with resource_type `image` for in-browser preview */
+    privacyPolicyPdfUrl: text("privacy_policy_pdf_url"),
+    privacyPolicyPdfPublicId: text("privacy_policy_pdf_public_id"),
     // Newsletter Section
     newsletterTitleEn: text("newsletter_title_en").notNull().default(""),
     newsletterTitleDe: text("newsletter_title_de").notNull().default(""),

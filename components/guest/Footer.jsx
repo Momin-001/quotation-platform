@@ -6,20 +6,24 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
+import { getPdfPreviewUrl } from "@/lib/cloudinaryPdfUrls";
+import { useFooter } from "@/context/FooterContext";
 
 export default function Footer({ footerData }) {
     const { language } = useLanguage();
+    const footerCtx = useFooter();
+    const effectiveFooterData = footerCtx?.footerData || footerData;
 
     // Get text based on current language with fallback
     const getText = (field) => {
-        if (!footerData) return "";
+        if (!effectiveFooterData) return "";
         const key = language === "en" ? `${field}En` : `${field}De`;
-        return footerData[key] || footerData[`${field}En`] || "";
+        return effectiveFooterData[key] || effectiveFooterData[`${field}En`] || "";
     };
 
     // Get quick links as array
     const getQuickLinks = () => {
-        if (!footerData) return [];
+        if (!effectiveFooterData) return [];
         const links = [];
         for (let i = 1; i <= 5; i++) {
             const linkText = getText(`quickLink${i}`);
@@ -33,6 +37,14 @@ export default function Footer({ footerData }) {
     const handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
+
+    const hasCmsQuickLinks = getQuickLinks().length > 0;
+    const privacyPdfPreviewUrl =
+        footerCtx?.privacyPolicyPdfUrl ||
+        (effectiveFooterData?.privacyPolicyPdfUrl ? getPdfPreviewUrl(effectiveFooterData.privacyPolicyPdfUrl) : null);
+    const privacyLabel = hasCmsQuickLinks
+        ? getText("quickLink5") || "Privacy Policy"
+        : "Privacy Policy";
 
     return (
         <footer className="bg-[#0f2e4a] text-primary-foreground pt-16 pb-8 font-open-sans">
@@ -77,24 +89,42 @@ export default function Footer({ footerData }) {
                             {getText("quickLinksTitle") || "Quick Links"}
                         </h3>
                         <ul className="space-y-2 text-lg font-normal text-gray-200">
-                            
-                            {getQuickLinks().length > 0 ? (
-                                <>
-                                    <li><Link href="/" className="hover:text-secondary">{getText("quickLink1") || "Home"}</Link></li>
-                                    <li><Link href="/products" className="hover:text-secondary">{getText("quickLink2") || "Products"}</Link></li>
-                                    <li><Link href="/controllers" className="hover:text-secondary">{getText("quickLink3") || "Controllers"}</Link></li>
-                                    <li><Link href="/leditor" className="hover:text-secondary">{getText("quickLink4") || "LEDitor"}</Link></li>
-                                    <li><Link href="/become-partner" className="hover:text-secondary">{getText("quickLink5") || "Become Partner"}</Link></li>
-                                </>
-                            ) : (
-                                <>
-                                    <li><Link href="/" className="hover:text-secondary">Home</Link></li>
-                                    <li><Link href="/products" className="hover:text-secondary">Products</Link></li>
-                                    <li><Link href="/controllers" className="hover:text-secondary">Controllers</Link></li>
-                                    <li><Link href="/leditor" className="hover:text-secondary">Leditor</Link></li>
-                                    <li><Link href="/become-partner" className="hover:text-secondary">Become Partner</Link></li>
-                                </>
-                            )}
+                            <li>
+                                <Link href="/products" className="hover:text-secondary">
+                                    {hasCmsQuickLinks ? getText("quickLink1") || "Products" : "Products"}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/imprint" className="hover:text-secondary">
+                                    {hasCmsQuickLinks ? getText("quickLink2") || "Imprint" : "Imprint"}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/terms-and-conditions" className="hover:text-secondary">
+                                    {hasCmsQuickLinks
+                                        ? getText("quickLink3") || "Terms and Conditions"
+                                        : "Terms and Conditions"}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/become-partner" className="hover:text-secondary">
+                                    {hasCmsQuickLinks ? getText("quickLink4") || "Become a Partner" : "Become a Partner"}
+                                </Link>
+                            </li>
+                            <li>
+                                {privacyPdfPreviewUrl ? (
+                                    <a
+                                        href={privacyPdfPreviewUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-secondary"
+                                    >
+                                        {privacyLabel}
+                                    </a>
+                                ) : (
+                                    <span className="opacity-70 cursor-not-allowed">{privacyLabel}</span>
+                                )}
+                            </li>
                         </ul>
                     </div>
 

@@ -3,6 +3,7 @@ import Navbar from "@/components/guest/Navbar";
 import UserHeader from "@/components/user/UserHeader";
 import Footer from "@/components/guest/Footer";
 import { BASE_URL } from "@/lib/constants";
+import { FooterProvider } from "@/context/FooterContext";
 
 const defaultNavbarData = {
     navItem1En: "HOME",
@@ -81,8 +82,10 @@ async function getLayoutData() {
       <div>
         <Navbar navbarData={navbarData} />
         <UserHeader userHeaderData={userHeaderData} />
-        {children}
-        <Footer footerData={footerData} />
+        <FooterProvider initialFooterData={footerData}>
+          {children}
+          <Footer footerData={footerData} />
+        </FooterProvider>
       </div>
     );
   }

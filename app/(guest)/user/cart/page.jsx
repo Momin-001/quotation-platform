@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
+import { useFooter } from "@/context/FooterContext";
 
 const formSchema = z.object({
     message: z.string().min(10, "Message must be at least 10 characters"),
@@ -40,6 +41,7 @@ export default function CartPage() {
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
     const { language } = useLanguage();
+    const { privacyPolicyPdfUrl } = useFooter();
     const {
         register,
         handleSubmit,
@@ -357,7 +359,18 @@ export default function CartPage() {
                                     htmlFor="privacy"
                                     className="text-sm cursor-pointer"
                                 >
-                                    I agree to the <Link href="/privacy-policy" target="_blank" className="font-bold hover:underline">Privacy Policy</Link> and <Link href="/terms-and-conditions" target="_blank" className="font-bold hover:underline">Terms & Conditions.</Link>
+                                    I agree to the{" "}
+                                    <Link
+                                        href={privacyPolicyPdfUrl || "#"}
+                                        target="_blank"
+                                        className={`font-bold hover:underline ${privacyPolicyPdfUrl ? "" : "pointer-events-none opacity-60"}`}
+                                    >
+                                        Privacy Policy
+                                    </Link>{" "}
+                                    and{" "}
+                                    <Link href="/terms-and-conditions" target="_blank" className="font-bold hover:underline">
+                                        Terms & Conditions.
+                                    </Link>
                                 </Label>
                             </div>
 

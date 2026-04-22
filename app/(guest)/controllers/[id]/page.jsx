@@ -53,6 +53,7 @@ export default function ControllerDetailPage() {
     const [loading, setLoading] = useState(true);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectProductModalOpen, setSelectProductModalOpen] = useState(false);
+    const [downloadOpening, setDownloadOpening] = useState(false);
 
     useEffect(() => {
         if (params.id) {
@@ -138,6 +139,22 @@ export default function ControllerDetailPage() {
         router.push("/user/cart");
     };
 
+    const handleOpenDownload = () => {
+        const url = controller?.downloadUrl ? String(controller.downloadUrl).trim() : "";
+        if (!url) {
+            toast.error("No download link available for this controller");
+            return;
+        }
+        setDownloadOpening(true);
+        try {
+            // Open in a new tab/window (no opener for security).
+            window.open(url, "_blank", "noopener,noreferrer");
+        } finally {
+            // Keep it snappy; this is not a network fetch.
+            setTimeout(() => setDownloadOpening(false), 300);
+        }
+    };
+
     return (
         <>
             <BreadCrumb
@@ -203,15 +220,15 @@ export default function ControllerDetailPage() {
                         <div className="space-y-8">
                             <div>
                                 <h1 className="text-3xl font-bold mb-2">{title}</h1>
-                                <p className="text-lg font-semibold mb-2">{controller.controllerNumber}</p>
+                                <p className="text-xl font-semibold mb-2">{controller.controllerNumber}</p>
                                 <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium mb-4">
                                     {controller.brandDisplay.toUpperCase() || "N/A"}
                                 </span>
-                                <p className="mb-4">{controller.interfaceDescription}</p>
+                                <p className="mb-4 font-normal text-xl">{controller.interfaceDescription}</p>
 
                             </div>
                             {/* Downloads */}
-                            {isAuthenticated && isUser && (
+                            {isAuthenticated && isUser && controller.downloadUrl && (
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4">
                                     <div>
                                         <h3 className="text-lg font-bold">Downloads</h3>
@@ -219,15 +236,24 @@ export default function ControllerDetailPage() {
                                     </div>
 
                                     <div className="mt-4 md:mt-0">
-                                        <Link
-                                            href={controller.downloadUrl}
-                                            target="_blank"
+                                        <button
+                                            type="button"
+                                            onClick={handleOpenDownload}
+                                            disabled={downloadOpening}
                                             className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            <FileText className="h-5 w-5 mr-2 text-red-500" />
-                                            <span>Controller Manual</span>
-
-                                        </Link>
+                                            {downloadOpening ? (
+                                                <>
+                                                    <Spinner className="h-5 w-5 mr-2 text-blue-600" />
+                                                    <span>Opening…</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FileText className="h-5 w-5 mr-2 text-red-500" />
+                                                    <span>Controller Manual</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             )}

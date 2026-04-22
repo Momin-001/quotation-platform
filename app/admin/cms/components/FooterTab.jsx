@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { getPdfPreviewUrl } from "@/lib/cloudinaryPdfUrls";
 
 // Zod schema for footer validation
 const footerSchema = z.object({
@@ -40,6 +42,8 @@ const footerSchema = z.object({
 
 export default function FooterTab({ onDataChange, onValidationChange, onSaveHandlerReady }) {
     const [loading, setLoading] = useState(true);
+    const [privacyPdfUrl, setPrivacyPdfUrl] = useState(null);
+    const [pdfBusy, setPdfBusy] = useState(false);
     const {
         register,
         reset,
@@ -102,6 +106,7 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
             const data = await res.json();
 
             if (data.success) {
+                setPrivacyPdfUrl(data.data.privacyPolicyPdfUrl || null);
                 const fetchedData = {
                     descriptionEn: data.data.descriptionEn || "",
                     descriptionDe: data.data.descriptionDe || "",
@@ -140,6 +145,66 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
         }
     }, [reset]);
 
+    const handlePrivacyPdfChange = async (e) => {
+        const file = e.target.files?.[0];
+        // allow picking the same file again
+        e.target.value = "";
+
+        if (!file) return;
+        const isPdf = file.type === "application/pdf" || file.name?.toLowerCase().endsWith(".pdf");
+        if (!isPdf) {
+            toast.error("Please choose a PDF file");
+            return;
+        }
+
+        setPdfBusy(true);
+        try {
+            const fd = new FormData();
+            fd.append("file", file);
+
+            const res = await fetch("/api/admin/footer/privacy-policy-pdf", {
+                method: "POST",
+                body: fd,
+            });
+            const json = await res.json();
+
+            if (!json.success) {
+                throw new Error(json.message || "Upload failed");
+            }
+
+            toast.success(json.message || "Privacy policy PDF uploaded");
+            setPrivacyPdfUrl(json.data?.privacyPolicyPdfUrl || null);
+            await fetchFooterData();
+        } catch (err) {
+            toast.error(err.message || "Upload failed");
+        } finally {
+            setPdfBusy(false);
+        }
+    };
+
+    const handleRemovePrivacyPdf = async () => {
+        if (!privacyPdfUrl) return;
+        if (!window.confirm("Remove the uploaded privacy policy PDF?")) return;
+
+        setPdfBusy(true);
+        try {
+            const res = await fetch("/api/admin/footer/privacy-policy-pdf", { method: "DELETE" });
+            const json = await res.json();
+
+            if (!json.success) {
+                throw new Error(json.message || "Remove failed");
+            }
+
+            toast.success(json.message || "PDF removed");
+            setPrivacyPdfUrl(null);
+            await fetchFooterData();
+        } catch (err) {
+            toast.error(err.message || "Remove failed");
+        } finally {
+            setPdfBusy(false);
+        }
+    };
+
     useEffect(() => {
         fetchFooterData();
     }, [fetchFooterData]);
@@ -174,10 +239,15 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
             toast.error("Please fill in all required fields");
             return { success: false };
         }
+
+        if (!privacyPdfUrl) {
+            toast.error("Please upload the privacy policy PDF");
+            return { success: false };
+        }
         
         const data = watch();
         return await handleSave(data);
-    }, [trigger, watch, handleSave]);
+    }, [trigger, watch, handleSave, privacyPdfUrl]);
 
     // Expose save handler to parent
     useEffect(() => {
@@ -448,6 +518,38 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
                             <p className="text-sm text-red-500">{errors.quickLink5De.message}</p>
                         )}
                     </div>
+                </div>
+
+                <div className="rounded-md border border-border p-4 space-y-3 bg-muted/30">
+                    <div>
+                        <Label htmlFor="privacyPolicyPdf">Privacy policy PDF</Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Upload a PDF for quick link 5. It opens in a new browser tab.
+                        </p>
+                    </div>
+                    <Input
+                        id="privacyPolicyPdf"
+                        type="file"
+                        accept="application/pdf,.pdf"
+                        disabled={pdfBusy}
+                        onChange={handlePrivacyPdfChange}
+                        className="cursor-pointer"
+                    />
+                    {privacyPdfUrl && (
+                        <div className="flex flex-wrap items-center gap-3">
+                            <a
+                                href={getPdfPreviewUrl(privacyPdfUrl)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary underline"
+                            >
+                                Preview current PDF
+                            </a>
+                            <Button type="button" variant="outline" size="sm" disabled={pdfBusy} onClick={handleRemovePrivacyPdf}>
+                                Remove PDF
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
 
