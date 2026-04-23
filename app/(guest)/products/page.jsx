@@ -39,6 +39,45 @@ const FALLBACK_FILTER_BOUNDS = {
     powerConsumptionTypicalMax: 20000,
 };
 
+/** Query param tokens — must match `app/api/(guest)/products/route.js` */
+const WARRANTY_FILTER_OPTIONS = [
+    { value: "12", labelEn: "12 Months (Basic)", labelDe: "12 Monate (Basic)" },
+    { value: "24", labelEn: "24 Months (Standard)", labelDe: "24 Monate (Standard)" },
+    { value: "36", labelEn: "36 Months (Industry Standard)", labelDe: "36 Monate (Industriestandard)" },
+    { value: "gte_60", labelEn: "≥ 60 Months (Premium)", labelDe: "≥ 60 Monate (Premium)" },
+];
+
+const LED_LIFESPAN_FILTER_OPTIONS = [
+    { value: "lt_50000", labelEn: "< 50,000", labelDe: "< 50.000" },
+    { value: "50000_70000", labelEn: "50,000 – 70,000", labelDe: "50.000 – 70.000" },
+    { value: "70000_100000", labelEn: "70,000 – 100,000", labelDe: "70.000 – 100.000" },
+    { value: "gte_100000", labelEn: "≥ 100,000", labelDe: "≥ 100.000" },
+];
+
+const BRIGHTNESS_FILTER_OPTIONS = [
+    { value: "lt_1000", labelEn: "< 1,000", labelDe: "< 1.000" },
+    { value: "1000_2000", labelEn: "1,000 – 2,000", labelDe: "1.000 – 2.000" },
+    { value: "2000_4000", labelEn: "2,000 – 4,000", labelDe: "2.000 – 4.000" },
+    { value: "4000_6000", labelEn: "4,000 – 6,000", labelDe: "4.000 – 6.000" },
+    { value: "6000_8000", labelEn: "6,000 – 8,000", labelDe: "6.000 – 8.000" },
+    { value: "gte_8000", labelEn: "≥ 8,000", labelDe: "≥ 8.000" },
+];
+
+const CONTRAST_FILTER_OPTIONS = [
+    { value: "lt_3000", labelEn: "< 3,000 (Basic)", labelDe: "< 3.000 (Basic)" },
+    { value: "3000_5000", labelEn: "3,000 – 5,000 (Standard)", labelDe: "3.000 – 5.000 (Standard)" },
+    { value: "5000_10000", labelEn: "5,000 – 10,000 (High Quality)", labelDe: "5.000 – 10.000 (Hohe Qualität)" },
+    { value: "gte_10000", labelEn: "≥ 10,000 (Premium)", labelDe: "≥ 10.000 (Premium)" },
+];
+
+const REFRESH_RATE_FILTER_OPTIONS = [
+    { value: "lt_1000", labelEn: "< 1,000 Hz", labelDe: "< 1.000 Hz" },
+    { value: "1000_1920", labelEn: "1,000 – 1,920 Hz", labelDe: "1.000 – 1.920 Hz" },
+    { value: "gt_1920_le_3840", labelEn: "> 1,920 Hz (Standard)", labelDe: "> 1.920 Hz (Standard)" },
+    { value: "gt_3840_le_7680", labelEn: "> 3,840 Hz (Professional)", labelDe: "> 3.840 Hz (Professional)" },
+    { value: "gt_7680", labelEn: "> 7,680 Hz (Broadcast)", labelDe: "> 7.680 Hz (Broadcast)" },
+];
+
 // ---------------------------------------------------------------------------
 // Debounce hook
 // Returns a debounced copy of `value` that only updates after `delay` ms of
@@ -86,19 +125,14 @@ function FiltersAccordion({
     ledTechnology, setLedTechnology,
     ledLifespan, setLedLifespan,
     chipBonding, setChipBonding,
-    brightnessControl, setBrightnessControl,
+    brightnessValue, setBrightnessValue,
     contrastRatio, setContrastRatio,
-    viewingAngleHorizontal, setViewingAngleHorizontal,
-    viewingAngleVertical, setViewingAngleVertical,
     refreshRate, setRefreshRate,
     powerRedundancy, setPowerRedundancy,
     memoryOnModule, setMemoryOnModule,
     smartModule, setSmartModule,
     controlSystem, setControlSystem,
-    receivingCard, setReceivingCard,
-    ipRating, setIpRating,
     warrantyPeriod, setWarrantyPeriod,
-    supportDuringWarrantyEn, setSupportDuringWarrantyEn,
     isAuthenticated,
 }) {
     const { language } = useLanguage();
@@ -156,7 +190,7 @@ function FiltersAccordion({
                         <div>
                             <Label className="font-normal">{language === "en" ? "Special Types" : "Spezialtypen"}</Label>
                             <Select value={specialTypes} onValueChange={setSpecialTypes}>
-                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectTrigger><SelectValue placeholder="Standard" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Transparent">Transparent</SelectItem>
                                     <SelectItem value="Curved">Curved</SelectItem>
@@ -219,7 +253,18 @@ function FiltersAccordion({
                         </div>
                         <div className={`${isAuthenticated ? "" : "mb-14"}`}>
                             <Label className="font-normal">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</Label>
-                            <Input type="number" value={ledLifespan} onChange={(e) => setLedLifespan(e.target.value)} placeholder="Enter number" />
+                            <Select value={ledLifespan || undefined} onValueChange={setLedLifespan}>
+                                <SelectTrigger>
+                                        <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {LED_LIFESPAN_FILTER_OPTIONS.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {language === "en" ? o.labelEn : o.labelDe}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
@@ -246,20 +291,34 @@ function FiltersAccordion({
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Brightness Control" : "Helligkeitssteuerung"}</Label>
-                            <Input value={brightnessControl} onChange={(e) => setBrightnessControl(e.target.value)} placeholder="Enter brightness control" />
+                            <Label className="font-normal">{language === "en" ? "Brightness Value" : "Helligkeitswert"}</Label>
+                            <Select value={brightnessValue || undefined} onValueChange={setBrightnessValue}>
+                                <SelectTrigger>
+                                        <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {BRIGHTNESS_FILTER_OPTIONS.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {language === "en" ? o.labelEn : o.labelDe}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div>
                             <Label className="font-normal">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</Label>
-                            <Input type="number" value={contrastRatio} onChange={(e) => setContrastRatio(e.target.value)} placeholder="Enter number" />
-                        </div>
-                        <div>
-                            <Label className="font-normal">{language === "en" ? "View Angle (Horizontal)" : "Ansichtswinkel (Horizontal)"}</Label>
-                            <Input value={viewingAngleHorizontal} onChange={(e) => setViewingAngleHorizontal(e.target.value)} placeholder="Enter viewing angle" />
-                        </div>
-                        <div>
-                            <Label className="font-normal">{language === "en" ? "View Angle (Vertical)" : "Ansichtswinkel (Vertikal)"}</Label>
-                            <Input value={viewingAngleVertical} onChange={(e) => setViewingAngleVertical(e.target.value)} placeholder="Enter viewing angle" />
+                            <Select value={contrastRatio || undefined} onValueChange={setContrastRatio}>
+                                <SelectTrigger>
+                                        <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {CONTRAST_FILTER_OPTIONS.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {language === "en" ? o.labelEn : o.labelDe}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                 </div>
@@ -274,7 +333,18 @@ function FiltersAccordion({
                     <div className="space-y-3">
                         <div>
                             <Label className="font-normal">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</Label>
-                            <Input type="number" value={refreshRate} onChange={(e) => setRefreshRate(e.target.value)} placeholder="Enter refresh rate" />
+                            <Select value={refreshRate || undefined} onValueChange={setRefreshRate}>
+                                <SelectTrigger>
+                                        <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {REFRESH_RATE_FILTER_OPTIONS.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {language === "en" ? o.labelEn : o.labelDe}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             {filterBounds ? (
@@ -350,24 +420,7 @@ function FiltersAccordion({
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div>
-                                <Label className="font-normal">{language === "en" ? "Receiving Card" : "Empfangs-Karte"}</Label>
-                                <Input value={receivingCard} onChange={(e) => setReceivingCard(e.target.value)} placeholder="Enter receiving card" />
-                            </div>
                         </RestrictedContentOverlay>
-                    </div>
-                </div>
-            </div>
-
-            {/* Operating Conditions */}
-            <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
-                    {language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}
-                </h3>
-                <div className="space-y-3">
-                    <div>
-                        <Label className="font-normal">{language === "en" ? "IP Rating" : "IP-Rating"}</Label>
-                        <Input value={ipRating} onChange={(e) => setIpRating(e.target.value)} placeholder="Enter text" />
                     </div>
                 </div>
             </div>
@@ -378,14 +431,21 @@ function FiltersAccordion({
                     {language === "en" ? "Warranty" : "Garantie"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
-                    <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                        <Label className="font-normal">{language === "en" ? "Support During Warranty" : "Support während der Garantie"}</Label>
-                        <Input value={supportDuringWarrantyEn} onChange={(e) => setSupportDuringWarrantyEn(e.target.value)} placeholder="Enter support during warranty" />
-                    </div>
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
                             <Label className="font-normal">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</Label>
-                            <Input type="number" value={warrantyPeriod} onChange={(e) => setWarrantyPeriod(e.target.value)} placeholder="Enter number" />
+                            <Select value={warrantyPeriod || undefined} onValueChange={setWarrantyPeriod}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {WARRANTY_FILTER_OPTIONS.map((o) => (
+                                        <SelectItem key={o.value} value={o.value}>
+                                            {language === "en" ? o.labelEn : o.labelDe}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </RestrictedContentOverlay>
                 </div>
@@ -425,19 +485,14 @@ function ProductsPageContent() {
     const [ledTechnology, setLedTechnology] = useState("");
     const [ledLifespan, setLedLifespan] = useState("");
     const [chipBonding, setChipBonding] = useState("");
-    const [brightnessControl, setBrightnessControl] = useState("");
+    const [brightnessValue, setBrightnessValue] = useState("");
     const [contrastRatio, setContrastRatio] = useState("");
-    const [viewingAngleHorizontal, setViewingAngleHorizontal] = useState("");
-    const [viewingAngleVertical, setViewingAngleVertical] = useState("");
     const [refreshRate, setRefreshRate] = useState("");
     const [powerRedundancy, setPowerRedundancy] = useState("");
     const [memoryOnModule, setMemoryOnModule] = useState("");
     const [smartModule, setSmartModule] = useState("");
     const [controlSystem, setControlSystem] = useState("");
-    const [receivingCard, setReceivingCard] = useState("");
-    const [ipRating, setIpRating] = useState("");
     const [warrantyPeriod, setWarrantyPeriod] = useState("");
-    const [supportDuringWarrantyEn, setSupportDuringWarrantyEn] = useState("");
 
     // ---------------------------------------------------------------------------
     // Debounced filter values  (used for the actual API call – 400 ms delay)
@@ -454,23 +509,20 @@ function ProductsPageContent() {
     const debouncedPowerMaxRange        = useDebounce(powerMaxRange, 400);
     const debouncedPowerTypicalRange    = useDebounce(powerTypicalRange, 400);
     const debouncedLedTechnology        = useDebounce(ledTechnology, 150);
-    const debouncedLedLifespan          = useDebounce(ledLifespan, 400);
+    const debouncedLedLifespan          = useDebounce(ledLifespan, 150);
     const debouncedChipBonding          = useDebounce(chipBonding, 150);
-    const debouncedBrightnessControl    = useDebounce(brightnessControl, 400);
-    const debouncedContrastRatio        = useDebounce(contrastRatio, 400);
-    const debouncedViewingAngleH        = useDebounce(viewingAngleHorizontal, 400);
-    const debouncedViewingAngleV        = useDebounce(viewingAngleVertical, 400);
-    const debouncedRefreshRate          = useDebounce(refreshRate, 400);
+    const debouncedBrightnessValue    = useDebounce(brightnessValue, 150);
+    const debouncedContrastRatio        = useDebounce(contrastRatio, 150);
+    const debouncedRefreshRate          = useDebounce(refreshRate, 150);
     const debouncedPowerRedundancy      = useDebounce(powerRedundancy, 150);
     const debouncedMemoryOnModule       = useDebounce(memoryOnModule, 150);
     const debouncedSmartModule          = useDebounce(smartModule, 150);
     const debouncedControlSystem        = useDebounce(controlSystem, 150);
-    const debouncedReceivingCard        = useDebounce(receivingCard, 400);
-    const debouncedIpRating             = useDebounce(ipRating, 400);
-    const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 400);
-    const debouncedSupportDuringWarranty = useDebounce(supportDuringWarrantyEn, 400);
+    const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 150);
 
     const [sheetOpen, setSheetOpen] = useState(false);
+    /** Bumps on "Clear All" so Radix Selects remount and show placeholders (controlled value → ""). */
+    const [filtersMountKey, setFiltersMountKey] = useState(0);
 
     const observer = useRef();
 
@@ -570,12 +622,18 @@ function ProductsPageContent() {
         const params = new URLSearchParams();
         params.append("page", pageNum.toString());
         params.append("limit", "10");
-        if (debouncedSearch)                params.append("search", debouncedSearch);
-        if (debouncedSelectedCategory)      params.append("categoryId", debouncedSelectedCategory);
-        if (debouncedProductType)           params.append("productType", debouncedProductType);
-        if (debouncedDesign)                params.append("design", debouncedDesign);
-        if (debouncedSpecialTypes)          params.append("specialTypes", debouncedSpecialTypes);
-        if (debouncedApplication)           params.append("application", debouncedApplication);
+        if (debouncedSearch)                
+            params.append("search", debouncedSearch);
+        if (debouncedSelectedCategory)      
+            params.append("categoryId", debouncedSelectedCategory);
+        if (debouncedProductType)           
+            params.append("productType", debouncedProductType);
+        if (debouncedDesign)                
+            params.append("design", debouncedDesign);
+        if (debouncedSpecialTypes)          
+            params.append("specialTypes", debouncedSpecialTypes);
+        if (debouncedApplication)           
+            params.append("application", debouncedApplication);
         if (
             filterBounds &&
             pixelRangeIsActive(debouncedPixelPitchRange, filterBounds)
@@ -587,13 +645,16 @@ function ProductsPageContent() {
                 params.append("pixelPitchMax", pMax.toFixed(2));
             }
         }
-        if (debouncedLedTechnology)         params.append("ledTechnology", debouncedLedTechnology);
-        if (debouncedLedLifespan)           params.append("ledLifespan", debouncedLedLifespan);
-        if (debouncedChipBonding)           params.append("chipBonding", debouncedChipBonding);
-        if (debouncedBrightnessControl)     params.append("brightnessControl", debouncedBrightnessControl);
-        if (debouncedContrastRatio)         params.append("contrastRatio", debouncedContrastRatio);
-        if (debouncedViewingAngleH)         params.append("viewingAngleHorizontal", debouncedViewingAngleH);
-        if (debouncedViewingAngleV)         params.append("viewingAngleVertical", debouncedViewingAngleV);
+        if (debouncedLedTechnology)         
+            params.append("ledTechnology", debouncedLedTechnology);
+        if (debouncedLedLifespan)           
+            params.append("ledLifespan", debouncedLedLifespan);
+        if (debouncedChipBonding)           
+            params.append("chipBonding", debouncedChipBonding);
+        if (debouncedBrightnessValue)     
+            params.append("brightnessValue", debouncedBrightnessValue);
+        if (debouncedContrastRatio)         
+            params.append("contrastRatio", debouncedContrastRatio);
         if (
             filterBounds &&
             intRangeIsActive(
@@ -624,26 +685,28 @@ function ProductsPageContent() {
                 params.append("powerConsumptionTypicalMax", String(pMax));
             }
         }
-        if (debouncedRefreshRate)           params.append("refreshRate", debouncedRefreshRate);
-        if (debouncedPowerRedundancy !== "") params.append("powerRedundancy", debouncedPowerRedundancy);
-        if (debouncedMemoryOnModule !== "")  params.append("memoryOnModule", debouncedMemoryOnModule);
-        if (debouncedSmartModule !== "")     params.append("smartModule", debouncedSmartModule);
-        if (debouncedControlSystem)         params.append("controlSystem", debouncedControlSystem);
-        if (debouncedReceivingCard)         params.append("receivingCard", debouncedReceivingCard);
-        if (debouncedIpRating)              params.append("ipRating", debouncedIpRating);
-        if (debouncedWarrantyPeriod)        params.append("warrantyPeriod", debouncedWarrantyPeriod);
-        if (debouncedSupportDuringWarranty !== "") params.append("supportDuringWarrantyEn", debouncedSupportDuringWarranty);
+        if (debouncedRefreshRate)           
+            params.append("refreshRate", debouncedRefreshRate);
+        if (debouncedPowerRedundancy !== "") 
+            params.append("powerRedundancy", debouncedPowerRedundancy);
+        if (debouncedMemoryOnModule !== "")  
+            params.append("memoryOnModule", debouncedMemoryOnModule);
+        if (debouncedSmartModule !== "")     
+            params.append("smartModule", debouncedSmartModule);
+        if (debouncedControlSystem)         
+            params.append("controlSystem", debouncedControlSystem);
+        if (debouncedWarrantyPeriod)        
+            params.append("warrantyPeriod", debouncedWarrantyPeriod);
         return params.toString();
     }, [
         page,
         filterBounds,
         debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
         debouncedSpecialTypes, debouncedApplication, debouncedPixelPitchRange, debouncedLedTechnology,
-        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
-        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerMaxRange, debouncedPowerTypicalRange,
+        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessValue, debouncedContrastRatio,
+        debouncedPowerMaxRange, debouncedPowerTypicalRange,
         debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
-        debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
-        debouncedSupportDuringWarranty,
+        debouncedControlSystem, debouncedWarrantyPeriod,
     ]);
 
     // Fetch products
@@ -681,11 +744,10 @@ function ProductsPageContent() {
         filterBoundsReady,
         debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
         debouncedSpecialTypes, debouncedApplication, debouncedPixelPitchRange, debouncedLedTechnology,
-        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessControl, debouncedContrastRatio,
-        debouncedViewingAngleH, debouncedViewingAngleV, debouncedPowerMaxRange, debouncedPowerTypicalRange,
+        debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessValue, debouncedContrastRatio,
+        debouncedPowerMaxRange, debouncedPowerTypicalRange,
         debouncedRefreshRate, debouncedPowerRedundancy, debouncedMemoryOnModule, debouncedSmartModule,
-        debouncedControlSystem, debouncedReceivingCard, debouncedIpRating, debouncedWarrantyPeriod,
-        debouncedSupportDuringWarranty,
+        debouncedControlSystem, debouncedWarrantyPeriod,
     ]);
 
     // Infinite scroll
@@ -733,19 +795,15 @@ function ProductsPageContent() {
         setLedTechnology("");
         setLedLifespan("");
         setChipBonding("");
-        setBrightnessControl("");
+        setBrightnessValue("");
         setContrastRatio("");
-        setViewingAngleHorizontal("");
-        setViewingAngleVertical("");
         setRefreshRate("");
         setPowerRedundancy("");
         setMemoryOnModule("");
         setSmartModule("");
         setControlSystem("");
-        setReceivingCard("");
-        setIpRating("");
         setWarrantyPeriod("");
-        setSupportDuringWarrantyEn("");
+        setFiltersMountKey((k) => k + 1);
     };
 
     return (
@@ -818,6 +876,7 @@ function ProductsPageContent() {
                         </SheetHeader>
                         <div className="flex-1 overflow-y-auto px-5 py-4">
                             <FiltersAccordion
+                                key={filtersMountKey}
                                 productType={productType} setProductType={setProductType}
                                 design={design} setDesign={setDesign}
                                 specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
@@ -829,19 +888,14 @@ function ProductsPageContent() {
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
                                 ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
-                                brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
+                                brightnessValue={brightnessValue} setBrightnessValue={setBrightnessValue}
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
-                                viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
-                                viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
                                 powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
                                 memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
                                 smartModule={smartModule} setSmartModule={setSmartModule}
                                 controlSystem={controlSystem} setControlSystem={setControlSystem}
-                                receivingCard={receivingCard} setReceivingCard={setReceivingCard}
-                                ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
-                                supportDuringWarrantyEn={supportDuringWarrantyEn} setSupportDuringWarrantyEn={setSupportDuringWarrantyEn}
                                 isAuthenticated={isAuthenticated}
                             />
                         </div>
@@ -868,6 +922,7 @@ function ProductsPageContent() {
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(100vh-100px)]">
                             <FiltersAccordion
+                                key={filtersMountKey}
                                 productType={productType} setProductType={setProductType}
                                 design={design} setDesign={setDesign}
                                 specialTypes={specialTypes} setSpecialTypes={setSpecialTypes}
@@ -879,19 +934,14 @@ function ProductsPageContent() {
                                 ledTechnology={ledTechnology} setLedTechnology={setLedTechnology}
                                 ledLifespan={ledLifespan} setLedLifespan={setLedLifespan}
                                 chipBonding={chipBonding} setChipBonding={setChipBonding}
-                                brightnessControl={brightnessControl} setBrightnessControl={setBrightnessControl}
+                                brightnessValue={brightnessValue} setBrightnessValue={setBrightnessValue}
                                 contrastRatio={contrastRatio} setContrastRatio={setContrastRatio}
-                                viewingAngleHorizontal={viewingAngleHorizontal} setViewingAngleHorizontal={setViewingAngleHorizontal}
-                                viewingAngleVertical={viewingAngleVertical} setViewingAngleVertical={setViewingAngleVertical}
                                 refreshRate={refreshRate} setRefreshRate={setRefreshRate}
                                 powerRedundancy={powerRedundancy} setPowerRedundancy={setPowerRedundancy}
                                 memoryOnModule={memoryOnModule} setMemoryOnModule={setMemoryOnModule}
                                 smartModule={smartModule} setSmartModule={setSmartModule}
                                 controlSystem={controlSystem} setControlSystem={setControlSystem}
-                                receivingCard={receivingCard} setReceivingCard={setReceivingCard}
-                                ipRating={ipRating} setIpRating={setIpRating}
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
-                                supportDuringWarrantyEn={supportDuringWarrantyEn} setSupportDuringWarrantyEn={setSupportDuringWarrantyEn}
                                 isAuthenticated={isAuthenticated}
                             />
                         </div>

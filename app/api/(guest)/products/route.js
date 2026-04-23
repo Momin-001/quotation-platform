@@ -1,7 +1,15 @@
 import { db } from "@/lib/db";
 import { products, productImages, productCertificates, certificates, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { desc, ilike, or, and, eq, sql, gte, lte, isNotNull } from "drizzle-orm";
+import { desc, ilike, or, and, eq, sql, gte, lte, gt, lt, isNotNull } from "drizzle-orm";
+
+/** Numeric brightness from text column (admin stores plain numbers). */
+function brightnessNumericSql() {
+    return sql`(CASE
+        WHEN trim(${products.brightnessValue}) ~ '^[0-9]+(\\.[0-9]*)?$' THEN trim(${products.brightnessValue})::numeric
+        ELSE NULL
+    END)`;
+}
 
 export async function GET(req) {
     try {
@@ -22,10 +30,8 @@ export async function GET(req) {
         const ledTechnology = searchParams.get("ledTechnology") || "";
         const ledLifespan = searchParams.get("ledLifespan") || "";
         const chipBonding = searchParams.get("chipBonding") || "";
-        const brightnessControl = searchParams.get("brightnessControl") || "";
+        const brightnessValue = searchParams.get("brightnessValue") || "";
         const contrastRatio = searchParams.get("contrastRatio") || "";
-        const viewingAngleHorizontal = searchParams.get("viewingAngleHorizontal") || "";
-        const viewingAngleVertical = searchParams.get("viewingAngleVertical") || "";
         const powerConsumptionMax = searchParams.get("powerConsumptionMax") || "";
         const powerConsumptionTypical = searchParams.get("powerConsumptionTypical") || "";
         const powerConsumptionMaxMin = searchParams.get("powerConsumptionMaxMin") || "";
@@ -37,10 +43,7 @@ export async function GET(req) {
         const memoryOnModule = searchParams.get("memoryOnModule") || "";
         const smartModule = searchParams.get("smartModule") || "";
         const controlSystem = searchParams.get("controlSystem") || "";
-        const receivingCard = searchParams.get("receivingCard") || "";
-        const ipRating = searchParams.get("ipRating") || "";
         const warrantyPeriod = searchParams.get("warrantyPeriod") || "";
-        const supportDuringWarrantyEn = searchParams.get("supportDuringWarrantyEn") || "";
         const offset = (page - 1) * limit;
 
         // Build where clause
@@ -111,11 +114,25 @@ export async function GET(req) {
             conditions.push(eq(products.ledTechnology, ledTechnology));
         }
 
-        // LED Lifespan filter (integer match)
+        // LED Lifespan: bucket tokens or legacy exact integer
         if (ledLifespan) {
-            const lifespanNum = parseInt(ledLifespan);
-            if (!isNaN(lifespanNum)) {
-                conditions.push(eq(products.ledLifespan, lifespanNum));
+            if (ledLifespan === "lt_50000") {
+                conditions.push(and(isNotNull(products.ledLifespan), lt(products.ledLifespan, 50000)));
+            } else if (ledLifespan === "50000_70000") {
+                conditions.push(
+                    and(isNotNull(products.ledLifespan), gte(products.ledLifespan, 50000), lte(products.ledLifespan, 70000))
+                );
+            } else if (ledLifespan === "70000_100000") {
+                conditions.push(
+                    and(isNotNull(products.ledLifespan), gte(products.ledLifespan, 70000), lte(products.ledLifespan, 100000))
+                );
+            } else if (ledLifespan === "gte_100000") {
+                conditions.push(and(isNotNull(products.ledLifespan), gte(products.ledLifespan, 100000)));
+            } else {
+                const lifespanNum = parseInt(ledLifespan, 10);
+                if (!Number.isNaN(lifespanNum)) {
+                    conditions.push(eq(products.ledLifespan, lifespanNum));
+                }
             }
         }
 
@@ -124,27 +141,55 @@ export async function GET(req) {
             conditions.push(eq(products.chipBonding, chipBonding));
         }
 
-        // Brightness Control filter (text search)
-        if (brightnessControl) {
-            conditions.push(ilike(products.brightnessControl, `%${brightnessControl}%`));
-        }
-
-        // Contrast Ratio filter (integer match - numerator)
-        if (contrastRatio) {
-            const ratioNum = parseInt(contrastRatio);
-            if (!isNaN(ratioNum)) {
-                conditions.push(eq(products.contrastRatioNumerator, ratioNum));
+        // Brightness (text column storing numeric string): bucket tokens or legacy substring search
+        if (brightnessValue) {
+            const b = brightnessValue;
+            const bn = brightnessNumericSql();
+            if (b === "lt_1000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, lt(bn, 1000)));
+            } else if (b === "1000_2000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, gte(bn, 1000), lte(bn, 2000)));
+            } else if (b === "2000_4000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, gte(bn, 2000), lte(bn, 4000)));
+            } else if (b === "4000_6000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, gte(bn, 4000), lte(bn, 6000)));
+            } else if (b === "6000_8000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, gte(bn, 6000), lte(bn, 8000)));
+            } else if (b === "gte_8000") {
+                conditions.push(and(isNotNull(products.brightnessValue), sql`${bn} IS NOT NULL`, gte(bn, 8000)));
+            } else {
+                conditions.push(ilike(products.brightnessValue, `%${brightnessValue}%`));
             }
         }
 
-        // Viewing Angle Horizontal filter (text search)
-        if (viewingAngleHorizontal) {
-            conditions.push(ilike(products.viewingAngleHorizontal, `%${viewingAngleHorizontal}%`));
-        }
-
-        // Viewing Angle Vertical filter (text search)
-        if (viewingAngleVertical) {
-            conditions.push(ilike(products.viewingAngleVertical, `%${viewingAngleVertical}%`));
+        // Contrast ratio (numerator): buckets or legacy exact match
+        if (contrastRatio) {
+            if (contrastRatio === "lt_3000") {
+                conditions.push(and(isNotNull(products.contrastRatioNumerator), lt(products.contrastRatioNumerator, 3000)));
+            } else if (contrastRatio === "3000_5000") {
+                conditions.push(
+                    and(
+                        isNotNull(products.contrastRatioNumerator),
+                        gte(products.contrastRatioNumerator, 3000),
+                        lte(products.contrastRatioNumerator, 5000)
+                    )
+                );
+            } else if (contrastRatio === "5000_10000") {
+                conditions.push(
+                    and(
+                        isNotNull(products.contrastRatioNumerator),
+                        gt(products.contrastRatioNumerator, 5000),
+                        lte(products.contrastRatioNumerator, 10000)
+                    )
+                );
+            } else if (contrastRatio === "gte_10000") {
+                conditions.push(and(isNotNull(products.contrastRatioNumerator), gte(products.contrastRatioNumerator, 10000)));
+            } else {
+                const ratioNum = parseInt(contrastRatio, 10);
+                if (!Number.isNaN(ratioNum)) {
+                    conditions.push(eq(products.contrastRatioNumerator, ratioNum));
+                }
+            }
         }
 
         // Power consumption max: inclusive integer range or legacy exact match
@@ -187,11 +232,25 @@ export async function GET(req) {
             }
         }
 
-        // Refresh Rate filter (integer match)
+        // Refresh rate: bucket tokens or legacy exact integer
         if (refreshRate) {
-            const refreshNum = parseInt(refreshRate);
-            if (!isNaN(refreshNum)) {
-                conditions.push(eq(products.refreshRate, refreshNum));
+            if (refreshRate === "lt_1000") {
+                conditions.push(and(isNotNull(products.refreshRate), lt(products.refreshRate, 1000)));
+            } else if (refreshRate === "1000_1920") {
+                conditions.push(
+                    and(isNotNull(products.refreshRate), gte(products.refreshRate, 1000), lte(products.refreshRate, 1920))
+                );
+            } else if (refreshRate === "gt_1920_le_3840") {
+                conditions.push(and(isNotNull(products.refreshRate), gt(products.refreshRate, 1920), lte(products.refreshRate, 3840)));
+            } else if (refreshRate === "gt_3840_le_7680") {
+                conditions.push(and(isNotNull(products.refreshRate), gt(products.refreshRate, 3840), lte(products.refreshRate, 7680)));
+            } else if (refreshRate === "gt_7680") {
+                conditions.push(and(isNotNull(products.refreshRate), gt(products.refreshRate, 7680)));
+            } else {
+                const refreshNum = parseInt(refreshRate, 10);
+                if (!Number.isNaN(refreshNum)) {
+                    conditions.push(eq(products.refreshRate, refreshNum));
+                }
             }
         }
 
@@ -225,27 +284,19 @@ export async function GET(req) {
             }
         }
 
-        // Receiving Card filter (text search)
-        if (receivingCard) {
-            conditions.push(ilike(products.receivingCard, `%${receivingCard}%`));
-        }
-
-        // IP Rating filter (text search)
-        if (ipRating) {
-            conditions.push(ilike(products.ipRating, `%${ipRating}%`));
-        }
-
-        // Warranty Period filter (integer match)
+        // Warranty period (months): dropdown exact tiers or premium >=60, or legacy exact int
         if (warrantyPeriod) {
-            const warrantyNum = parseInt(warrantyPeriod);
-            if (!isNaN(warrantyNum)) {
-                conditions.push(eq(products.warrantyPeriod, warrantyNum));
+            if (warrantyPeriod === "gte_60") {
+                conditions.push(and(isNotNull(products.warrantyPeriod), gte(products.warrantyPeriod, 60)));
+            } else if (warrantyPeriod === "12" || warrantyPeriod === "24" || warrantyPeriod === "36") {
+                const m = parseInt(warrantyPeriod, 10);
+                conditions.push(and(isNotNull(products.warrantyPeriod), eq(products.warrantyPeriod, m)));
+            } else {
+                const warrantyNum = parseInt(warrantyPeriod, 10);
+                if (!Number.isNaN(warrantyNum)) {
+                    conditions.push(eq(products.warrantyPeriod, warrantyNum));
+                }
             }
-        }
-
-        // Support During Warranty filter (ENUM: yes/no)
-        if (supportDuringWarrantyEn !== "") {
-            conditions.push(ilike(products.supportDuringWarrantyEn, `%${supportDuringWarrantyEn}%`));
         }
 
         // Build final where clause

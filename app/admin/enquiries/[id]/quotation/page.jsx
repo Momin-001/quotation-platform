@@ -79,6 +79,8 @@ export default function QuotationBuilderPage() {
                         productNumber: items[0].productNumber,
                         pixelPitch: items[0].pixelPitch,
                         imageUrl: items[0].imageUrl || null,
+                        isCustom: items[0].isCustom,
+                        customTotalCabinets: items[0].customTotalCabinets,
                     },
                     quantity: items[0].quantity || 1,
                     unitPrice: "",
@@ -109,6 +111,8 @@ export default function QuotationBuilderPage() {
                         productNumber: items[1].productNumber,
                         pixelPitch: items[1].pixelPitch,
                         imageUrl: items[1].imageUrl || null,
+                        isCustom: items[1].isCustom,
+                        customTotalCabinets: items[1].customTotalCabinets,
                     },
                     quantity: items[1].quantity || 1,
                     unitPrice: "",
@@ -434,7 +438,7 @@ export default function QuotationBuilderPage() {
             // Main product
             items.push({
                 productId: mainProduct.product.id,
-                quantity: mainProduct.quantity,
+                quantity: mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity,
                 unitPrice: parseFloat(mainProduct.unitPrice),
                 taxPercentage: parseFloat(mainProduct.taxPercentage) || 0,
                 discountPercentage: parseFloat(mainProduct.discountPercentage) || 0,
@@ -463,7 +467,7 @@ export default function QuotationBuilderPage() {
             if (alternativeProduct && alternativeProduct.product) {
                 items.push({
                     productId: alternativeProduct.product.id,
-                    quantity: alternativeProduct.quantity,
+                    quantity: alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity,
                     unitPrice: parseFloat(alternativeProduct.unitPrice),
                     taxPercentage: parseFloat(alternativeProduct.taxPercentage) || 0,
                     discountPercentage: parseFloat(alternativeProduct.discountPercentage) || 0,

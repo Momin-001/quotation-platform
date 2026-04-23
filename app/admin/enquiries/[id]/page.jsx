@@ -274,44 +274,7 @@ export default function EnquiryDetailPage() {
                             <p className="text-sm text-gray-600">
                                 Base Product: <span className="font-semibold text-gray-900">{item.productName}</span>
                             </p>
-                            {/* Cabinet Specs */}
-                            <div>
-                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Cabinet Specifications</p>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">LED Technology</p>
-                                        <p className="font-semibold">{item.customLedTechnology || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Brightness</p>
-                                        <p className="font-semibold">{item.customBrightnessValue ? `${item.customBrightnessValue} nits` : "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Pixel Pitch</p>
-                                        <p className="font-semibold">{item.customPixelPitch ? `${item.customPixelPitch}mm` : "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Refresh Rate</p>
-                                        <p className="font-semibold">{item.customRefreshRate ? `${item.customRefreshRate} Hz` : "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Cabinet Size</p>
-                                        <p className="font-semibold">
-                                            {item.customCabinetWidth && item.customCabinetHeight
-                                                ? `${item.customCabinetWidth} × ${item.customCabinetHeight} mm`
-                                                : "N/A"}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Cabinet Resolution</p>
-                                        <p className="font-semibold">
-                                            {item.customResolutionHorizontal && item.customResolutionVertical
-                                                ? `${item.customResolutionHorizontal} × ${item.customResolutionVertical} px`
-                                                : "N/A"}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                           
                             {/* Custom LED Summary */}
                             <div>
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Custom LED Summary</p>
@@ -322,7 +285,10 @@ export default function EnquiryDetailPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">Dimension</p>
-                                        <p className="font-semibold">{item.customDimension || "N/A"}</p>
+                                        <p className="font-semibold">{item.customScreenWidth && item.customScreenHeight
+                                                ? `${item.customScreenWidth} × ${item.customScreenHeight} m`
+                                                : "N/A"}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">Display Area</p>
@@ -347,14 +313,6 @@ export default function EnquiryDetailPage() {
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">Power Typical</p>
                                         <p className="font-semibold">{item.customPowerConsumptionTyp ? `${item.customPowerConsumptionTyp} W` : "N/A"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Screen Size</p>
-                                        <p className="font-semibold">
-                                            {item.customScreenWidth && item.customScreenHeight
-                                                ? `${item.customScreenWidth}m × ${item.customScreenHeight}m`
-                                                : "N/A"}
-                                        </p>
                                     </div>
                                 </div>
                             </div>

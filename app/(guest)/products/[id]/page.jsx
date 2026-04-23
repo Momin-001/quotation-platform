@@ -619,7 +619,7 @@ export default function ProductDetailPage() {
                                             <SpecRow label="Number of Colours" value={product.numberOfColours} />
                                             <SpecRow label="Viewing Angle (Horizontal)" value={product.viewingAngleHorizontal} />
                                             <SpecRow label="Viewing Angle (Vertical)" value={product.viewingAngleVertical} />
-                                            <SpecRow label="Brightness Control" value={product.brightnessControl} />
+                                            <SpecRow label="Brightness Value" value={product.brightnessValue} />
                                             <SpecRow
                                                 label="Contrast Ratio"
                                                 value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}

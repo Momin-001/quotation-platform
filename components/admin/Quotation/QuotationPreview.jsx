@@ -11,7 +11,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
     if (mainProduct.product) {
         grandTotal += calculateItemTotal(
             mainProduct.unitPrice,
-            mainProduct.quantity,
+            mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity,
             mainProduct.taxPercentage,
             mainProduct.discountPercentage
         );
@@ -28,7 +28,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
     if (alternativeProduct?.product) {
         grandTotal += calculateItemTotal(
             alternativeProduct.unitPrice,
-            alternativeProduct.quantity,
+            alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity,
             alternativeProduct.taxPercentage,
             alternativeProduct.discountPercentage
         );
@@ -72,7 +72,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                         <>
                             <ProductItemDisplay
                                 product={mainProduct.product}
-                                quantity={mainProduct.quantity}
+                                quantity={mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity}
                                 unitPrice={mainProduct.unitPrice}
                                 description={mainProduct.description}
                                 taxPercentage={mainProduct.taxPercentage}
@@ -90,7 +90,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                         <div key={addIndex} className="bg-purple-50/50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={add.product}
-                                                quantity={add.quantity}
+                                                quantity={add.product.isCustom ? add.product.customTotalCabinets : add.quantity}
                                                 unitPrice={add.unitPrice}
                                                 description={add.description}
                                                 taxPercentage={add.taxPercentage}
@@ -111,7 +111,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                         <div key={optIndex} className="bg-blue-50/50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={opt.product}
-                                                quantity={opt.quantity}
+                                                quantity={opt.product.isCustom ? opt.product.customTotalCabinets : opt.quantity}
                                                 unitPrice={opt.unitPrice}
                                                 description={opt.description}
                                                 taxPercentage={opt.taxPercentage}
@@ -132,7 +132,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                     </div>
                                     <span className="text-2xl font-bold text-blue-700">
                                         {formatCurrency(
-                                            calculateItemTotal(mainProduct.unitPrice, mainProduct.quantity, mainProduct.taxPercentage, mainProduct.discountPercentage) +
+                                            calculateItemTotal(mainProduct.unitPrice, mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity, mainProduct.taxPercentage, mainProduct.discountPercentage) +
                                             (mainProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
                                         )}
                                     </span>
@@ -148,7 +148,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                         <h3 className="text-xl font-semibold text-green-700 mb-4">Alternative Product</h3>
                         <ProductItemDisplay
                             product={alternativeProduct.product}
-                            quantity={alternativeProduct.quantity}
+                            quantity={alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity}
                             unitPrice={alternativeProduct.unitPrice}
                             description={alternativeProduct.description}
                             taxPercentage={alternativeProduct.taxPercentage}
@@ -165,7 +165,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                     <div key={addIndex} className="bg-purple-50 rounded-lg px-3 py-2">
                                         <ProductItemDisplay
                                             product={add.product}
-                                            quantity={add.quantity}
+                                            quantity={add.product.isCustom ? add.product.customTotalCabinets : add.quantity}
                                             unitPrice={add.unitPrice}
                                             description={add.description}
                                             taxPercentage={add.taxPercentage}
@@ -186,7 +186,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                     <div key={optIndex} className="bg-green-50 rounded-lg px-3 py-2">
                                         <ProductItemDisplay
                                             product={opt.product}
-                                            quantity={opt.quantity}
+                                            quantity={opt.product.isCustom ? opt.product.customTotalCabinets : opt.quantity}
                                             unitPrice={opt.unitPrice}
                                             description={opt.description}
                                             taxPercentage={opt.taxPercentage}
@@ -207,7 +207,7 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                                 </div>
                                 <span className="text-2xl font-bold text-green-700">
                                     {formatCurrency(
-                                        calculateItemTotal(alternativeProduct.unitPrice, alternativeProduct.quantity, alternativeProduct.taxPercentage, alternativeProduct.discountPercentage) +
+                                        calculateItemTotal(alternativeProduct.unitPrice, alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity, alternativeProduct.taxPercentage, alternativeProduct.discountPercentage) +
                                         (alternativeProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
                                     )}
                                 </span>

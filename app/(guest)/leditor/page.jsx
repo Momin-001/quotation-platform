@@ -130,7 +130,7 @@ export default function LeditorPage() {
     const [installationData, setInstallationData] = useState({
         serviceAccess: [],
         mountingMethod: "Wall Mount",
-        operatingHours: "Standard (8-12 hours/day)",
+        operatingHours: "24/7 Operation",
         powerRedundancy: "Required",
         ipRating: "",
         installationAndService: [],
@@ -610,21 +610,12 @@ export default function LeditorPage() {
                         quantity: 1,
                         isCustom: true,
                         controllerId: selectedController?.id || null,
-                        customLedTechnology: config.ledTechnology,
-                        customBrightnessValue: config.brightnessValue,
-                        customPixelPitch: config.pixelPitch,
-                        customRefreshRate: parseInt(config.refreshRate) || 0,
-                        customResolutionHorizontal: selectedProduct.cabinetResolutionHorizontal || null,
-                        customResolutionVertical: selectedProduct.cabinetResolutionVertical || null,
-                        customCabinetWidth: config.cabinetWidth,
-                        customCabinetHeight: config.cabinetHeight,
                         customScreenWidth: config.screenWidth.toString(),
                         customScreenHeight: config.screenHeight.toString(),
                         customTotalResolutionH: computed.totalResH,
                         customTotalResolutionV: computed.totalResV,
                         customWeight: computed.totalWeight.toString(),
                         customDisplayArea: computed.displayArea.toString(),
-                        customDimension: computed.dimension,
                         customPowerConsumptionMax: computed.powerMax.toString(),
                         customPowerConsumptionTyp: computed.powerTypical.toString(),
                         customTotalCabinets: computed.totalCabinets,
@@ -1168,7 +1159,7 @@ export default function LeditorPage() {
                                         <div className="space-y-2">
                                             <Label>Operating Hours</Label>
                                             <div className="flex flex-wrap gap-4 pt-1">
-                                                {["Standard (8-12 hours/day)", "Extended (12-20 hours/day)", "24/7 Operation"].map((val) => (
+                                                {["24/7 Operation"].map((val) => (
                                                     <Label key={val} className="cursor-pointer font-normal mb-0">
                                                         <input
                                                             type="radio"

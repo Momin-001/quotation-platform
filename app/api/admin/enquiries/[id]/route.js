@@ -62,21 +62,12 @@ export async function GET(req, { params }) {
                 itemOrder: enquiryItems.itemOrder,
                 controllerId: enquiryItems.controllerId,
                 isCustom: enquiryItems.isCustom,
-                customLedTechnology: enquiryItems.customLedTechnology,
-                customBrightnessValue: enquiryItems.customBrightnessValue,
-                customPixelPitch: enquiryItems.customPixelPitch,
-                customRefreshRate: enquiryItems.customRefreshRate,
-                customResolutionHorizontal: enquiryItems.customResolutionHorizontal,
-                customResolutionVertical: enquiryItems.customResolutionVertical,
-                customCabinetWidth: enquiryItems.customCabinetWidth,
-                customCabinetHeight: enquiryItems.customCabinetHeight,
-                customScreenWidth: enquiryItems.customScreenWidth,
-                customScreenHeight: enquiryItems.customScreenHeight,
                 customTotalResolutionH: enquiryItems.customTotalResolutionH,
                 customTotalResolutionV: enquiryItems.customTotalResolutionV,
                 customWeight: enquiryItems.customWeight,
                 customDisplayArea: enquiryItems.customDisplayArea,
-                customDimension: enquiryItems.customDimension,
+                customScreenWidth: enquiryItems.customScreenWidth,
+                customScreenHeight: enquiryItems.customScreenHeight,
                 customPowerConsumptionMax: enquiryItems.customPowerConsumptionMax,
                 customPowerConsumptionTyp: enquiryItems.customPowerConsumptionTyp,
                 customTotalCabinets: enquiryItems.customTotalCabinets,
@@ -123,14 +114,16 @@ export async function GET(req, { params }) {
                             id: controllers.id,
                             productName: controllers.interfaceName,
                             brandName: controllers.brandName,
+                            imageUrl: productImages.imageUrl,
                         })
                         .from(controllers)
+                        .innerJoin(productImages, eq(controllers.id, productImages.controllerId))
                         .where(eq(controllers.id, item.controllerId))
                         .limit(1);
                     if (ctrl) {
                         controller = {
                             ...ctrl,
-                            imageUrl: null,
+                            imageUrl: ctrl.imageUrl || null,
                             sourceType: "controller",
                             productNumber: ctrl.brandName || ctrl.id?.slice(0, 8) || "N/A",
                         };
