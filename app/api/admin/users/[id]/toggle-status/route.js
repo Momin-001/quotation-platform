@@ -87,6 +87,7 @@ export async function PATCH(req, { params }) {
 
         return successResponse("User status updated successfully", userWithoutPassword);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update user status");
+        console.error("PATCH /api/admin/users/[id]/toggle-status error:", error);
+        return errorResponse("Failed to update user status", 500);
     }
 }

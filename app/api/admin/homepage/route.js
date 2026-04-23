@@ -112,7 +112,8 @@ export async function GET() {
 
         return successResponse("Homepage content fetched successfully", homepageContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch homepage content");
+        console.error("GET /api/admin/homepage error:", error);
+        return errorResponse("Failed to fetch homepage content", 500);
     }
 }
 
@@ -422,7 +423,8 @@ export async function PUT(req) {
 
         return successResponse("Homepage content updated successfully", result[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update homepage content");
+        console.error("PUT /api/admin/homepage error:", error);
+        return errorResponse("Failed to update homepage content", 500);
     }
 }
 

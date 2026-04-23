@@ -41,7 +41,6 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                 setMessages(response.data.messages || []);
             }
         } catch (error) {
-            console.error("Error fetching messages:", error);
         } finally {
             setLoading(false);
         }
@@ -180,7 +179,6 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                 setNewMessage(messageText); // Restore message on error
             }
         } catch (error) {
-            console.error("Error sending message:", error);
             toast.error("Failed to send message");
             setNewMessage(messageText); // Restore message on error
         } finally {

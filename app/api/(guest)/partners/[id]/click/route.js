@@ -36,7 +36,8 @@ export async function POST(req, { params }) {
 
         return successResponse("Click count updated successfully", updatedPartner);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update click count");
+        console.error("POST /api/partners/[id]/click error:", error);
+        return errorResponse("Failed to update click count", 500);
     }
 }
 

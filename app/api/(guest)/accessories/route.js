@@ -36,6 +36,7 @@ export async function GET(req) {
 
         return successResponse("Accessories fetched successfully", allAccessories);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch accessories");
-    }
+        console.error("GET /api/accessories error:", error);
+        return errorResponse("Failed to fetch accessories");
+      }
 }

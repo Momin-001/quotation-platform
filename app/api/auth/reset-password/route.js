@@ -26,7 +26,8 @@ export async function GET(req) {
         }
         verifyResetToken(token);
         return successResponse("Token is valid", { valid: true });
-    } catch {
+    } catch (error) {
+        console.error("GET /api/auth/reset-password error:", error);
         return errorResponse("This reset link is invalid or has expired.", 400);
     }
 }
@@ -56,7 +57,8 @@ export async function POST(req) {
         let userId;
         try {
             userId = verifyResetToken(token);
-        } catch {
+        } catch (error) {
+            console.error("POST /api/auth/reset-password error:", error);
             return errorResponse("This reset link is invalid or has expired.", 400);
         }
 
@@ -75,6 +77,7 @@ export async function POST(req) {
 
         return successResponse("Your password has been updated. You can now sign in.");
     } catch (error) {
-        return errorResponse(error.message || "Failed to reset password");
+        console.error("POST /api/auth/reset-password error:", error);
+        return errorResponse("Failed to reset password", 500);
     }
 }

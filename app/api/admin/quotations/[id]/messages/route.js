@@ -71,8 +71,8 @@ export async function GET(req, { params }) {
             chatDisabled,
         });
     } catch (error) {
-        console.error("Error fetching messages:", error);
-        return errorResponse(error.message || "Failed to fetch messages");
+        console.error("GET /api/admin/quotations/[id]/messages error:", error);
+        return errorResponse("Failed to fetch messages", 500);
     }
 }
 
@@ -140,7 +140,7 @@ export async function POST(req, { params }) {
 
         return successResponse("Message sent successfully", newMessage);
     } catch (error) {
-        console.error("Error sending message:", error);
-        return errorResponse(error.message || "Failed to send message");
+        console.error("POST /api/admin/quotations/[id]/messages error:", error);
+        return errorResponse("Failed to send message", 500);
     }
 }

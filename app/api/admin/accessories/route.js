@@ -13,7 +13,8 @@ export async function GET() {
 
         return successResponse("Accessories fetched successfully", allAccessories);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch accessories");
+        console.error("GET /api/admin/accessories error:", error);
+        return errorResponse("Failed to fetch accessories", 500);
     }
 }
 
@@ -82,6 +83,7 @@ export async function POST(request) {
         if (error.message?.includes("unique") || error.code === "23505") {
             return errorResponse("An accessory with this product number already exists", 400);
         }
-        return errorResponse(error.message || "Failed to create accessory");
+        console.error("POST /api/admin/accessories error:", error);
+        return errorResponse("Failed to create accessory", 500);
     }
 }

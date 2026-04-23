@@ -77,6 +77,7 @@ export async function GET(req, { params }) {
         };
         return successResponse("Product fetched successfully", formattedProduct);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch product");
+        console.error("GET /api/products/[id] error:", error);
+        return errorResponse("Failed to fetch product", 500);
     }
 }

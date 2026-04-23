@@ -71,7 +71,8 @@ export async function GET(request, { params }) {
             icons: productIconLinks,
         });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch product");
+        console.error("GET /api/admin/products/[id] error:", error);
+        return errorResponse("Failed to fetch product", 500);
     }
 }
 
@@ -338,7 +339,8 @@ export async function PUT(request, { params }) {
 
         return successResponse("Product updated successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to update product");
+        console.error("PUT /api/admin/products/[id] error:", error);
+        return errorResponse("Failed to update product", 500);
     }
 }
 
@@ -372,6 +374,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Product deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete product");
+        console.error("DELETE /api/admin/products/[id] error:", error);
+        return errorResponse("Failed to delete product", 500);
     }
 }

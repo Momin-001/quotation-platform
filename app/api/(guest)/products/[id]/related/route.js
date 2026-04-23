@@ -64,6 +64,7 @@ export async function GET(req, { params }) {
 
         return successResponse("Related products fetched successfully", formatted);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch related products");
+        console.error("GET /api/products/[id]/related error:", error);
+        return errorResponse("Failed to fetch related products", 500);
     }
 }

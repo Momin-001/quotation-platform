@@ -67,6 +67,7 @@ export async function POST(req) {
 
         return successResponse(GENERIC_MESSAGE);
     } catch (error) {
-        return errorResponse(error.message || "Failed to process request");
+        console.error("POST /api/auth/forgot-password error:", error);
+        return errorResponse("Failed to process request", 500);
     }
 }

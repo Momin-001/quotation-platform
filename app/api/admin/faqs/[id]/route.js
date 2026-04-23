@@ -36,7 +36,8 @@ export async function PATCH(request, { params }) {
 
         return successResponse("FAQ updated successfully", updatedFaq[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update FAQ");
+        console.error("PATCH /api/admin/faqs/[id] error:", error);
+        return errorResponse("Failed to update FAQ", 500);
     }
 }
 
@@ -57,6 +58,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("FAQ deleted successfully", deletedFaq[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete FAQ");
+        console.error("DELETE /api/admin/faqs/[id] error:", error);
+        return errorResponse("Failed to delete FAQ", 500);
     }
 }

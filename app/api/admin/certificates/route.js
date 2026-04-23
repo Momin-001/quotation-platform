@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("Certificates fetched successfully", allCertificates);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch certificates");
+        console.error("GET /api/admin/certificates error:", error);
+        return errorResponse("Failed to fetch certificates", 500);
     }
 }
 
@@ -52,7 +53,8 @@ export async function POST(request) {
 
         return successResponse("Certificate created successfully", newCertificate[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create certificate");
+        console.error("POST /api/admin/certificates error:", error);
+        return errorResponse("Failed to create certificate", 500);
     }
 }
 

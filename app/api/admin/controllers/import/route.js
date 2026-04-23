@@ -229,8 +229,8 @@ export async function POST(req) {
             total: results.total,
             errors: results.errors,
         });
-    } catch (err) {
-        console.error("Controller bulk import error:", err);
-        return errorResponse(err.message || "Import failed", 500);
+    } catch (error) {
+        console.error("POST /api/admin/controllers/import error:", error);
+        return errorResponse("Import failed", 500);
     }
 }

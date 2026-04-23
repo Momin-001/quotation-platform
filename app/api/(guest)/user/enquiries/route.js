@@ -111,7 +111,8 @@ export async function POST(req) {
             { enquiryId: enquiry.id }
         );
     } catch (error) {
-        return errorResponse(error.message || "Failed to create enquiry");
+        console.error("POST /api/user/enquiries error:", error);
+        return errorResponse("Failed to create enquiry", 500);
     }
 }
 
@@ -159,6 +160,7 @@ export async function GET(req) {
 
         return successResponse("Enquiries fetched successfully", userEnquiries);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch enquiries");
+        console.error("GET /api/user/enquiries error:", error);
+        return errorResponse("Failed to fetch enquiries", 500);
     }
 }

@@ -28,7 +28,8 @@ export async function GET(request, { params }) {
             features: featuresRows.map((r) => r.feature),
         });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch accessory");
+        console.error("GET /api/admin/accessories/[id] error:", error);
+        return errorResponse("Failed to fetch accessory", 500);
     }
 }
 
@@ -100,7 +101,8 @@ export async function PUT(request, { params }) {
         const featuresRows = await db.select().from(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, id));
         return successResponse("Accessory updated successfully", { ...updated, features: featuresRows.map((r) => r.feature) });
     } catch (error) {
-        return errorResponse(error.message || "Failed to update accessory");
+        console.error("PUT /api/admin/accessories/[id] error:", error);
+        return errorResponse("Failed to update accessory", 500);
     }
 }
 
@@ -123,6 +125,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Accessory deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete accessory");
+        console.error("DELETE /api/admin/accessories/[id] error:", error);
+        return errorResponse("Failed to delete accessory", 500);
     }
 }

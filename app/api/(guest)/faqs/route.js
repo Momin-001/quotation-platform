@@ -26,6 +26,7 @@ export async function GET(request) {
         const allFaqs = await query;
         return successResponse("FAQs fetched successfully", allFaqs);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch FAQs");
+        console.error("GET /api/faqs error:", error);
+        return errorResponse("Failed to fetch FAQs", 500);
     }
 }

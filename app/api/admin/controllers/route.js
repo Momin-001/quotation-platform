@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("Controllers fetched successfully", allControllers);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch controllers");
+        console.error("GET /api/admin/controllers error:", error);
+        return errorResponse("Failed to fetch controllers", 500);
     }
 }
 
@@ -117,6 +118,7 @@ export async function POST(request) {
         if (error.message?.includes("unique") || error.code === "23505") {
             return errorResponse("A controller with this product number already exists", 400);
         }
-        return errorResponse(error.message || "Failed to create controller");
+        console.error("POST /api/admin/controllers error:", error);
+        return errorResponse("Failed to create controller", 500);
     }
 }

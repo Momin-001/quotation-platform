@@ -19,7 +19,8 @@ export async function GET(request, { params }) {
 
         return successResponse("Blog fetched successfully", { ...blog, contentBlocks: blocks });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch blog");
+        console.error("GET /api/admin/blogs/[id] error:", error);
+        return errorResponse("Failed to fetch blog", 500);
     }
 }
 

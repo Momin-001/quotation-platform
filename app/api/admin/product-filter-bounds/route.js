@@ -9,7 +9,8 @@ export async function GET() {
         const row = await getOrCreateProductFilterBounds();
         return successResponse("Filter bounds fetched successfully", serializeProductFilterBounds(row));
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch filter bounds");
+        console.error("GET /api/admin/product-filter-bounds error:", error);
+        return errorResponse("Failed to fetch filter bounds", 500);
     }
 }
 
@@ -62,6 +63,7 @@ export async function PUT(req) {
 
         return successResponse("Filter bounds updated successfully", serializeProductFilterBounds(updated));
     } catch (error) {
-        return errorResponse(error.message || "Failed to update filter bounds");
+        console.error("PUT /api/admin/product-filter-bounds error:", error);
+        return errorResponse("Failed to update filter bounds", 500);
     }
 }

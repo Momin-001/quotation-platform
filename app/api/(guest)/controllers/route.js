@@ -76,6 +76,7 @@ export async function GET(req) {
 
         return successResponse("Controllers fetched successfully", result);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch controllers");
+        console.error("GET /api/controllers error:", error);
+        return errorResponse("Failed to fetch controllers", 500);
     }
 }

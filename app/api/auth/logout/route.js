@@ -8,6 +8,7 @@ export async function POST() {
         cookieStore.delete("token")
         return successResponse("Logged out successfully")
     } catch (error) {
-        return errorResponse(error.message || "Failed to logout")
+        console.error("POST /api/auth/logout error:", error);
+        return errorResponse("Failed to logout", 500);
     }
 }

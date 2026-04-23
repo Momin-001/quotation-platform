@@ -75,7 +75,6 @@ export default function CMSPage() {
                 return;
             }
         } catch (error) {
-            console.error(error);
         } finally {
             setSaving(false);
         }

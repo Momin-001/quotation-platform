@@ -27,7 +27,6 @@ export default function QuotationDropDown({ value, onChange, placeholder = "Sele
                 setHasMore(response.data.pagination.hasMore);
             }
         } catch (error) {
-            console.error("Error fetching products:", error);
         } finally {
             setLoading(false);
         }

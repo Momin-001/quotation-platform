@@ -32,7 +32,8 @@ export async function GET() {
 
         return successResponse("Navbar content fetched successfully", navbarContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch navbar content");
+        console.error("GET /api/admin/navbar error:", error);
+        return errorResponse("Failed to fetch navbar content", 500);
     }
 }
 
@@ -102,7 +103,8 @@ export async function PUT(req) {
 
         return successResponse("Navbar content updated successfully", result[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update navbar content");
+        console.error("PUT /api/admin/navbar error:", error);
+        return errorResponse("Failed to update navbar content", 500);
     }
 }
 

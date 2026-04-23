@@ -61,6 +61,7 @@ export async function POST(req) {
 
         return successResponse("Login successful", userWithoutPassword);
     } catch (error) {
-        return errorResponse(error.message || "Failed to login");
+        console.error("POST /api/auth/login error:", error);
+        return errorResponse("Failed to login", 500);
     }
 }

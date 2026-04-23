@@ -71,7 +71,6 @@ export default function UserHeaderTab({ onDataChange, onValidationChange, onSave
                 toast.error(data.message);
             }        
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch user header content");
         } finally {
             setLoading(false);

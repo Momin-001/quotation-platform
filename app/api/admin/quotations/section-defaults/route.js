@@ -9,8 +9,8 @@ export async function GET() {
         const defaults = await getOrCreateSectionDefaults();
         return successResponse("Section defaults fetched", defaults);
     } catch (err) {
-        console.error("Error fetching section defaults:", err);
-        return errorResponse(err.message || "Failed to fetch section defaults");
+        console.error("GET /api/admin/quotations/section-defaults error:", error);
+        return errorResponse("Failed to fetch section defaults", 500);
     }
 }
 
@@ -40,8 +40,8 @@ export async function PUT(request) {
             sectionConditionsHtml: updated.sectionConditionsHtml,
             sectionOptionsHtml: updated.sectionOptionsHtml,
         });
-    } catch (err) {
-        console.error("Error updating section defaults:", err);
-        return errorResponse(err.message || "Failed to update section defaults");
+    } catch (error) {
+        console.error("PUT /api/admin/quotations/section-defaults error:", error);
+        return errorResponse("Failed to update section defaults", 500);
     }
 }

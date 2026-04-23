@@ -81,7 +81,6 @@ export async function GET(req, { params }) {
                     mainImageDataUrl = `data:${mime};base64,${buf.toString("base64")}`;
                 }
             } catch (err) {
-                console.warn("Could not fetch product image for PDF:", err.message);
             }
         }
 
@@ -132,7 +131,7 @@ export async function GET(req, { params }) {
             },
         });
     } catch (error) {
-        console.error("Error generating datasheet:", error);
-        return errorResponse(error.message || "Failed to generate datasheet", 500);
+        console.error("GET /api/products/[id]/datasheet error:", error);
+        return errorResponse("Failed to generate datasheet", 500);
     }
 }

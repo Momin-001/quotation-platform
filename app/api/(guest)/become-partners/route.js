@@ -45,7 +45,8 @@ export async function POST(req) {
 
         return successResponse("Partner application submitted successfully. We will contact you soon.");
     } catch (error) {
-        return errorResponse(error.message || "Failed to submit partner application");
+        console.error("POST /api/become-partners error:", error);
+        return errorResponse("Failed to submit partner application", 500);
     }
 }
 

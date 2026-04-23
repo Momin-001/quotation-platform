@@ -45,6 +45,7 @@ export async function PATCH(request, { params }) {
             isActive ? "Controller activated successfully" : "Controller deactivated successfully"
         );
     } catch (error) {
-        return errorResponse(error.message || "Failed to toggle controller status");
+        console.error("PATCH /api/admin/controllers/[id]/toggle-status error:", error);
+        return errorResponse("Failed to toggle controller status", 500);
     }
 }

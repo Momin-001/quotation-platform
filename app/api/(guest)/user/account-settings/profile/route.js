@@ -75,7 +75,8 @@ export async function PUT(req) {
         const { password: _, ...safeProfile } = updated[0];
         return successResponse("Profile updated successfully", safeProfile);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update profile");
+        console.error("PUT /api/user/account-settings/profile error:", error);
+        return errorResponse("Failed to update profile", 500);
     }
 }
 

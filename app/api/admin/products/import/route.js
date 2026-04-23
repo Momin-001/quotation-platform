@@ -511,8 +511,8 @@ export async function POST(req) {
       (results.errors.length ? ` ${results.errors.length} product(s) had errors.` : "");
 
     return successResponse(message, results);
-  } catch (err) {
-    console.error("Bulk import error:", err);
-    return errorResponse(err.message || "Import failed", 500);
+  } catch (error) {
+    console.error("POST /api/admin/products/import error:", error);
+    return errorResponse("Failed to import products", 500);
   }
 }

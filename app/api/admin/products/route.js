@@ -25,7 +25,8 @@ export async function GET() {
 
         return successResponse("Products fetched successfully", allProducts);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch products");
+        console.error("GET /api/admin/products error:", error);
+        return errorResponse("Failed to fetch products", 500);
     }
 }
 
@@ -231,7 +232,7 @@ export async function POST(request) {
 
         return successResponse("Product created successfully", newProduct[0]);
     } catch (error) {
-        console.log(error);
-        return errorResponse(error.message || "Failed to create product");
+        console.error("POST /api/admin/products error:", error);
+        return errorResponse("Failed to create product", 500);
     }
 }

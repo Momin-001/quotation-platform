@@ -12,7 +12,8 @@ export async function GET() {
             .orderBy(desc(productIcons.createdAt));
         return successResponse("Product icons fetched successfully", all);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch product icons");
+        console.error("GET /api/admin/product-icons error:", error);
+        return errorResponse("Failed to fetch product icons", 500);
     }
 }
 
@@ -46,6 +47,7 @@ export async function POST(request) {
 
         return successResponse("Product icon created successfully", row);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create product icon");
+        console.error("POST /api/admin/product-icons error:", error);
+        return errorResponse("Failed to create product icon", 500);
     }
 }

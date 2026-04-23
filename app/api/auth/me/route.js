@@ -36,6 +36,7 @@ export async function GET(req) {
 
         return successResponse("User retrieved successfully", userWithoutPassword);
     } catch (error) {
-        return errorResponse(error.message || "Failed to get user");
+        console.error("GET /api/auth/me error:", error);
+        return errorResponse("Failed to get user", 500);
     }
 }

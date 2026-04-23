@@ -32,7 +32,8 @@ export async function PATCH(request, { params }) {
 
         return successResponse("Category updated successfully", updatedCategory[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update category");
+        console.error("PATCH /api/admin/categories/[id] error:", error);
+        return errorResponse("Failed to update category", 500);
     }
 }
 
@@ -53,6 +54,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Category deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete category");
+        console.error("DELETE /api/admin/categories/[id] error:", error);
+        return errorResponse("Failed to delete category", 500);
     }
 }

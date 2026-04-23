@@ -138,7 +138,7 @@ export async function GET(req) {
             limit,
         });
     } catch (error) {
-        console.error("Error fetching enquiries:", error);
-        return errorResponse(error.message || "Failed to fetch enquiries");
+        console.error("GET /api/admin/enquiries error:", error);
+        return errorResponse("Failed to fetch enquiries", 500);
     }
 }

@@ -44,7 +44,8 @@ export async function GET() {
 
         return successResponse("Footer content fetched successfully", footerContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch footer content");
+        console.error("GET /api/admin/footer error:", error);
+        return errorResponse("Failed to fetch footer content", 500);
     }
 }
 
@@ -150,7 +151,8 @@ export async function PUT(req) {
 
         return successResponse("Footer content updated successfully", result[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update footer content");
+        console.error("PUT /api/admin/footer error:", error);
+        return errorResponse("Failed to update footer content", 500);
     }
 }
 

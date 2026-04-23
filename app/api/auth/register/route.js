@@ -51,6 +51,7 @@ export async function POST(req) {
 
         return successResponse("Registration successful! Please wait for admin approval.", newUser[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create user");
+        console.error("POST /api/auth/register error:", error);
+        return errorResponse("Failed to create user", 500);
     }
 }

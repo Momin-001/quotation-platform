@@ -39,7 +39,6 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
                 setMessages(response.data.messages || []);
             }
         } catch (error) {
-            console.error("Error fetching messages:", error);
         } finally {
             setLoading(false);
         }
@@ -180,7 +179,6 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
                 setNewMessage(messageText); // Restore message on error
             }
         } catch (error) {
-            console.error("Error sending message:", error);
             toast.error("Failed to send message");
             setNewMessage(messageText); // Restore message on error
         } finally {

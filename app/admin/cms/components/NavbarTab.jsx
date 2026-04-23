@@ -96,7 +96,6 @@ export default function NavbarTab({ onDataChange, onValidationChange, onSaveHand
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch navbar content");
         } finally {
             setLoading(false);

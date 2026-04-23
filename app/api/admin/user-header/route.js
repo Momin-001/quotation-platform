@@ -8,7 +8,8 @@ export async function GET() {
         const userHeaderContent = await db.select().from(userHeader).limit(1).then((res) => res[0]);
         return successResponse("User header content fetched successfully", userHeaderContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch user header content");
+        console.error("GET /api/admin/user-header error:", error);
+        return errorResponse("Failed to fetch user header content", 500);
     }
 }
 
@@ -66,6 +67,7 @@ export async function PUT(req) {
 
         return successResponse("User header content updated successfully", result[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update user header content");
+        console.error("PUT /api/admin/user-header error:", error);
+        return errorResponse("Failed to update user header content", 500);
     }
 }

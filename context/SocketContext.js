@@ -37,7 +37,6 @@ export function SocketProvider({ children }) {
 
         // Connection established
         socketInstance.on("connect", () => {
-            console.log("[Socket] Connected:", socketInstance.id);
             setIsConnected(true);
             setConnectionError(null);
             reconnectAttempts.current = 0;
@@ -45,7 +44,6 @@ export function SocketProvider({ children }) {
 
         // Connection lost
         socketInstance.on("disconnect", (reason) => {
-            console.log("[Socket] Disconnected:", reason);
             setIsConnected(false);
 
             // If the server disconnected us, try to reconnect
@@ -56,7 +54,6 @@ export function SocketProvider({ children }) {
 
         // Connection error
         socketInstance.on("connect_error", (error) => {
-            console.error("[Socket] Connection error:", error.message);
             reconnectAttempts.current += 1;
             
             if (reconnectAttempts.current >= maxReconnectAttempts) {
@@ -66,32 +63,27 @@ export function SocketProvider({ children }) {
 
         // Reconnection attempt
         socketInstance.on("reconnect_attempt", (attempt) => {
-            console.log("[Socket] Reconnection attempt:", attempt);
         });
 
         // Reconnection successful
         socketInstance.on("reconnect", (attempt) => {
-            console.log("[Socket] Reconnected after", attempt, "attempts");
             setIsConnected(true);
             setConnectionError(null);
         });
 
         // Reconnection failed
         socketInstance.on("reconnect_failed", () => {
-            console.error("[Socket] Reconnection failed");
             setConnectionError("Failed to reconnect to chat server. Please refresh the page.");
         });
 
         // Server error
         socketInstance.on("error", (error) => {
-            console.error("[Socket] Server error:", error);
         });
 
         setSocket(socketInstance);
 
         // Cleanup on unmount
         return () => {
-            console.log("[Socket] Cleaning up connection");
             socketInstance.removeAllListeners();
             socketInstance.disconnect();
         };
@@ -101,7 +93,6 @@ export function SocketProvider({ children }) {
     const joinRoom = useCallback((quotationId, userId, userRole) => {
         if (socket && isConnected) {
             socket.emit("join-room", { quotationId, userId, userRole });
-            console.log("[Socket] Joining room for quotation:", quotationId);
         }
     }, [socket, isConnected]);
 
@@ -109,7 +100,6 @@ export function SocketProvider({ children }) {
     const leaveRoom = useCallback((quotationId) => {
         if (socket) {
             socket.emit("leave-room", { quotationId });
-            console.log("[Socket] Leaving room for quotation:", quotationId);
         }
     }, [socket]);
 
@@ -118,7 +108,6 @@ export function SocketProvider({ children }) {
         if (socket && isConnected) {
             socket.emit("send-message", data);
         } else {
-            console.warn("[Socket] Cannot send message - not connected");
         }
     }, [socket, isConnected]);
 

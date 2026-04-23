@@ -27,6 +27,7 @@ export async function GET(request) {
 
         return successResponse("Blogs fetched successfully", allBlogs);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch blogs");
+        console.error("GET /api/blogs error:", error);
+        return errorResponse("Failed to fetch blogs", 500);
     }
 }

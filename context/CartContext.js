@@ -39,7 +39,6 @@ export const CartProvider = ({ children }) => {
                 }));
                 setCartItems(itemsWithType);
             } catch (error) {
-                console.error("Error loading cart from localStorage:", error);
             }
         }
     }, []);

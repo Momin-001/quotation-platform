@@ -64,7 +64,6 @@ export default function CertificatesPage() {
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch certificates");
         } finally {
             setLoadingCertificates(false);

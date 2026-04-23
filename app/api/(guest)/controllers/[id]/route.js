@@ -37,6 +37,7 @@ export async function GET(req, { params }) {
                 : (controller.brandName || "N/A"),
         });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch controller");
+        console.error("GET /api/controllers/[id] error:", error);
+        return errorResponse("Failed to fetch controller", 500);
     }
 }

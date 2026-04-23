@@ -61,8 +61,8 @@ export async function POST(req) {
             privacyPolicyPdfUrl: secure_url,
         });
     } catch (error) {
-        console.error("Privacy policy PDF upload error:", error);
-        return errorResponse(error.message || "Failed to upload PDF", 500);
+        console.error("POST /api/admin/footer/privacy-policy-pdf error:", error);
+        return errorResponse("Failed to upload PDF", 500);
     }
 }
 
@@ -91,7 +91,7 @@ export async function DELETE() {
 
         return successResponse("Privacy policy PDF removed successfully");
     } catch (error) {
-        console.error("Privacy policy PDF delete error:", error);
-        return errorResponse(error.message || "Failed to remove PDF", 500);
+        console.error("DELETE /api/admin/footer/privacy-policy-pdf error:", error);
+        return errorResponse("Failed to remove PDF", 500);
     }
 }

@@ -69,8 +69,8 @@ export async function GET(req, { params }) {
                 "Cache-Control": "no-cache",
             },
         });
-    } catch (err) {
-        console.error("Enquiry file download error:", err);
-        return errorResponse(err.message || "Failed to download file", 500);
+    } catch (error) {
+        console.error("GET /api/admin/enquiries/files/[id]/download error:", error);
+        return errorResponse("Failed to download file", 500);
     }
 }

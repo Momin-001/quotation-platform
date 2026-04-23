@@ -56,7 +56,8 @@ export async function PATCH(req) {
 
         return successResponse("Password changed successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to change password");
+        console.error("PATCH /api/user/account-settings/password error:", error);
+        return errorResponse("Failed to change password", 500);
     }
 }
 

@@ -30,8 +30,8 @@ export async function GET(req, { params }) {
                 "Content-Disposition": `attachment; filename="${filename}"`,
             },
         });
-    } catch (err) {
-        console.error("Error generating quotation PDF:", err);
-        return errorResponse(err.message || "Failed to generate PDF", 500);
+    } catch (error) {
+        console.error("GET /api/user/quotations/[id]/pdf error:", error);
+        return errorResponse("Failed to generate PDF", 500);
     }
 }

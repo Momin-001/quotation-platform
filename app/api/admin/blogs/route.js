@@ -13,7 +13,8 @@ export async function GET() {
 
         return successResponse("Blogs fetched successfully", allBlogs);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch blogs");
+        console.error("GET /api/admin/blogs error:", error);
+        return errorResponse("Failed to fetch blogs", 500);
     }
 }
 
@@ -101,6 +102,7 @@ export async function POST(request) {
 
         return successResponse("Blog created successfully", newBlog);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create blog");
+        console.error("POST /api/admin/blogs error:", error);
+        return errorResponse("Failed to create blog", 500);
     }
 }

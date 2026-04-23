@@ -46,8 +46,8 @@ export async function POST(req) {
             heroImageUrl: result.secure_url,
         });
     } catch (error) {
-        console.error("Hero image upload error:", error);
-        return errorResponse(error.message || "Failed to upload hero image", 500);
+        console.error("POST /api/admin/homepage/hero-image error:", error);
+        return errorResponse("Failed to upload hero image", 500);
     }
 }
 
@@ -73,6 +73,7 @@ export async function DELETE() {
 
         return successResponse("Hero image removed successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to remove hero image", 500);
+        console.error("DELETE /api/admin/homepage/hero-image error:", error);
+        return errorResponse("Failed to remove hero image", 500);
     }
 }

@@ -63,6 +63,7 @@ export async function POST(req) {
 
         return successResponse("Thank you. Your message has been sent.");
     } catch (error) {
-        return errorResponse(error.message || "Failed to send message");
+        console.error("POST /api/contact error:", error);
+        return errorResponse("Failed to send message", 500);
     }
 }

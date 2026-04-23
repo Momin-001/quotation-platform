@@ -56,7 +56,7 @@ export async function GET(req, { params }) {
             },
         });
     } catch (error) {
-        console.error("Download PDF error:", error);
-        return errorResponse(error.message || "Failed to download PDF", 500);
+        console.error("GET /api/products/[id]/download-pdf error:", error);
+        return errorResponse("Failed to download PDF", 500);
     }
 }

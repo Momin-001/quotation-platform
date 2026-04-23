@@ -144,15 +144,15 @@ export async function GET() {
 
             dbConnected = true;
         } catch (dbErr) {
-            console.error("Dashboard stats DB error:", dbErr);
+            return errorResponse(dbErr.message || "Failed to fetch dashboard stats", 500);
         }
 
         return successResponse("Dashboard stats fetched", {
             ...stats,
             apiStatus: dbConnected ? "connected" : "disconnected",
         });
-    } catch (err) {
-        console.error("Dashboard stats error:", err);
-        return errorResponse(err.message || "Failed to fetch dashboard stats", 500);
+    } catch (error) {
+        console.error("GET /api/admin/dashboard/stats error:", error);
+        return errorResponse("Failed to fetch dashboard stats", 500);
     }
 }

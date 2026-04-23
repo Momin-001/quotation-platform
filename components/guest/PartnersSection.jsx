@@ -17,7 +17,6 @@ export default function PartnersSection({ homepageData, partners = [] }) {
             });
             window.open(websiteUrl, "_blank", "noopener,noreferrer");
         } catch (error) {
-            console.error("Error updating partner click:", error);
         }
     };
 

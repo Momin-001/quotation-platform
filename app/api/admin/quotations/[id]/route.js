@@ -257,8 +257,8 @@ export async function GET(req, { params }) {
             chatDisabled,
         });
     } catch (error) {
-        console.error("Error fetching quotation:", error);
-        return errorResponse(error.message || "Failed to fetch quotation");
+        console.error("GET /api/admin/quotations/[id] error:", error);
+        return errorResponse("Failed to fetch quotation", 500);
     }
 }
 
@@ -456,7 +456,7 @@ export async function PUT(req, { params }) {
             }
         );
     } catch (error) {
-        console.error("Error updating quotation:", error);
-        return errorResponse(error.message || "Failed to update quotation");
+        console.error("PUT /api/admin/quotations/[id] error:", error);
+        return errorResponse("Failed to update quotation", 500);
     }
 }

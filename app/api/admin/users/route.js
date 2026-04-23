@@ -59,6 +59,7 @@ export async function GET(req) {
 
         return successResponse("Users fetched successfully", sanitizedData);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch users");
+        console.error("GET /api/admin/users error:", error);
+        return errorResponse("Failed to fetch users", 500);
     }
 }

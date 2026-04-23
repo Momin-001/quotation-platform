@@ -42,7 +42,8 @@ export async function PATCH(request, { params }) {
         if (!updated) return errorResponse("Product icon not found", 404);
         return successResponse("Product icon updated successfully", updated);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update product icon");
+        console.error("PATCH /api/admin/product-icons/[id] error:", error);
+        return errorResponse("Failed to update product icon", 500);
     }
 }
 
@@ -59,6 +60,7 @@ export async function DELETE(request, { params }) {
         await db.delete(productIcons).where(eq(productIcons.id, id));
         return successResponse("Product icon deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete product icon");
+        console.error("DELETE /api/admin/product-icons/[id] error:", error);
+        return errorResponse("Failed to delete product icon", 500);
     }
 }

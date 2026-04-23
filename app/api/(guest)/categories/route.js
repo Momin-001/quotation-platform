@@ -11,7 +11,8 @@ export async function GET() {
 
         return successResponse("Categories fetched successfully", allCategories);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch categories");
+        console.error("GET /api/categories error:", error);
+        return errorResponse("Failed to fetch categories", 500);
     }
 }
 

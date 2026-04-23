@@ -34,7 +34,8 @@ export async function GET(request, { params }) {
             images,
         });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch controller");
+        console.error("GET /api/admin/controllers/[id] error:", error);
+        return errorResponse("Failed to fetch controller", 500);
     }
 }
 
@@ -176,8 +177,8 @@ export async function PUT(request, { params }) {
 
         return successResponse("Controller updated successfully", updated);
     } catch (error) {
-        console.log(error);
-        return errorResponse(error.message || "Failed to update controller");
+        console.error("PUT /api/admin/controllers/[id] error:", error);
+        return errorResponse("Failed to update controller", 500);
     }
 }
 
@@ -204,6 +205,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Controller deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete controller");
+        console.error("DELETE /api/admin/controllers/[id] error:", error);
+        return errorResponse("Failed to delete controller", 500);
     }
 }

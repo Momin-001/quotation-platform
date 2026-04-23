@@ -271,7 +271,7 @@ export async function GET(req, { params }) {
             buttonsDisabledReason,
         });
     } catch (error) {
-        console.error("Error fetching quotation:", error);
-        return errorResponse(error.message || "Failed to fetch quotation");
+        console.error("GET /api/user/quotations/[id] error:", error);
+        return errorResponse("Failed to fetch quotation", 500);
     }
 }

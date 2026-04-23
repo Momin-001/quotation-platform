@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("FAQs fetched successfully", allFaqs);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch FAQs");
+        console.error("GET /api/admin/faqs error:", error);
+        return errorResponse("Failed to fetch FAQs", 500);
     }
 }
 
@@ -41,6 +42,7 @@ export async function POST(request) {
 
         return successResponse("FAQ created successfully", newFaq[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create FAQ");
+        console.error("POST /api/admin/faqs error:", error);
+        return errorResponse("Failed to create FAQ", 500);
     }
 }

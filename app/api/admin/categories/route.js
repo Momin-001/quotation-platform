@@ -23,7 +23,8 @@ export async function GET() {
 
         return successResponse("Categories fetched successfully", categoriesWithCount);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch categories");
+        console.error("GET /api/admin/categories error:", error);
+        return errorResponse("Failed to fetch categories", 500);
     }
 }
 
@@ -47,6 +48,7 @@ export async function POST(request) {
 
         return successResponse("Category created successfully", newCategory[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create category");
+        console.error("POST /api/admin/categories error:", error);
+        return errorResponse("Failed to create category", 500);
     }
 }

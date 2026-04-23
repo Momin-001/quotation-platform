@@ -20,9 +20,9 @@ export async function GET(req, { params }) {
             return errorResponse("Quotation not found", 404);
 
         return successResponse("Quotation sections fetched", quotation);
-    } catch (err) {
-        console.error("Error fetching quotation sections:", err);
-        return errorResponse(err.message || "Failed to fetch sections");
+    } catch (error) {
+        console.error("GET /api/admin/quotations/[id]/sections error:", error);
+        return errorResponse("Failed to fetch sections", 500);
     }
 }
 
@@ -51,8 +51,8 @@ export async function PUT(req, { params }) {
             .where(eq(quotations.id, id));
 
         return successResponse("Quotation sections updated");
-    } catch (err) {
-        console.error("Error updating quotation sections:", err);
-        return errorResponse(err.message || "Failed to update sections");
+    } catch (error) {
+        console.error("PUT /api/admin/quotations/[id]/sections error:", error);
+        return errorResponse("Failed to update sections", 500);
     }
 }

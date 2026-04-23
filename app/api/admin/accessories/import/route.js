@@ -417,7 +417,7 @@ export async function POST(req) {
             errors: results.errors,
         });
     } catch (err) {
-        console.error("Accessory bulk import error:", err);
-        return errorResponse(err.message || "Import failed", 500);
+        console.error("POST /api/admin/accessories/import error:", error);
+        return errorResponse("Import failed", 500);
     }
 }

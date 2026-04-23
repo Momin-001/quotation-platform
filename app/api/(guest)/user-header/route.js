@@ -11,6 +11,7 @@ export async function GET() {
         }
         return successResponse("User header content fetched successfully", userHeaderContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch user header content");
+        console.error("GET /api/user-header error:", error);
+        return errorResponse("Failed to fetch user header content", 500);
     }
 }

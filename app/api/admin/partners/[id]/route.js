@@ -66,7 +66,8 @@ export async function PATCH(request, { params }) {
 
         return successResponse("Partner updated successfully", updatedPartner[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update partner");
+        console.error("PATCH /api/admin/partners/[id] error:", error);
+        return errorResponse("Failed to update partner", 500);
     }
 }
 
@@ -97,6 +98,7 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Partner deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete partner");
+        console.error("DELETE /api/admin/partners/[id] error:", error);
+        return errorResponse("Failed to delete partner", 500);
     }
 }

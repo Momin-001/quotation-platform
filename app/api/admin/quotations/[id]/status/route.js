@@ -76,7 +76,7 @@ export async function PUT(req, { params }) {
             newStatus: status,
         });
     } catch (error) {
-        console.error("Error updating quotation status:", error);
-        return errorResponse(error.message || "Failed to update quotation status");
+        console.error("PUT /api/admin/quotations/[id]/status error:", error);
+        return errorResponse("Failed to update quotation status", 500);
     }
 }

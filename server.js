@@ -42,8 +42,6 @@ app.prepare().then(() => {
 
     // Socket.IO connection handling
     io.on("connection", (socket) => {
-        console.log(`[Socket.IO] Client connected: ${socket.id}`);
-
         // Handle joining a quotation chat room
         socket.on("join-room", (data) => {
             try {
@@ -71,8 +69,6 @@ app.prepare().then(() => {
                 }
                 quotationRooms.get(roomName).set(socket.id, { userId, userRole });
 
-                console.log(`[Socket.IO] User ${userId} (${userRole}) joined room ${roomName}`);
-
                 // Notify others in the room that someone joined
                 socket.to(roomName).emit("user-joined", {
                     userId,
@@ -86,7 +82,6 @@ app.prepare().then(() => {
                     participants: Array.from(quotationRooms.get(roomName).values()),
                 });
             } catch (error) {
-                console.error("[Socket.IO] Error joining room:", error);
                 socket.emit("error", { message: "Failed to join room" });
             }
         });
@@ -114,9 +109,8 @@ app.prepare().then(() => {
                     timestamp: new Date().toISOString(),
                 });
 
-                console.log(`[Socket.IO] User left room ${roomName}`);
             } catch (error) {
-                console.error("[Socket.IO] Error leaving room:", error);
+
             }
         });
 
@@ -143,9 +137,7 @@ app.prepare().then(() => {
                     createdAt: createdAt || new Date().toISOString(),
                 });
 
-                console.log(`[Socket.IO] Message sent in room ${roomName} by ${senderRole}`);
             } catch (error) {
-                console.error("[Socket.IO] Error sending message:", error);
                 socket.emit("error", { message: "Failed to send message" });
             }
         });
@@ -187,7 +179,6 @@ app.prepare().then(() => {
 
         // Handle disconnection
         socket.on("disconnect", (reason) => {
-            console.log(`[Socket.IO] Client disconnected: ${socket.id}, reason: ${reason}`);
 
             const userData = userSockets.get(socket.id);
             if (userData) {
@@ -214,27 +205,21 @@ app.prepare().then(() => {
 
         // Handle connection errors
         socket.on("error", (error) => {
-            console.error(`[Socket.IO] Socket error for ${socket.id}:`, error);
         });
     });
 
     // Handle server-level errors
     io.on("error", (error) => {
-        console.error("[Socket.IO] Server error:", error);
+        console.error(error);
     });
 
     httpServer.listen(port, () => {
-        console.log(`> Ready on http://${hostname}:${port}`);
-        console.log(`> Socket.IO server is running`);
     });
 
     // Graceful shutdown
     process.on("SIGTERM", () => {
-        console.log("SIGTERM received, shutting down gracefully");
         io.close(() => {
-            console.log("Socket.IO server closed");
             httpServer.close(() => {
-                console.log("HTTP server closed");
                 process.exit(0);
             });
         });

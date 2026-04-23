@@ -91,6 +91,7 @@ export async function GET(req) {
             },
         });
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch leditor products");
+        console.error("GET /api/leditor error:", error);
+        return errorResponse("Failed to fetch leditor products", 500);
     }
 }

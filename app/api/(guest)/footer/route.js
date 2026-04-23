@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("Footer content fetched successfully", footerContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch footer content");
+        console.error("GET /api/footer error:", error);
+        return errorResponse("Failed to fetch footer content", 500);
     }
 }
 

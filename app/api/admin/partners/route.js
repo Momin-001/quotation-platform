@@ -15,7 +15,8 @@ export async function GET() {
 
         return successResponse("Partners fetched successfully", allPartners);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch partners");
+        console.error("GET /api/admin/partners error:", error);
+        return errorResponse("Failed to fetch partners", 500);
     }
 }
 
@@ -57,6 +58,7 @@ export async function POST(request) {
 
         return successResponse("Partner created successfully", newPartner[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create partner");
+        console.error("POST /api/admin/partners error:", error);
+        return errorResponse("Failed to create partner", 500);
     }
 }

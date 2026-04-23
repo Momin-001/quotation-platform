@@ -163,7 +163,7 @@ export async function GET(req, { params }) {
             quotations: enquiryQuotations,
         });
     } catch (error) {
-        console.error("Error fetching enquiry:", error);
-        return errorResponse(error.message || "Failed to fetch enquiry");
+        console.error("GET /api/admin/enquiries/[id] error:", error);
+        return errorResponse("Failed to fetch enquiry", 500);
     }
 }

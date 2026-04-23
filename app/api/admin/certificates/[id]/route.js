@@ -61,7 +61,8 @@ export async function PATCH(request, { params }) {
 
         return successResponse("Certificate updated successfully", updatedCertificate[0]);
     } catch (error) {
-        return errorResponse(error.message || "Failed to update certificate");
+        console.error("PATCH /api/admin/certificates/[id] error:", error);
+        return errorResponse("Failed to update certificate", 500);
     }
 }
 
@@ -92,7 +93,8 @@ export async function DELETE(request, { params }) {
 
         return successResponse("Certificate deleted successfully");
     } catch (error) {
-        return errorResponse(error.message || "Failed to delete certificate");
+        console.error("DELETE /api/admin/certificates/[id] error:", error);
+        return errorResponse("Failed to delete certificate", 500);
     }
 }
 

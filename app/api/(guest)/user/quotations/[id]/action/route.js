@@ -121,7 +121,7 @@ export async function POST(req, { params }) {
             enquiryStatus,
         });
     } catch (error) {
-        console.error("Error updating quotation:", error);
-        return errorResponse(error.message || "Failed to update quotation");
+        console.error("POST /api/user/quotations/[id]/action error:", error);
+        return errorResponse("Failed to update quotation", 500);
     }
 }

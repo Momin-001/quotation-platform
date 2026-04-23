@@ -68,6 +68,7 @@ export async function GET(req) {
 
         return successResponse("Latest projects fetched successfully", list.map(formatProduct));
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch latest projects");
+        console.error("GET /api/latest-projects error:", error);
+        return errorResponse("Failed to fetch latest projects", 500);
     }
 }

@@ -160,7 +160,7 @@ export async function GET(request) {
             }
         });
     } catch (error) {
-        console.error("Error fetching all products:", error);
-        return errorResponse(error.message || "Failed to fetch products");
+        console.error("GET /api/admin/products/search-all error:", error);
+        return errorResponse("Failed to fetch products", 500);
     }
 }

@@ -370,7 +370,6 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch homepage content");
         } finally {
             setLoading(false);

@@ -138,7 +138,6 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch footer content");
         } finally {
             setLoading(false);

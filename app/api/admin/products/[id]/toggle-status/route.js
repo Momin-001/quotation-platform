@@ -47,6 +47,7 @@ export async function PATCH(request, { params }) {
             isActive ? "Product activated successfully" : "Product deactivated successfully"
         );
     } catch (error) {
-        return errorResponse(error.message || "Failed to toggle product status");
+        console.error("PATCH /api/admin/products/[id]/toggle-status error:", error);
+        return errorResponse("Failed to toggle product status", 500);
     }
 }

@@ -537,7 +537,6 @@ export default function LeditorPage() {
                     setControllerResults(json.data || []);
                 }
             } catch (e) {
-                console.error("Failed to fetch controllers:", e);
             } finally {
                 setControllerLoading(false);
             }

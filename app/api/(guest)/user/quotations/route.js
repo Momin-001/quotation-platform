@@ -38,7 +38,7 @@ export async function GET(req) {
         
         return successResponse("Quotations fetched successfully", formattedData);
     } catch (error) {
-        console.error("Error fetching quotations:", error);
-        return errorResponse(error.message || "Failed to fetch quotations");
+        console.error("GET /api/user/quotations error:", error);
+        return errorResponse("Failed to fetch quotations", 500);
     }
 }

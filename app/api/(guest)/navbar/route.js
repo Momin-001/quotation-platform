@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("Navbar content fetched successfully", navbarContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch navbar content");
+        console.error("GET /api/navbar error:", error);
+        return errorResponse("Failed to fetch navbar content", 500);
     }
 }
 

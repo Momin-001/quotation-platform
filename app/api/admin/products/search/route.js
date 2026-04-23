@@ -78,7 +78,7 @@ export async function GET(request) {
             }
         });
     } catch (error) {
-        console.error("Error fetching products:", error);
-        return errorResponse(error.message || "Failed to fetch products");
+        console.error("GET /api/admin/products/search error:", error);
+        return errorResponse("Failed to fetch products", 500);
     }
 }

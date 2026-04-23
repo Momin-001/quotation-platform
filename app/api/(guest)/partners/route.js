@@ -18,7 +18,8 @@ export async function GET() {
 
         return successResponse("Partners fetched successfully", allPartners);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch partners");
+        console.error("GET /api/partners error:", error);
+        return errorResponse("Failed to fetch partners", 500);
     }
 }
 

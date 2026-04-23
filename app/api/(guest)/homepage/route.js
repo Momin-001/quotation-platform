@@ -14,7 +14,8 @@ export async function GET() {
 
         return successResponse("Homepage content fetched successfully", homepageContent);
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch homepage content");
+        console.error("GET /api/homepage error:", error);
+        return errorResponse("Failed to fetch homepage content", 500);
     }
 }
 

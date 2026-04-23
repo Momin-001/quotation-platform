@@ -6,6 +6,7 @@ export async function GET() {
         const row = await getOrCreateProductFilterBounds();
         return successResponse("Filter bounds fetched successfully", serializeProductFilterBounds(row));
     } catch (error) {
-        return errorResponse(error.message || "Failed to fetch filter bounds");
+        console.error("GET /api/product-filter-bounds error:", error);
+        return errorResponse("Failed to fetch filter bounds", 500);
     }
 }

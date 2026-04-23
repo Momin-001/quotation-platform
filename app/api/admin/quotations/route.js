@@ -107,8 +107,8 @@ export async function GET(request) {
             }
         });
     } catch (error) {
-        console.error("Error fetching quotations:", error);
-        return errorResponse(error.message || "Failed to fetch quotations");
+        console.error("GET /api/admin/quotations error:", error);
+        return errorResponse("Failed to fetch quotations", 500);
     }
 }
 
@@ -287,7 +287,7 @@ export async function POST(request) {
             }
         );
     } catch (error) {
-        console.error("Error saving quotation:", error);
-        return errorResponse(error.message || "Failed to save quotation");
+        console.error("POST /api/admin/quotations error:", error);
+        return errorResponse("Failed to save quotation", 500);
     }
 }

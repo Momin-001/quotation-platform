@@ -65,7 +65,8 @@ export async function POST(req) {
 
         return successResponse("Admin user created successfully", adminWithoutPassword);
     } catch (error) {
-        return errorResponse(error.message || "Failed to create admin user");
+        console.error("POST /api/admin/users/add-admin error:", error);
+        return errorResponse("Failed to create admin user", 500);
     }
 }
 
