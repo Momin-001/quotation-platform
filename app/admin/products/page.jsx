@@ -372,7 +372,7 @@ export default function ProductsPage() {
                                                 </Link>
                                                 <Button
                                                         variant="link"
-                                                        className=" text-red-500 hover:text-red-700"
+                                                        className="text-red-500 hover:text-red-700"
                                                         onClick={() => deleteProduct(product.id)}
                                                     >
                                                         <Trash2/>

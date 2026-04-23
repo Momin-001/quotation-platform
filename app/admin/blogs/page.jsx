@@ -193,20 +193,18 @@ export default function AdminBlogsPage() {
                                         })}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        <div>
                                             <Link href={`/admin/blogs/${blog.id}/edit`}>
-                                                <Button variant="link" className="p-0 h-auto">
+                                                <Button variant="link">
                                                     Edit
                                                 </Button>
                                             </Link>
                                             <Button
                                                 variant="link"
-                                                className="p-0 h-auto text-red-600 hover:text-red-700"
+                                                className="text-red-600 hover:text-red-700"
                                                 onClick={() => openDeleteDialog(blog)}
                                             >
                                                 Delete
                                             </Button>
-                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))
