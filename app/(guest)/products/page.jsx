@@ -458,6 +458,7 @@ function FiltersAccordion({
 function ProductsPageContent() {
     const searchParams = useSearchParams();
     const urlCategoryAppliedRef = useRef(false);
+    const lastQueryRef = useRef("");
     const [products, setProducts] = useState([]);
     const { language } = useLanguage();
     const { isAuthenticated } = useAuth();
@@ -736,12 +737,20 @@ function ProductsPageContent() {
     // Reset and fetch when DEBOUNCED filters change (after CMS bounds are loaded)
     useEffect(() => {
         if (!filterBoundsReady) return;
+
+        // Avoid duplicate fetches when debounced state changes but the actual query stays the same
+        // (e.g. initial range defaults coming from filter bounds).
+        const query = buildQueryParams(1);
+        if (lastQueryRef.current === query) return;
+        lastQueryRef.current = query;
+
         setPage(1);
         setProducts([]);
         fetchProducts(1, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         filterBoundsReady,
+        buildQueryParams,
+        fetchProducts,
         debouncedSearch, debouncedSelectedCategory, debouncedProductType, debouncedDesign,
         debouncedSpecialTypes, debouncedApplication, debouncedPixelPitchRange, debouncedLedTechnology,
         debouncedLedLifespan, debouncedChipBonding, debouncedBrightnessValue, debouncedContrastRatio,
