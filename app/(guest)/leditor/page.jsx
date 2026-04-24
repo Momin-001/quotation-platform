@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
+import { useFooter } from "@/context/FooterContext";
 
 const enquirySchema = z.object({
     message: z.string().min(10, "Please enter a message (at least 10 characters)"),
@@ -78,6 +80,7 @@ export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
     const { language } = useLanguage();
+    const { privacyPolicyPdfUrl } = useFooter();
     // Data states
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
@@ -1491,7 +1494,8 @@ export default function LeditorPage() {
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-start gap-2">
                                                 <Controller
                                                     name="privacy"
                                                     control={control}
@@ -1503,15 +1507,16 @@ export default function LeditorPage() {
                                                         />
                                                     )}
                                                 />
-                                                <Label
-                                                    htmlFor="privacy-leditor"
-                                                    className="text-sm cursor-pointer"
-                                                >
-                                                    I agree to the Privacy Policy and Terms & Conditions.
+                                                <Label className="text-sm">
+                                                    I agree to the <Link href={privacyPolicyPdfUrl || "#"} target="_blank" className="font-bold hover:underline">Privacy Policy</Link> and <Link href="/terms-and-conditions" target="_blank" className="font-bold hover:underline">Terms & Conditions</Link>.
                                                 </Label>
+                                                </div>
+                                               
+
                                                 {errors.privacy && (
-                                                    <p className="text-sm text-red-500 ml-2">{errors.privacy.message}</p>
+                                                    <p className="text-sm text-red-500">{errors.privacy.message}</p>
                                                 )}
+                                            
                                             </div>
 
                                             <div>

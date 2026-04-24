@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
-import { 
-    quotations, 
-    quotationItems, 
+import {
+    quotations,
+    quotationItems,
     quotationOptionalItems,
     quotationAdditionalItems,
-    products, 
+    products,
     productImages,
     controllers,
     accessories,
@@ -15,6 +15,7 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne, or } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 
+const allowedEnquiryStatuses = ["pending", "in_progress", "expired"];
 async function getProductImage(productId) {
     const images = await db
         .select({ imageUrl: productImages.imageUrl })
@@ -47,7 +48,7 @@ async function getProductDetails(productId) {
         .from(products)
         .where(eq(products.id, productId))
         .limit(1);
-    
+
     if (product) {
         const imageUrl = await getProductImage(productId);
         return { ...product, imageUrl, sourceType: "product" };
@@ -66,7 +67,7 @@ async function getControllerDetails(controllerId) {
         .from(controllers)
         .where(eq(controllers.id, controllerId))
         .limit(1);
-    
+
     if (controller) {
         const imageUrl = await getControllerImage(controllerId);
         return {
@@ -91,7 +92,7 @@ async function getAccessoryDetails(accessoryId) {
         .from(accessories)
         .where(eq(accessories.id, accessoryId))
         .limit(1);
-    
+
     if (accessory) {
         return { ...accessory, imageUrl: null, sourceType: "accessory" };
     }
@@ -137,7 +138,7 @@ export async function GET(req, { params }) {
             .from(quotations)
             .where(eq(quotations.id, id))
             .limit(1)
-           
+
 
         if (!quotation) {
             return errorResponse("Quotation not found", 404);
@@ -198,7 +199,7 @@ export async function GET(req, { params }) {
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
                 const product = await getProductDetails(item.productId);
-                
+
                 // Fetch optional items
                 const optionalItemsData = await db
                     .select()
@@ -302,7 +303,22 @@ export async function PUT(req, { params }) {
         if (existingQuotation.status !== "draft") {
             return errorResponse("Only draft quotations can be edited", 400);
         }
+        const enquiry = await db
+            .select()
+            .from(enquiries)
+            .where(eq(enquiries.id, existingQuotation.enquiryId))
+            .limit(1)
+            .then((res) => res[0]);
 
+        if (!enquiry) {
+            return errorResponse("Enquiry not found", 404);
+        }
+        if (!allowedEnquiryStatuses.includes(enquiry.status)) {
+            return errorResponse(
+                `Cannot update quotation for ${enquiry.status} enquiry.`,
+                400
+            );
+        }
         // Validate items
         for (const item of items) {
             if (!item.productId || !item.unitPrice) {
@@ -317,7 +333,7 @@ export async function PUT(req, { params }) {
         if (isSendingToUser) {
             await db
                 .update(quotations)
-                .set({ 
+                .set({
                     status: "closed",
                     updatedAt: new Date(),
                 })
@@ -355,7 +371,7 @@ export async function PUT(req, { params }) {
         // Create new quotation items
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
-            
+
             const newItem = await db
                 .insert(quotationItems)
                 .values({
@@ -379,7 +395,7 @@ export async function PUT(req, { params }) {
                     const optItem = item.optionalItems[j];
                     const sourceId = optItem.sourceId || optItem.productId;
                     const sourceType = optItem.sourceType || "product";
-                    
+
                     if (sourceId && optItem.unitPrice) {
                         const optionalData = {
                             quotationItemId,
@@ -425,7 +441,7 @@ export async function PUT(req, { params }) {
         // Update quotation status
         await db
             .update(quotations)
-            .set({ 
+            .set({
                 status: newStatus,
                 updatedAt: new Date(),
             })

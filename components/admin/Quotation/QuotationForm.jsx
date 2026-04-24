@@ -69,7 +69,7 @@ export default function QuotationForm({
                     <Input
                         type="number"
                         min="1"
-                        value={item.product.isCustom ? item.product.customTotalCabinets : item.quantity || ""}
+                        value={item.product?.isCustom ? item.product?.customTotalCabinets : item.quantity || ""}
                         onChange={(e) => handleChange("quantity", parseInt(e.target.value) || 1)}
                         placeholder="0"
                         disabled={isMainProduct}

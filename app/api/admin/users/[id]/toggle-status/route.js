@@ -5,7 +5,6 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { SMTP_USER } from "@/lib/constants";
 import { createEmailTransporter } from "@/lib/email-transporter";
-
 function generateInitialPassword(length = 10) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
     let password = "";
