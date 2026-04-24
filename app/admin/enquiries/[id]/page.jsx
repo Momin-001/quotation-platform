@@ -508,21 +508,21 @@ export default function EnquiryDetailPage() {
                                             {format(new Date(quotation.createdAt), "MMM d, yyyy")}
                                         </TableCell>
                                         <TableCell className="p-4">
-                                        {quotation.status === "draft" ? (
+                                        {quotation.status === "draft" && (
                                             <Link href={`/admin/enquiries/${quotation.enquiryId}/quotation?draft=${quotation.id}`}>
                                                 <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-800">
                                                     <Pencil className="h-4 w-4 mr-1" />
                                                     Edit
                                                 </Button>
                                             </Link>
-                                        ) : (
+                                        )}
                                             <Link href={`/admin/quotations/${quotation.id}`}>
                                                 <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
                                                     <Eye className="h-4 w-4 mr-1" />
                                                     View
                                                 </Button>
                                             </Link>
-                                        )}
+                                        
                                         </TableCell>
                                     </TableRow>
                                 ))}

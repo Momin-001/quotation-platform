@@ -19,6 +19,8 @@ export default function QuotationBuilderPage() {
     const [enquiry, setEnquiry] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [savingDraft, setSavingDraft] = useState(false);
+    const [savingQuotation, setSavingQuotation] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [editingDraftId, setEditingDraftId] = useState(null);
     
@@ -431,6 +433,11 @@ export default function QuotationBuilderPage() {
         if (!validateForm()) return;
 
         setSaving(true);
+        if (status === "draft") {
+            setSavingDraft(true);
+        } else {
+            setSavingQuotation(true);
+        }
         try {
             // Build items array
             const items = [];
@@ -534,6 +541,8 @@ export default function QuotationBuilderPage() {
             toast.error(error.message);
         } finally {
             setSaving(false);
+            setSavingDraft(false);
+            setSavingQuotation(false);
         }
     };
 
@@ -569,6 +578,8 @@ export default function QuotationBuilderPage() {
                 onSaveDraft={() => handleSave("draft")}
                 onSendQuotation={handleSendQuotation}
                 saving={saving}
+                savingDraft={savingDraft}
+                savingQuotation={savingQuotation}
             />
         );
     }

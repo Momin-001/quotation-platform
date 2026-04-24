@@ -102,8 +102,8 @@ export default function QuotationDetailPage() {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             toast.success("PDF downloaded");
-            setTimeout(() => setPdfLoading(false), 4000);
         } catch (err) {
             toast.error(err.message || "Failed to download PDF");
         } finally {

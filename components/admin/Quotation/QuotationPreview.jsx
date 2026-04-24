@@ -4,7 +4,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
 
-export default function QuotationPreview({ quotationId, mainProduct, alternativeProduct, onClose,  onSaveDraft,  onSendQuotation, saving }) {
+export default function QuotationPreview({ quotationId, mainProduct, alternativeProduct, onClose,  onSaveDraft,  onSendQuotation, saving, savingDraft, savingQuotation }) {
     let grandTotal = 0;
     
     // Totals include main/alternative LED line + additional products (controllers) only. Optional (accessories) are excluded.
@@ -226,16 +226,16 @@ export default function QuotationPreview({ quotationId, mainProduct, alternative
                     variant="default"
                     size="lg"
                 >
-                    {saving ? <Spinner className="h-4 w-4 mr-2" /> : null}
+                    {savingDraft ? <Spinner className="h-4 w-4 mr-2" /> : null}
                     Save Draft
                 </Button>
                 <Button
                     onClick={onSendQuotation}
-                    disabled={saving}
+                    disabled={savingQuotation}
                     variant="secondary"
                     size="lg"
                 >
-                    {saving ? <Spinner className="h-4 w-4 mr-2" /> : null}
+                    {savingQuotation ? <Spinner className="h-4 w-4 mr-2" /> : null}
                     Send Quotation
                 </Button>
                 <Button
