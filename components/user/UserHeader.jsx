@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -10,6 +11,17 @@ export default function UserHeader() {
     const { isAuthenticated, isUser } = useAuth();
     const { language } = useLanguage();
     const { getTotalItems } = useCart();
+    const pathname = usePathname();
+
+    const isActive = (href) => {
+        if (!pathname) return false;
+        return pathname === href || pathname.startsWith(`${href}/`);
+    };
+
+    const linkClass = (href) =>
+        `hover:underline whitespace-nowrap transition-colors ${
+            isActive(href) ? "font-semibold underline underline-offset-4" : ""
+        }`;
     // Only show this header if user is authenticated
     if (!isAuthenticated || isUser === false) {
         return null;
@@ -24,19 +36,19 @@ export default function UserHeader() {
                     <div className="flex items-center gap-6">
                         <Link
                             href="/user/my-enquiries"
-                            className="hover:underline whitespace-nowrap"
+                            className={linkClass("/user/my-enquiries")}
                         >
                             {language === "en" ? "My Enquiries" : "Meine Anfragen"}
                         </Link>
                         <Link
                             href="/user/my-quotations"
-                            className="hover:underline whitespace-nowrap"
+                            className={linkClass("/user/my-quotations")}
                         >
                             {language === "en" ? "My Quotations" : "Meine Angebote"}
                         </Link>
                         <Link
                             href="/user/account-settings"
-                            className="hover:underline whitespace-nowrap"
+                            className={linkClass("/user/account-settings")}
                         >
                             {language === "en" ? "My Account" : "Mein Konto"}
                         </Link>
@@ -47,7 +59,9 @@ export default function UserHeader() {
                     {/* Cart */}
                     <Link
                         href="/user/cart"
-                        className="flex items-center gap-2 hover:underline relative whitespace-nowrap"
+                        className={`flex items-center gap-2 hover:underline relative whitespace-nowrap transition-colors ${
+                            isActive("/user/cart") ? "font-semibold underline underline-offset-4" : ""
+                        }`}
                     >
                         <div className="relative">
                             <ShoppingCart className="h-5 w-5" />

@@ -57,7 +57,7 @@ export async function GET(req, { params }) {
 
         let logoDataUrl = null;
         try {
-            const logoPath = path.join(process.cwd(), "public", "logo.svg");
+            const logoPath = path.join(process.cwd(), "public", "logo-name.png");
             const logoBuf = await readFile(logoPath);
             logoDataUrl = `data:image/svg+xml;base64,${logoBuf.toString("base64")}`;
         } catch {

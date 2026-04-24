@@ -22,11 +22,25 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar({ navbarData }) {
     const { isAuthenticated, loading } = useAuth();
     const { language, setLanguage } = useLanguage();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const pathname = usePathname();
+
+    const isActive = (href) => {
+        if (!pathname) return false;
+        if (href === "/") return pathname === "/";
+        return pathname === href || pathname.startsWith(`${href}/`);
+    };
+
+    const navLinkClass = (href) =>
+        `hover:text-primary transition-colors ${isActive(href) ? "text-primary" : ""}`;
+
+    const mobileNavLinkClass = (href) =>
+        `block py-2 hover:text-primary ${isActive(href) ? "text-primary" : ""}`;
 
     const getNavText = (itemNumber) => {
         if (!navbarData) return "";
@@ -46,22 +60,22 @@ export default function Navbar({ navbarData }) {
                      />
                 </Link>
                 <div className="hidden lg:flex px-8 items-center gap-8 text-lg font-medium text-gray-800">
-                    <Link href="/" className="hover:text-primary transition-colors">
+                    <Link href="/" className={navLinkClass("/")}>
                         {getNavText(1)}
                     </Link>
-                    <Link href="/products" className="hover:text-primary transition-colors">
+                    <Link href="/products" className={navLinkClass("/products")}>
                         {getNavText(2)}
                     </Link>
-                    <Link href="/controllers" className="hover:text-primary transition-colors">
+                    <Link href="/controllers" className={navLinkClass("/controllers")}>
                         {getNavText(3)}
                     </Link>
-                    <Link href="/leditor" className="hover:text-primary transition-colors">
+                    <Link href="/leditor" className={navLinkClass("/leditor")}>
                         {getNavText(4)}
                     </Link>
-                    <Link href="/blogs" className="hover:text-primary transition-colors">
+                    <Link href="/blogs" className={navLinkClass("/blogs")}>
                         {getNavText(5)}
                     </Link>
-                    <Link href="/become-partner" className="hover:text-primary transition-colors">
+                    <Link href="/become-partner" className={navLinkClass("/become-partner")}>
                         {getNavText(6)}
                     </Link>
                 </div>
@@ -140,19 +154,19 @@ export default function Navbar({ navbarData }) {
 
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                     <div className="space-y-2 text-sm font-medium text-gray-800">
-                                        <Link href="/" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
+                                        <Link href="/" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/")}>
                                             {getNavText(1)}
                                         </Link>
-                                        <Link href="/products" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
+                                        <Link href="/products" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/products")}>
                                             {getNavText(2)}
                                         </Link>
-                                        <Link href="/controllers" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
+                                        <Link href="/controllers" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/controllers")}>
                                             {getNavText(3)}
                                         </Link>
-                                        <Link href="/leditor" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
+                                        <Link href="/leditor" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/leditor")}>
                                             {getNavText(4)}
                                         </Link>
-                                        <Link href="/become-partner" onClick={() => setMobileOpen(false)} className="block py-2 hover:text-primary">
+                                        <Link href="/become-partner" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/become-partner")}>
                                             {getNavText(6)}
                                         </Link>
                                     </div>
