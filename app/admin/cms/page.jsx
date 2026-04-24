@@ -8,7 +8,6 @@ import NavbarTab from "./components/NavbarTab";
 import HomepageTab from "./components/HomepageTab";
 import FooterTab from "./components/FooterTab";
 import QuotationPdfTab from "./components/QuotationPdfTab";
-import UserHeaderTab from "./components/UserHeaderTab";
 import ProductFilterBoundsTab from "./components/ProductFilterBoundsTab";
 
 export default function CMSPage() {
@@ -20,7 +19,6 @@ export default function CMSPage() {
     const homepageSaveHandlerRef = useRef(null);
     const footerSaveHandlerRef = useRef(null);
     const quotationPdfSaveHandlerRef = useRef(null);
-    const userHeaderSaveHandlerRef = useRef(null);
     const productFilterBoundsSaveHandlerRef = useRef(null);
     // Handle data change from child components
     const handleDataChange = (data) => {
@@ -53,12 +51,6 @@ export default function CMSPage() {
             } else if (activeTab === "quotation-pdf") {
                 if (quotationPdfSaveHandlerRef.current) {
                     result = await quotationPdfSaveHandlerRef.current();
-                } else {
-                    return;
-                }
-            } else if (activeTab === "user-header") {
-                if (userHeaderSaveHandlerRef.current) {
-                    result = await userHeaderSaveHandlerRef.current();
                 } else {
                     return;
                 }
@@ -117,12 +109,6 @@ export default function CMSPage() {
                             QUOTATION PDF
                         </TabsTrigger>
                         <TabsTrigger
-                            value="user-header"
-                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
-                        >
-                            USER HEADER
-                        </TabsTrigger>
-                        <TabsTrigger
                             value="product-filters"
                             className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
                         >
@@ -163,14 +149,6 @@ export default function CMSPage() {
                     <QuotationPdfTab
                         onSaveHandlerReady={(handler) => {
                             quotationPdfSaveHandlerRef.current = handler;
-                        }}
-                    />
-                </TabsContent>
-
-                <TabsContent value="user-header" className="space-y-6">
-                    <UserHeaderTab
-                        onSaveHandlerReady={(handler) => {
-                            userHeaderSaveHandlerRef.current = handler;
                         }}
                     />
                 </TabsContent>

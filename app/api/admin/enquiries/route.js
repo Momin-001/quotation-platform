@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { enquiries, enquiryItems, users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc, and, or, ilike, sql, inArray } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
 function formatEnquiryId(enquiryId, createdAt) {
@@ -13,15 +12,6 @@ function formatEnquiryId(enquiryId, createdAt) {
 
 export async function GET(req) {
     try {
-        // Verify admin access
-        const { user, error } = await getCurrentUser();
-        if (error || !user) {
-            return errorResponse("Unauthorized", 401);
-        }
-        if (user.role !== "admin" && user.role !== "super_admin") {
-            return errorResponse("Forbidden: Admin access required", 403);
-        }
-
         const { searchParams } = new URL(req.url);
         const search = searchParams.get("search") || "";
         const sortBy = searchParams.get("sortBy") || "desc"; // asc or desc

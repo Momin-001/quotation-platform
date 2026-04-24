@@ -1,9 +1,9 @@
 
 import Navbar from "@/components/guest/Navbar";
-import UserHeader from "@/components/user/UserHeader";
 import Footer from "@/components/guest/Footer";
 import { BASE_URL } from "@/lib/constants";
 import { FooterProvider } from "@/context/FooterContext";
+import UserHeader from "@/components/user/UserHeader";
 
 const defaultNavbarData = {
     navItem1En: "HOME",
@@ -39,49 +39,31 @@ const defaultFooterData = {
     quickLink5De: "Hilfe",
     newsletterTitleEn: "Newsletter",
     newsletterTitleDe: "Newsletter",
-    emailPlaceholderEn: "Your Email Address",
-    emailPlaceholderDe: "Ihre E-Mail-Adresse",
-    subscribeButtonEn: "Subscribe",
-    subscribeButtonDe: "Abonnieren",
     copyrightTextEn: "© Copyright Quotation Platform. All Right Reserved",
     copyrightTextDe: "© Copyright Quotationsplattform. Alle Rechte vorbehalten",
 };
 
-const defaultUserHeaderData = {
-    userHeaderMyEnquiryEn: "My Enquiry",
-    userHeaderMyEnquiryDe: "Meine Anfrage",
-    userHeaderMyQuotationEn: "My Quotation",
-    userHeaderMyQuotationDe: "Meine Angebot",
-    userHeaderMyAccountEn: "My Account",
-    userHeaderMyAccountDe: "Mein Konto",
-    userHeaderMyCartEn: "My Cart",
-    userHeaderMyCartDe: "Mein Warenkorb",
-};
-
 async function getLayoutData() {
-    const [navbarRes, footerRes, userHeaderRes] = await Promise.all([
+    const [navbarRes, footerRes] = await Promise.all([
       fetch(`${BASE_URL}/api/navbar`, { cache: "no-store" }),
       fetch(`${BASE_URL}/api/footer`, { cache: "no-store" }),
-      fetch(`${BASE_URL}/api/user-header`, { cache: "no-store" }),
     ]);
   
     const navbarJson = await navbarRes.json();
     const footerJson = await footerRes.json();
-    const userHeaderJson = await userHeaderRes.json();
     return {
       navbarData: navbarJson?.data || defaultNavbarData,
       footerData: footerJson?.data || defaultFooterData,
-      userHeaderData: userHeaderJson?.data || defaultUserHeaderData,
     };
   }
   
   export default async function GuestLayout({ children }) {
-    const { navbarData, footerData, userHeaderData } = await getLayoutData();
+    const { navbarData, footerData } = await getLayoutData();
   
     return (
       <div>
         <Navbar navbarData={navbarData} />
-        <UserHeader userHeaderData={userHeaderData} />
+        <UserHeader />
         <FooterProvider initialFooterData={footerData}>
           {children}
           <Footer footerData={footerData} />

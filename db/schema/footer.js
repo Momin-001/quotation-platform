@@ -27,10 +27,6 @@ export const footer = pgTable("footer", {
     // Newsletter Section
     newsletterTitleEn: text("newsletter_title_en").notNull().default(""),
     newsletterTitleDe: text("newsletter_title_de").notNull().default(""),
-    emailPlaceholderEn: text("email_placeholder_en").notNull().default(""),
-    emailPlaceholderDe: text("email_placeholder_de").notNull().default(""),
-    subscribeButtonEn: text("subscribe_button_en").notNull().default(""),
-    subscribeButtonDe: text("subscribe_button_de").notNull().default(""),
     // Copyright
     copyrightTextEn: text("copyright_text_en").notNull().default(""),
     copyrightTextDe: text("copyright_text_de").notNull().default(""),

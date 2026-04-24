@@ -88,21 +88,21 @@ export default function FAQsPage() {
                                                 <AccordionItem
                                                     key={index}
                                                     value={index.toString()}
-                                                    className={`bg-white rounded-lg border border-gray-200 overflow-hidden transition-all duration-300 ${
+                                                    className={`bg-white rounded-sm border border-gray-300 overflow-hidden transition-all duration-300 ${
                                                         isOpen ? "shadow-lg border-primary" : "shadow-sm"
                                                     }`}
                                                 >
                                                     <AccordionTrigger
-                                                        className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
+                                                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
                                                     >
-                                                        <h3 className="text-lg font-semibold text-gray-900 font-archivo pr-4">
+                                                        <h3 className={`text-[21px] font-open-sans pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}>
                                                             {faq.title}
                                                         </h3>
                                                         <div
                                                             className={`shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
                                                                 isOpen
-                                                                    ? "bg-primary text-white"
-                                                                    : "bg-gray-200 text-gray-600"
+                                                                    ? "bg-primary text-primary-foreground"
+                                                                    : "bg-gray-300 text-primary-foreground"
                                                             }`}
                                                         >
                                                             {isOpen ? (
@@ -112,8 +112,8 @@ export default function FAQsPage() {
                                                             )}
                                                         </div>
                                                     </AccordionTrigger>
-                                                    <AccordionContent className="p-6 pt-0">
-                                                        <p className="text-gray-700 leading-relaxed font-open-sans">
+                                                    <AccordionContent className="px-6 pt-0">
+                                                            <p className="leading-relaxed font-open-sans font-normal text-[19px]">
                                                             {faq.description}
                                                         </p>
                                                     </AccordionContent>

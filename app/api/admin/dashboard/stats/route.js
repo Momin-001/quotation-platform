@@ -12,7 +12,6 @@ import {
     certificates,
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { getCurrentUser } from "@/lib/auth-helpers";
 import { sql, eq, gte } from "drizzle-orm";
 
 async function countTable(table, alias = "count") {
@@ -24,14 +23,6 @@ async function countTable(table, alias = "count") {
 
 export async function GET() {
     try {
-        const { user, error } = await getCurrentUser();
-        if (error || !user) {
-            return errorResponse("Unauthorized", 401);
-        }
-        if (user.role !== "admin" && user.role !== "super_admin") {
-            return errorResponse("Forbidden: Admin access required", 403);
-        }
-
         let dbConnected = false;
         const stats = {
             totalEnquiries: 0,

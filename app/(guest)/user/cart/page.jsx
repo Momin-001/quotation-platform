@@ -236,7 +236,7 @@ export default function CartPage() {
                                                                 parseInt(e.target.value) || 1
                                                             )
                                                         }
-                                                        className="w-16 h-8 pl-6 text-center"
+                                                        className="w-20 pl-6 h-8 text-center"
                                                     />
                                                     <Button
                                                         type="button"

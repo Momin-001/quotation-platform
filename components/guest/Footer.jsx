@@ -71,14 +71,14 @@ export default function Footer({ footerData }) {
                         </h3>
                         <ul className="space-y-4 text-lg font-normal text-gray-200">
                             <li className="flex items-center gap-2">
-                                <span><Phone size={16} /></span> +49 000 000 0000
+                                <span><Phone size={16} /></span> +49 1520 2071165
                             </li>
                             <li className="flex items-center gap-2">
-                                <span><Mail size={16} /></span> support@website.com
+                                <span><Mail size={16} /></span> info@proledall.eu
                             </li>
                             <li className="flex items-start gap-2">
-                                <span><MapPin size={16} /></span>
-                                <span>885 road, 1122 street.<br />Berlin, Germany</span>
+                                <span className="mt-1"><MapPin size={16} /></span>
+                                <span>Local Court Ludwigshafen, <br /> HRB 6882</span>
                             </li>
                         </ul>
                     </div>
@@ -135,11 +135,11 @@ export default function Footer({ footerData }) {
                         </h3>
                         <div className="flex flex-col gap-4">
                             <Input
-                                placeholder={getText("emailPlaceholder") || "Your Email Address"}
+                                placeholder={language === "en" ? "Your Email Address" : "Ihre E-Mail-Adresse"}
                                 className="h-16"
                             />
                             <Button variant="secondary" size="lg" className="w-fit">
-                                {getText("subscribeButton") || "Subscribe"}
+                                {language === "en" ? "Subscribe" : "Abonnieren"}
                             </Button>
                         </div>
                     </div>

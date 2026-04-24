@@ -496,30 +496,28 @@ function ProductsPageContent() {
     const [warrantyPeriod, setWarrantyPeriod] = useState("");
 
     // ---------------------------------------------------------------------------
-    // Debounced filter values  (used for the actual API call – 400 ms delay)
-    // Select / category filters use a shorter 150 ms delay since the user has
-    // already made a deliberate choice; text / number inputs use the full 400 ms.
+    // Debounced values ( 400 ms delay)
     // ---------------------------------------------------------------------------
     const debouncedSearch               = useDebounce(search, 400);
-    const debouncedSelectedCategory     = useDebounce(selectedCategory, 150);
-    const debouncedProductType          = useDebounce(productType, 150);
-    const debouncedDesign               = useDebounce(design, 150);
-    const debouncedSpecialTypes         = useDebounce(specialTypes, 150);
-    const debouncedApplication          = useDebounce(application, 150);
+    const debouncedSelectedCategory     = useDebounce(selectedCategory, 400);
+    const debouncedProductType          = useDebounce(productType, 400);
+    const debouncedDesign               = useDebounce(design, 400);
+    const debouncedSpecialTypes         = useDebounce(specialTypes, 400);
+    const debouncedApplication          = useDebounce(application, 400);
     const debouncedPixelPitchRange      = useDebounce(pixelPitchRange, 400);
     const debouncedPowerMaxRange        = useDebounce(powerMaxRange, 400);
     const debouncedPowerTypicalRange    = useDebounce(powerTypicalRange, 400);
-    const debouncedLedTechnology        = useDebounce(ledTechnology, 150);
-    const debouncedLedLifespan          = useDebounce(ledLifespan, 150);
-    const debouncedChipBonding          = useDebounce(chipBonding, 150);
-    const debouncedBrightnessValue    = useDebounce(brightnessValue, 150);
-    const debouncedContrastRatio        = useDebounce(contrastRatio, 150);
-    const debouncedRefreshRate          = useDebounce(refreshRate, 150);
-    const debouncedPowerRedundancy      = useDebounce(powerRedundancy, 150);
-    const debouncedMemoryOnModule       = useDebounce(memoryOnModule, 150);
-    const debouncedSmartModule          = useDebounce(smartModule, 150);
-    const debouncedControlSystem        = useDebounce(controlSystem, 150);
-    const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 150);
+    const debouncedLedTechnology        = useDebounce(ledTechnology, 400);
+    const debouncedLedLifespan          = useDebounce(ledLifespan, 400);
+    const debouncedChipBonding          = useDebounce(chipBonding, 400);
+    const debouncedBrightnessValue    = useDebounce(brightnessValue, 400);
+    const debouncedContrastRatio        = useDebounce(contrastRatio, 400);
+    const debouncedRefreshRate          = useDebounce(refreshRate, 400);
+    const debouncedPowerRedundancy      = useDebounce(powerRedundancy, 400);
+    const debouncedMemoryOnModule       = useDebounce(memoryOnModule, 400);
+    const debouncedSmartModule          = useDebounce(smartModule, 400);
+    const debouncedControlSystem        = useDebounce(controlSystem, 400);
+    const debouncedWarrantyPeriod       = useDebounce(warrantyPeriod, 400);
 
     const [sheetOpen, setSheetOpen] = useState(false);
     /** Bumps on "Clear All" so Radix Selects remount and show placeholders (controlled value → ""). */

@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { PhoneCall, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 export default function HeroSection({ homepageData }) {
     const { language } = useLanguage();
-
+    const router = useRouter();
     // Get text based on current language with fallback
     const getText = (field) => {
         if (!homepageData) return "";
@@ -82,7 +82,7 @@ return (
                     </div>
 
                     {/* Request for Offer Button */}
-                    <Button variant="secondary" className="sm:mr-16 sm:mb-6 text-xl font-bold font-open-sans px-4! rounded-full">
+                    <Button onClick={() => router.push("/products")} variant="secondary" className="sm:mr-16 sm:mb-6 text-xl font-bold font-open-sans px-4! rounded-full">
                         <Pencil className="h-6 w-6 shrink-0" />
                         {getText("heroRequestButton")}
                     </Button>

@@ -2,14 +2,12 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, ilike, or, ne, and } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { verifySuperAdmin } from "@/lib/auth-helpers";
 
 export async function GET(req) {
     try {
-        // Get current user to check if they're super_admin
-        const { user: currentUser } = await getCurrentUser();
-        const isSuperAdmin = currentUser?.role === "super_admin";
-
+        // Verify super_admin access
+        const { isSuperAdmin } = await verifySuperAdmin();
         const { searchParams } = new URL(req.url);
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");

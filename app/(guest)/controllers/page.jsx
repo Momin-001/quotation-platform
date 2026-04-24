@@ -13,6 +13,20 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"];
 
+// ---------------------------------------------------------------------------
+// Debounce hook (same idea as products listing page)
+// ---------------------------------------------------------------------------
+function useDebounce(value, delay = 400) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(timer);
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
 export default function ControllersPage() {
     const { language } = useLanguage();
     const [controllers, setControllers] = useState([]);
@@ -22,16 +36,19 @@ export default function ControllersPage() {
     const [search, setSearch] = useState("");
     const [selectedBrand, setSelectedBrand] = useState("");
 
+    const debouncedSearch = useDebounce(search, 400);
+    const debouncedSelectedBrand = useDebounce(selectedBrand, 150);
+
     const observer = useRef();
 
     const buildQueryParams = useCallback((pageNum = page) => {
         const params = new URLSearchParams();
         params.append("page", pageNum.toString());
         params.append("limit", "10");
-        if (search) params.append("search", search);
-        if (selectedBrand) params.append("brand", selectedBrand);
+        if (debouncedSearch) params.append("search", debouncedSearch);
+        if (debouncedSelectedBrand) params.append("brand", debouncedSelectedBrand);
         return params.toString();
-    }, [page, search, selectedBrand]);
+    }, [page, debouncedSearch, debouncedSelectedBrand]);
 
     const fetchControllers = useCallback(async (pageNum, reset = false) => {
         setLoading(true);
@@ -60,8 +77,7 @@ export default function ControllersPage() {
         setPage(1);
         setControllers([]);
         fetchControllers(1, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, selectedBrand]);
+    }, [debouncedSearch, debouncedSelectedBrand, fetchControllers]);
 
     const loadMore = useCallback(() => {
         if (loading || !hasMore) return;

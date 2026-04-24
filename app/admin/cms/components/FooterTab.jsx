@@ -32,10 +32,6 @@ const footerSchema = z.object({
     quickLink5De: z.string().min(1, "Quick Link 5 DE is required"),
     newsletterTitleEn: z.string().min(1, "Newsletter Title EN is required"),
     newsletterTitleDe: z.string().min(1, "Newsletter Title DE is required"),
-    emailPlaceholderEn: z.string().min(1, "Email Placeholder EN is required"),
-    emailPlaceholderDe: z.string().min(1, "Email Placeholder DE is required"),
-    subscribeButtonEn: z.string().min(1, "Subscribe Button EN is required"),
-    subscribeButtonDe: z.string().min(1, "Subscribe Button DE is required"),
     copyrightTextEn: z.string().min(1, "Copyright Text EN is required"),
     copyrightTextDe: z.string().min(1, "Copyright Text DE is required"),
 });
@@ -72,10 +68,6 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
             quickLink5De: "",
             newsletterTitleEn: "",
             newsletterTitleDe: "",
-            emailPlaceholderEn: "",
-            emailPlaceholderDe: "",
-            subscribeButtonEn: "",
-            subscribeButtonDe: "",
             copyrightTextEn: "",
             copyrightTextDe: "",
         },
@@ -126,10 +118,6 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
                     quickLink5De: data.data.quickLink5De || "",
                     newsletterTitleEn: data.data.newsletterTitleEn || "",
                     newsletterTitleDe: data.data.newsletterTitleDe || "",
-                    emailPlaceholderEn: data.data.emailPlaceholderEn || "",
-                    emailPlaceholderDe: data.data.emailPlaceholderDe || "",
-                    subscribeButtonEn: data.data.subscribeButtonEn || "",
-                    subscribeButtonDe: data.data.subscribeButtonDe || "",
                     copyrightTextEn: data.data.copyrightTextEn || "",
                     copyrightTextDe: data.data.copyrightTextDe || "",
                 };
@@ -580,62 +568,6 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
                         />
                         {errors.newsletterTitleDe && (
                             <p className="text-sm text-red-500">{errors.newsletterTitleDe.message}</p>
-                        )}
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="emailPlaceholderEn">
-                            Email Placeholder EN
-                        </Label>
-                        <Input
-                            id="emailPlaceholderEn"
-                            {...register("emailPlaceholderEn")}
-                            placeholder="Enter email placeholder text in English"
-                        />
-                        {errors.emailPlaceholderEn && (
-                            <p className="text-sm text-red-500">{errors.emailPlaceholderEn.message}</p>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="emailPlaceholderDe">
-                            Email Placeholder DE
-                        </Label>
-                        <Input
-                            id="emailPlaceholderDe"
-                            {...register("emailPlaceholderDe")}
-                            placeholder="Enter email placeholder text in German"
-                        />
-                        {errors.emailPlaceholderDe && (
-                            <p className="text-sm text-red-500">{errors.emailPlaceholderDe.message}</p>
-                        )}
-                    </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="subscribeButtonEn">
-                            Subscribe Button EN
-                        </Label>
-                        <Input
-                            id="subscribeButtonEn"
-                            {...register("subscribeButtonEn")}
-                            placeholder="Enter Subscribe button text in English"
-                        />
-                        {errors.subscribeButtonEn && (
-                            <p className="text-sm text-red-500">{errors.subscribeButtonEn.message}</p>
-                        )}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="subscribeButtonDe">
-                            Subscribe Button DE
-                        </Label>
-                        <Input
-                            id="subscribeButtonDe"
-                            {...register("subscribeButtonDe")}
-                            placeholder="Enter Subscribe button text in German"
-                        />
-                        {errors.subscribeButtonDe && (
-                            <p className="text-sm text-red-500">{errors.subscribeButtonDe.message}</p>
                         )}
                     </div>
                 </div>

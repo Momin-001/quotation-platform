@@ -14,6 +14,7 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -24,7 +25,7 @@ const navItems = [
     { href: "/admin/partners", label: "Partners", icon: Handshake },
     { href: "/admin/enquiries", label: "Customer Enquiries", icon: MessageSquare },
     { href: "/admin/quotations", label: "Quotations", icon: FileText },
-    { href: "/admin/cms", label: "CMS Pages", icon: NotebookText },
+    { href: "/admin/cms", label: "CMS Pages", icon: NotebookText, isSuperAdminOnly: true },
     { href: "/admin/certificates", label: "Certificates", icon: TicketCheck },
     { href: "/admin/product-icons", label: "Product Icons", icon: ImageIcon },
     { href: "/admin/blogs", label: "Blogs", icon: BookOpen },
@@ -32,6 +33,7 @@ const navItems = [
 ];
 
 function NavLinks({ pathname, onNavigate, className = "" }) {
+    const { isSuperAdmin } = useAuth();
     return (
         <nav className={`flex-1 min-h-0 overflow-y-auto py-4 ${className}`}>
             {navItems.map((item) => {
@@ -39,6 +41,9 @@ function NavLinks({ pathname, onNavigate, className = "" }) {
                 const isActive = item.href === "/admin"
                     ? pathname === "/admin"
                     : pathname.startsWith(item.href);
+                if (item.isSuperAdminOnly && !isSuperAdmin) {
+                    return null;
+                }
                 return (
                     <Link key={item.href} href={item.href} onClick={onNavigate}>
                         <Button

@@ -26,6 +26,9 @@ export async function proxy(request) {
             if (isAdminPath && payload.role !== "admin" && payload.role !== "super_admin") {
                 return NextResponse.redirect(new URL("/", request.url));
             }
+            if (pathname.startsWith("/admin/cms") && payload.role !== "super_admin") {
+                return NextResponse.redirect(new URL("/admin", request.url));
+            }
             if (isUserPath && payload.role !== "user") {
                 return NextResponse.redirect(new URL("/", request.url));
             }

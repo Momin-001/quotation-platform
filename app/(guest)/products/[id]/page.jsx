@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,7 @@ export default function ProductDetailPage() {
     const params = useParams();
     const { language } = useLanguage();
     const { addToCart } = useCart();
+    const router = useRouter();
     const { isAuthenticated, isUser } = useAuth();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -349,14 +350,27 @@ export default function ProductDetailPage() {
                                 >
                                     Add to Cart
                                 </Button>
-                                <Button variant="default" size="lg">
+                                <Button  onClick={() => {
+                                        if (product) {
+                                            addToCart({
+                                                id: product.id,
+                                                productName: product.productName,
+                                                productNumber: product.productNumber,
+                                                imageUrl: product.images?.[0] || null,
+                                                categoryName: product.categoryName,
+                                            });
+                                            router.push("/user/cart");
+                                        }
+                                    }} variant="default" size="lg">
                                     <FileText className="h-5 w-5 mr-2" />
                                     Get a Quote
                                 </Button>
-                                <Button size="lg" variant="outline" className="text-primary hover:bg-primary/10 border-primary">
-                                    <Wrench className="h-5 w-5 mr-2" />
-                                    Get Custom Solution
-                                </Button>
+                                {product.productType === "LED Display Single Cabinet" && (
+                                    <Button onClick={() => router.push("/leditor")} size="lg" variant="outline" className="text-primary hover:bg-primary/10 border-primary">
+                                        <Wrench className="h-5 w-5 mr-2" />
+                                        Get Custom Solution
+                                    </Button>
+                                )}
                             </div>
                             )}
 

@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function UserHeader({ userHeaderData }) {
+export default function UserHeader() {
     const { isAuthenticated, isUser } = useAuth();
     const { language } = useLanguage();
     const { getTotalItems } = useCart();
@@ -14,12 +14,6 @@ export default function UserHeader({ userHeaderData }) {
     if (!isAuthenticated || isUser === false) {
         return null;
     }
-
-    const getUserHeaderText = (text) => {
-        if (!userHeaderData) return "";
-        const key = language === "en" ? `${text}En` : `${text}De`;
-        return userHeaderData[key] || userHeaderData[`userHeader${text}En`] || "";
-    };
 
     return (
         <div className="w-full bg-primary text-primary-foreground">
@@ -32,19 +26,19 @@ export default function UserHeader({ userHeaderData }) {
                             href="/user/my-enquiries"
                             className="hover:underline whitespace-nowrap"
                         >
-                            {getUserHeaderText("userHeaderMyEnquiry")}
+                            {language === "en" ? "My Enquiries" : "Meine Anfragen"}
                         </Link>
                         <Link
                             href="/user/my-quotations"
                             className="hover:underline whitespace-nowrap"
                         >
-                            {getUserHeaderText("userHeaderMyQuotation")}
+                            {language === "en" ? "My Quotations" : "Meine Angebote"}
                         </Link>
                         <Link
                             href="/user/account-settings"
                             className="hover:underline whitespace-nowrap"
                         >
-                            {getUserHeaderText("userHeaderMyAccount")}
+                            {language === "en" ? "My Account" : "Mein Konto"}
                         </Link>
                     </div>
 
@@ -63,7 +57,7 @@ export default function UserHeader({ userHeaderData }) {
                                 </span>
                             )}
                         </div>
-                        <span>{getUserHeaderText("userHeaderMyCart")}</span>
+                        <span>{language === "en" ? "My Cart" : "Mein Warenkorb"}</span>
                     </Link>
                 </div>
             </div>
