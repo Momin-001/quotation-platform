@@ -1,1 +1,0 @@
-ALTER TABLE "enquiries" DROP COLUMN "notes";

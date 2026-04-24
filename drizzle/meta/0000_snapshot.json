@@ -1,5 +1,5 @@
 {
-  "id": "03228329-6840-40ae-ab2e-23f4014e1309",
+  "id": "7200ca22-7748-409d-8337-c4afe3ecc0c1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -63,6 +63,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "product_datasheet_url": {
+          "name": "product_datasheet_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "purchase_price": {
           "name": "purchase_price",
           "type": "numeric(10, 2)",
@@ -78,6 +84,12 @@
         "lead_time": {
           "name": "lead_time",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optional_field": {
+          "name": "optional_field",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },
@@ -115,6 +127,222 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.accessory_features": {
+      "name": "accessory_features",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "accessory_id": {
+          "name": "accessory_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "feature": {
+          "name": "feature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "accessory_features_accessory_id_accessories_id_fk": {
+          "name": "accessory_features_accessory_id_accessories_id_fk",
+          "tableFrom": "accessory_features",
+          "tableTo": "accessories",
+          "columnsFrom": [
+            "accessory_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blog_content_blocks": {
+      "name": "blog_content_blocks",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "blog_id": {
+          "name": "blog_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "text_html": {
+          "name": "text_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_public_id": {
+          "name": "image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "blog_content_blocks_blog_id_blogs_id_fk": {
+          "name": "blog_content_blocks_blog_id_blogs_id_fk",
+          "tableFrom": "blog_content_blocks",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "blog_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blogs": {
+      "name": "blogs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_name": {
+          "name": "author_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "main_image_url": {
+          "name": "main_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "main_image_public_id": {
+          "name": "main_image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "main_content_html": {
+          "name": "main_content_html",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "partner_ad_image_url": {
+          "name": "partner_ad_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "partner_ad_image_public_id": {
+          "name": "partner_ad_image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "partner_ad_link_url": {
+          "name": "partner_ad_link_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -238,6 +466,12 @@
         },
         "interface_name": {
           "name": "interface_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interface_description": {
+          "name": "interface_description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -641,6 +875,71 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.enquiry_files": {
+      "name": "enquiry_files",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "enquiry_id": {
+          "name": "enquiry_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_url": {
+          "name": "file_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_id": {
+          "name": "public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "enquiry_files_enquiry_id_enquiries_id_fk": {
+          "name": "enquiry_files_enquiry_id_enquiries_id_fk",
+          "tableFrom": "enquiry_files",
+          "tableTo": "enquiries",
+          "columnsFrom": [
+            "enquiry_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.enquiry_items": {
       "name": "enquiry_items",
       "schema": "",
@@ -698,66 +997,6 @@
           "notNull": true,
           "default": false
         },
-        "custom_led_technology": {
-          "name": "custom_led_technology",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_brightness_value": {
-          "name": "custom_brightness_value",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_pixel_pitch": {
-          "name": "custom_pixel_pitch",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_refresh_rate": {
-          "name": "custom_refresh_rate",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_resolution_horizontal": {
-          "name": "custom_resolution_horizontal",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_resolution_vertical": {
-          "name": "custom_resolution_vertical",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_cabinet_width": {
-          "name": "custom_cabinet_width",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_cabinet_height": {
-          "name": "custom_cabinet_height",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_screen_width": {
-          "name": "custom_screen_width",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "custom_screen_height": {
-          "name": "custom_screen_height",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "custom_total_resolution_h": {
           "name": "custom_total_resolution_h",
           "type": "integer",
@@ -782,9 +1021,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "custom_dimension": {
-          "name": "custom_dimension",
-          "type": "text",
+        "custom_screen_width": {
+          "name": "custom_screen_width",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_screen_height": {
+          "name": "custom_screen_height",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
@@ -803,6 +1048,96 @@
         "custom_total_cabinets": {
           "name": "custom_total_cabinets",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_service_access": {
+          "name": "custom_service_access",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_mounting_method": {
+          "name": "custom_mounting_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_operating_hours": {
+          "name": "custom_operating_hours",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_power_redundancy": {
+          "name": "custom_power_redundancy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_ip_rating": {
+          "name": "custom_ip_rating",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_installation_and_service": {
+          "name": "custom_installation_and_service",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_structural_width": {
+          "name": "custom_structural_width",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_structural_height": {
+          "name": "custom_structural_height",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_structural_depth": {
+          "name": "custom_structural_depth",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_viewing_distance_min": {
+          "name": "custom_viewing_distance_min",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_viewing_distance_max": {
+          "name": "custom_viewing_distance_max",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_controller_config": {
+          "name": "custom_controller_config",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_network_connection": {
+          "name": "custom_network_connection",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_signal_source_inputs": {
+          "name": "custom_signal_source_inputs",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_additional_services": {
+          "name": "custom_additional_services",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -1050,6 +1385,18 @@
           "notNull": true,
           "default": "''"
         },
+        "privacy_policy_pdf_url": {
+          "name": "privacy_policy_pdf_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "privacy_policy_pdf_public_id": {
+          "name": "privacy_policy_pdf_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "newsletter_title_en": {
           "name": "newsletter_title_en",
           "type": "text",
@@ -1059,34 +1406,6 @@
         },
         "newsletter_title_de": {
           "name": "newsletter_title_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "email_placeholder_en": {
-          "name": "email_placeholder_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "email_placeholder_de": {
-          "name": "email_placeholder_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "subscribe_button_en": {
-          "name": "subscribe_button_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "subscribe_button_de": {
-          "name": "subscribe_button_de",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1139,6 +1458,18 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "hero_image_url": {
+          "name": "hero_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hero_image_public_id": {
+          "name": "hero_image_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "hero_small_label_en": {
           "name": "hero_small_label_en",
@@ -1728,6 +2059,62 @@
           "notNull": true,
           "default": "''"
         },
+        "marketing_partners_title_en": {
+          "name": "marketing_partners_title_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "marketing_partners_title_de": {
+          "name": "marketing_partners_title_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "marketing_partners_subtitle_en": {
+          "name": "marketing_partners_subtitle_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "marketing_partners_subtitle_de": {
+          "name": "marketing_partners_subtitle_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "blogs_section_title_en": {
+          "name": "blogs_section_title_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "blogs_section_title_de": {
+          "name": "blogs_section_title_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "blogs_section_subtitle_en": {
+          "name": "blogs_section_subtitle_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "blogs_section_subtitle_de": {
+          "name": "blogs_section_subtitle_de",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1774,6 +2161,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "company_address": {
+          "name": "company_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "email": {
           "name": "email",
           "type": "text",
@@ -1786,11 +2179,17 @@
           "primaryKey": false,
           "notNull": false
         },
+        "commercial_register_number": {
+          "name": "commercial_register_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "password": {
           "name": "password",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "role": {
           "name": "role",
@@ -2758,6 +3157,14 @@
           "primaryKey": false,
           "notNull": true
         },
+        "type": {
+          "name": "type",
+          "type": "partner_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'technology'"
+        },
         "logo_url": {
           "name": "logo_url",
           "type": "text",
@@ -3534,8 +3941,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_header": {
-      "name": "user_header",
+    "public.product_filter_bounds": {
+      "name": "product_filter_bounds",
       "schema": "",
       "columns": {
         "id": {
@@ -3545,68 +3952,41 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "user_header_my_enquiry_en": {
-          "name": "user_header_my_enquiry_en",
-          "type": "text",
+        "pixel_pitch_min": {
+          "name": "pixel_pitch_min",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
+          "notNull": true
         },
-        "user_header_my_enquiry_de": {
-          "name": "user_header_my_enquiry_de",
-          "type": "text",
+        "pixel_pitch_max": {
+          "name": "pixel_pitch_max",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
+          "notNull": true
         },
-        "user_header_my_quotation_en": {
-          "name": "user_header_my_quotation_en",
-          "type": "text",
+        "power_consumption_max_min": {
+          "name": "power_consumption_max_min",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
+          "notNull": true
         },
-        "user_header_my_quotation_de": {
-          "name": "user_header_my_quotation_de",
-          "type": "text",
+        "power_consumption_max_max": {
+          "name": "power_consumption_max_max",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
+          "notNull": true
         },
-        "user_header_my_account_en": {
-          "name": "user_header_my_account_en",
-          "type": "text",
+        "power_consumption_typical_min": {
+          "name": "power_consumption_typical_min",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
+          "notNull": true
         },
-        "user_header_my_account_de": {
-          "name": "user_header_my_account_de",
-          "type": "text",
+        "power_consumption_typical_max": {
+          "name": "power_consumption_typical_max",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "user_header_my_cart_en": {
-          "name": "user_header_my_cart_en",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "user_header_my_cart_de": {
-          "name": "user_header_my_cart_de",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         },
         "updated_at": {
           "name": "updated_at",
@@ -3818,6 +4198,14 @@
       "values": [
         "Yes",
         "No"
+      ]
+    },
+    "public.partner_type": {
+      "name": "partner_type",
+      "schema": "public",
+      "values": [
+        "technology",
+        "marketing"
       ]
     }
   },

@@ -18,6 +18,7 @@ CREATE TYPE "public"."special_types" AS ENUM('Transparent', 'Curved', 'Floor', '
 CREATE TYPE "public"."support" AS ENUM('Frontendside', 'Backside', 'Frontside and Backside');--> statement-breakpoint
 CREATE TYPE "public"."video_rate" AS ENUM('50/60', '120', '240');--> statement-breakpoint
 CREATE TYPE "public"."yes_no" AS ENUM('Yes', 'No');--> statement-breakpoint
+CREATE TYPE "public"."partner_type" AS ENUM('technology', 'marketing');--> statement-breakpoint
 CREATE TABLE "accessories" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"product_name" text NOT NULL,
@@ -28,13 +29,47 @@ CREATE TABLE "accessories" (
 	"unit" text,
 	"manufacturer" text,
 	"supplier" text,
+	"product_datasheet_url" text,
 	"purchase_price" numeric(10, 2),
 	"retail_price" numeric(10, 2),
 	"lead_time" text,
+	"optional_field" text[],
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "accessories_product_number_unique" UNIQUE("product_number")
+);
+--> statement-breakpoint
+CREATE TABLE "accessory_features" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"accessory_id" uuid NOT NULL,
+	"feature" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "blog_content_blocks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"blog_id" uuid NOT NULL,
+	"sort_order" integer DEFAULT 0 NOT NULL,
+	"text_html" text DEFAULT '' NOT NULL,
+	"image_url" text,
+	"image_public_id" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "blogs" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" text NOT NULL,
+	"author_name" text NOT NULL,
+	"main_image_url" text,
+	"main_image_public_id" text,
+	"main_content_html" text DEFAULT '' NOT NULL,
+	"partner_ad_image_url" text,
+	"partner_ad_image_public_id" text,
+	"partner_ad_link_url" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
@@ -58,6 +93,7 @@ CREATE TABLE "certificates" (
 CREATE TABLE "controllers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"interface_name" text,
+	"interface_description" text,
 	"brand_name" "brand_system",
 	"controller_number" text,
 	"brand_name_other" text,
@@ -118,6 +154,15 @@ CREATE TABLE "enquiries" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "enquiry_files" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"enquiry_id" uuid NOT NULL,
+	"file_url" text NOT NULL,
+	"public_id" text NOT NULL,
+	"file_name" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "enquiry_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"enquiry_id" uuid NOT NULL,
@@ -127,24 +172,30 @@ CREATE TABLE "enquiry_items" (
 	"item_order" integer DEFAULT 0,
 	"controller_id" uuid,
 	"is_custom" boolean DEFAULT false NOT NULL,
-	"custom_led_technology" text,
-	"custom_brightness_value" text,
-	"custom_pixel_pitch" numeric(10, 2),
-	"custom_refresh_rate" integer,
-	"custom_resolution_horizontal" integer,
-	"custom_resolution_vertical" integer,
-	"custom_cabinet_width" numeric(10, 2),
-	"custom_cabinet_height" numeric(10, 2),
-	"custom_screen_width" numeric(10, 2),
-	"custom_screen_height" numeric(10, 2),
 	"custom_total_resolution_h" integer,
 	"custom_total_resolution_v" integer,
 	"custom_weight" numeric(10, 2),
 	"custom_display_area" numeric(10, 4),
-	"custom_dimension" text,
+	"custom_screen_width" numeric(10, 2),
+	"custom_screen_height" numeric(10, 2),
 	"custom_power_consumption_max" numeric(10, 2),
 	"custom_power_consumption_typ" numeric(10, 2),
 	"custom_total_cabinets" integer,
+	"custom_service_access" jsonb,
+	"custom_mounting_method" text,
+	"custom_operating_hours" text,
+	"custom_power_redundancy" text,
+	"custom_ip_rating" text,
+	"custom_installation_and_service" jsonb,
+	"custom_structural_width" numeric(10, 2),
+	"custom_structural_height" numeric(10, 2),
+	"custom_structural_depth" numeric(10, 2),
+	"custom_viewing_distance_min" numeric(10, 2),
+	"custom_viewing_distance_max" numeric(10, 2),
+	"custom_controller_config" jsonb,
+	"custom_network_connection" jsonb,
+	"custom_signal_source_inputs" jsonb,
+	"custom_additional_services" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -177,12 +228,10 @@ CREATE TABLE "footer" (
 	"quick_link_4_de" text DEFAULT '' NOT NULL,
 	"quick_link_5_en" text DEFAULT '' NOT NULL,
 	"quick_link_5_de" text DEFAULT '' NOT NULL,
+	"privacy_policy_pdf_url" text,
+	"privacy_policy_pdf_public_id" text,
 	"newsletter_title_en" text DEFAULT '' NOT NULL,
 	"newsletter_title_de" text DEFAULT '' NOT NULL,
-	"email_placeholder_en" text DEFAULT '' NOT NULL,
-	"email_placeholder_de" text DEFAULT '' NOT NULL,
-	"subscribe_button_en" text DEFAULT '' NOT NULL,
-	"subscribe_button_de" text DEFAULT '' NOT NULL,
 	"copyright_text_en" text DEFAULT '' NOT NULL,
 	"copyright_text_de" text DEFAULT '' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -191,6 +240,8 @@ CREATE TABLE "footer" (
 --> statement-breakpoint
 CREATE TABLE "homepage" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"hero_image_url" text,
+	"hero_image_public_id" text,
 	"hero_small_label_en" text DEFAULT '' NOT NULL,
 	"hero_small_label_de" text DEFAULT '' NOT NULL,
 	"hero_title_en" text DEFAULT '' NOT NULL,
@@ -275,6 +326,14 @@ CREATE TABLE "homepage" (
 	"partners_title_de" text DEFAULT '' NOT NULL,
 	"partners_subtitle_en" text DEFAULT '' NOT NULL,
 	"partners_subtitle_de" text DEFAULT '' NOT NULL,
+	"marketing_partners_title_en" text DEFAULT '' NOT NULL,
+	"marketing_partners_title_de" text DEFAULT '' NOT NULL,
+	"marketing_partners_subtitle_en" text DEFAULT '' NOT NULL,
+	"marketing_partners_subtitle_de" text DEFAULT '' NOT NULL,
+	"blogs_section_title_en" text DEFAULT '' NOT NULL,
+	"blogs_section_title_de" text DEFAULT '' NOT NULL,
+	"blogs_section_subtitle_en" text DEFAULT '' NOT NULL,
+	"blogs_section_subtitle_de" text DEFAULT '' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -283,9 +342,11 @@ CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"full_name" text NOT NULL,
 	"company_name" text,
+	"company_address" text,
 	"email" text NOT NULL,
 	"phone_number" text,
-	"password" text NOT NULL,
+	"commercial_register_number" text,
+	"password" text,
 	"role" "role" DEFAULT 'user' NOT NULL,
 	"is_active" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -429,6 +490,7 @@ CREATE TABLE "navbar" (
 CREATE TABLE "partners" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"type" "partner_type" DEFAULT 'technology' NOT NULL,
 	"logo_url" text NOT NULL,
 	"public_id" text NOT NULL,
 	"website_url" text NOT NULL,
@@ -531,21 +593,21 @@ CREATE TABLE "product_product_icons" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "user_header" (
+CREATE TABLE "product_filter_bounds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_header_my_enquiry_en" text DEFAULT '' NOT NULL,
-	"user_header_my_enquiry_de" text DEFAULT '' NOT NULL,
-	"user_header_my_quotation_en" text DEFAULT '' NOT NULL,
-	"user_header_my_quotation_de" text DEFAULT '' NOT NULL,
-	"user_header_my_account_en" text DEFAULT '' NOT NULL,
-	"user_header_my_account_de" text DEFAULT '' NOT NULL,
-	"user_header_my_cart_en" text DEFAULT '' NOT NULL,
-	"user_header_my_cart_de" text DEFAULT '' NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
+	"pixel_pitch_min" numeric(10, 2) NOT NULL,
+	"pixel_pitch_max" numeric(10, 2) NOT NULL,
+	"power_consumption_max_min" integer NOT NULL,
+	"power_consumption_max_max" integer NOT NULL,
+	"power_consumption_typical_min" integer NOT NULL,
+	"power_consumption_typical_max" integer NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "accessory_features" ADD CONSTRAINT "accessory_features_accessory_id_accessories_id_fk" FOREIGN KEY ("accessory_id") REFERENCES "public"."accessories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "blog_content_blocks" ADD CONSTRAINT "blog_content_blocks_blog_id_blogs_id_fk" FOREIGN KEY ("blog_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiries" ADD CONSTRAINT "enquiries_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "enquiry_files" ADD CONSTRAINT "enquiry_files_enquiry_id_enquiries_id_fk" FOREIGN KEY ("enquiry_id") REFERENCES "public"."enquiries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_enquiry_id_enquiries_id_fk" FOREIGN KEY ("enquiry_id") REFERENCES "public"."enquiries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "enquiry_items" ADD CONSTRAINT "enquiry_items_controller_id_controllers_id_fk" FOREIGN KEY ("controller_id") REFERENCES "public"."controllers"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
