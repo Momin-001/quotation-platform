@@ -51,8 +51,8 @@ export default function Footer({ footerData }) {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     {/* Brand & Description */}
-                    <div className="">
-                        <Image src="/logo.svg" alt="Logo" width={60} height={60}/>
+                    <div className="space-y-1">
+                        <Image src="/logo-name-white.png" alt="Logo" width={170} height={170}/>
                         <p className="text-lg font-normal leading-relaxed max-w-md">
                             {getText("description") || "PROLEDALL is a platform that allows you to get quotes for your LED products. We are a team of experts who are dedicated to providing the best possible service to our clients."}
                         </p>

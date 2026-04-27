@@ -53,10 +53,10 @@ export default function Navbar({ navbarData }) {
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 <Link href="/" className="shrink-0">
                     <Image 
-                    src="/logo.svg" 
+                    src="/logo-name.png" 
                     alt="Logo"
-                    width={60}
-                    height={60}
+                    width={150}
+                    height={150}
                      />
                 </Link>
                 <div className="hidden lg:flex px-8 items-center gap-8 text-lg font-medium text-gray-800">
@@ -83,7 +83,7 @@ export default function Navbar({ navbarData }) {
                 {/* Right side actions (desktop) + hamburger (mobile) */}
                 <div className="flex items-center gap-3">
                     {/* Desktop actions */}
-                    <div className="hidden lg:flex items-center gap-3">
+                    <div className="hidden xl:flex items-center gap-3">
                         {loading ? (
                             <Spinner />
                         ) : !isAuthenticated ? (
@@ -137,7 +137,7 @@ export default function Navbar({ navbarData }) {
                     </div>
 
                     {/* Mobile hamburger */}
-                    <div className="lg:hidden">
+                    <div className="xl:hidden">
                         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="icon" className="border-gray-300">
@@ -147,13 +147,12 @@ export default function Navbar({ navbarData }) {
                             <SheetContent side="right" className="w-72 flex flex-col p-0">
                                 <SheetHeader className="shrink-0 p-4 border-b">
                                     <SheetTitle className="flex items-center gap-2">
-                                        <Image src="/logo.png" alt="Logo" width={32} height={32} />
                                         <span className="font-archivo text-base text-gray-800">Menu</span>
                                     </SheetTitle>
                                 </SheetHeader>
 
                                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                    <div className="space-y-2 text-sm font-medium text-gray-800">
+                                    <div className="block lg:hidden space-y-2 text-sm font-medium text-gray-800 border-b pb-4">
                                         <Link href="/" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/")}>
                                             {getNavText(1)}
                                         </Link>
@@ -171,7 +170,7 @@ export default function Navbar({ navbarData }) {
                                         </Link>
                                     </div>
 
-                                    <div className="border-t pt-4 space-y-3">
+                                    <div className="space-y-3">
                                         {loading ? (
                                             <div className="flex items-center justify-center py-4">
                                                 <Spinner />

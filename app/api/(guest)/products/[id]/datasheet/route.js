@@ -59,9 +59,9 @@ export async function GET(req, { params }) {
         try {
             const logoPath = path.join(process.cwd(), "public", "logo-name.png");
             const logoBuf = await readFile(logoPath);
-            logoDataUrl = `data:image/svg+xml;base64,${logoBuf.toString("base64")}`;
+            logoDataUrl = `data:image/png;base64,${logoBuf.toString("base64")}`;
         } catch {
-            // logo.png missing or unreadable
+            // logo-name.png missing or unreadable
         }
 
         const imageUrls = product.images?.map((img) => img.imageUrl) ?? [];
