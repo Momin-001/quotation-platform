@@ -77,11 +77,11 @@ function parseDecimal(value) {
 }
 
 // --- Boolean / Enum Matching ---
-function matchYesNo(value) {
+function matchOptionalNo(value) {
   if (!value) return null;
   const v = value.toString().trim().toLowerCase();
-  if (["yes", "y", "true", "1"].includes(v)) return "Yes";
-  if (["no", "n", "false", "0"].includes(v)) return "No";
+  if (["optional", "Optional"].includes(v)) return "Optional";
+  if (["no", "No" , "n", "false", "0"].includes(v)) return "No";
   return null;
 }
 
@@ -304,9 +304,9 @@ export async function POST(req) {
         const drivingMethod = matchEnum(cell(43, p), DRIVING_METHODS);
         const powerSupply = str(cell(44, p));
         const mtbfPowerSupply = parseInteger(cell(45, p));
-        const powerRedundancy = matchYesNo(cell(46, p));
-        const memoryOnModule = matchYesNo(cell(47, p));
-        const smartModule = matchYesNo(cell(48, p));
+        const powerRedundancy = matchOptionalNo(cell(46, p));
+        const memoryOnModule = matchOptionalNo(cell(47, p));
+        const smartModule = matchOptionalNo(cell(48, p));
         const controlSysResult = matchEnumWithOther(cell(49, p), CONTROL_SYSTEMS);
         const receivingCard = str(cell(50, p));
         const operatingTemperature = str(cell(51, p));
@@ -320,6 +320,8 @@ export async function POST(req) {
         const safety = str(cell(59, p));
         const support = matchSupport(cell(60, p));
         const warrantyPeriod = parseInteger(cell(61, p));
+        const supportDuringWarrantyEn = str(cell(62, p));
+        const supportAfterWarrantyEn = str(cell(63, p));
         const pricePerCabinetUsd = parseDecimal(cell(64, p));
         const pricePerMetreSquareUsd = parseDecimal(cell(65, p));
         const profitMargin = parseDecimal(cell(66, p));
@@ -418,7 +420,9 @@ export async function POST(req) {
           smartModule,
           support,
           areaOfUseId,
-
+          supportDuringWarrantyEn,
+          supportAfterWarrantyEn,
+          
           // Other-companion enums
           specialTypes: specialTypesResult.value || "Other",
           specialTypesOther: specialTypesResult.other,

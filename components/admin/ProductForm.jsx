@@ -186,13 +186,13 @@ const productSchema = z.object({
     cooling: z.enum(["Convection", "Fan"], {
         required_error: "Cooling is required",
     }),
-    powerRedundancy: z.enum(["Yes", "No"], {
+    powerRedundancy: z.enum(["Optional", "No"], {
         required_error: "Power redundancy is required",
     }),
-    memoryOnModule: z.enum(["Yes", "No"], {
+    memoryOnModule: z.enum(["Optional", "No"], {
         required_error: "Memory on module is required",
     }),
-    smartModule: z.enum(["Yes", "No"], {
+    smartModule: z.enum(["Optional", "No"], {
         required_error: "Smart module is required",
     }),
     support: z.enum(["Frontendside", "Backside", "Frontside and Backside"]).optional(),
@@ -746,9 +746,9 @@ export default function ProductForm({
                     {renderInput("Power Consumption Typical (W)", "powerConsumptionTypical", "number", { required: true, step: "0.01", placeholder: "e.g., 300" })}
                     {renderInput("Refresh Rate (Hz)", "refreshRate", "number", { required: true, step: "0.01", placeholder: "e.g., 1920" })}
                     {renderInput("Scan Rate Denominator", "scanRateDenominator", "number", { required: true, step: "0.01", placeholder: "e.g., 16" })}
-                    {renderSelect("Power Redundancy *", "powerRedundancy", ["Yes", "No"])}
-                    {renderSelect("Memory on Module *", "memoryOnModule", ["Yes", "No"])}
-                    {renderSelect("Smart Module *", "smartModule", ["Yes", "No"])}
+                    {renderSelect("Power Redundancy *", "powerRedundancy", ["Optional", "No"])}
+                    {renderSelect("Memory on Module *", "memoryOnModule", ["Optional", "No"])}
+                    {renderSelect("Smart Module *", "smartModule", ["Optional", "No"])}
                     {renderSelect("Control System *", "controlSystem", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"])}
                     {controlSystem === "Other" && renderInput("Control System Other", "controlSystemOther", "text", { required: true })}
                     {renderInput("Input Voltage", "inputVoltage", "text", { required: true, placeholder: "e.g., 100-240V AC" })}

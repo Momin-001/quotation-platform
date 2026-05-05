@@ -345,8 +345,8 @@ export default function LeditorPage() {
 
         const pcMax = selectedProduct?.powerConsumptionMax || 0;
         const pcTyp = selectedProduct?.powerConsumptionTypical || 0;
-        const powerMax = parseFloat((pcMax * displayArea).toFixed(2));
-        const powerTypical = parseFloat((pcTyp * displayArea).toFixed(2));
+        const powerMax = parseFloat((pcMax * displayArea) / 1000).toFixed(2);
+        const powerTypical = parseFloat((pcTyp * displayArea) / 1000).toFixed(2);
 
         return {
             cabInfo,
@@ -1058,17 +1058,17 @@ export default function LeditorPage() {
                                                     <Input value={computed.dimension} readOnly className="bg-gray-100" />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>Power Consumption Max (W)</Label>
+                                                    <Label>Power Consumption Max (kW)</Label>
                                                     <Input
-                                                        value={computed.powerMax ? `${computed.powerMax} W` : "N/A"}
+                                                        value={computed.powerMax ? `${computed.powerMax} kW` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>Power Consumption Typical (W)</Label>
+                                                    <Label>Power Consumption Typical (kW)</Label>
                                                     <Input
-                                                        value={computed.powerTypical ? `${computed.powerTypical} W` : "N/A"}
+                                                        value={computed.powerTypical ? `${computed.powerTypical} kW` : "N/A"}
                                                         readOnly
                                                         className="bg-gray-100"
                                                     />

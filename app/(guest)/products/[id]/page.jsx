@@ -277,9 +277,9 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
 
-                                {(product.leadtimeDays || product.stockPieces) && (
+                                
                                     <div className="mt-4 space-y-1">
-                                        {product.leadtimeDays && 
+                                        {product.stockPieces > 0 && 
                                         <div className="flex items-center gap-2">
                                             <span className="font-semibold text-xl">Stock:</span>
                                             <span className="font-normal text-xl">
@@ -287,7 +287,7 @@ export default function ProductDetailPage() {
                                             </span>
                                         </div>
                                         }
-                                        {product.leadtimeDays && 
+                                        {product.leadtimeDays > 0 && 
                                         <div className="flex items-center gap-2">
                                             <span className="font-semibold text-xl">Lead Time:</span>
                                             <span className="font-normal text-xl">
@@ -296,7 +296,6 @@ export default function ProductDetailPage() {
                                         </div>
                                         }
                                     </div>
-                                )}
                             </div>
 
                             {/* Downloads */}
@@ -401,7 +400,6 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Product Specifications */}
-                    <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Left Column */}
                         <div className="space-y-4">
@@ -418,6 +416,7 @@ export default function ProductDetailPage() {
                                             <SpecRow label="Special Types" value={product.specialTypes } />
                                             <SpecRow label="Application" value={Array.isArray(product.application) ? product.application.join(", ") : product.application} />
                                             <SpecRow label="Category" value={product.areaOfUse} />
+                                            <SpecRow label="Service" value={product.support} />
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -444,6 +443,7 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
                             {/* Electrical Specifications */}
                             <Accordion type="single" defaultValue="electrical-specs" collapsible className="rounded-lg">
@@ -588,6 +588,9 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+
+                            </RestrictedContentOverlay>
+
                         </div>
 
                         {/* Right Column */}
@@ -602,10 +605,13 @@ export default function ProductDetailPage() {
                                         <div>
                                             <SpecRow label="LED Technology" value={formatEnum(product.ledTechnology)} />
                                             <SpecRow label="Pixel Configuration" value={product.pixelConfiguration} />
-                                            <SpecRow label="Chip Bonding" value={formatEnum(product.chipBonding)} />
                                             <SpecRow label="LED Lifespan" value={product.ledLifespan} unit="hours" />
+
+                                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
+                                            <SpecRow label="Chip Bonding" value={formatEnum(product.chipBonding)} />
                                             <SpecRow label="LED Chip Manufacturer" value={product.ledChipManufacturer} />
                                             <SpecRow label="LED Modules per Cabinet" value={product.ledModulesPerCabinet} />
+                                            </RestrictedContentOverlay>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
@@ -624,25 +630,28 @@ export default function ProductDetailPage() {
                                                 label="Scan Rate"
                                                 value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null}
                                             />
+                                            <SpecRow label="Brightness Value" value={product.brightnessValue} unit="cd/m²" />
+                                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
                                             <SpecRow label="Video Rate" value={product.videoRate} />
                                             <SpecRow label="Colour Depth" value={product.colourDepth} unit="bit" />
                                             <SpecRow
                                                 label="Greyscale Processing"
                                                 value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
                                             />
-                                            <SpecRow label="Number of Colours" value={product.numberOfColours} />
+                                            <SpecRow label="Number of Colours" value={product.numberOfColours ? `${product.numberOfColours} billion` : null} />
                                             <SpecRow label="Viewing Angle (Horizontal)" value={product.viewingAngleHorizontal} />
                                             <SpecRow label="Viewing Angle (Vertical)" value={product.viewingAngleVertical} />
-                                            <SpecRow label="Brightness Value" value={product.brightnessValue} />
                                             <SpecRow
                                                 label="Contrast Ratio"
                                                 value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
                                             />
                                             <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
+                                            </RestrictedContentOverlay>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
                             {/* Calibration */}
                             <Accordion type="single" defaultValue="calibration" collapsible className="rounded-lg">
@@ -717,9 +726,10 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+                            </RestrictedContentOverlay>
+
                         </div>
                     </div>
-                    </RestrictedContentOverlay>
 
                     <RelatedProductsSection productId={product.id} language={language} />
                 </div>

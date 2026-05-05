@@ -382,7 +382,7 @@ function FiltersAccordion({
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -392,7 +392,7 @@ function FiltersAccordion({
                                 <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -402,7 +402,7 @@ function FiltersAccordion({
                                 <Select value={smartModule} onValueChange={setSmartModule}>
                                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Yes">Yes</SelectItem>
+                                        <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
                                     </SelectContent>
                                 </Select>

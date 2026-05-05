@@ -8,6 +8,20 @@
       "when": 1777021616649,
       "tag": "0000_steep_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777897979489,
+      "tag": "0001_romantic_earthquake",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777898007019,
+      "tag": "0002_careful_chimera",
+      "breakpoints": true
     }
   ]
 }

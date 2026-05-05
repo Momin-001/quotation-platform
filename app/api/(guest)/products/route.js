@@ -254,17 +254,17 @@ export async function GET(req) {
             }
         }
 
-        // Power Redundancy filter (ENUM: yes/no)
+        // Power Redundancy filter (ENUM: optional/no)
         if (powerRedundancy !== "") {
             conditions.push(eq(products.powerRedundancy, powerRedundancy));
         }
 
-        // Memory on Module filter (ENUM: yes/no)
+        // Memory on Module filter (ENUM: optional/no)
         if (memoryOnModule !== "") {
             conditions.push(eq(products.memoryOnModule, memoryOnModule));
         }
 
-        // Smart Module filter (ENUM: yes/no)
+        // Smart Module filter (ENUM: optional/no)
         if (smartModule !== "") {
             conditions.push(eq(products.smartModule, smartModule));
         }

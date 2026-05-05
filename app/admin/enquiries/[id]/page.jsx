@@ -308,11 +308,11 @@ export default function EnquiryDetailPage() {
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">Power Max</p>
-                                        <p className="font-semibold">{item.customPowerConsumptionMax ? `${item.customPowerConsumptionMax} W` : "N/A"}</p>
+                                        <p className="font-semibold">{item.customPowerConsumptionMax ? `${item.customPowerConsumptionMax} kW` : "N/A"}</p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide">Power Typical</p>
-                                        <p className="font-semibold">{item.customPowerConsumptionTyp ? `${item.customPowerConsumptionTyp} W` : "N/A"}</p>
+                                        <p className="font-semibold">{item.customPowerConsumptionTyp ? `${item.customPowerConsumptionTyp} kW` : "N/A"}</p>
                                     </div>
                                 </div>
                             </div>

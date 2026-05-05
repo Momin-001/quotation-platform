@@ -43,7 +43,7 @@ export const drivingMethodEnum = pgEnum("driving_method", ["Common Anode", "Comm
 export const controlSystemEnum = pgEnum("control_system", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"]);
 export const greyscaleProcessingEnum = pgEnum("greyscale_processing", ["<16", "16", "18+", "22+", "Other"]);
 export const coolingEnum = pgEnum("cooling", ["Convection", "Fan"]);
-export const yesNoEnum = pgEnum("yes_no", ["Yes", "No"]);
+export const optionalNoEnum = pgEnum("optional_no", ["Optional", "No"]);
 export const supportEnum = pgEnum("support", ["Frontendside", "Backside", "Frontside and Backside"]);
 
 export const products = pgTable("products", {
@@ -95,9 +95,9 @@ export const products = pgTable("products", {
     controlSystem: controlSystemEnum("control_system"),
     controlSystemOther: text("control_system_other"),
     cooling: coolingEnum("cooling"),
-    powerRedundancy: yesNoEnum("power_redundancy"),
-    memoryOnModule: yesNoEnum("memory_on_module"),
-    smartModule: yesNoEnum("smart_module"),
+    powerRedundancy: optionalNoEnum("power_redundancy"),
+    memoryOnModule: optionalNoEnum("memory_on_module"),
+    smartModule: optionalNoEnum("smart_module"),
     support: supportEnum("support"),
     
     // Foreign Key

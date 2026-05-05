@@ -2,13 +2,14 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export const RestrictedContentOverlay = ({ children, isAuthenticated }) => {
+export const RestrictedContentOverlay = ({ children, isAuthenticated, register=true }) => {
     if (isAuthenticated) return children;
     return (
         <div className="relative min-h-[120px]">
             <div className="blur-sm pointer-events-none select-none">
                 {children}
             </div>
+            {register && (
             <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm text-center border border-gray-100">
                     <div className="flex justify-center mb-3">
@@ -24,6 +25,7 @@ export const RestrictedContentOverlay = ({ children, isAuthenticated }) => {
                     </Link>
                 </div>
             </div>
+            )}
         </div>
     );
 };
