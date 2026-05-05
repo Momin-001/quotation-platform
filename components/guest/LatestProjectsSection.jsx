@@ -1,16 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-    Globe,
-    Monitor,
-    PanelTop,
-    Truck,
-    MoveLeft,
-    MoveRight,
-} from "lucide-react";
+import { MoveLeft, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Carousel,
@@ -20,7 +13,6 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
-import { Spinner } from "@/components/ui/spinner";
 
 const COPY = {
     en: {
@@ -41,27 +33,44 @@ const COPY = {
     },
 };
 
-function categoryIconForName(name) {
-    const n = (name || "").toLowerCase();
-    if (n.includes("indoor")) return Monitor;
-    if (n.includes("outdoor")) return PanelTop;
-    if (n.includes("mobil")) return Truck;
-    return Monitor;
+function normalizeCategoryName(name) {
+    return String(name || "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/[^\p{L}\p{N}\s]/gu, "");
 }
 
-function ProjectCard({ product, presetLabel }) {
-    const href = product.areaOfUseId
-        ? `/products?categoryId=${encodeURIComponent(product.areaOfUseId)}`
+function resolveCategoryIdByName(categories, categoryName) {
+    const target = normalizeCategoryName(categoryName);
+    if (!target) return "";
+
+    const candidates = [
+        target,
+        target.replace("mobile", "mobil"),
+        target.replace("mobil", "mobile"),
+    ];
+
+    const match = (categories || []).find((c) => {
+        const n = normalizeCategoryName(c?.name);
+        return candidates.some((x) => x === n || n.includes(x) || x.includes(n));
+    });
+
+    return match?.id || "";
+}
+
+function CategoryCard({ card, presetLabel, categoryId }) {
+    const href = categoryId
+        ? `/products?categoryId=${encodeURIComponent(categoryId)}`
         : "/products";
-    const badge = (product.areaOfUseName || "").toUpperCase();
 
     return (
         <div className="relative h-full min-h-[600px] lg:min-h-[740px] rounded-xl overflow-hidden shadow-xl flex flex-col">
             <div className="absolute inset-0 z-0">
-                {product.imageUrl ? (
+                {card.imageUrl ? (
                     <Image
-                        src={product.imageUrl}
-                        alt={product.productName}
+                        src={card.imageUrl}
+                        alt={card.title}
                         fill
                         className="object-cover"
                         sizes="(max-width: 1024px) 100vw, 50vw"
@@ -76,20 +85,20 @@ function ProjectCard({ product, presetLabel }) {
                 <div className="mt-auto space-y-3 text-white">
 
                     <span className="self-start bg-primary text-primary-foreground font-open-sans text-lg font-semibold tracking-wide px-5 py-1.5 rounded-sm">
-                        {badge}
+                        {(card.categoryName || "").toUpperCase()}
                     </span>
 
                     <h3 className="text-2xl mt-6 font-bold font-open-sans leading-tight line-clamp-2">
-                        {product.productName}
+                        {card.title}
                     </h3>
-                    {product.productDescription ? (
+                    {card.description ? (
                         <p className="text-lg text-white/80 font-normal font-open-sans line-clamp-3 leading-relaxed">
-                            {product.productDescription}
+                            {card.description}
                         </p>
                     ) : null}
-                    {product.features?.length > 0 ? (
+                    {card.features?.length > 0 ? (
                         <ul className="text-lg text-white/80 font-normal font-open-sans space-y-1.5 list-disc pl-4 marker:text-primary">
-                            {product.features.map((f, i) => (
+                            {card.features.map((f, i) => (
                                 <li key={i} className="leading-snug">
                                     {f}
                                 </li>
@@ -103,6 +112,7 @@ function ProjectCard({ product, presetLabel }) {
                             size="lg"
                             variant="secondary"
                             className="font-archivo"
+                            disabled={!categoryId}
                         >
                             <Link href={href}>
                                 {presetLabel} →
@@ -121,9 +131,7 @@ export default function LatestProjectsSection() {
     const t = COPY[lang];
 
     const [categories, setCategories] = useState([]);
-    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-    const [projects, setProjects] = useState([]);
-    const [loadingList, setLoadingList] = useState(true);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [api, setApi] = useState(null);
     const [canPrev, setCanPrev] = useState(false);
     const [canNext, setCanNext] = useState(false);
@@ -131,6 +139,7 @@ export default function LatestProjectsSection() {
     useEffect(() => {
         let cancelled = false;
         (async () => {
+            setCategoriesLoading(true);
             try {
                 const res = await fetch("/api/categories");
                 const json = await res.json();
@@ -138,6 +147,8 @@ export default function LatestProjectsSection() {
                 if (!cancelled) setCategories(json.data || []);
             } catch {
                 if (!cancelled) setCategories([]);
+            } finally {
+                if (!cancelled) setCategoriesLoading(false);
             }
         })();
         return () => {
@@ -145,26 +156,64 @@ export default function LatestProjectsSection() {
         };
     }, []);
 
-    const fetchProjects = useCallback(async (categoryId) => {
-        setLoadingList(true);
-        try {
-            const url = categoryId
-                ? `/api/latest-projects?categoryId=${encodeURIComponent(categoryId)}`
-                : "/api/latest-projects?mode=all";
-            const res = await fetch(url);
-            const json = await res.json();
-            if (!json.success) throw new Error(json.message);
-            setProjects(json.data || []);
-        } catch {
-            setProjects([]);
-        } finally {
-            setLoadingList(false);
-        }
-    }, []);
+    const cards = useMemo(
+        () => [
+            {
+                categoryName: "Mobil",
+                title: lang === "en" ? "Lightweight, fast and flexible LED systems for events, stages & touring productions." : "Leichte, schnelle und flexible LED-Systeme für Events, Bühnen & Touring Produktionen.",
+                description:
+                    lang === "en"
+                        ? "Fast setup, stable rigging and maximum reliability in tough conditions."
+                        : "Schneller Aufbau, stabiles  Rigging und maximale  Zuverlässigkeit im harten  Einsatz.   ",
+                features: [
+                    lang === "en" ? "Lightweight cabinets for quick assembly" : "Leichtbau-Cabinets für schnellen Aufbau  ",
+                    lang === "en" ? "Curving options (concave/convex)" : "Curving-Optionen  (konkav/konvex)",
+                    lang === "en" ? "High Refresh Rates (≥ 3840–7680 Hz)  " : "Hohe Refresh Rates (≥ 3840–7680 Hz)  ",
+                    lang === "en" ? "Anti collision edges, magnetic modules" : "Anti Kollisionskanten, Magnetmodule ",
+                    lang === "en" ? "Touring-ready hardware & flight cases" : "Touring-taugliche Hardware & Flightcases",
+                ],
+                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777978966/05d906c42c4cd59fcfeb9c8d6508509b05e56a79_dtlm0z.png",
+            },
+            {
+                categoryName: "Indoor",
+                title: lang === "en" ? "High-resolution LED solutions for retail, corporate, studios & control rooms" : "Hochauflösende LED Lösungen für Retail, Corporate, Studios & Control Room",
+                description:
+                    lang === "en"
+                        ? "Optimized for brilliant color reproduction, fine pixel pitches and 24/7 operation – perfect for demanding interiors."
+                        : "Optimiert für brillante Farbwiedergabe, feine Pixelabstände und 24/7 Betrieb – perfekt für anspruchsvolle Innenräume.",
+                features: [
+                    lang === "en" ? "Ultra-fine pixel pitches (0.9–2.5 mm)" : "Ultra-feine Pixelpitches (0.9–2.5 mm)",
+                    lang === "en" ? "High Dynamic Range (HDR10+)" : "High Dynamic Range  (HDR10+)",
+                    lang === "en" ? "Flicker-free image display for camera/studio" : "Flimmerfreie Bilddarstellung für Kamera/Studio",
+                    lang === "en" ? "Quiet & energy-efficient" : "Leise &  energieeffizient ",
+                    lang === "en" ? "Seamless installations (precision cabinets)" : "Nahtlose Installationen (precision cabinets)",
+                ],
+                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777978999/93d4d1d5fb159fac181fe9c355b57a7571e49f8d_vvnvq9.png",
+            },
+            {
+                categoryName: "Outdoor",
+                title: lang === "en" ? "Robust LED systems for DOOH, sports venues and building facades." : "Robuste LED-Systeme für DOOH, Sportstätten und Gebäudefassaden.",
+                description:
+                    lang === "en"
+                        ? "Extremely high brightness, maximum weather resistance and durable electronics – built for continuous operation."
+                        : "Extrem hohe Helligkeit, maximale Wetterfestigkeit und langlebige Elektronik – gebaut für den Dauerbetrieb.",
+                features: [
+                    lang === "en" ? "Helligkeiten bis 10.000 Nits" : "Helligkeiten bis  10.000 Nits ",
+                    lang === "en" ? "IP65/67 weatherproof – heat, rain, dust" : "IP65/67 wetterfest – Hitze, Regen, Staub ",
+                    lang === "en" ? "High impact resistance & UV resistance" : "Hohe  Schlagfestigkeit & UV-Beständigkeiy",
+                    lang === "en" ? "Optimized for sunlight" : "Optimiert für Sonneneinstrahlung",
+                    lang === "en" ? "Long lifespan & stable energy efficiency" : "Lange Lebensdauer & stabile Energieeffizienz",
+                ],
+                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777979018/b5029f8167fe80a44769791760eb0f8c0781ff82_cz6xyx.png",
+            },
+        ],
+        [lang]
+    );
 
-    useEffect(() => {
-        fetchProjects(selectedCategoryId);
-    }, [selectedCategoryId, fetchProjects]);
+    const categoryIdsByCardIndex = useMemo(
+        () => cards.map((c) => resolveCategoryIdByName(categories, c.categoryName)),
+        [cards, categories]
+    );
 
     useEffect(() => {
         if (!api) return;
@@ -183,9 +232,7 @@ export default function LatestProjectsSection() {
 
     useEffect(() => {
         api?.reInit();
-    }, [api, projects]);
-
-    const isAll = selectedCategoryId === null;
+    }, [api, cards]);
 
     return (
         <section className="w-full bg-[#F6FBFF] py-16 lg:py-24">
@@ -219,82 +266,43 @@ export default function LatestProjectsSection() {
                         </Button>
                     </div>
                 </div>
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-14 lg:items-start">
-                    <aside className="shrink-0 lg:w-[260px] xl:w-[280px]">
-                        <nav className="space-y-1 font-open-sans font-semibold  text-md lg:text-lg">
-                            <button
-                                type="button"
-                                onClick={() => setSelectedCategoryId(null)}
-                                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors ${isAll ? "text-primary" : ""}`}
-                            >
-                                <div className={`bg-primary-foreground p-2 border ${isAll ? "border-primary" : "border-gray-400"} rounded-full`}>
-                                    <Globe className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
-                                </div>
-                                {t.allProjects}
-                            </button>
-                            {categories.map((cat) => {
-                                const Icon = categoryIconForName(cat.name);
-                                const active = selectedCategoryId === cat.id;
-                                return (
 
-                                    <button
-                                        key={cat.id}
-                                        type="button"
-                                        onClick={() => setSelectedCategoryId(cat.id)}
-                                        className=
-                                        {`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors uppercase tracking-wide" ${active ? "text-primary" : ""}`}
+                <div className="min-w-0">
+                    <Carousel
+                        setApi={setApi}
+                        opts={{ align: "start", loop: false }}
+                        className="w-full"
+                    >
+                        <CarouselContent className="-ml-1">
+                            {cards.map((card, idx) => {
+                                const catLabel = (card.categoryName || "").toUpperCase();
+                                const presetLabel = `${t.presetPrefix} ${catLabel}`.trim();
+                                const categoryId = categoryIdsByCardIndex[idx] || "";
+                                return (
+                                    <CarouselItem
+                                        key={card.categoryName}
+                                        className="pl-1 basis-full lg:basis-1/2"
                                     >
-                                        <div className={`bg-primary-foreground p-2 border ${active ? "border-primary" : "border-gray-400"} rounded-full`}>
-                                            <Icon className="h-5 w-5 shrink-0 opacity-90" strokeWidth={1.5} />
-                                        </div>
-                                        {cat.name}
-                                    </button>
+                                        <CategoryCard
+                                            card={card}
+                                            presetLabel={presetLabel}
+                                            categoryId={categoryId}
+                                        />
+                                    </CarouselItem>
                                 );
                             })}
-                        </nav>
-                        <Link href="/become-partner" className="mt-8 block">
-                            <Button variant="default" size="lg" className="w-full uppercase">
-                                {t.aboutUs}
-                                <MoveRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </Link>
-                    </aside>
+                        </CarouselContent>
+                        <CarouselPrevious className="hidden" />
+                        <CarouselNext className="hidden" />
+                    </Carousel>
 
-                    <div className="flex-1 min-w-0">
-                        {loadingList ? (
-                            <div className="flex justify-center py-20">
-                                <Spinner className="h-10 w-10 text-primary" />
-                            </div>
-                        ) : projects.length === 0 ? (
-                            <p className="text-center py-16 font-open-sans">
-                                {lang === "en" ? "No projects to show yet." : "Noch keine Projekte verfügbar."}
-                            </p>
-                        ) : (
-                            <Carousel
-                                key={selectedCategoryId || "all"}
-                                setApi={setApi}
-                                opts={{ align: "start", loop: false }}
-                                className="w-full"
-                            >
-                                <CarouselContent className="-ml-1">
-                                    {projects.map((product) => {
-                                        const catLabel = (product.areaOfUseName || "").toUpperCase();
-                                        const presetLabel = `${t.presetPrefix} ${catLabel}`.trim();
-                                        return (
-                                            <CarouselItem
-                                                key={product.id}
-                                                className="pl-1 basis-full lg:basis-1/2"
-                                            >
-                                                <ProjectCard product={product} presetLabel={presetLabel} />
-                                            </CarouselItem>
-                                        );
-                                    })}
-                                </CarouselContent>
-                                <CarouselPrevious className="hidden" />
-                                <CarouselNext className="hidden" />
-                            </Carousel>
-                        )}
-                    </div>
+                    {categoriesLoading ? (
+                        <p className="text-center pt-6 text-sm text-muted-foreground font-open-sans">
+                            {lang === "en"
+                                ? "Loading categories… preset filters will activate shortly."
+                                : "Kategorien werden geladen… Preset-Filter werden in Kürze aktiv."}
+                        </p>
+                    ) : null}
                 </div>
             </div>
         </section>
