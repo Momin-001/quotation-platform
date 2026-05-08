@@ -230,7 +230,7 @@ export default function ProductDetailPage() {
                                                         src={image}
                                                         alt={`${product.productName} ${index + 1}`}
                                                         fill
-                                                        className="object-cover"
+                                                        className="object-contain"
                                                     />
                                                 </button>
                                             </CarouselItem>
