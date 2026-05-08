@@ -389,9 +389,9 @@ export default function ProductDetailPage() {
                                                     className="object-fill"
                                                 />
                                             </div>
-                                            {/* <p className="text-xs font-medium text-center line-clamp-2 leading-tight">
+                                            <p className="text-xs font-medium text-center line-clamp-2 leading-tight">
                                                 {icon.name}
-                                            </p> */}
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
@@ -626,12 +626,10 @@ export default function ProductDetailPage() {
                                     <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
                                         <div>
                                             <SpecRow label="Refresh Rate" value={product.refreshRate} unit="Hz" />
-                                            <SpecRow
-                                                label="Scan Rate"
-                                                value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null}
-                                            />
                                             <SpecRow label="Brightness Value" value={product.brightnessValue} unit="cd/m²" />
+
                                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
+                                            <SpecRow label="Scan Rate" value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null} />
                                             <SpecRow label="Video Rate" value={product.videoRate} />
                                             <SpecRow label="Colour Depth" value={product.colourDepth} unit="bit" />
                                             <SpecRow
