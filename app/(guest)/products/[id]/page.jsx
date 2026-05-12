@@ -373,23 +373,27 @@ export default function ProductDetailPage() {
                             </div>
                             )}
 
-                            {/* Product feature icons (max 8 per line) */}
+                            {/* Product feature icons — card: icon + divider + label (inside one frame) */}
                             {product.productIcons && product.productIcons.length > 0 && (
-                                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                                     {product.productIcons.map((icon) => (
                                         <div
                                             key={icon.id}
-                                            className="aspect-square bg-white shadow-lg border-b-8 border-black border rounded flex flex-col items-center justify-end"
+                                            className="flex flex-col overflow-hidden"
                                         >
-                                            <div className="relative w-full flex-1">
-                                                <Image
-                                                    src={icon.imageUrl}
-                                                    alt={icon.name}
-                                                    fill
-                                                    className="object-fill"
-                                                />
+                                            <div className="flex flex-1 items-center justify-center p-3 min-h-18 sm:min-h-20 border border-gray-800 rounded-lg bg-white shadow-sm">
+                                                <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0">
+                                                    <Image
+                                                        src={icon.imageUrl}
+                                                        alt={icon.name}
+                                                        fill
+                                                        sizes="(max-width: 640px) 96px, 112px"
+                                                        className="object-contain"
+                                                    />
+                                                </div>
                                             </div>
-                                            <p className="text-xs font-medium text-center line-clamp-2 leading-tight">
+                                        <div className="w-full shrink-0 mt-2 border-t border-gray-800" aria-hidden />
+                                            <p className="p-2 font-semibold text-center text-[13px] font-medium font-open-sans leading-snug line-clamp-2">
                                                 {icon.name}
                                             </p>
                                         </div>
