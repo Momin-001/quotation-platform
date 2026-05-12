@@ -393,7 +393,7 @@ export default function ProductDetailPage() {
                                                 </div>
                                             </div>
                                         <div className="w-full shrink-0 mt-2 border-t border-gray-800" aria-hidden />
-                                            <p className="p-2 font-semibold text-center text-[13px] font-medium font-open-sans leading-snug line-clamp-2">
+                                            <p className="p-2 font-semibold text-center text-[13px] font-open-sans leading-snug line-clamp-2">
                                                 {icon.name}
                                             </p>
                                         </div>
