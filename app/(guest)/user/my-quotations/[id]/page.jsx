@@ -27,26 +27,28 @@ import { useLanguage } from "@/context/LanguageContext";
 
 function OfferTotalsSummary({ item, label, color }) {
     if (!item?.product) return null;
-    const qty = item.quantity || 1;
-    const unit = parseFloat(item.unitPrice || 0);
-    const taxPct = parseFloat(item.taxPercentage || 0);
-    const discPct = parseFloat(item.discountPercentage || 0);
-
-    let subtotal = qty * unit;
-    let discountTotal = subtotal * (discPct / 100);
-    let taxTotal = subtotal * (taxPct / 100);
-    let grandTotal = subtotal + taxTotal - discountTotal;
-
+    const mainQty = item.product?.isCustom ? item.product?.customTotalCabinets : item.quantity;
+    let grandTotal = calculateItemTotal(
+        item.unitPrice,
+        mainQty,
+        item.taxPercentage,
+        item.discountPercentage
+    );
     for (const add of item.additionalItems || []) {
-        const aQty = parseInt(add.quantity || 1);
-        const aUnit = parseFloat(add.unitPrice || 0);
-        const aBase = aQty * aUnit;
-        const aDisc = aBase * (parseFloat(add.discountPercentage || 0) / 100);
-        const aTax = aBase * (parseFloat(add.taxPercentage || 0) / 100);
-        subtotal += aBase;
-        discountTotal += aDisc;
-        taxTotal += aTax;
-        grandTotal += aBase + aTax - aDisc;
+        grandTotal += calculateItemTotal(
+            add.unitPrice,
+            add.quantity,
+            add.taxPercentage,
+            add.discountPercentage
+        );
+    }
+    for (const opt of item.optionalItems || []) {
+        grandTotal += calculateItemTotal(
+            opt.unitPrice,
+            opt.quantity,
+            opt.taxPercentage,
+            opt.discountPercentage
+        );
     }
 
     const colorClass = color === "green" ? "text-green-700" : "text-blue-700";
