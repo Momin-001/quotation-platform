@@ -135,6 +135,8 @@ export default function LatestProjectsSection() {
     const [api, setApi] = useState(null);
     const [canPrev, setCanPrev] = useState(false);
     const [canNext, setCanNext] = useState(false);
+    /** Bump to reset autoplay interval after manual navigation */
+    const [autoplayNonce, setAutoplayNonce] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -234,6 +236,15 @@ export default function LatestProjectsSection() {
         api?.reInit();
     }, [api, cards]);
 
+    useEffect(() => {
+        if (!api) return;
+        const intervalMs = 3000;
+        const id = setInterval(() => {
+            api.scrollNext();
+        }, intervalMs);
+        return () => clearInterval(id);
+    }, [api, autoplayNonce, cards]);
+
     return (
         <section className="w-full bg-[#F6FBFF] py-16 lg:py-24">
             <div className="container mx-auto px-4">
@@ -252,7 +263,10 @@ export default function LatestProjectsSection() {
                             variant="outline"
                             className="rounded-full h-14 w-14 border-primary text-primary hover:text-primary"
                             disabled={!canPrev}
-                            onClick={() => api?.scrollPrev()}
+                            onClick={() => {
+                                api?.scrollPrev();
+                                setAutoplayNonce((n) => n + 1);
+                            }}
                         >
                             <MoveLeft className="h-5 w-5" />
                         </Button>
@@ -260,7 +274,10 @@ export default function LatestProjectsSection() {
                             type="button"
                             className="rounded-full h-14 w-14 bg-primary text-primary-foreground hover:bg-primary/90"
                             disabled={!canNext}
-                            onClick={() => api?.scrollNext()}
+                            onClick={() => {
+                                api?.scrollNext();
+                                setAutoplayNonce((n) => n + 1);
+                            }}
                         >
                             <MoveRight className="h-5 w-5" />
                         </Button>
@@ -270,7 +287,7 @@ export default function LatestProjectsSection() {
                 <div className="min-w-0">
                     <Carousel
                         setApi={setApi}
-                        opts={{ align: "start", loop: false }}
+                        opts={{ align: "start", loop: true }}
                         className="w-full"
                     >
                         <CarouselContent className="-ml-1">

@@ -25,6 +25,42 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/LanguageContext";
 
+function OfferTotalsSummary({ item, label, color }) {
+    if (!item?.product) return null;
+    const qty = item.quantity || 1;
+    const unit = parseFloat(item.unitPrice || 0);
+    const taxPct = parseFloat(item.taxPercentage || 0);
+    const discPct = parseFloat(item.discountPercentage || 0);
+
+    let subtotal = qty * unit;
+    let discountTotal = subtotal * (discPct / 100);
+    let taxTotal = subtotal * (taxPct / 100);
+    let grandTotal = subtotal + taxTotal - discountTotal;
+
+    for (const add of item.additionalItems || []) {
+        const aQty = parseInt(add.quantity || 1);
+        const aUnit = parseFloat(add.unitPrice || 0);
+        const aBase = aQty * aUnit;
+        const aDisc = aBase * (parseFloat(add.discountPercentage || 0) / 100);
+        const aTax = aBase * (parseFloat(add.taxPercentage || 0) / 100);
+        subtotal += aBase;
+        discountTotal += aDisc;
+        taxTotal += aTax;
+        grandTotal += aBase + aTax - aDisc;
+    }
+
+    const colorClass = color === "green" ? "text-green-700" : "text-blue-700";
+
+    return (
+        <div className="mt-6 pt-4 space-y-1.5 text-sm">
+            <div className="flex justify-between border-t border-gray-300 pt-2">
+                <span className="text-lg font-semibold text-gray-900">{label} Total</span>
+                <span className={`text-2xl font-bold ${colorClass}`}>{formatCurrency(grandTotal)}</span>
+            </div>
+        </div>
+    );
+}
+
 export default function QuotationDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -175,9 +211,7 @@ export default function QuotationDetailPage() {
                     <h1 className="text-xl font-bold font-archivo text-gray-900">
                         Quotation {quotation.quotationNumber}
                     </h1>
-                    {quotation.description && (
-                        <p className="text-gray-600">{quotation.description}</p>
-                    )}
+                    
                 </div>
 
                 {/* Project Info */}
@@ -254,20 +288,42 @@ export default function QuotationDetailPage() {
                                     </div>
                                 )}
 
-                                {/* Main Product Total (LED + additional only; optional excluded) */}
-                                <div className="mt-6 pt-4">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-lg font-semibold text-gray-900">Main Product Total</p>
-                                        </div>
-                                        <span className="text-2xl font-bold text-blue-700">
-                                            {formatCurrency(
-                                                calculateItemTotal(mainProduct.unitPrice, mainProduct.quantity, mainProduct.taxPercentage, mainProduct.discountPercentage) +
-                                                (mainProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
+                                {/* Custom LED Wall Summary (LEDitor enquiries) */}
+                                {mainProduct.product?.isCustom && (
+                                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                        <h5 className="text-sm font-semibold text-blue-700 mb-2">Custom LED Wall Summary</h5>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-sm">
+                                            {mainProduct.product.customTotalCabinets && (
+                                                <p><span className="text-gray-500">Cabinets:</span> {mainProduct.product.customTotalCabinets}</p>
                                             )}
-                                        </span>
+                                            {mainProduct.product.customScreenWidth && mainProduct.product.customScreenHeight && (
+                                                <p><span className="text-gray-500">Dimensions:</span> {mainProduct.product.customScreenWidth}m × {mainProduct.product.customScreenHeight}m</p>
+                                            )}
+                                            {mainProduct.product.customDisplayArea && (
+                                                <p><span className="text-gray-500">Display Area:</span> {mainProduct.product.customDisplayArea} m²</p>
+                                            )}
+                                            {mainProduct.product.customTotalResolutionH && mainProduct.product.customTotalResolutionV && (
+                                                <p><span className="text-gray-500">Resolution:</span> {mainProduct.product.customTotalResolutionH}×{mainProduct.product.customTotalResolutionV} px</p>
+                                            )}
+                                            {mainProduct.product.customWeight && (
+                                                <p><span className="text-gray-500">Total Weight:</span> {mainProduct.product.customWeight} kg</p>
+                                            )}
+                                            {mainProduct.product.customPowerConsumptionMax && (
+                                                <p><span className="text-gray-500">Power (Max):</span> {mainProduct.product.customPowerConsumptionMax} kW</p>
+                                            )}
+                                            {mainProduct.product.customPowerConsumptionTyp && (
+                                                <p><span className="text-gray-500">Power (Typical):</span> {mainProduct.product.customPowerConsumptionTyp} kW</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+
+                                {/* Main Product Totals Summary */}
+                                <OfferTotalsSummary
+                                    item={mainProduct}
+                                    label="Main Product"
+                                    color="blue"
+                                />
                             </>
                         )}
                     </div>
@@ -329,20 +385,12 @@ export default function QuotationDetailPage() {
                                 </div>
                             )}
 
-                            {/* Alternative Product Total (LED + additional only; optional excluded) */}
-                            <div className="mt-6 pt-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-lg font-semibold text-gray-900">Alternative Product Total</p>
-                                    </div>
-                                    <span className="text-2xl font-bold text-green-700">
-                                        {formatCurrency(
-                                            calculateItemTotal(alternativeProduct.unitPrice, alternativeProduct.quantity, alternativeProduct.taxPercentage, alternativeProduct.discountPercentage) +
-                                            (alternativeProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
-                                        )}
-                                    </span>
-                                </div>
-                            </div>
+                            {/* Alternative Product Totals Summary */}
+                            <OfferTotalsSummary
+                                item={alternativeProduct}
+                                label="Alternative Product"
+                                color="green"
+                            />
                         </div>
                     )}
 

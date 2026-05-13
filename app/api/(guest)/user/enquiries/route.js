@@ -5,6 +5,10 @@ import { eq, desc, and, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import cloudinary from "@/lib/cloudinary";
 
+// Shared endpoint for both cart and LEDitor enquiries.
+// Cart sends JSON ({ message, items }); LEDitor sends multipart/form-data
+// with a "payload" JSON part (items carry isCustom + custom_* fields) plus
+// optional file attachments. Per-item `isCustom` distinguishes the two flows.
 export async function POST(req) {
     try {
         const { user, error } = await getCurrentUser();

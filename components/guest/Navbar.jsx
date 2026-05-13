@@ -51,13 +51,16 @@ export default function Navbar({ navbarData }) {
     return (
         <nav className="w-full border-b bg-background sticky top-0 left-0 right-0 z-50 font-archivo">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                <Link href="/" className="shrink-0">
-                    <Image 
-                    src="/logo-name.png" 
-                    alt="Logo"
-                    width={150}
-                    height={150}
-                     />
+                <Link href="/" className="shrink-0 flex items-center">
+                    <Image
+                        src="/logo-name.png"
+                        alt="Logo"
+                        width={1024}
+                        height={360}
+                        priority
+                        sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 380px"
+                        className="h-14 w-auto sm:h-16 md:h-17 lg:h-18"
+                    />
                 </Link>
                 <div className="hidden lg:flex px-8 items-center gap-8 text-lg font-medium text-gray-800">
                     <Link href="/" className={navLinkClass("/")}>
@@ -106,34 +109,50 @@ export default function Navbar({ navbarData }) {
                             </>
                         )}
                         <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="justify-center border-gray-400 rounded">
-                                            <Image
-                                                src={language === "en" ? "/us.svg" : "/de.svg"}
-                                                alt={language === "en" ? "English" : "German"}
-                                                width={20}
-                                                height={15}
-                                            />
-                                            <ChevronDown className="h-3 w-3 text-gray-400 ml-1" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                            className="gap-2"
-                                            onClick={() => setLanguage("en")}
-                                        >
-                                            <Image src="/us.svg" alt="English" width={20} height={15} />
-                                            <span className="text-sm">English</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="gap-2"
-                                            onClick={() => setLanguage("de")}
-                                        >
-                                            <Image src="/de.svg" alt="German" width={20} height={15} />
-                                            <span className="text-sm">German</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className="h-12 min-h-12 border-gray-400 rounded-sm px-4 gap-2 text-base font-medium justify-center"
+                                >
+                                    <Image
+                                        src={language === "en" ? "/us.svg" : "/de.svg"}
+                                        alt={language === "en" ? "English" : "German"}
+                                        width={28}
+                                        height={21}
+                                        className="shrink-0"
+                                    />
+                                    <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-48 p-2 text-base">
+                                <DropdownMenuItem
+                                    className="gap-3 py-2.5 px-3 text-base cursor-pointer"
+                                    onClick={() => setLanguage("en")}
+                                >
+                                    <Image
+                                        src="/us.svg"
+                                        alt="English"
+                                        width={28}
+                                        height={21}
+                                        className="shrink-0"
+                                    />
+                                    <span>English</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="gap-3 py-2.5 px-3 text-base cursor-pointer"
+                                    onClick={() => setLanguage("de")}
+                                >
+                                    <Image
+                                        src="/de.svg"
+                                        alt="German"
+                                        width={28}
+                                        height={21}
+                                        className="shrink-0"
+                                    />
+                                    <span>German</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
                     {/* Mobile hamburger */}
@@ -191,43 +210,58 @@ export default function Navbar({ navbarData }) {
                                         ) : (
                                             <div className="space-y-3">
                                                 <div className="w-full" onClick={() => setMobileOpen(false)}>
-                                                    <UserAvatar />
+                                                    <UserAvatar triggerClassName="w-full min-h-12" />
                                                 </div>
-                                               
                                             </div>
                                         )}
-                                         <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" className="w-full justify-between border-gray-300">
-                                                            <span className="flex items-center gap-2">
-                                                                <Image
-                                                                    src={language === "en" ? "/us.svg" : "/de.svg"}
-                                                                    alt={language === "en" ? "English" : "German"}
-                                                                    width={20}
-                                                                    height={15}
-                                                                />
-                                                                <span className="text-sm">Language</span>
-                                                            </span>
-                                                            <ChevronDown className="h-4 w-4 text-gray-500" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem
-                                                            className="gap-2"
-                                                            onClick={() => setLanguage("en")}
-                                                        >
-                                                            <Image src="/us.svg" alt="English" width={20} height={15} />
-                                                            <span className="text-sm">English</span>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            className="gap-2"
-                                                            onClick={() => setLanguage("de")}
-                                                        >
-                                                            <Image src="/de.svg" alt="German" width={20} height={15} />
-                                                            <span className="text-sm">German</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    className="w-full min-h-12 h-auto py-3 justify-between border-gray-300 text-base font-medium"
+                                                >
+                                                    <span className="flex items-center gap-3">
+                                                        <Image
+                                                            src={language === "en" ? "/us.svg" : "/de.svg"}
+                                                            alt={language === "en" ? "English" : "German"}
+                                                            width={28}
+                                                            height={21}
+                                                            className="shrink-0"
+                                                        />
+                                                        <span>Language</span>
+                                                    </span>
+                                                    <ChevronDown className="h-5 w-5 text-gray-500 shrink-0" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="min-w-48 p-2 text-base">
+                                                <DropdownMenuItem
+                                                    className="gap-3 py-2.5 px-3 text-base cursor-pointer"
+                                                    onClick={() => setLanguage("en")}
+                                                >
+                                                    <Image
+                                                        src="/us.svg"
+                                                        alt="English"
+                                                        width={28}
+                                                        height={21}
+                                                        className="shrink-0"
+                                                    />
+                                                    <span>English</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="gap-3 py-2.5 px-3 text-base cursor-pointer"
+                                                    onClick={() => setLanguage("de")}
+                                                >
+                                                    <Image
+                                                        src="/de.svg"
+                                                        alt="German"
+                                                        width={28}
+                                                        height={21}
+                                                        className="shrink-0"
+                                                    />
+                                                    <span>German</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                             </SheetContent>

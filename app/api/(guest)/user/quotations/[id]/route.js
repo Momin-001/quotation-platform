@@ -8,7 +8,8 @@ import {
     productImages,
     controllers,
     accessories,
-    enquiries 
+    enquiries,
+    enquiryItems,
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne } from "drizzle-orm";
@@ -204,10 +205,57 @@ export async function GET(req, { params }) {
             .where(eq(quotationItems.quotationId, id))
             .orderBy(quotationItems.itemOrder);
 
+        // Fetch enquiry_items to merge LEDitor custom fields onto products
+        const enquiryItemRows = await db
+            .select({
+                productId: enquiryItems.productId,
+                itemType: enquiryItems.itemType,
+                isCustom: enquiryItems.isCustom,
+                customTotalResolutionH: enquiryItems.customTotalResolutionH,
+                customTotalResolutionV: enquiryItems.customTotalResolutionV,
+                customWeight: enquiryItems.customWeight,
+                customDisplayArea: enquiryItems.customDisplayArea,
+                customScreenWidth: enquiryItems.customScreenWidth,
+                customScreenHeight: enquiryItems.customScreenHeight,
+                customPowerConsumptionMax: enquiryItems.customPowerConsumptionMax,
+                customPowerConsumptionTyp: enquiryItems.customPowerConsumptionTyp,
+                customTotalCabinets: enquiryItems.customTotalCabinets,
+            })
+            .from(enquiryItems)
+            .where(eq(enquiryItems.enquiryId, quotation.enquiryId));
+
+        const enquiryItemByKey = new Map();
+        const enquiryItemByProductId = new Map();
+        for (const row of enquiryItemRows) {
+            if (!row.productId) continue;
+            const key = `${row.productId}|${row.itemType || "main"}`;
+            if (!enquiryItemByKey.has(key)) enquiryItemByKey.set(key, row);
+            if (!enquiryItemByProductId.has(row.productId)) enquiryItemByProductId.set(row.productId, row);
+        }
+
         // Build items with product details, optional items, and additional items
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
-                const product = await getProductDetails(item.productId);
+                const baseProduct = await getProductDetails(item.productId);
+                const matchingEnquiryItem =
+                    enquiryItemByKey.get(`${item.productId}|${item.itemType}`) ||
+                    enquiryItemByProductId.get(item.productId) ||
+                    null;
+                const product = baseProduct
+                    ? {
+                        ...baseProduct,
+                        isCustom: !!matchingEnquiryItem?.isCustom,
+                        customTotalResolutionH: matchingEnquiryItem?.customTotalResolutionH ?? null,
+                        customTotalResolutionV: matchingEnquiryItem?.customTotalResolutionV ?? null,
+                        customWeight: matchingEnquiryItem?.customWeight ?? null,
+                        customDisplayArea: matchingEnquiryItem?.customDisplayArea ?? null,
+                        customScreenWidth: matchingEnquiryItem?.customScreenWidth ?? null,
+                        customScreenHeight: matchingEnquiryItem?.customScreenHeight ?? null,
+                        customPowerConsumptionMax: matchingEnquiryItem?.customPowerConsumptionMax ?? null,
+                        customPowerConsumptionTyp: matchingEnquiryItem?.customPowerConsumptionTyp ?? null,
+                        customTotalCabinets: matchingEnquiryItem?.customTotalCabinets ?? null,
+                    }
+                    : null;
                 
                 // Fetch optional items
                 const optionalItemsData = await db

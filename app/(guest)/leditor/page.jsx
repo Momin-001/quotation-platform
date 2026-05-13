@@ -605,7 +605,6 @@ export default function LeditorPage() {
         try {
             const payload = {
                 message: data.message.trim(),
-                isCustom: true,
                 items: [
                     {
                         productId: selectedProduct.id,

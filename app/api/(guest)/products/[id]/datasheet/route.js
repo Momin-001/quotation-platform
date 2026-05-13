@@ -44,6 +44,20 @@ export async function GET(req, { params }) {
                         },
                     },
                 },
+                productProductIcons: {
+                    columns: {
+                        iconOrder: true,
+                    },
+                    with: {
+                        productIcon: {
+                            columns: {
+                                id: true,
+                                name: true,
+                                imageUrl: true,
+                            },
+                        },
+                    },
+                },
             },
         });
 
@@ -106,6 +120,31 @@ export async function GET(req, { params }) {
             })
         );
 
+        const iconRows = [...(product.productProductIcons ?? [])].sort(
+            (a, b) => (a.iconOrder ?? 0) - (b.iconOrder ?? 0)
+        );
+        const productIconsWithDataUrls = await Promise.all(
+            iconRows.map(async (row) => {
+                const icon = row.productIcon;
+                if (!icon?.imageUrl) return { ...icon, imageDataUrl: null };
+                const url = icon.imageUrl;
+                const absoluteUrl =
+                    url.startsWith("http://") || url.startsWith("https://")
+                        ? url
+                        : `${baseUrl.replace(/\/$/, "")}${url.startsWith("/") ? url : `/${url}`}`;
+                try {
+                    const res = await fetch(absoluteUrl);
+                    if (!res.ok) return { ...icon, imageDataUrl: null };
+                    const blob = await res.blob();
+                    const buf = Buffer.from(await blob.arrayBuffer());
+                    const mime = res.headers.get("content-type") || "image/png";
+                    return { ...icon, imageDataUrl: `data:${mime};base64,${buf.toString("base64")}` };
+                } catch {
+                    return { ...icon, imageDataUrl: null };
+                }
+            })
+        );
+
         const formattedProduct = {
             ...product,
             categoryName: product.areaOfUse?.name ?? null,
@@ -113,6 +152,7 @@ export async function GET(req, { params }) {
             images: imageUrls,
             features: product.features?.map((f) => f.feature) ?? [],
             productCertificates: certificatesWithDataUrls,
+            productIcons: productIconsWithDataUrls,
             mainImageDataUrl,
         };
 

@@ -10,10 +10,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { Bell, ChevronDown, User } from "lucide-react";
+import { ChevronDown, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
-export default function UserAvatar() {
+export default function UserAvatar({ triggerClassName }) {
     const { user, logout } = useAuth();
 
     if (!user) return null;
@@ -26,29 +27,43 @@ export default function UserAvatar() {
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-400 pl-2 pr-2 w-full rounded h-11 flex gap-2 justify-between items-center">
-                        <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                            <AvatarImage src="" /> {/* Placeholder for user image */}
-                            <AvatarFallback className="bg-gray-200"><User className="h-4 w-4 text-gray-500" /></AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col items-start mr-1">
-                            <span className="text-xs font-bold leading-none text-[#0F2E4A]">{user?.fullName || "User Name"}</span>
-                            <span className="text-[10px] text-gray-500 capitalize leading-none mt-0.5">{formatRole(user?.role)}</span>
+                    <Button
+                        variant="outline"
+                        className={cn(
+                            "border-gray-400 rounded h-12 px-3 gap-2 justify-between items-center w-auto min-h-12",
+                            triggerClassName
+                        )}
+                    >
+                        <div className="flex items-center gap-3 min-w-0">
+                            <Avatar className="h-9 w-9 shrink-0">
+                                <AvatarImage src="" />
+                                <AvatarFallback className="bg-gray-200">
+                                    <User className="h-5 w-5 text-gray-500" />
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col items-start min-w-0 text-left">
+                                <span className="text-sm sm:text-base font-bold leading-tight text-[#0F2E4A] truncate max-w-40 sm:max-w-56">
+                                    {user?.fullName || "User Name"}
+                                </span>
+                                <span className="text-xs text-gray-500 capitalize leading-tight mt-0.5">
+                                    {formatRole(user?.role)}
+                                </span>
+                            </div>
                         </div>
-                        </div>
-                        
-                        <ChevronDown className="h-3 w-3 text-gray-400" />
+                        <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    
-                    {(user?.role === 'admin' || user?.role === 'super_admin') && (
-                        <DropdownMenuItem asChild>
-                            <Link href="/admin" className="cursor-pointer">Dashboard</Link>
+                <DropdownMenuContent align="end" className="min-w-56 p-2 text-base">
+                    {(user?.role === "admin" || user?.role === "super_admin") && (
+                        <DropdownMenuItem asChild className="text-base py-2.5 px-3 cursor-pointer">
+                            <Link href="/admin">Dashboard</Link>
                         </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-500">
+                    <DropdownMenuItem
+                        onClick={logout}
+                        variant="destructive"
+                        className="text-base py-2.5 px-3 cursor-pointer"
+                    >
                         Logout
                     </DropdownMenuItem>
                 </DropdownMenuContent>

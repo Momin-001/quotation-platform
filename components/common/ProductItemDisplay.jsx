@@ -54,7 +54,7 @@ export default function ProductItemDisplay({ product, quantity, unitPrice, descr
                     <div className="text-right shrink-0">
                         <div className="grid grid-cols-3 gap-8 text-sm">
                             <div>
-                                <span className="text-gray-500">Qty:</span>{" "}
+                                <span className="text-gray-500">{product?.isCustom ? "Cabinets:" : "Qty:"}</span>{" "}
                                 <span className="font-medium">{quantity || 1}</span>
                             </div>
                             <div>
