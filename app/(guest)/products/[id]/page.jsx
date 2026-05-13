@@ -381,7 +381,7 @@ export default function ProductDetailPage() {
                                             key={icon.id}
                                             className="flex h-full min-h-0 flex-col"
                                         >
-                                            <div className="flex h-24 w-full shrink-0 items-center justify-center border border-gray-800 rounded-lg bg-white p-3 shadow-sm sm:h-28">
+                                            <div className="flex w-full shrink-0 items-center justify-center border border-gray-800 rounded-lg bg-white p-3 shadow-sm h-20">
                                                 <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
                                                     <Image
                                                         src={icon.imageUrl}
