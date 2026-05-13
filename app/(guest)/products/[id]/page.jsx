@@ -375,14 +375,14 @@ export default function ProductDetailPage() {
 
                             {/* Product feature icons — card: icon + divider + label (inside one frame) */}
                             {product.productIcons && product.productIcons.length > 0 && (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 items-stretch">
                                     {product.productIcons.map((icon) => (
                                         <div
                                             key={icon.id}
-                                            className="flex flex-col overflow-hidden"
+                                            className="flex h-full min-h-0 flex-col"
                                         >
-                                            <div className="flex flex-1 items-center justify-center p-3 min-h-18 sm:min-h-20 border border-gray-800 rounded-lg bg-white shadow-sm">
-                                                <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0">
+                                            <div className="flex h-24 w-full shrink-0 items-center justify-center border border-gray-800 rounded-lg bg-white p-3 shadow-sm sm:h-28">
+                                                <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
                                                     <Image
                                                         src={icon.imageUrl}
                                                         alt={icon.name}
@@ -392,8 +392,11 @@ export default function ProductDetailPage() {
                                                     />
                                                 </div>
                                             </div>
-                                        <div className="w-full shrink-0 mt-2 border-t border-gray-800" aria-hidden />
-                                            <p className="p-2 font-semibold text-center text-[13px] font-open-sans leading-snug line-clamp-2">
+                                            <div
+                                                className="mt-2 w-full shrink-0 border-t border-gray-800"
+                                                aria-hidden
+                                            />
+                                            <p className="mt-2 px-1 text-center text-[13px] font-semibold leading-snug line-clamp-2 font-open-sans">
                                                 {icon.name}
                                             </p>
                                         </div>
