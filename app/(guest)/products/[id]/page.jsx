@@ -469,19 +469,6 @@ export default function ProductDetailPage() {
                                             <SpecRow label="Memory on Module" value={formatEnum(product.memoryOnModule)} />
                                             <SpecRow label="Smart Module" value={formatEnum(product.smartModule)} />
                                             <SpecRow label="MTBF Power Supply" value={product.mtbfPowerSupply} unit="hours" />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            {/* Control System */}
-                            <Accordion type="single" defaultValue="control-system" collapsible className="rounded-lg">
-                                <AccordionItem value="control-system">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Control System
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                        <div>
                                             <SpecRow
                                                 label="Control System"
                                                 value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
@@ -496,7 +483,7 @@ export default function ProductDetailPage() {
                             <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
                                     <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Operating Conditions
+                                       Downloads
                                         </AccordionTrigger>
                                         <AccordionContent className="bg-white px-4 pb-4 pt-2">
                                         <div className="space-y-3">
@@ -650,7 +637,6 @@ export default function ProductDetailPage() {
                                                 label="Contrast Ratio"
                                                 value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
                                             />
-                                            <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
                                             </RestrictedContentOverlay>
                                         </div>
                                     </AccordionContent>
@@ -668,6 +654,8 @@ export default function ProductDetailPage() {
                                         <div>
                                             <SpecRow label="Calibration Method" value={formatEnum(product.calibrationMethod)} />
                                             <SpecRow label="White Point Calibration" value={product.whitePointCalibration} />
+                                            <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
+
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>

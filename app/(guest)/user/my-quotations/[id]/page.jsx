@@ -9,7 +9,7 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileText, ArrowLeft } from "lucide-react";
-import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
+import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers";
 import { formatEnquiryNumber } from "@/lib/helpers";
 import UserQuotationChat from "@/components/user/Quotation/UserQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
@@ -25,39 +25,28 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/context/LanguageContext";
 
-function OfferTotalsSummary({ item, label, color }) {
+function OfferTotalsSummary({ item, label, color, quotationTaxPercentage }) {
     if (!item?.product) return null;
-    const mainQty = item.product?.isCustom ? item.product?.customTotalCabinets : item.quantity;
-    let grandTotal = calculateItemTotal(
-        item.unitPrice,
-        mainQty,
-        item.taxPercentage,
-        item.discountPercentage
+    const { offerNet, tax, offerTotal, taxPercentage } = calculateQuotationOfferTotals(
+        item,
+        quotationTaxPercentage
     );
-    for (const add of item.additionalItems || []) {
-        grandTotal += calculateItemTotal(
-            add.unitPrice,
-            add.quantity,
-            add.taxPercentage,
-            add.discountPercentage
-        );
-    }
-    for (const opt of item.optionalItems || []) {
-        grandTotal += calculateItemTotal(
-            opt.unitPrice,
-            opt.quantity,
-            opt.taxPercentage,
-            opt.discountPercentage
-        );
-    }
 
     const colorClass = color === "green" ? "text-green-700" : "text-blue-700";
 
     return (
-        <div className="mt-6 pt-4 space-y-1.5 text-sm">
+        <div className="mt-6 pt-4 space-y-1.5 text-sm border-t border-gray-300">
+            <div className="flex justify-between pt-2">
+                <span className="text-gray-600">Total Net:</span>
+                <span className="font-medium">{formatCurrency(offerNet)}</span>
+            </div>
+            <div className="flex justify-between">
+                <span className="text-gray-600">+ ({taxPercentage}%) VAT on</span>
+                <span className="font-medium">{formatCurrency(tax)}</span>
+            </div>
             <div className="flex justify-between border-t border-gray-300 pt-2">
                 <span className="text-lg font-semibold text-gray-900">{label} Total</span>
-                <span className={`text-2xl font-bold ${colorClass}`}>{formatCurrency(grandTotal)}</span>
+                <span className={`text-2xl font-bold ${colorClass}`}>{formatCurrency(offerTotal)}</span>
             </div>
         </div>
     );
@@ -181,6 +170,7 @@ export default function QuotationDetailPage() {
     }
 
     const { mainProduct, alternativeProduct } = quotation;
+    const quotationTax = quotation.taxPercentage ?? "19";
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -238,14 +228,17 @@ export default function QuotationDetailPage() {
                             <>
                                 <ProductItemDisplay
                                     product={mainProduct.product}
-                                    quantity={mainProduct.quantity}
+                                    quantity={
+                                        mainProduct.product?.isCustom
+                                            ? mainProduct.product?.customTotalCabinets
+                                            : mainProduct.quantity
+                                    }
                                     unitPrice={mainProduct.unitPrice}
                                     description={mainProduct.description}
-                                    taxPercentage={mainProduct.taxPercentage}
                                     discountPercentage={mainProduct.discountPercentage}
                                     badge="Main"
                                     badgeColor="bg-blue-600"
-
+                                    quotationTaxPercentage={quotationTax}
                                 />
 
                                 {/* Main Product Additional Items (included in total) */}
@@ -256,20 +249,24 @@ export default function QuotationDetailPage() {
                                             <div key={addIndex} className="bg-purple-50/50 rounded-lg px-3 py-2">
                                                 <ProductItemDisplay
                                                     product={add.product}
-                                                    quantity={add.quantity}
+                                                    quantity={
+                                                        add.product?.isCustom
+                                                            ? add.product?.customTotalCabinets
+                                                            : add.quantity
+                                                    }
                                                     unitPrice={add.unitPrice}
                                                     description={add.description}
-                                                    taxPercentage={add.taxPercentage}
                                                     discountPercentage={add.discountPercentage}
                                                     badge="Additional"
                                                     badgeColor="bg-purple-500"
+                                                    quotationTaxPercentage={quotationTax}
                                                 />
                                             </div>
                                         ))}
                                     </div>
                                 )}
 
-                                {/* Main Product Optional Items (not in total) */}
+                                {/* Main Product Optional Items (included in offer net + VAT) */}
                                 {mainProduct.optionalItems && mainProduct.optionalItems.length > 0 && (
                                     <div className="mt-4 ml-8 border-l-3 border-blue-300 pl-4 space-y-2">
                                         <h5 className="text-sm font-semibold text-blue-600">Optional Products</h5>
@@ -277,13 +274,17 @@ export default function QuotationDetailPage() {
                                             <div key={optIndex} className="bg-blue-50/50 rounded-lg px-3 py-2">
                                                 <ProductItemDisplay
                                                     product={opt.product}
-                                                    quantity={opt.quantity}
+                                                    quantity={
+                                                        opt.product?.isCustom
+                                                            ? opt.product?.customTotalCabinets
+                                                            : opt.quantity
+                                                    }
                                                     unitPrice={opt.unitPrice}
                                                     description={opt.description}
-                                                    taxPercentage={opt.taxPercentage}
                                                     discountPercentage={opt.discountPercentage}
                                                     badge="Optional"
                                                     badgeColor="bg-blue-500"
+                                                    quotationTaxPercentage={quotationTax}
                                                 />
                                             </div>
                                         ))}
@@ -325,6 +326,7 @@ export default function QuotationDetailPage() {
                                     item={mainProduct}
                                     label="Main Product"
                                     color="blue"
+                                    quotationTaxPercentage={quotationTax}
                                 />
                             </>
                         )}
@@ -336,13 +338,17 @@ export default function QuotationDetailPage() {
                             <h3 className="text-xl font-semibold text-green-700 mb-4">Alternative Product</h3>
                             <ProductItemDisplay
                                 product={alternativeProduct.product}
-                                quantity={alternativeProduct.quantity}
+                                quantity={
+                                    alternativeProduct.product?.isCustom
+                                        ? alternativeProduct.product?.customTotalCabinets
+                                        : alternativeProduct.quantity
+                                }
                                 unitPrice={alternativeProduct.unitPrice}
                                 description={alternativeProduct.description}
-                                taxPercentage={alternativeProduct.taxPercentage}
                                 discountPercentage={alternativeProduct.discountPercentage}
                                 badge="Alternative"
                                 badgeColor="bg-green-600"
+                                quotationTaxPercentage={quotationTax}
                             />
 
                             {/* Alternative Product Additional Items (included in total) */}
@@ -353,20 +359,24 @@ export default function QuotationDetailPage() {
                                         <div key={addIndex} className="bg-purple-50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={add.product}
-                                                quantity={add.quantity}
+                                                quantity={
+                                                    add.product?.isCustom
+                                                        ? add.product?.customTotalCabinets
+                                                        : add.quantity
+                                                }
                                                 unitPrice={add.unitPrice}
                                                 description={add.description}
-                                                taxPercentage={add.taxPercentage}
                                                 discountPercentage={add.discountPercentage}
                                                 badge="Additional"
                                                 badgeColor="bg-purple-500"
+                                                quotationTaxPercentage={quotationTax}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* Alternative Product Optional Items (not in total) */}
+                            {/* Alternative Product Optional Items (included in offer net + VAT) */}
                             {alternativeProduct.optionalItems && alternativeProduct.optionalItems.length > 0 && (
                                 <div className="mt-4 ml-8 border-l-3 border-green-300 pl-4 space-y-2">
                                     <h5 className="text-sm font-semibold text-green-600">Optional Products</h5>
@@ -374,13 +384,17 @@ export default function QuotationDetailPage() {
                                         <div key={optIndex} className="bg-green-50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={opt.product}
-                                                quantity={opt.quantity}
+                                                quantity={
+                                                    opt.product?.isCustom
+                                                        ? opt.product?.customTotalCabinets
+                                                        : opt.quantity
+                                                }
                                                 unitPrice={opt.unitPrice}
                                                 description={opt.description}
-                                                taxPercentage={opt.taxPercentage}
                                                 discountPercentage={opt.discountPercentage}
                                                 badge="Optional"
                                                 badgeColor="bg-green-500"
+                                                quotationTaxPercentage={quotationTax}
                                             />
                                         </div>
                                     ))}
@@ -392,6 +406,7 @@ export default function QuotationDetailPage() {
                                 item={alternativeProduct}
                                 label="Alternative Product"
                                 color="green"
+                                quotationTaxPercentage={quotationTax}
                             />
                         </div>
                     )}

@@ -15,6 +15,7 @@ export const quotations = pgTable("quotations", {
     sectionOfferHtml: text("section_offer_html"),
     sectionConditionsHtml: text("section_conditions_html"),
     sectionOptionsHtml: text("section_options_html"),
+    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("19"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -38,7 +39,6 @@ export const quotationItems = pgTable("quotation_items", {
         .references(() => products.id, { onDelete: "cascade" }),
     quantity: integer("quantity").notNull().default(1),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
     discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
     description: text("description"), // Optional product description
     itemType: text("item_type").default("main").notNull(), // "main" or "alternative"
@@ -58,7 +58,6 @@ export const quotationAdditionalItems = pgTable("quotation_additional_items", {
         .references(() => controllers.id, { onDelete: "cascade" }),
     quantity: integer("quantity").notNull().default(1),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
     discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
     description: text("description"),
     itemOrder: integer("item_order").default(0),
@@ -83,7 +82,6 @@ export const quotationOptionalItems = pgTable("quotation_optional_items", {
     itemSourceType: text("item_source_type").default("product").notNull(),
     quantity: integer("quantity").notNull().default(1),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    taxPercentage: decimal("tax_percentage", { precision: 5, scale: 2 }).default("0"),
     discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
     description: text("description"),
     itemOrder: integer("item_order").default(0),

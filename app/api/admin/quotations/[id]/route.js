@@ -229,7 +229,6 @@ export async function GET(req, { params }) {
                             product,
                             quantity: add.quantity,
                             unitPrice: add.unitPrice,
-                            taxPercentage: add.taxPercentage,
                             discountPercentage: add.discountPercentage,
                             description: add.description,
                         };
@@ -277,7 +276,11 @@ export async function PUT(req, { params }) {
 
         const { id } = await params;
         const body = await req.json();
-        const { status, items } = body;
+        const { status, items, taxPercentage: quotationTaxFromBody } = body;
+        const quotationTax =
+            quotationTaxFromBody !== undefined && quotationTaxFromBody !== null && quotationTaxFromBody !== ""
+                ? parseFloat(quotationTaxFromBody)
+                : 19;
 
         if (!id) {
             return errorResponse("Quotation ID is required", 400);
@@ -379,7 +382,6 @@ export async function PUT(req, { params }) {
                     productId: item.productId,
                     quantity: item.quantity || 1,
                     unitPrice: item.unitPrice.toString(),
-                    taxPercentage: (item.taxPercentage || 0).toString(),
                     discountPercentage: (item.discountPercentage || 0).toString(),
                     description: item.description || null,
                     itemType: item.itemType || (i === 0 ? "main" : "alternative"),
@@ -405,7 +407,6 @@ export async function PUT(req, { params }) {
                             accessoryId: sourceType === "accessory" ? sourceId : null,
                             quantity: optItem.quantity || 1,
                             unitPrice: optItem.unitPrice.toString(),
-                            taxPercentage: (optItem.taxPercentage || 0).toString(),
                             discountPercentage: (optItem.discountPercentage || 0).toString(),
                             description: optItem.description || null,
                             itemOrder: j,
@@ -429,7 +430,6 @@ export async function PUT(req, { params }) {
                         controllerId,
                         quantity: addItem.quantity || 1,
                         unitPrice: addItem.unitPrice.toString(),
-                        taxPercentage: (addItem.taxPercentage ?? 0).toString(),
                         discountPercentage: (addItem.discountPercentage ?? 0).toString(),
                         description: addItem.description || null,
                         itemOrder: j,
@@ -438,11 +438,12 @@ export async function PUT(req, { params }) {
             }
         }
 
-        // Update quotation status
+        // Update quotation status and VAT %
         await db
             .update(quotations)
             .set({
                 status: newStatus,
+                taxPercentage: Number.isFinite(quotationTax) ? quotationTax.toString() : "19",
                 updatedAt: new Date(),
             })
             .where(eq(quotations.id, id));

@@ -119,7 +119,11 @@ const allowedEnquiryStatuses = ["pending", "in_progress", "expired"];
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { enquiryId, status, items } = body;
+        const { enquiryId, status, items, taxPercentage: quotationTaxFromBody } = body;
+        const quotationTax =
+            quotationTaxFromBody !== undefined && quotationTaxFromBody !== null && quotationTaxFromBody !== ""
+                ? parseFloat(quotationTaxFromBody)
+                : 19;
 
         // Validate required fields
         if (!enquiryId) {
@@ -195,6 +199,7 @@ export async function POST(request) {
                 sectionOfferHtml: sectionDefaults.sectionOfferHtml,
                 sectionConditionsHtml: sectionDefaults.sectionConditionsHtml,
                 sectionOptionsHtml: sectionDefaults.sectionOptionsHtml,
+                taxPercentage: Number.isFinite(quotationTax) ? quotationTax.toString() : "19",
             })
             .returning();
 
@@ -211,7 +216,6 @@ export async function POST(request) {
                     productId: item.productId,
                     quantity: item.quantity || 1,
                     unitPrice: item.unitPrice.toString(),
-                    taxPercentage: (item.taxPercentage || 0).toString(),
                     discountPercentage: (item.discountPercentage || 0).toString(),
                     description: item.description || null,
                     itemType: item.itemType || (i === 0 ? "main" : "alternative"),
@@ -237,7 +241,6 @@ export async function POST(request) {
                             accessoryId: sourceType === "accessory" ? sourceId : null,
                             quantity: optItem.quantity || 1,
                             unitPrice: optItem.unitPrice.toString(),
-                            taxPercentage: (optItem.taxPercentage || 0).toString(),
                             discountPercentage: (optItem.discountPercentage || 0).toString(),
                             description: optItem.description || null,
                             itemOrder: j,
@@ -261,7 +264,6 @@ export async function POST(request) {
                         controllerId,
                         quantity: addItem.quantity || 1,
                         unitPrice: addItem.unitPrice.toString(),
-                        taxPercentage: (addItem.taxPercentage ?? 0).toString(),
                         discountPercentage: (addItem.discountPercentage ?? 0).toString(),
                         description: addItem.description || null,
                         itemOrder: j,

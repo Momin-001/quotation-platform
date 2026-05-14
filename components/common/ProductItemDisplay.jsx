@@ -1,9 +1,21 @@
-import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
+import { calculateLineNetAfterDiscount, formatCurrency } from "@/lib/helpers";
 import Image from "next/image";
 
-export default function ProductItemDisplay({ product, quantity, unitPrice, description, taxPercentage, discountPercentage, badge, badgeColor }) {
-    const total = calculateItemTotal(unitPrice, quantity, taxPercentage, discountPercentage);
-    
+/**
+ * @param {string|number} [quotationTaxPercentage] - When set, shows note that VAT applies to offer total at this rate (not per line).
+ */
+export default function ProductItemDisplay({
+    product,
+    quantity,
+    unitPrice,
+    description,
+    discountPercentage,
+    badge,
+    badgeColor,
+    quotationTaxPercentage,
+}) {
+    const lineNet = calculateLineNetAfterDiscount(unitPrice, quantity, discountPercentage);
+
     return (
         <div className="flex items-start gap-4 py-4">
             <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 border">
@@ -62,17 +74,20 @@ export default function ProductItemDisplay({ product, quantity, unitPrice, descr
                                 <span className="font-medium">{formatCurrency(unitPrice || 0)}</span>
                             </div>
                             <div>
-                                <span className="text-gray-500">Total:</span>{" "}
-                                <span className="font-semibold">{formatCurrency(total)}</span>
+                                <span className="text-gray-500">Net:</span>{" "}
+                                <span className="font-semibold">{formatCurrency(lineNet)}</span>
                             </div>
                         </div>
-                        {(taxPercentage > 0 || discountPercentage > 0) && (
+                        {discountPercentage > 0 && (
                             <div className="text-xs text-gray-500 mt-1">
-                                {taxPercentage > 0 && <span>Tax: {taxPercentage}%</span>}
-                                {taxPercentage > 0 && discountPercentage > 0 && <span> | </span>}
-                                {discountPercentage > 0 && <span>Discount: {discountPercentage}%</span>}
+                                <span>Discount: {discountPercentage}%</span>
                             </div>
                         )}
+                        {/* {quotationTaxPercentage != null && quotationTaxPercentage !== "" && (
+                            <div className="text-xs text-gray-500 mt-0.5">
+                                MwSt {quotationTaxPercentage}% auf Angebotssumme
+                            </div>
+                        )} */}
                     </div>
                 </div>
             </div>

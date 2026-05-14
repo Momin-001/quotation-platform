@@ -284,7 +284,6 @@ export async function GET(req, { params }) {
                             product,
                             quantity: add.quantity,
                             unitPrice: add.unitPrice,
-                            taxPercentage: add.taxPercentage,
                             discountPercentage: add.discountPercentage,
                             description: add.description,
                         };

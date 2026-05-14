@@ -19,7 +19,7 @@ export default function QuotationForm({
         onUpdate({ ...item, [field]: value });
     };
 
-    // Optional = accessories only (not in total). Additional = controllers only (included in total).
+    // Optional = accessories; additional = controllers. Both contribute to offer net + quotation VAT.
     const DropdownComponent = isOptionalItem || isAdditionalItem
         ? QuotationOptionalDropDown
         : QuotationDropDown;
@@ -92,23 +92,7 @@ export default function QuotationForm({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Tax % */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tax %
-                    </label>
-                    <Input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        value={item.taxPercentage || ""}
-                        onChange={(e) => handleChange("taxPercentage", e.target.value)}
-                        placeholder="0%"
-                    />
-                </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Discount % */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

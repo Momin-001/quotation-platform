@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileText, ArrowLeft, ChevronDown, ChevronUp, Save } from "lucide-react";
 import Link from "next/link";
-import { calculateItemTotal, formatCurrency } from "@/lib/helpers";
+import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers";
 import AdminQuotationChat from "@/components/admin/Quotation/AdminQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
 import { useAuth } from "@/context/AuthContext";
@@ -137,6 +137,7 @@ export default function AdminQuotationDetailPage() {
     }
 
     const { mainProduct, alternativeProduct } = quotation;
+    const quotationTax = quotation.taxPercentage ?? "19";
 
     // Status color classes
     const getStatusColor = (status) => {
@@ -202,14 +203,17 @@ export default function AdminQuotationDetailPage() {
                         <>
                             <ProductItemDisplay
                                 product={mainProduct.product}
-                                quantity={mainProduct.quantity}
+                                quantity={
+                                    mainProduct.product?.isCustom
+                                        ? mainProduct.product?.customTotalCabinets
+                                        : mainProduct.quantity
+                                }
                                 unitPrice={mainProduct.unitPrice}
                                 description={mainProduct.description}
-                                taxPercentage={mainProduct.taxPercentage}
                                 discountPercentage={mainProduct.discountPercentage}
                                 badge="Main"
                                 badgeColor="bg-blue-600"
-                               
+                                quotationTaxPercentage={quotationTax}
                             />
 
                             {/* Main Product Additional Items (included in total) */}
@@ -220,20 +224,24 @@ export default function AdminQuotationDetailPage() {
                                         <div key={addIndex} className="bg-purple-50/50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={add.product}
-                                                quantity={add.quantity}
+                                                quantity={
+                                                    add.product?.isCustom
+                                                        ? add.product?.customTotalCabinets
+                                                        : add.quantity
+                                                }
                                                 unitPrice={add.unitPrice}
                                                 description={add.description}
-                                                taxPercentage={add.taxPercentage}
                                                 discountPercentage={add.discountPercentage}
                                                 badge="Additional"
                                                 badgeColor="bg-purple-500"
+                                                quotationTaxPercentage={quotationTax}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* Main Product Optional Items (not in total) */}
+                            {/* Main Product Optional Items (included in offer net + VAT) */}
                             {mainProduct.optionalItems && mainProduct.optionalItems.length > 0 && (
                                 <div className="mt-4 ml-8 border-l-3 border-blue-300 pl-4 space-y-2">
                                     <h5 className="text-sm font-semibold text-blue-600">Optional Products</h5>
@@ -241,33 +249,45 @@ export default function AdminQuotationDetailPage() {
                                         <div key={optIndex} className="bg-blue-50/50 rounded-lg px-3 py-2">
                                             <ProductItemDisplay
                                                 product={opt.product}
-                                                quantity={opt.quantity}
+                                                quantity={
+                                                    opt.product?.isCustom
+                                                        ? opt.product?.customTotalCabinets
+                                                        : opt.quantity
+                                                }
                                                 unitPrice={opt.unitPrice}
                                                 description={opt.description}
-                                                taxPercentage={opt.taxPercentage}
                                                 discountPercentage={opt.discountPercentage}
                                                 badge="Optional"
                                                 badgeColor="bg-blue-500"
+                                                quotationTaxPercentage={quotationTax}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* Main Product Total (LED + additional only) */}
-                            <div className="mt-6 pt-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-lg font-semibold text-gray-900">Main Product Total</p>
+                            {/* Main offer totals */}
+                            {(() => {
+                                const t = calculateQuotationOfferTotals(mainProduct, quotationTax);
+                                return (
+                                    <div className="mt-6 pt-4 border-t border-gray-200 space-y-1.5 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Total Net:</span>
+                                            <span className="font-medium">{formatCurrency(t.offerNet)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">+ ({t.taxPercentage}%) VAT on</span>
+                                            <span className="font-medium">+ {formatCurrency(t.tax)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between pt-1">
+                                            <p className="text-lg font-semibold text-gray-900">Main Product Total</p>
+                                            <span className="text-2xl font-bold text-blue-700">
+                                                {formatCurrency(t.offerTotal)}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span className="text-2xl font-bold text-blue-700">
-                                        {formatCurrency(
-                                            calculateItemTotal(mainProduct.unitPrice, mainProduct.quantity, mainProduct.taxPercentage, mainProduct.discountPercentage) +
-                                            (mainProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
-                                        )}
-                                    </span>
-                                </div>
-                            </div>
+                                );
+                            })()}
                         </>
                     )}
                 </div>
@@ -278,13 +298,17 @@ export default function AdminQuotationDetailPage() {
                         <h3 className="text-xl font-semibold text-green-700 mb-4">Alternative Product</h3>
                         <ProductItemDisplay
                             product={alternativeProduct.product}
-                            quantity={alternativeProduct.quantity}
+                            quantity={
+                                alternativeProduct.product?.isCustom
+                                    ? alternativeProduct.product?.customTotalCabinets
+                                    : alternativeProduct.quantity
+                            }
                             unitPrice={alternativeProduct.unitPrice}
                             description={alternativeProduct.description}
-                            taxPercentage={alternativeProduct.taxPercentage}
                             discountPercentage={alternativeProduct.discountPercentage}
                             badge="Alternative"
                             badgeColor="bg-green-600"
+                            quotationTaxPercentage={quotationTax}
                         />
 
                         {/* Alternative Product Additional Items (included in total) */}
@@ -295,20 +319,24 @@ export default function AdminQuotationDetailPage() {
                                     <div key={addIndex} className="bg-purple-50 rounded-lg px-3 py-2">
                                         <ProductItemDisplay
                                             product={add.product}
-                                            quantity={add.quantity}
+                                            quantity={
+                                                add.product?.isCustom
+                                                    ? add.product?.customTotalCabinets
+                                                    : add.quantity
+                                            }
                                             unitPrice={add.unitPrice}
                                             description={add.description}
-                                            taxPercentage={add.taxPercentage}
                                             discountPercentage={add.discountPercentage}
                                             badge="Additional"
                                             badgeColor="bg-purple-500"
+                                            quotationTaxPercentage={quotationTax}
                                         />
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        {/* Alternative Product Optional Items (not in total) */}
+                        {/* Alternative Product Optional Items (included in offer net + VAT) */}
                         {alternativeProduct.optionalItems && alternativeProduct.optionalItems.length > 0 && (
                             <div className="mt-4 ml-8 border-l-3 border-green-300 pl-4 space-y-2">
                                 <h5 className="text-sm font-semibold text-green-600">Optional Products</h5>
@@ -316,33 +344,44 @@ export default function AdminQuotationDetailPage() {
                                     <div key={optIndex} className="bg-green-50 rounded-lg px-3 py-2">
                                         <ProductItemDisplay
                                             product={opt.product}
-                                            quantity={opt.quantity}
+                                            quantity={
+                                                opt.product?.isCustom
+                                                    ? opt.product?.customTotalCabinets
+                                                    : opt.quantity
+                                            }
                                             unitPrice={opt.unitPrice}
                                             description={opt.description}
-                                            taxPercentage={opt.taxPercentage}
                                             discountPercentage={opt.discountPercentage}
                                             badge="Optional"
                                             badgeColor="bg-green-500"
+                                            quotationTaxPercentage={quotationTax}
                                         />
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        {/* Alternative Product Total (LED + additional only) */}
-                        <div className="mt-6 pt-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-lg font-semibold text-gray-900">Alternative Product Total</p>
+                        {(() => {
+                            const t = calculateQuotationOfferTotals(alternativeProduct, quotationTax);
+                            return (
+                                <div className="mt-6 pt-4 border-t border-gray-200 space-y-1.5 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Total Net:</span>
+                                        <span className="font-medium">{formatCurrency(t.offerNet)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">+ ({t.taxPercentage}%) VAT on</span>
+                                        <span className="font-medium">+ {formatCurrency(t.tax)}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-1">
+                                        <p className="text-lg font-semibold text-gray-900">Alternative Product Total</p>
+                                        <span className="text-2xl font-bold text-green-700">
+                                            {formatCurrency(t.offerTotal)}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span className="text-2xl font-bold text-green-700">
-                                    {formatCurrency(
-                                        calculateItemTotal(alternativeProduct.unitPrice, alternativeProduct.quantity, alternativeProduct.taxPercentage, alternativeProduct.discountPercentage) +
-                                        (alternativeProduct.additionalItems?.reduce((sum, add) => sum + calculateItemTotal(add.unitPrice, add.quantity, add.taxPercentage, add.discountPercentage), 0) || 0)
-                                    )}
-                                </span>
-                            </div>
-                        </div>
+                            );
+                        })()}
                     </div>
                 )}
 

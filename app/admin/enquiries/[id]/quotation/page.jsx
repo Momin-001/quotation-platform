@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Eye, Percent } from "lucide-react";
 
 import QuotationPreview from "@/components/admin/Quotation/QuotationPreview";
 import QuotationBuilderSection from "@/components/admin/Quotation/QuotationBuilderSection";
@@ -23,12 +24,12 @@ export default function QuotationBuilderPage() {
     const [savingQuotation, setSavingQuotation] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [editingDraftId, setEditingDraftId] = useState(null);
-    
+    const [quotationTaxPercentage, setQuotationTaxPercentage] = useState("19");
+
     const [mainProduct, setMainProduct] = useState({
         product: null,
         quantity: 1,
         unitPrice: "",
-        taxPercentage: "",
         discountPercentage: "",
         description: "",
         optionalItems: [],
@@ -69,7 +70,6 @@ export default function QuotationBuilderPage() {
                         product: items[0].controller,
                         quantity: 1,
                         unitPrice: "",
-                        taxPercentage: "",
                         discountPercentage: "",
                         description: "",
                     }]
@@ -86,7 +86,6 @@ export default function QuotationBuilderPage() {
                     },
                     quantity: items[0].quantity || 1,
                     unitPrice: "",
-                    taxPercentage: "",
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
@@ -101,7 +100,6 @@ export default function QuotationBuilderPage() {
                         product: items[1].controller,
                         quantity: 1,
                         unitPrice: "",
-                        taxPercentage: "",
                         discountPercentage: "",
                         description: "",
                     }]
@@ -118,7 +116,6 @@ export default function QuotationBuilderPage() {
                     },
                     quantity: items[1].quantity || 1,
                     unitPrice: "",
-                    taxPercentage: "",
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
@@ -157,20 +154,24 @@ export default function QuotationBuilderPage() {
 
             setEditingDraftId(quotationId);
 
+            setQuotationTaxPercentage(
+                draft.taxPercentage != null && draft.taxPercentage !== ""
+                    ? String(draft.taxPercentage)
+                    : "19"
+            );
+
             // Load main product from draft
             if (draft.mainProduct) {
                 setMainProduct({
                     product: draft.mainProduct.product,
                     quantity: draft.mainProduct.quantity || 1,
                     unitPrice: draft.mainProduct.unitPrice || "",
-                    taxPercentage: draft.mainProduct.taxPercentage || "",
                     discountPercentage: draft.mainProduct.discountPercentage || "",
                     description: draft.mainProduct.description || "",
                     optionalItems: (draft.mainProduct.optionalItems || []).map(opt => ({
                         product: opt.product,
                         quantity: opt.quantity || 1,
                         unitPrice: opt.unitPrice || "",
-                        taxPercentage: opt.taxPercentage || "",
                         discountPercentage: opt.discountPercentage || "",
                         description: opt.description || "",
                     })),
@@ -178,7 +179,6 @@ export default function QuotationBuilderPage() {
                         product: add.product,
                         quantity: add.quantity || 1,
                         unitPrice: add.unitPrice || "",
-                        taxPercentage: add.taxPercentage || "",
                         discountPercentage: add.discountPercentage || "",
                         description: add.description || "",
                     })),
@@ -191,14 +191,12 @@ export default function QuotationBuilderPage() {
                     product: draft.alternativeProduct.product,
                     quantity: draft.alternativeProduct.quantity || 1,
                     unitPrice: draft.alternativeProduct.unitPrice || "",
-                    taxPercentage: draft.alternativeProduct.taxPercentage || "",
                     discountPercentage: draft.alternativeProduct.discountPercentage || "",
                     description: draft.alternativeProduct.description || "",
                     optionalItems: (draft.alternativeProduct.optionalItems || []).map(opt => ({
                         product: opt.product,
                         quantity: opt.quantity || 1,
                         unitPrice: opt.unitPrice || "",
-                        taxPercentage: opt.taxPercentage || "",
                         discountPercentage: opt.discountPercentage || "",
                         description: opt.description || "",
                     })),
@@ -206,7 +204,6 @@ export default function QuotationBuilderPage() {
                         product: add.product,
                         quantity: add.quantity || 1,
                         unitPrice: add.unitPrice || "",
-                        taxPercentage: add.taxPercentage || "",
                         discountPercentage: add.discountPercentage || "",
                         description: add.description || "",
                     })),
@@ -240,7 +237,6 @@ export default function QuotationBuilderPage() {
                 product: null,
                 quantity: 1,
                 unitPrice: "",
-                taxPercentage: "",
                 discountPercentage: "",
                 description: "",
             }]
@@ -270,7 +266,6 @@ export default function QuotationBuilderPage() {
                 product: null,
                 quantity: 1,
                 unitPrice: "",
-                taxPercentage: "",
                 discountPercentage: "",
                 description: "",
             }]
@@ -297,7 +292,6 @@ export default function QuotationBuilderPage() {
             product: null,
             quantity: 1,
             unitPrice: "",
-            taxPercentage: "",
             discountPercentage: "",
             description: "",
             optionalItems: [],
@@ -322,7 +316,6 @@ export default function QuotationBuilderPage() {
                 product: null,
                 quantity: 1,
                 unitPrice: "",
-                taxPercentage: "",
                 discountPercentage: "",
                 description: "",
             }]
@@ -352,7 +345,6 @@ export default function QuotationBuilderPage() {
                 product: null,
                 quantity: 1,
                 unitPrice: "",
-                taxPercentage: "",
                 discountPercentage: "",
                 description: "",
             }]
@@ -442,12 +434,14 @@ export default function QuotationBuilderPage() {
             // Build items array
             const items = [];
             
+            const rootTax = parseFloat(quotationTaxPercentage);
+            const taxPercentage = Number.isFinite(rootTax) ? rootTax : 19;
+
             // Main product
             items.push({
                 productId: mainProduct.product.id,
                 quantity: mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity,
                 unitPrice: parseFloat(mainProduct.unitPrice),
-                taxPercentage: parseFloat(mainProduct.taxPercentage) || 0,
                 discountPercentage: parseFloat(mainProduct.discountPercentage) || 0,
                 description: mainProduct.description || null,
                 itemType: "main",
@@ -456,7 +450,6 @@ export default function QuotationBuilderPage() {
                     sourceId: opt.product.id,
                     quantity: opt.quantity,
                     unitPrice: parseFloat(opt.unitPrice),
-                    taxPercentage: parseFloat(opt.taxPercentage) || 0,
                     discountPercentage: parseFloat(opt.discountPercentage) || 0,
                     description: opt.description || null,
                 })),
@@ -464,7 +457,6 @@ export default function QuotationBuilderPage() {
                     controllerId: add.product?.id,
                     quantity: add.quantity || 1,
                     unitPrice: parseFloat(add.unitPrice),
-                    taxPercentage: parseFloat(add.taxPercentage) || 0,
                     discountPercentage: parseFloat(add.discountPercentage) || 0,
                     description: add.description || null,
                 })),
@@ -476,7 +468,6 @@ export default function QuotationBuilderPage() {
                     productId: alternativeProduct.product.id,
                     quantity: alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity,
                     unitPrice: parseFloat(alternativeProduct.unitPrice),
-                    taxPercentage: parseFloat(alternativeProduct.taxPercentage) || 0,
                     discountPercentage: parseFloat(alternativeProduct.discountPercentage) || 0,
                     description: alternativeProduct.description || null,
                     itemType: "alternative",
@@ -485,7 +476,6 @@ export default function QuotationBuilderPage() {
                         sourceId: opt.product.id,
                         quantity: opt.quantity,
                         unitPrice: parseFloat(opt.unitPrice),
-                        taxPercentage: parseFloat(opt.taxPercentage) || 0,
                         discountPercentage: parseFloat(opt.discountPercentage) || 0,
                         description: opt.description || null,
                     })),
@@ -493,7 +483,6 @@ export default function QuotationBuilderPage() {
                         controllerId: add.product?.id,
                         quantity: add.quantity || 1,
                         unitPrice: parseFloat(add.unitPrice),
-                        taxPercentage: parseFloat(add.taxPercentage) || 0,
                         discountPercentage: parseFloat(add.discountPercentage) || 0,
                         description: add.description || null,
                     })),
@@ -509,6 +498,7 @@ export default function QuotationBuilderPage() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         status,
+                        taxPercentage,
                         items,
                     }),
                 });
@@ -520,6 +510,7 @@ export default function QuotationBuilderPage() {
                     body: JSON.stringify({
                         enquiryId: params.id,
                         status,
+                        taxPercentage,
                         items,
                     }),
                 });
@@ -572,6 +563,7 @@ export default function QuotationBuilderPage() {
         return (
             <QuotationPreview
                 quotationId={enquiry?.enquiryId ? formatEnquiryId(enquiry.id) : ""}
+                quotationTaxPercentage={quotationTaxPercentage}
                 mainProduct={mainProduct}
                 alternativeProduct={alternativeProduct}
                 onClose={() => setShowPreview(false)}
@@ -608,6 +600,54 @@ export default function QuotationBuilderPage() {
                     }
                 </p>
             </div>
+
+            <section
+                className="rounded-xl border-2 border-blue-200 bg-blue-50/30 p-6"
+                aria-labelledby="quotation-tax-heading"
+            >
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+                    <div className="min-w-0 space-y-2 lg:max-w-2xl">
+                        <div className="flex items-start gap-3">
+                            <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-700 ring-1 ring-blue-200/60">
+                                <Percent className="h-4 w-4" aria-hidden />
+                            </span>
+                            <div className="min-w-0 space-y-1">
+                                <h2
+                                    id="quotation-tax-heading"
+                                    className="text-xl font-bold font-archivo text-blue-700"
+                                >
+                                    VAT
+                                </h2>
+                                <p className="text-sm leading-relaxed text-gray-600">
+                                Uniform tax rate for this offer; applied to the sum of the net lines (including optional items) for each main and alternative offer.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex shrink-0 flex-col gap-1.5 lg:w-40">
+                        <label
+                            htmlFor="quotation-tax"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            Tax Rate (%)
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                id="quotation-tax"
+                                type="number"
+                                min={0}
+                                step={0.01}
+                                className="h-10 w-full min-w-0 font-medium tabular-nums"
+                                value={quotationTaxPercentage}
+                                onChange={(e) => setQuotationTaxPercentage(e.target.value)}
+                            />
+                            <span className="select-none text-sm font-semibold text-gray-500" aria-hidden>
+                                %
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* Main Product Section */}
             <QuotationBuilderSection
