@@ -478,8 +478,7 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
-                            <Accordion type="single" defaultValue="operating-conditions
-                            " collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
                                     <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                         Operating Conditions
