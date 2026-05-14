@@ -478,14 +478,30 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
-
-                            {/* Operating Conditions */}
-                            <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
+                            <Accordion type="single" defaultValue="operating-conditions
+                            " collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
+                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
+                                        Operating Conditions
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                        <div>
+                                            <SpecRow label="Operating Temperature" value={product.operatingTemperature} unit="°C" />
+                                            <SpecRow label="Operating Humidity" value={product.operatingHumidity} unit="%" />
+                                            <SpecRow label="Cooling" value={formatEnum(product.cooling)} />
+                                            <SpecRow label="Heat Dissipation" value={product.heatDissipation} unit="W" />
+                                            <SpecRow label="Monitoring Function" value={product.monitoringFunctionEn} />
+                                            </div>
+                                        </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                            {/* Downloads */}
+                            <Accordion type="single" defaultValue="downloads" collapsible className="rounded-lg">
+                                <AccordionItem value="downloads">
                                     <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
                                        Downloads
                                         </AccordionTrigger>
-                                        <AccordionContent className="bg-white px-4 pb-4 pt-2">
+                                        <AccordionContent className="bg-gray-100 px-4 pb-4 pt-2">
                                         <div className="space-y-3">
                                             {/* Product Datasheet */}
                                             <div className="flex items-center justify-between gap-4 py-1">
@@ -671,7 +687,6 @@ export default function ProductDetailPage() {
                                         <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
                                             {product.productCertificates && product.productCertificates.length > 0 && (
                                                 <div className="mb-4">
-                                                    <p className="text-sm text-gray-600 mb-2">Certificates</p>
                                                     <div className="flex flex-wrap gap-2">
                                                         {product.productCertificates.map((cert) => (
                                                             <div key={cert.id} className="flex items-center gap-2 bg-white p-2 px-4 rounded-md">
