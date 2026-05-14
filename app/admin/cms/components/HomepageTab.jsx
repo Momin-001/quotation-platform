@@ -12,6 +12,7 @@ import HowItWorksSection from "./sections/HowItWorksSection";
 import FAQSection from "./sections/FAQSection";
 import PartnersSection from "./sections/PartnersSection";
 import BlogsSectionCMS from "./sections/BlogsSection";
+import PreSelectedFiltersSection from "./sections/PreSelectedFiltersSection";
 
 // Zod schema for homepage validation
 const homepageSchema = z.object({
@@ -67,7 +68,7 @@ const homepageSchema = z.object({
     step1Description2En: z.string().min(1, "Step 1 Description 2 EN is required"),
     step1Description2De: z.string().min(1, "Step 1 Description 2 DE is required"),
     step2TitleEn: z.string().min(1, "Step 2 Title EN is required"),
-    step2TitleDe: z.string().min(1, "Step 2 Title DE is required"),
+    step2TitleDe: z.string().min(1,"Step 2 Title DE is required"),
     step2Description1En: z.string().min(1, "Step 2 Description 1 EN is required"),
     step2Description1De: z.string().min(1, "Step 2 Description 1 DE is required"),
     step2Description2En: z.string().min(1, "Step 2 Description 2 EN is required"),
@@ -109,6 +110,13 @@ const homepageSchema = z.object({
     marketingPartnersTitleDe: z.string().optional().default(""),
     marketingPartnersSubtitleEn: z.string().optional().default(""),
     marketingPartnersSubtitleDe: z.string().optional().default(""),
+    // Pre-Selected Filters Section
+    preSelectedFiltersTitleEn: z.string().optional().default(""),
+    preSelectedFiltersTitleDe: z.string().optional().default(""),
+    preSelectedFiltersSubtitleEn: z.string().optional().default(""),
+    preSelectedFiltersSubtitleDe: z.string().optional().default(""),
+    preSelectedFiltersPresetPrefixEn: z.string().optional().default(""),
+    preSelectedFiltersPresetPrefixDe: z.string().optional().default(""),
     // Blogs Section
     blogsSectionTitleEn: z.string().optional().default(""),
     blogsSectionTitleDe: z.string().optional().default(""),
@@ -226,6 +234,13 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             marketingPartnersTitleDe: "",
             marketingPartnersSubtitleEn: "",
             marketingPartnersSubtitleDe: "",
+            // Pre-Selected Filters Section
+            preSelectedFiltersTitleEn: "",
+            preSelectedFiltersTitleDe: "",
+            preSelectedFiltersSubtitleEn: "",
+            preSelectedFiltersSubtitleDe: "",
+            preSelectedFiltersPresetPrefixEn: "",
+            preSelectedFiltersPresetPrefixDe: "",
             // Blogs Section
             blogsSectionTitleEn: "",
             blogsSectionTitleDe: "",
@@ -354,6 +369,13 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
                     marketingPartnersTitleDe: data.data.marketingPartnersTitleDe || "",
                     marketingPartnersSubtitleEn: data.data.marketingPartnersSubtitleEn || "",
                     marketingPartnersSubtitleDe: data.data.marketingPartnersSubtitleDe || "",
+                    // Pre-Selected Filters Section
+                    preSelectedFiltersTitleEn: data.data.preSelectedFiltersTitleEn || "",
+                    preSelectedFiltersTitleDe: data.data.preSelectedFiltersTitleDe || "",
+                    preSelectedFiltersSubtitleEn: data.data.preSelectedFiltersSubtitleEn || "",
+                    preSelectedFiltersSubtitleDe: data.data.preSelectedFiltersSubtitleDe || "",
+                    preSelectedFiltersPresetPrefixEn: data.data.preSelectedFiltersPresetPrefixEn || "",
+                    preSelectedFiltersPresetPrefixDe: data.data.preSelectedFiltersPresetPrefixDe || "",
                     // Blogs Section
                     blogsSectionTitleEn: data.data.blogsSectionTitleEn || "",
                     blogsSectionTitleDe: data.data.blogsSectionTitleDe || "",
@@ -495,6 +517,7 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             <HowItWorksSection register={register} errors={errors} />
             <FAQSection register={register} errors={errors} />
             <PartnersSection register={register} errors={errors} />
+            <PreSelectedFiltersSection register={register} errors={errors} />
             <BlogsSectionCMS register={register} errors={errors} />
         </div>
     );

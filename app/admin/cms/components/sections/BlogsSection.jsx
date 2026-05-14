@@ -7,7 +7,7 @@ export default function BlogsSection({ register, errors }) {
     return (
         <div className="space-y-6">
             <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
-                SECTION 6 — BLOGS
+                SECTION 7 — BLOGS
             </h2>
 
             {/* Blogs Section Title */}

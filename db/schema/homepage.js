@@ -104,6 +104,13 @@ export const homepage = pgTable("homepage", {
     marketingPartnersTitleDe: text("marketing_partners_title_de").notNull().default(""),
     marketingPartnersSubtitleEn: text("marketing_partners_subtitle_en").notNull().default(""),
     marketingPartnersSubtitleDe: text("marketing_partners_subtitle_de").notNull().default(""),
+    // Pre-Selected Filters Section
+    preSelectedFiltersTitleEn: text("pre_selected_filters_title_en").notNull().default(""),
+    preSelectedFiltersTitleDe: text("pre_selected_filters_title_de").notNull().default(""),
+    preSelectedFiltersSubtitleEn: text("pre_selected_filters_subtitle_en").notNull().default(""),
+    preSelectedFiltersSubtitleDe: text("pre_selected_filters_subtitle_de").notNull().default(""),
+    preSelectedFiltersPresetPrefixEn: text("pre_selected_filters_preset_prefix_en").notNull().default(""),
+    preSelectedFiltersPresetPrefixDe: text("pre_selected_filters_preset_prefix_de").notNull().default(""),
     // Blogs Section
     blogsSectionTitleEn: text("blogs_section_title_en").notNull().default(""),
     blogsSectionTitleDe: text("blogs_section_title_de").notNull().default(""),

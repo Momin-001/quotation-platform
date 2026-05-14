@@ -14,24 +14,6 @@ import {
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
 
-const COPY = {
-    en: {
-        title: "Pre-Selected Filters",
-        description:
-            "Explore our newest LED installations across indoor, outdoor, and mobile applications—precision-built displays engineered for lasting performance.",
-        allProjects: "All Projects",
-        aboutUs: "About us",
-        presetPrefix: "PRESET FILTER",
-    },
-    de: {
-        title: "Vorausgewählte Filter",
-        description:
-            "Entdecken Sie unsere neuesten LED-Installationen für Innen-, Außen- und mobile Anwendungen—präzise gefertigte Displays für dauerhafte Leistung.",
-        allProjects: "Alle Projekte",
-        aboutUs: "Über uns",
-        presetPrefix: "FILTER VOREINSTELLEN",
-    },
-};
 
 function normalizeCategoryName(name) {
     return String(name || "")
@@ -125,10 +107,9 @@ function CategoryCard({ card, presetLabel, categoryId }) {
     );
 }
 
-export default function LatestProjectsSection() {
+export default function PreSelectedFiltersSection({ homepageData }) {
     const { language } = useLanguage();
     const lang = language === "de" ? "de" : "en";
-    const t = COPY[lang];
 
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -137,6 +118,12 @@ export default function LatestProjectsSection() {
     const [canNext, setCanNext] = useState(false);
     /** Bump to reset autoplay interval after manual navigation */
     const [autoplayNonce, setAutoplayNonce] = useState(0);
+
+    const getText = (field) => {
+        if (!homepageData) return "";
+        const key = language === "en" ? `${field}En` : `${field}De`;
+        return homepageData[key] || homepageData[`${field}En`] || "";
+    };
 
     useEffect(() => {
         let cancelled = false;
@@ -205,7 +192,7 @@ export default function LatestProjectsSection() {
                     lang === "en" ? "High impact resistance & UV resistance" : "Hohe  Schlagfestigkeit & UV-Beständigkeiy",
                     lang === "en" ? "Optimized for sunlight" : "Optimiert für Sonneneinstrahlung",
                     lang === "en" ? "Long lifespan & stable energy efficiency" : "Lange Lebensdauer & stabile Energieeffizienz",
-                ],
+                ],  
                 imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777979018/b5029f8167fe80a44769791760eb0f8c0781ff82_cz6xyx.png",
             },
         ],
@@ -251,10 +238,10 @@ export default function LatestProjectsSection() {
                 <div className="relative mb-10">
                     <div className="text-center">
                         <h2 className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold font-archivo mb-4">
-                            {t.title}
+                            {getText("preSelectedFiltersTitle")}
                         </h2>
                         <p className="text-md md:text-lg mx-auto max-w-6xl font-normal font-open-sans">
-                            {t.description}
+                            {getText("preSelectedFiltersSubtitle")}
                         </p>
                     </div>
                     <div className="flex justify-center gap-2 mt-6 lg:mt-0 lg:absolute lg:top-0 lg:right-0">
@@ -293,7 +280,7 @@ export default function LatestProjectsSection() {
                         <CarouselContent className="-ml-1">
                             {cards.map((card, idx) => {
                                 const catLabel = (card.categoryName || "").toUpperCase();
-                                const presetLabel = `${t.presetPrefix} ${catLabel}`.trim();
+                                const presetLabel = `${getText("preSelectedFiltersPresetPrefix")} ${catLabel}`.trim();
                                 const categoryId = categoryIdsByCardIndex[idx] || "";
                                 return (
                                     <CarouselItem

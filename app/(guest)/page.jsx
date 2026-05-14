@@ -1,7 +1,7 @@
 import HeroSection from "@/components/guest/HeroSection";
 import ValueBlocksSection from "@/components/guest/ValueBlocksSection";
 import HowItWorksSection from "@/components/guest/HowItWorksSection";
-import LatestProjectsSection from "@/components/guest/LatestProjectsSection";
+import PreSelectedFiltersSection from "@/components/guest/PreSelectedFiltersSection";
 import FAQSection from "@/components/guest/FAQSection";
 import PartnersSection from "@/components/guest/PartnersSection";
 import MarketingPartnersSection from "@/components/guest/MarketingPartnersSection";
@@ -127,6 +127,13 @@ const defaultHomepageData = {
     marketingPartnersTitleDe: "Marketing Partner",
     marketingPartnersSubtitleEn: "Trusted collaborations that strengthen every project",
     marketingPartnersSubtitleDe: "Vertrauensvolle Zusammenarbeit, die jedes Projekt stärkt",
+    // Pre-Selected Filters
+    preSelectedFiltersTitleEn: "Pre-Selected Filters",
+    preSelectedFiltersTitleDe: "Vorausgewählte Filter",
+    preSelectedFiltersSubtitleEn: "Explore our newest LED installations across indoor, outdoor, and mobile applications—precision-built displays engineered for lasting performance.",
+    preSelectedFiltersSubtitleDe: "Entdecken Sie unsere neuesten LED-Installationen für Innen-, Außen- und mobile Anwendungen—präzise gefertigte Displays für dauerhafte Leistung.",
+    preSelectedFiltersPresetPrefixEn: "PRESET FILTER",
+    preSelectedFiltersPresetPrefixDe: "FILTER VOREINSTELLEN",
     // Blogs
     blogsSectionTitleEn: "Blogs & Insights",
     blogsSectionTitleDe: "Blogs & Einblicke",
@@ -172,7 +179,7 @@ async function getHomeData() {
         {marketingPartners.length > 0 && (
           <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} />
         )}
-        <LatestProjectsSection />
+        <PreSelectedFiltersSection homepageData={homepageData} />
         <BlogsSection homepageData={homepageData} blogs={blogs} />
         <FAQSection homepageData={homepageData} faqsData={faqs} />
       </div>
