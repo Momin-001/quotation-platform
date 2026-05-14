@@ -478,6 +478,8 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+
+                            {/* Operating Conditions */}
                             <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
                                 <AccordionItem value="operating-conditions">
                                     <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
@@ -494,6 +496,7 @@ export default function ProductDetailPage() {
                                         </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+
                             {/* Downloads */}
                             <Accordion type="single" defaultValue="downloads" collapsible className="rounded-lg">
                                 <AccordionItem value="downloads">
@@ -657,6 +660,7 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+
                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
                             {/* Calibration */}
@@ -733,8 +737,8 @@ export default function ProductDetailPage() {
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
+                            
                             </RestrictedContentOverlay>
-
                         </div>
                     </div>
 

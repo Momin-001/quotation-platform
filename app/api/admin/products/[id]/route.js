@@ -173,6 +173,7 @@ export async function PUT(request, { params }) {
             oemBrand: body.oemBrand?.toString().trim() || null,
             ledDriver: body.ledDriver?.toString().trim() || null,
             powerSupply: body.powerSupply?.toString().trim() || null,
+            profitMargin: body.profitMargin != null && body.profitMargin !== "" ? parseFloat(body.profitMargin) : null,
             pricePerCabinetUsd: body.pricePerCabinetUsd != null && body.pricePerCabinetUsd !== "" ? String(body.pricePerCabinetUsd) : null,
             pricePerMetreSquareUsd: body.pricePerMetreSquareUsd != null && body.pricePerMetreSquareUsd !== "" ? String(body.pricePerMetreSquareUsd) : null,
             stockPieces: body.stockPieces != null && body.stockPieces !== "" ? parseInt(body.stockPieces) : null,
