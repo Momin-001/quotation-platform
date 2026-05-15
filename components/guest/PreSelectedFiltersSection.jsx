@@ -102,9 +102,10 @@ export default function PreSelectedFiltersSection({ homepageData }) {
         (async () => {
             setCategoriesLoading(true);
             try {
-                const res = await fetch("/api/categories");
+                const res = await fetch("/api/categories/showcase");
                 const json = await res.json();
-                if (!json.success) throw new Error(json.message);
+                if (!json.success) 
+                    throw new Error(json.message);
                 if (!cancelled) setCategories(json.data || []);
             } catch {
                 if (!cancelled) setCategories([]);
