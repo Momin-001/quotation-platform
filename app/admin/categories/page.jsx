@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
     Table,
     TableBody,
@@ -12,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search } from "lucide-react";
+import { Search, Upload, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -34,6 +35,8 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+const emptyFeature = () => ({ en: "", de: "" });
+
 export default function CategoriesPage() {
     const [categories, setCategories] = useState([]);
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -42,10 +45,18 @@ export default function CategoriesPage() {
     const [sortBy, setSortBy] = useState("");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
-    // Form states
+
     const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
+    const [titleEn, setTitleEn] = useState("");
+    const [titleDe, setTitleDe] = useState("");
+    const [descriptionEn, setDescriptionEn] = useState("");
+    const [descriptionDe, setDescriptionDe] = useState("");
+    const [features, setFeatures] = useState([emptyFeature()]);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [removeImage, setRemoveImage] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [loadingForm, setLoadingForm] = useState(false);
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -69,24 +80,26 @@ export default function CategoriesPage() {
         fetchCategories();
     }, []);
 
-    // Search and sort
     useEffect(() => {
         let filtered = [...categories];
 
-        // Search
         if (search) {
+            const q = search.toLowerCase();
             filtered = filtered.filter(
                 (cat) =>
-                    cat.name.toLowerCase().includes(search.toLowerCase()) ||
-                    cat.description?.toLowerCase().includes(search.toLowerCase())
+                    cat.name.toLowerCase().includes(q) ||
+                    cat.titleEn?.toLowerCase().includes(q) ||
+                    cat.titleDe?.toLowerCase().includes(q) ||
+                    cat.descriptionEn?.toLowerCase().includes(q) ||
+                    cat.descriptionDe?.toLowerCase().includes(q)
             );
         }
 
-        // Sort
         filtered.sort((a, b) => {
             if (sortBy === "name") {
                 return a.name.localeCompare(b.name);
-            } else if (sortBy === "products") {
+            }
+            if (sortBy === "products") {
                 return b.productCount - a.productCount;
             }
             return 0;
@@ -95,12 +108,47 @@ export default function CategoriesPage() {
         setFilteredCategories(filtered);
     }, [search, sortBy, categories]);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            setRemoveImage(false);
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e) => {
+        setLoadingForm(true);
         e.preventDefault();
 
         if (!name.trim()) {
             toast.error("Category name is required");
+            setLoadingForm(false);
             return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", name.trim());
+        formData.append("titleEn", titleEn.trim());
+        formData.append("titleDe", titleDe.trim());
+        formData.append("descriptionEn", descriptionEn.trim());
+        formData.append("descriptionDe", descriptionDe.trim());
+        formData.append(
+            "features",
+            JSON.stringify(
+                features
+                    .map((f) => ({ en: f.en.trim(), de: f.de.trim() }))
+                    .filter((f) => f.en || f.de)
+            )
+        );
+
+        if (imageFile) {
+            formData.append("image", imageFile);
+        }
+        if (removeImage) {
+            formData.append("removeImage", "true");
         }
 
         const url = editingId
@@ -109,29 +157,34 @@ export default function CategoriesPage() {
         const method = editingId ? "PATCH" : "POST";
 
         try {
-            const res = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, description }),
-            });
-
+            const res = await fetch(url, { method, body: formData });
             const response = await res.json();
 
             if (!response.success) {
-                throw new Error(response.message || "Failed to update category");
+                throw new Error(response.message || "Failed to save category");
             }
-            toast.success(response.message || "Category updated");
+            toast.success(response.message || "Category saved");
             fetchCategories();
             clearForm();
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setLoadingForm(false);
         }
     };
 
     const handleEdit = (category) => {
         setEditingId(category.id);
         setName(category.name);
-        setDescription(category.description || "");
+        setTitleEn(category.titleEn || "");
+        setTitleDe(category.titleDe || "");
+        setDescriptionEn(category.descriptionEn || "");
+        setDescriptionDe(category.descriptionDe || "");
+        const list = Array.isArray(category.features) ? category.features : [];
+        setFeatures(list.length > 0 ? list.map((f) => ({ en: f.en || "", de: f.de || "" })) : [emptyFeature()]);
+        setImageFile(null);
+        setImagePreview(category.imageUrl || null);
+        setRemoveImage(false);
     };
 
     const openDeleteDialog = (category) => {
@@ -165,8 +218,27 @@ export default function CategoriesPage() {
 
     const clearForm = () => {
         setName("");
-        setDescription("");
+        setTitleEn("");
+        setTitleDe("");
+        setDescriptionEn("");
+        setDescriptionDe("");
+        setFeatures([emptyFeature()]);
+        setImageFile(null);
+        setImagePreview(null);
+        setRemoveImage(false);
         setEditingId(null);
+    };
+
+    const updateFeature = (index, field, value) => {
+        setFeatures((prev) =>
+            prev.map((f, i) => (i === index ? { ...f, [field]: value } : f))
+        );
+    };
+
+    const addFeature = () => setFeatures((prev) => [...prev, emptyFeature()]);
+
+    const removeFeature = (index) => {
+        setFeatures((prev) => (prev.length <= 1 ? [emptyFeature()] : prev.filter((_, i) => i !== index)));
     };
 
     return (
@@ -174,54 +246,162 @@ export default function CategoriesPage() {
             <div className="space-y-2">
                 <h1 className="text-2xl font-bold font-archivo">Product Categories</h1>
                 <p className="text-sm">
-                    Create, edit, or remove product categories for the catalogue.
+                    Manage catalogue categories and homepage showcase cards (titles, descriptions, features, and images).
                 </p>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-6 bg-white shadow-sm">
+                <div className="space-y-2 max-w-md">
+                    <Label htmlFor="name">Category Name</Label>
+                    <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="e.g., Indoor"
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Category Name</Label>
-                        <Input
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="e.g., Indoor"
-                            className="w-1/3"
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="titleEn">Card Title (EN)</Label>
                         <Textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Description"
-                            className="w-1/3"
+                            id="titleEn"
+                            value={titleEn}
+                            onChange={(e) => setTitleEn(e.target.value)}
+                            placeholder="Headline shown on the homepage card"
+                            rows={3}
                         />
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="titleDe">Card Title (DE)</Label>
+                        <Textarea
+                            id="titleDe"
+                            value={titleDe}
+                            onChange={(e) => setTitleDe(e.target.value)}
+                            placeholder="Überschrift auf der Homepage-Karte"
+                            rows={3}
+                        />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="descriptionEn">Description (EN)</Label>
+                        <Textarea
+                            id="descriptionEn"
+                            value={descriptionEn}
+                            onChange={(e) => setDescriptionEn(e.target.value)}
+                            placeholder="Short description under the title"
+                            rows={3}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="descriptionDe">Description (DE)</Label>
+                        <Textarea
+                            id="descriptionDe"
+                            value={descriptionDe}
+                            onChange={(e) => setDescriptionDe(e.target.value)}
+                            placeholder="Kurzbeschreibung unter dem Titel"
+                            rows={3}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <Label>Features (bullet points)</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={addFeature}>
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add feature
+                        </Button>
+                    </div>
+                    <div className="space-y-3">
+                        {features.map((feature, index) => (
+                            <div
+                                key={index}
+                                className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 items-start border rounded-md p-3 bg-slate-50"
+                            >
+                                <Input
+                                    value={feature.en}
+                                    onChange={(e) => updateFeature(index, "en", e.target.value)}
+                                    placeholder="Feature (EN)"
+                                />
+                                <Input
+                                    value={feature.de}
+                                    onChange={(e) => updateFeature(index, "de", e.target.value)}
+                                    placeholder="Feature (DE)"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeFeature(index)}
+                                    aria-label="Remove feature"
+                                >
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-2 max-w-md">
+                    <Label htmlFor="image">Category Image</Label>
+                    <div className="flex items-center gap-4">
+                        <Input
+                            id="image"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="cursor-pointer"
+                        />
+                        <Upload className="h-5 w-5 text-muted-foreground shrink-0" />
+                    </div>
+                    {imagePreview ? (
+                        <div className="relative mt-2 h-32 w-48 rounded border overflow-hidden">
+                            <Image
+                                src={imagePreview}
+                                alt="Category preview"
+                                fill
+                                className="object-cover"
+                                unoptimized={imagePreview.startsWith("data:")}
+                            />
+                        </div>
+                    ) : null}
+                    {editingId && imagePreview && !removeImage ? (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                setRemoveImage(true);
+                                setImageFile(null);
+                                setImagePreview(null);
+                            }}
+                        >
+                            Remove image
+                        </Button>
+                    ) : null}
                 </div>
 
                 <div className="flex gap-2">
                     {editingId ? (
                         <>
-                            <Button type="submit" className="bg-primary">
-                                Edit Category
+                            <Button type="submit" className="bg-primary" disabled={loadingForm}>
+                                Save Category
                             </Button>
                             <Button type="button" variant="outline" onClick={clearForm}>
                                 Clear
                             </Button>
                         </>
                     ) : (
-                        <Button type="submit" size="lg" className="bg-primary">
+                        <Button type="submit" size="lg" className="bg-primary" disabled={loadingForm}>
                             Add Category
                         </Button>
                     )}
                 </div>
             </form>
 
-            {/* Search and Sort */}
             <div className="flex justify-end items-center gap-4">
                 <div className="relative">
                     <Search className="absolute left-2 top-4 h-4 w-4" />
@@ -243,21 +423,21 @@ export default function CategoriesPage() {
                 </Select>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
                     <TableHeader className="bg-secondary font-archivo">
                         <TableRow>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Category Name</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Description</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Products Count</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Image</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Name</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Title (EN)</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Products</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading && filteredCategories.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center">
+                                <TableCell colSpan={5} className="h-24 text-center">
                                     <div className="flex items-center justify-center gap-2">
                                         <Spinner className="h-5 w-5" />
                                         <span>Loading categories...</span>
@@ -265,28 +445,36 @@ export default function CategoriesPage() {
                                 </TableCell>
                             </TableRow>
                         ) : filteredCategories.length > 0 ? (
-                            filteredCategories.map((category, index) => (
+                            filteredCategories.map((category) => (
                                 <TableRow
                                     key={category.id}
                                     className="even:bg-[#EAF6FF] font-open-sans"
                                 >
+                                    <TableCell className="p-4">
+                                        {category.imageUrl ? (
+                                            <div className="relative h-12 w-16 rounded overflow-hidden">
+                                                <Image
+                                                    src={category.imageUrl}
+                                                    alt={category.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">—</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{category.name}</TableCell>
-                                    <TableCell className="p-4 whitespace-nowrap">
-                                        {category.description || "-"}
+                                    <TableCell className="p-4 max-w-xs truncate">
+                                        {category.titleEn || "—"}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{category.productCount}</TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
                                         <div>
-                                            <Button
-                                                variant="link"
-                                                onClick={() => handleEdit(category)}
-                                            >
+                                            <Button variant="link" onClick={() => handleEdit(category)}>
                                                 Edit
                                             </Button>
-                                            <Button
-                                                variant="link"
-                                                onClick={() => openDeleteDialog(category)}
-                                            >
+                                            <Button variant="link" onClick={() => openDeleteDialog(category)}>
                                                 Delete
                                             </Button>
                                         </div>
@@ -295,7 +483,7 @@ export default function CategoriesPage() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center">
+                                <TableCell colSpan={5} className="h-24 text-center">
                                     No categories found.
                                 </TableCell>
                             </TableRow>
@@ -304,13 +492,12 @@ export default function CategoriesPage() {
                 </Table>
             </div>
 
-            {/* Delete Confirmation Dialog */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently delete the category "{categoryToDelete?.name}".
+                            This will permanently delete the category &quot;{categoryToDelete?.name}&quot;.
                             {categoryToDelete?.productCount > 0 && (
                                 <span className="block mt-2 text-red-600 font-semibold">
                                     Warning: This category has {categoryToDelete.productCount} product(s) associated with it.

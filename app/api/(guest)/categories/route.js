@@ -1,13 +1,23 @@
 import { db } from "@/lib/db";
 import { categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { asc } from "drizzle-orm";
 
 export async function GET() {
     try {
         const allCategories = await db
-            .select()
+            .select({
+                id: categories.id,
+                name: categories.name,
+                titleEn: categories.titleEn,
+                titleDe: categories.titleDe,
+                descriptionEn: categories.descriptionEn,
+                descriptionDe: categories.descriptionDe,
+                imageUrl: categories.imageUrl,
+                features: categories.features,
+            })
             .from(categories)
-            .orderBy(categories.name);
+            .orderBy(asc(categories.name));
 
         return successResponse("Categories fetched successfully", allCategories);
     } catch (error) {
@@ -15,4 +25,3 @@ export async function GET() {
         return errorResponse("Failed to fetch categories", 500);
     }
 }
-

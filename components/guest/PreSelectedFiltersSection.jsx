@@ -13,33 +13,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
-
-
-function normalizeCategoryName(name) {
-    return String(name || "")
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, " ")
-        .replace(/[^\p{L}\p{N}\s]/gu, "");
-}
-
-function resolveCategoryIdByName(categories, categoryName) {
-    const target = normalizeCategoryName(categoryName);
-    if (!target) return "";
-
-    const candidates = [
-        target,
-        target.replace("mobile", "mobil"),
-        target.replace("mobil", "mobile"),
-    ];
-
-    const match = (categories || []).find((c) => {
-        const n = normalizeCategoryName(c?.name);
-        return candidates.some((x) => x === n || n.includes(x) || x.includes(n));
-    });
-
-    return match?.id || "";
-}
+import { categoryToShowcaseCard } from "@/lib/category-helpers";
 
 function CategoryCard({ card, presetLabel, categoryId }) {
     const href = categoryId
@@ -65,7 +39,6 @@ function CategoryCard({ card, presetLabel, categoryId }) {
 
             <div className="relative z-10 flex flex-col h-full p-8 lg:p-10 pt-8">
                 <div className="mt-auto space-y-3 text-white">
-
                     <span className="self-start bg-primary text-primary-foreground font-open-sans text-lg font-semibold tracking-wide px-5 py-1.5 rounded-sm">
                         {(card.categoryName || "").toUpperCase()}
                     </span>
@@ -116,7 +89,6 @@ export default function PreSelectedFiltersSection({ homepageData }) {
     const [api, setApi] = useState(null);
     const [canPrev, setCanPrev] = useState(false);
     const [canNext, setCanNext] = useState(false);
-    /** Bump to reset autoplay interval after manual navigation */
     const [autoplayNonce, setAutoplayNonce] = useState(0);
 
     const getText = (field) => {
@@ -146,62 +118,8 @@ export default function PreSelectedFiltersSection({ homepageData }) {
     }, []);
 
     const cards = useMemo(
-        () => [
-            {
-                categoryName: "Mobil",
-                title: lang === "en" ? "Lightweight, fast and flexible LED systems for events, stages & touring productions." : "Leichte, schnelle und flexible LED-Systeme für Events, Bühnen & Touring Produktionen.",
-                description:
-                    lang === "en"
-                        ? "Fast setup, stable rigging and maximum reliability in tough conditions."
-                        : "Schneller Aufbau, stabiles  Rigging und maximale  Zuverlässigkeit im harten  Einsatz.   ",
-                features: [
-                    lang === "en" ? "Lightweight cabinets for quick assembly" : "Leichtbau-Cabinets für schnellen Aufbau  ",
-                    lang === "en" ? "Curving options (concave/convex)" : "Curving-Optionen  (konkav/konvex)",
-                    lang === "en" ? "High Refresh Rates (≥ 3840–7680 Hz)  " : "Hohe Refresh Rates (≥ 3840–7680 Hz)  ",
-                    lang === "en" ? "Anti collision edges, magnetic modules" : "Anti Kollisionskanten, Magnetmodule ",
-                    lang === "en" ? "Touring-ready hardware & flight cases" : "Touring-taugliche Hardware & Flightcases",
-                ],
-                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777978966/05d906c42c4cd59fcfeb9c8d6508509b05e56a79_dtlm0z.png",
-            },
-            {
-                categoryName: "Indoor",
-                title: lang === "en" ? "High-resolution LED solutions for retail, corporate, studios & control rooms" : "Hochauflösende LED Lösungen für Retail, Corporate, Studios & Control Room",
-                description:
-                    lang === "en"
-                        ? "Optimized for brilliant color reproduction, fine pixel pitches and 24/7 operation – perfect for demanding interiors."
-                        : "Optimiert für brillante Farbwiedergabe, feine Pixelabstände und 24/7 Betrieb – perfekt für anspruchsvolle Innenräume.",
-                features: [
-                    lang === "en" ? "Ultra-fine pixel pitches (0.9–2.5 mm)" : "Ultra-feine Pixelpitches (0.9–2.5 mm)",
-                    lang === "en" ? "High Dynamic Range (HDR10+)" : "High Dynamic Range  (HDR10+)",
-                    lang === "en" ? "Flicker-free image display for camera/studio" : "Flimmerfreie Bilddarstellung für Kamera/Studio",
-                    lang === "en" ? "Quiet & energy-efficient" : "Leise &  energieeffizient ",
-                    lang === "en" ? "Seamless installations (precision cabinets)" : "Nahtlose Installationen (precision cabinets)",
-                ],
-                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777978999/93d4d1d5fb159fac181fe9c355b57a7571e49f8d_vvnvq9.png",
-            },
-            {
-                categoryName: "Outdoor",
-                title: lang === "en" ? "Robust LED systems for DOOH, sports venues and building facades." : "Robuste LED-Systeme für DOOH, Sportstätten und Gebäudefassaden.",
-                description:
-                    lang === "en"
-                        ? "Extremely high brightness, maximum weather resistance and durable electronics – built for continuous operation."
-                        : "Extrem hohe Helligkeit, maximale Wetterfestigkeit und langlebige Elektronik – gebaut für den Dauerbetrieb.",
-                features: [
-                    lang === "en" ? "Helligkeiten bis 10.000 Nits" : "Helligkeiten bis  10.000 Nits ",
-                    lang === "en" ? "IP65/67 weatherproof – heat, rain, dust" : "IP65/67 wetterfest – Hitze, Regen, Staub ",
-                    lang === "en" ? "High impact resistance & UV resistance" : "Hohe  Schlagfestigkeit & UV-Beständigkeiy",
-                    lang === "en" ? "Optimized for sunlight" : "Optimiert für Sonneneinstrahlung",
-                    lang === "en" ? "Long lifespan & stable energy efficiency" : "Lange Lebensdauer & stabile Energieeffizienz",
-                ],  
-                imageUrl: "https://res.cloudinary.com/dgyweycow/image/upload/v1777979018/b5029f8167fe80a44769791760eb0f8c0781ff82_cz6xyx.png",
-            },
-        ],
-        [lang]
-    );
-
-    const categoryIdsByCardIndex = useMemo(
-        () => cards.map((c) => resolveCategoryIdByName(categories, c.categoryName)),
-        [cards, categories]
+        () => categories.map((c) => categoryToShowcaseCard(c, lang)),
+        [categories, lang]
     );
 
     useEffect(() => {
@@ -224,7 +142,7 @@ export default function PreSelectedFiltersSection({ homepageData }) {
     }, [api, cards]);
 
     useEffect(() => {
-        if (!api) return;
+        if (!api || cards.length === 0) return;
         const intervalMs = 3000;
         const id = setInterval(() => {
             api.scrollNext();
@@ -272,41 +190,46 @@ export default function PreSelectedFiltersSection({ homepageData }) {
                 </div>
 
                 <div className="min-w-0">
-                    <Carousel
-                        setApi={setApi}
-                        opts={{ align: "start", loop: true }}
-                        className="w-full"
-                    >
-                        <CarouselContent className="-ml-1">
-                            {cards.map((card, idx) => {
-                                const catLabel = (card.categoryName || "").toUpperCase();
-                                const presetLabel = `${getText("preSelectedFiltersPresetPrefix")} ${catLabel}`.trim();
-                                const categoryId = categoryIdsByCardIndex[idx] || "";
-                                return (
-                                    <CarouselItem
-                                        key={card.categoryName}
-                                        className="pl-1 basis-full lg:basis-1/2"
-                                    >
-                                        <CategoryCard
-                                            card={card}
-                                            presetLabel={presetLabel}
-                                            categoryId={categoryId}
-                                        />
-                                    </CarouselItem>
-                                );
-                            })}
-                        </CarouselContent>
-                        <CarouselPrevious className="hidden" />
-                        <CarouselNext className="hidden" />
-                    </Carousel>
-
                     {categoriesLoading ? (
-                        <p className="text-center pt-6 text-sm text-muted-foreground font-open-sans">
+                        <p className="text-center py-12 text-sm text-muted-foreground font-open-sans">
                             {lang === "en"
-                                ? "Loading categories… preset filters will activate shortly."
-                                : "Kategorien werden geladen… Preset-Filter werden in Kürze aktiv."}
+                                ? "Loading categories…"
+                                : "Kategorien werden geladen…"}
                         </p>
-                    ) : null}
+                    ) : cards.length === 0 ? (
+                        <p className="text-center py-12 text-sm text-muted-foreground font-open-sans">
+                            {lang === "en"
+                                ? "No categories configured yet."
+                                : "Noch keine Kategorien konfiguriert."}
+                        </p>
+                    ) : (
+                        <Carousel
+                            setApi={setApi}
+                            opts={{ align: "start", loop: true }}
+                            className="w-full"
+                        >
+                            <CarouselContent className="-ml-1">
+                                {cards.map((card) => {
+                                    const catLabel = (card.categoryName || "").toUpperCase();
+                                    const presetLabel = `${getText("preSelectedFiltersPresetPrefix")} ${catLabel}`.trim();
+                                    return (
+                                        <CarouselItem
+                                            key={card.id}
+                                            className="pl-1 basis-full lg:basis-1/2"
+                                        >
+                                            <CategoryCard
+                                                card={card}
+                                                presetLabel={presetLabel}
+                                                categoryId={card.id}
+                                            />
+                                        </CarouselItem>
+                                    );
+                                })}
+                            </CarouselContent>
+                            <CarouselPrevious className="hidden" />
+                            <CarouselNext className="hidden" />
+                        </Carousel>
+                    )}
                 </div>
             </div>
         </section>

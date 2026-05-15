@@ -12,7 +12,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,7 @@ export default function AdminUsersPage() {
     const [search, setSearch] = useState("");
     const [addAdminDialogOpen, setAddAdminDialogOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [exporting, setExporting] = useState(false);
     const observer = useRef();
 
     const {
@@ -144,7 +145,7 @@ export default function AdminUsersPage() {
                 throw new Error(response.message || "Failed to update user status");
             }
             // Revert on failure
-           
+
             toast.success(response.message || "User status updated");
         } catch (error) {
             // Revert on failure
@@ -154,6 +155,38 @@ export default function AdminUsersPage() {
                 )
             );
             toast.error(error.message);
+        }
+    };
+
+    const exportCustomers = async () => {
+        setExporting(true);
+        try {
+            const res = await fetch("/api/admin/users/export-customers");
+            if (!res.ok) {
+                const json = await res.json().catch(() => null);
+                throw new Error(json?.message || "Failed to export customers");
+            }
+            const blob = await res.blob();
+            const disposition = res.headers.get("Content-Disposition");
+            const filenameMatch = disposition?.match(/filename="?([^"]+)"?/);
+            const filename =
+                filenameMatch?.[1] ||
+                `customers-${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Customers exported successfully");
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setExporting(false);
         }
     };
 
@@ -193,8 +226,7 @@ export default function AdminUsersPage() {
                 </p>
             </div>
             {/*Add search bar and Add Admin button */}
-            <div className="flex justify-end items-center gap-4">
-
+            <div className="flex justify-end items-center gap-4 flex-wrap">
                 <div className="relative">
                     <Search className="absolute left-2 top-4 h-4 w-4" />
                     <Input
@@ -204,6 +236,20 @@ export default function AdminUsersPage() {
                         className="pl-8 placeholder:text-gray-800"
                     />
                 </div>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="lg"
+                    onClick={exportCustomers}
+                    disabled={exporting}
+                >
+                    {exporting ? (
+                        <Spinner className="h-4 w-4" />
+                    ) : (
+                        <Download className="h-4 w-4" />
+                    )}
+                    {exporting ? "Exporting…" : "Export Customers"}
+                </Button>
                 {isSuperAdmin && (
                     <Dialog open={addAdminDialogOpen} onOpenChange={setAddAdminDialogOpen}>
                         <DialogTrigger asChild>
