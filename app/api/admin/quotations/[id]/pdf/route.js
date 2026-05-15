@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { errorResponse } from "@/lib/api-response";
 import { getQuotationDataForPDF } from "@/lib/get-quotation-pdf-data";
-import { generateQuotationPDF } from "@/lib/quotation-pdf";
+import { generateQuotationReactPDF } from "@/lib/quotation-react-pdf";
 
 export async function GET(req, { params }) {
     try {
@@ -23,7 +23,7 @@ export async function GET(req, { params }) {
             return errorResponse("Quotation not found", 404);
         }
 
-        const buffer = await generateQuotationPDF(data);
+        const buffer = await generateQuotationReactPDF(data);
         const filename = `Angebot-${data.quotation.quotationNumber}.pdf`;
 
         return new Response(buffer, {

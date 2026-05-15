@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { products } from "@/db/schema";
 import { errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { generateProductDatasheetPDF } from "@/lib/product-datasheet-pdf";
+import { generateProductDatasheetReactPDF } from "@/lib/product-datasheet-react-pdf";
 import { readFile } from "fs/promises";
 import path from "path";
 
@@ -156,7 +156,7 @@ export async function GET(req, { params }) {
             mainImageDataUrl,
         };
 
-        const pdfBuffer = await generateProductDatasheetPDF(formattedProduct, { baseUrl, logoDataUrl });
+        const pdfBuffer = await generateProductDatasheetReactPDF(formattedProduct, { baseUrl, logoDataUrl });
 
         const safeName = String(formattedProduct.productNumber || "datasheet")
             .replace(/[/\\:*?"<>|]/g, "_")

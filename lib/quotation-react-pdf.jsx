@@ -435,7 +435,7 @@ function renderSegment(seg, key) {
     return <Text key={key} style={textStyle}>{seg.text}</Text>;
 }
 
-// ─── Data helpers (mirror quotation-pdf.js) ─────────────────────────────────
+// ─── Data helpers (quotation line items, display details, pricing) ───────────
 
 function formatDate(date) {
     if (!date) return "";
