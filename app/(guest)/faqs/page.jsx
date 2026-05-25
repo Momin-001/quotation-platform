@@ -56,10 +56,10 @@ export default function FAQsPage() {
                     <div className="container mx-auto px-4">
                         <div className="max-w-4xl mx-auto">
                             <div className="space-y-4 mb-12 text-center">
-                                <p className="text-md font-medium text-blue-600 uppercase tracking-wide font-open-sans">
+                                <p className="text-md font-medium text-blue-600 uppercase tracking-wide">
                                     {language === "en" ? "FAQ" : "Häufig gestellte Fragen"}
                                 </p>
-                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 font-archivo leading-tight">
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
                                     {language === "en" ? "Frequently Asked Questions" : "Häufig gestellte Fragen"}
                                 </h2>
                             </div>
@@ -95,7 +95,7 @@ export default function FAQsPage() {
                                                     <AccordionTrigger
                                                         className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
                                                     >
-                                                        <h3 className={`text-[21px] font-open-sans pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}>
+                                                        <h3 className={`text-[21px] pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}>
                                                             {faq.title}
                                                         </h3>
                                                         <div
@@ -113,7 +113,7 @@ export default function FAQsPage() {
                                                         </div>
                                                     </AccordionTrigger>
                                                     <AccordionContent className="px-6 pt-0">
-                                                            <p className="leading-relaxed font-open-sans font-normal text-[19px]">
+                                                            <p className="leading-relaxed font-normal text-[19px]">
                                                             {faq.description}
                                                         </p>
                                                     </AccordionContent>

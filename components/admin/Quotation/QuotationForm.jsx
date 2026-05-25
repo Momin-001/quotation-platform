@@ -32,7 +32,7 @@ export default function QuotationForm({
     return (
         <div className="bg-white rounded-lg border shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold font-archivo">{label}</h3>
+                <h3 className="text-lg font-semibold ">{label}</h3>
                 {onRemove && (
                     <Button
                         type="button"

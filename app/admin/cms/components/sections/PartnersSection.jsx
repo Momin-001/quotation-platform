@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 export default function PartnersSection({ register, errors }) {
     return (
         <div className="space-y-6">
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
+            <h2 className="text-sm font-bold text-primary  mb-6">
                 SECTION 5 — TECHNOLOGY PARTNERS
             </h2>
             
@@ -74,7 +74,7 @@ export default function PartnersSection({ register, errors }) {
                 </div>
             </div>
 
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6 pt-6">
+            <h2 className="text-sm font-bold text-primary  mb-6 pt-6">
                 SECTION 5b — MARKETING PARTNERS
             </h2>
 

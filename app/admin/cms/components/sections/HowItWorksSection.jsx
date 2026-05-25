@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default function HowItWorksSection({ register, errors }) {
     return (
         <div className="space-y-6">
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
+            <h2 className="text-sm font-bold text-primary  mb-6">
                 SECTION 3 — HOW IT WORKS
             </h2>
             

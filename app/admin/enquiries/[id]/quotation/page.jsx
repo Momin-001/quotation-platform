@@ -590,7 +590,7 @@ export default function QuotationBuilderPage() {
                     Back to Enquiry
                 </Button>
 
-                <h1 className="text-2xl font-bold font-archivo">
+                <h1 className="text-2xl font-bold ">
                     {editingDraftId ? "Edit Draft Quotation" : "Quotation Builder"} {enquiry?.enquiryId ? formatEnquiryId(enquiry.id) : ""}
                 </h1>
                 <p className="text-gray-600 mt-1">
@@ -614,7 +614,7 @@ export default function QuotationBuilderPage() {
                             <div className="min-w-0 space-y-1">
                                 <h2
                                     id="quotation-tax-heading"
-                                    className="text-xl font-bold font-archivo text-blue-700"
+                                    className="text-xl font-bold  text-blue-700"
                                 >
                                     VAT
                                 </h2>

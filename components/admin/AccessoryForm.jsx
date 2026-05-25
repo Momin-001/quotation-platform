@@ -146,7 +146,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Basic Information</h3>
+                <h3 className="text-lg font-semibold  mb-4">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
                         <Label>Product Name *</Label>
@@ -198,7 +198,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
 
             {/* Descriptions */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Descriptions</h3>
+                <h3 className="text-lg font-semibold  mb-4">Descriptions</h3>
                 <div className="space-y-4">
                     <div className="space-y-1">
                         <Label>Short Text</Label>
@@ -220,7 +220,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
 
             {/* Features (after Long Text) */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Features</h3>
+                <h3 className="text-lg font-semibold  mb-4">Features</h3>
                 <div className="space-y-4">
                     <div className="flex gap-2">
                         <Input
@@ -270,7 +270,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
 
             {/* Optional Field (multi-valued) */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Optional Field</h3>
+                <h3 className="text-lg font-semibold  mb-4">Optional Field</h3>
                 <div className="space-y-4">
                     <div className="flex gap-2">
                         <Input
@@ -320,7 +320,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
 
             {/* Supply & Pricing */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Supply & Pricing</h3>
+                <h3 className="text-lg font-semibold  mb-4">Supply & Pricing</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-1">
                         <Label>Unit</Label>

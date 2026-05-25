@@ -1,6 +1,6 @@
 
 import Navbar from "@/components/guest/Navbar";
-import Footer from "@/components/guest/Footer";
+import Footer from "@/components/guest/Homepage/Footer";
 import { BASE_URL } from "@/lib/constants";
 import { FooterProvider } from "@/context/FooterContext";
 import UserHeader from "@/components/user/UserHeader";
@@ -44,9 +44,10 @@ const defaultFooterData = {
 };
 
 async function getLayoutData() {
+  const revalidateTime  = 900;
     const [navbarRes, footerRes] = await Promise.all([
-      fetch(`${BASE_URL}/api/navbar`, { cache: "no-store" }),
-      fetch(`${BASE_URL}/api/footer`, { cache: "no-store" }),
+      fetch(`${BASE_URL}/api/navbar`, { next: { revalidate: revalidateTime } }),
+      fetch(`${BASE_URL}/api/footer`, { next: { revalidate: revalidateTime } }),
     ]);
   
     const navbarJson = await navbarRes.json();

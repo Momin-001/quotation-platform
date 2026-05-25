@@ -12,9 +12,8 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { ChevronDown, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 
-export default function UserAvatar({ triggerClassName }) {
+export default function UserAvatar() {
     const { user, logout } = useAuth();
 
     if (!user) return null;
@@ -29,23 +28,20 @@ export default function UserAvatar({ triggerClassName }) {
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="outline"
-                        className={cn(
-                            "border-gray-400 rounded h-12 px-3 gap-2 justify-between items-center w-auto min-h-12",
-                            triggerClassName
-                        )}
+                        className="w-full justify-between border-border"
                     >
-                        <div className="flex items-center gap-3 min-w-0">
-                            <Avatar className="h-9 w-9 shrink-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <Avatar className="h-7 w-7 shrink-0">
                                 <AvatarImage src="" />
                                 <AvatarFallback className="bg-gray-200">
-                                    <User className="h-5 w-5 text-gray-500" />
+                                    <User className="h-4 w-4 text-gray-500" />
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col items-start min-w-0 text-left">
-                                <span className="text-sm sm:text-base font-bold leading-tight text-[#0F2E4A] truncate max-w-40 sm:max-w-56">
+                                <span className="text-xs font-bold leading-tight text-[#0F2E4A] truncate max-w-32 sm:max-w-48">
                                     {user?.fullName || "User Name"}
                                 </span>
-                                <span className="text-xs text-gray-500 capitalize leading-tight mt-0.5">
+                                <span className="text-xs text-gray-500 capitalize leading-tight">
                                     {formatRole(user?.role)}
                                 </span>
                             </div>
@@ -68,7 +64,7 @@ export default function UserAvatar({ triggerClassName }) {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-           
+
         </div>
     );
 }

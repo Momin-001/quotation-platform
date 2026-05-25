@@ -5,46 +5,52 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-  } from "@/components/ui/breadcrumb";
-  import Link from "next/link";
-  
-  export default function BreadCrumb({ title, breadcrumbs }) {
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
+import { Fragment } from "react";
+
+export default function BreadCrumb({ title, breadcrumbs }) {
     return (
-      <div className="bg-secondary">
-        <div className="container text-white mx-auto py-3 px-4 flex flex-wrap gap-3 items-center justify-between">
-          {/* Left: Page Title */}
-          <h1 className="text-[32px] font-archivo tracking-tight">
-            {title}
-          </h1>
-  
-          {/* Right: Breadcrumb */}
-          <div className="border rounded-2xl p-1 px-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              {breadcrumbs.map((item, index) => {
-                const isLast = index === breadcrumbs.length - 1;
-  
-                return (
-                  <div key={index} className="flex items-center font-open-sans font-normal text-md">
-                    <BreadcrumbItem>
-                      {isLast || !item.href ? (
-                        <BreadcrumbPage className="space-x-2">{item.label}</BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink className="space-x-2" asChild>
-                          <Link href={item.href}>{item.label}</Link>
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-  
-                    {!isLast && <BreadcrumbSeparator />}
-                  </div>
-                );
-              })}
-            </BreadcrumbList>
-          </Breadcrumb>
-          </div>
+        <div className="bg-secondary text-primary-foreground">
+            <div className="container mx-auto px-4 lg:px-6 py-1.5 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between">
+                <h1 className="text-base sm:text-lg md:text-xl  leading-tight tracking-tight">
+                    {title}
+                </h1>
+
+                {breadcrumbs?.length > 0 && (
+                    <div className="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2">
+                        <Breadcrumb>
+                            <BreadcrumbList className="text-xs sm:text-sm text-primary-foreground/90 gap-1 sm:gap-1.5">
+                                {breadcrumbs.map((item, index) => {
+                                    const isLast = index === breadcrumbs.length - 1;
+
+                                    return (
+                                        <Fragment key={index}>
+                                            <BreadcrumbItem>
+                                                {isLast || !item.href ? (
+                                                    <BreadcrumbPage className="font-medium text-primary-foreground">
+                                                        {item.label}
+                                                    </BreadcrumbPage>
+                                                ) : (
+                                                    <BreadcrumbLink
+                                                        asChild
+                                                        className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                                                    >
+                                                        <Link href={item.href}>{item.label}</Link>
+                                                    </BreadcrumbLink>
+                                                )}
+                                            </BreadcrumbItem>
+                                            {!isLast && (
+                                                <BreadcrumbSeparator className="text-primary-foreground/50 [&>span]:text-primary-foreground/50" />
+                                            )}
+                                        </Fragment>
+                                    );
+                                })}
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
     );
-  }
-  
+}

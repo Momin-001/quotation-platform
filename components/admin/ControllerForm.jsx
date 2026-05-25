@@ -277,7 +277,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Basic Information</h3>
+                <h3 className="text-lg font-semibold  mb-4">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {renderInput("Interface Name", "interfaceName", "text", { placeholder: "e.g. VX2000 Pro Max" })}
                     {renderSelect("Brand Name", "brandName", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"])}
@@ -291,7 +291,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Input Ports */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Input Ports</h3>
+                <h3 className="text-lg font-semibold  mb-4">Input Ports</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
                     {renderInput("DP 1.2", "dp12", "number", { min: 0, placeholder: "0" })}
                     {renderInput("HDMI 2.0", "hdmi20", "number", { min: 0, placeholder: "0" })}
@@ -306,7 +306,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Output Ports */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Output Ports</h3>
+                <h3 className="text-lg font-semibold  mb-4">Output Ports</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {renderInput("Gigabit Ethernet (RJ45)", "gigabitEthernetRj45", "number", { min: 0, placeholder: "0" })}
                     {renderInput("10G Optical Fiber (Out)", "opticalFiberOut10g", "number", { min: 0, placeholder: "0" })}
@@ -316,7 +316,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Monitoring Ports */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Monitoring Ports</h3>
+                <h3 className="text-lg font-semibold  mb-4">Monitoring Ports</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {renderInput("HDMI 1.3 (Monitoring)", "hdmi13Monitoring", "number", { min: 0, placeholder: "0" })}
                     {renderInput("3D Connector (Mini DIN 4)", "connector3dMiniDin4", "number", { min: 0, placeholder: "0" })}
@@ -325,7 +325,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Loop Ports */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Loop Ports</h3>
+                <h3 className="text-lg font-semibold  mb-4">Loop Ports</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {renderInput("HDMI 2.0 LOOP", "hdmi20Loop", "number", { min: 0, placeholder: "0" })}
                     {renderInput("12G-SDI LOOP", "sdi12gLoop", "number", { min: 0, placeholder: "0" })}
@@ -336,7 +336,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Audio & Control Ports */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Audio & Control Ports</h3>
+                <h3 className="text-lg font-semibold  mb-4">Audio & Control Ports</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {renderInput("3.5mm Audio Input", "audioInput35mm", "number", { min: 0, placeholder: "0" })}
                     {renderInput("3.5mm Audio Output", "audioOutput35mm", "number", { min: 0, placeholder: "0" })}
@@ -350,7 +350,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Features */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Features</h3>
+                <h3 className="text-lg font-semibold  mb-4">Features</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {renderInput("Maximum Layers", "maximumLayers", "text", { placeholder: "e.g. 4 (4K×2K)" })}
                     {renderSelect("Layer Scaling", "layerScaling", yesNoOptions)}
@@ -373,7 +373,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
 
             {/* Controller Images */}
             <div>
-                <h3 className="text-lg font-semibold font-archivo mb-4">Controller Images</h3>
+                <h3 className="text-lg font-semibold  mb-4">Controller Images</h3>
                 <div className="space-y-2">
                     <Label>Images</Label>
                     <div className="flex flex-wrap gap-4">

@@ -151,13 +151,13 @@ export default function EnquiryDetailPage() {
                     Back to Enquiries
                 </Button>
 
-                <h1 className="text-2xl font-bold font-archivo">Enquiry Detail Page</h1>
+                <h1 className="text-2xl font-bold ">Enquiry Detail Page</h1>
                 <p className="text-lg text-gray-600 mt-1">{enquiry.enquiryId}</p>
             </div>
 
             <div className="bg-white rounded-lg border shadow-sm p-6 space-y-8">
                 <div>
-                    <h2 className="text-xl font-bold font-archivo mb-2">Customer Information</h2>
+                    <h2 className="text-xl font-bold  mb-2">Customer Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <span className="font-semibold text-gray-700">Name:</span>
@@ -175,18 +175,18 @@ export default function EnquiryDetailPage() {
                 </div>
                 {enquiry.message && (
                     <div className="mt-4">
-                        <h2 className="text-xl font-bold font-archivo mb-2">Message</h2>
+                        <h2 className="text-xl font-bold  mb-2">Message</h2>
                         <p className="text-gray-700 whitespace-pre-wrap">{enquiry.message}</p>
                     </div>
                 )}
             </div>
 
             <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h2 className="text-xl font-bold font-archivo mb-4">Enquiry Products</h2>
+                <h2 className="text-xl font-bold  mb-4">Enquiry Products</h2>
                 {items.length > 0 ? (
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                         <Table className="min-w-full">
-                            <TableHeader className="bg-secondary font-archivo">
+                            <TableHeader className="bg-secondary ">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Pixel Pitch</TableHead>
@@ -264,7 +264,7 @@ export default function EnquiryDetailPage() {
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Monitor className="h-5 w-5 text-blue-600" />
-                        <h2 className="text-xl font-bold font-archivo">Custom LED Configuration</h2>
+                        <h2 className="text-xl font-bold ">Custom LED Configuration</h2>
                         <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
                             Leditor
                         </span>
@@ -326,7 +326,7 @@ export default function EnquiryDetailPage() {
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Wrench className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-xl font-bold font-archivo">Installation & Service</h2>
+                        <h2 className="text-xl font-bold ">Installation & Service</h2>
                     </div>
                     {items.filter((item) => item.isCustom).map((item) => (
                         <div key={`install-${item.id}`} className="bg-gray-50 border rounded-lg p-5 space-y-4">
@@ -387,7 +387,7 @@ export default function EnquiryDetailPage() {
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Settings2 className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-xl font-bold font-archivo">Additional Configuration</h2>
+                        <h2 className="text-xl font-bold ">Additional Configuration</h2>
                     </div>
                     {items.filter((item) => item.isCustom).map((item) => (
                         <div key={`config-${item.id}`} className="bg-gray-50 border rounded-lg p-5">
@@ -419,7 +419,7 @@ export default function EnquiryDetailPage() {
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Package className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-xl font-bold font-archivo">Selected Controller</h2>
+                        <h2 className="text-xl font-bold ">Selected Controller</h2>
                     </div>
                     {items.filter((item) => item.isCustom && item.controller).map((item) => (
                         <div key={`ctrl-${item.id}`} className="space-y-2">
@@ -439,7 +439,7 @@ export default function EnquiryDetailPage() {
                 <div className="bg-white rounded-lg border shadow-sm p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <Upload className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-xl font-bold font-archivo">Reference Files</h2>
+                        <h2 className="text-xl font-bold ">Reference Files</h2>
                     </div>
                     <div className="space-y-2">
                         {enquiry.files.map((file) => (
@@ -465,7 +465,7 @@ export default function EnquiryDetailPage() {
             {/* Quotations for this Enquiry */}
             <div className="bg-white rounded-lg border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold font-archivo">Quotations</h2>
+                    <h2 className="text-xl font-bold ">Quotations</h2>
                     <Link href={`/admin/enquiries/${params.id}/quotation`}>
                         <Button variant="default" size="lg">
                             + Create New Quotation
@@ -475,7 +475,7 @@ export default function EnquiryDetailPage() {
                 {enquiry.quotations && enquiry.quotations.length > 0 ? (
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                         <Table className="min-w-full">
-                            <TableHeader className="bg-secondary font-archivo">
+                            <TableHeader className="bg-secondary ">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Quotation Number</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>

@@ -10,7 +10,7 @@ export default function AddProductPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold font-archivo">Add New Product</h1>
+                    <h1 className="text-2xl font-bold ">Add New Product</h1>
                     <p className="text-sm text-muted-foreground">
                         Choose a product type and fill in the details.
                     </p>

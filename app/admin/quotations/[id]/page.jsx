@@ -170,7 +170,7 @@ export default function AdminQuotationDetailPage() {
                     Back
                 </Button>
 
-                <h1 className="text-2xl font-bold font-archivo">
+                <h1 className="text-2xl font-bold ">
                     Quotation {quotation.quotationNumber}
                 </h1>
             </div>
@@ -389,7 +389,7 @@ export default function AdminQuotationDetailPage() {
 
             {/* Actions */}
             <div className="bg-primary-foreground/80 rounded-lg border shadow-sm p-4">
-            <h3 className="text-xl font-bold font-open-sans mb-4">Actions</h3>
+            <h3 className="text-xl font-bold  mb-4">Actions</h3>
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={handleDownloadPDF}
@@ -414,7 +414,7 @@ export default function AdminQuotationDetailPage() {
                     onClick={handleToggleSections}
                     className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                 >
-                    <h3 className="text-xl font-bold font-open-sans">Edit PDF Sections</h3>
+                    <h3 className="text-xl font-bold ">Edit PDF Sections</h3>
                     {sectionsOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
                 </button>
                 {sectionsOpen && (

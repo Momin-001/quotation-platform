@@ -5,17 +5,15 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import Image from "next/image";
 import Link from "next/link";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
+import { cn } from "@/lib/utils";
+import ControllerCard from "@/components/guest/ControllerCard";
 
 const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"];
 
-// ---------------------------------------------------------------------------
-// Debounce hook (same idea as products listing page)
-// ---------------------------------------------------------------------------
 function useDebounce(value, delay = 400) {
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -29,6 +27,7 @@ function useDebounce(value, delay = 400) {
 
 export default function ControllersPage() {
     const { language } = useLanguage();
+    const isEn = language === "en";
     const [controllers, setControllers] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -41,37 +40,43 @@ export default function ControllersPage() {
 
     const observer = useRef();
 
-    const buildQueryParams = useCallback((pageNum = page) => {
-        const params = new URLSearchParams();
-        params.append("page", pageNum.toString());
-        params.append("limit", "10");
-        if (debouncedSearch) params.append("search", debouncedSearch);
-        if (debouncedSelectedBrand) params.append("brand", debouncedSelectedBrand);
-        return params.toString();
-    }, [page, debouncedSearch, debouncedSelectedBrand]);
+    const buildQueryParams = useCallback(
+        (pageNum = page) => {
+            const params = new URLSearchParams();
+            params.append("page", pageNum.toString());
+            params.append("limit", "10");
+            if (debouncedSearch) params.append("search", debouncedSearch);
+            if (debouncedSelectedBrand) params.append("brand", debouncedSelectedBrand);
+            return params.toString();
+        },
+        [page, debouncedSearch, debouncedSelectedBrand]
+    );
 
-    const fetchControllers = useCallback(async (pageNum, reset = false) => {
-        setLoading(true);
-        try {
-            const queryParams = buildQueryParams(pageNum);
-            const res = await fetch(`/api/controllers?${queryParams}`);
-            const response = await res.json();
+    const fetchControllers = useCallback(
+        async (pageNum, reset = false) => {
+            setLoading(true);
+            try {
+                const queryParams = buildQueryParams(pageNum);
+                const res = await fetch(`/api/controllers?${queryParams}`);
+                const response = await res.json();
 
-            if (!response.success) {
-                throw new Error(response.message || "Failed to fetch controllers");
+                if (!response.success) {
+                    throw new Error(response.message || "Failed to fetch controllers");
+                }
+                if (reset) {
+                    setControllers(response.data);
+                } else {
+                    setControllers((prev) => [...prev, ...response.data]);
+                }
+                setHasMore(response.data.length === 10);
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setLoading(false);
             }
-            if (reset) {
-                setControllers(response.data);
-            } else {
-                setControllers((prev) => [...prev, ...response.data]);
-            }
-            setHasMore(response.data.length === 10);
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [buildQueryParams]);
+        },
+        [buildQueryParams]
+    );
 
     useEffect(() => {
         setPage(1);
@@ -103,106 +108,96 @@ export default function ControllersPage() {
     return (
         <div className="min-h-screen flex flex-col">
             <BreadCrumb
-                title={language === "en" ? "Controllers" : "Controller"}
+                title={isEn ? "Controllers" : "Controller"}
                 breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: language === "en" ? "Controllers" : "Controller" },
+                    { label: isEn ? "Home" : "Startseite", href: "/" },
+                    { label: isEn ? "Controllers" : "Controller" },
                 ]}
             />
-            <main className="flex-1 container mx-auto px-4 py-8">
-                {/* Search Bar */}
-                <div className="mb-6">
+            <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
+            <div className="mb-6 sm:mb-8">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-800" />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search controllers by interface or brand"
-                            className="pl-12 placeholder:text-gray-700"
+                            placeholder={
+                                isEn
+                                    ? "Search by interface or brand…"
+                                    : "Nach Schnittstelle oder Marke suchen…"
+                            }
+                            className="pl-10 h-10 sm:h-11 text-sm rounded-lg border-border/80 shadow-sm placeholder:text-muted-foreground"
                         />
                     </div>
                 </div>
 
-                {/* Brand Tabs */}
-                <div className="mb-6 flex flex-wrap gap-2">
+                <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
                     <Button
                         variant={selectedBrand === "" ? "default" : "outline"}
-                        className={`font-open-sans font-semibold uppercase ${selectedBrand === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                        size="sm"
+                        className={cn(selectedBrand === "" ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground")}
                         onClick={() => setSelectedBrand("")}
                     >
-                        All
+                        {isEn ? "All" : "Alle"}
                     </Button>
                     {BRANDS.map((brand) => (
                         <Button
                             key={brand}
                             variant={selectedBrand === brand ? "default" : "outline"}
+                            size="sm"
                             onClick={() => setSelectedBrand(brand)}
-                            className={`font-open-sans font-semibold uppercase ${selectedBrand === brand ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                            className={cn(selectedBrand === brand ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground")}
                         >
                             {brand}
                         </Button>
                     ))}
                 </div>
 
-                {/* Controller Grid */}
-                <div>
-                    {loading && controllers.length === 0 ? (
-                        <div className="flex items-center justify-center h-64">
-                            <div className="flex items-center gap-2">
-                                <Spinner className="h-6 w-6" />
-                                <span>Loading controllers...</span>
-                            </div>
+                {loading && controllers.length === 0 ? (
+                    <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/60 bg-white/60">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <Spinner className="h-5 w-5" />
+                            <span className="text-sm">
+                                {isEn ? "Loading controllers…" : "Controller werden geladen…"}
+                            </span>
                         </div>
-                    ) : controllers.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {controllers.map((controller, index) => {
-                                const isLast = controllers.length === index + 1;
-                                return (
-                                    <Link
-                                        href={`/controllers/${controller.id}`}
-                                        key={controller.id}
-                                        ref={isLast ? lastCardRef : null}
-                                        className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer block"
-                                    >
-                                        <div className="relative aspect-8/7 bg-gray-100">
-                                            {controller.images?.length > 0 ? (
-                                                <Image
-                                                    src={controller.images[0]}
-                                                    alt={controller.interfaceName || "Controller"}
-                                                    fill
-                                                    className="object-contain"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                    No Image
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                        <h3 className="font-bold font-open-sans text-xl mb-1">
-                                        {controller.interfaceName}
-                                                </h3>
-                                                <p className="text-lg mb-1">{controller.controllerNumber}</p>
-                                                <p className="text-sm font-semibold font-open-sans bg-secondary text-white uppercase rounded-md px-4 py-1 w-fit">{controller.brandDisplay || "N/A"}</p>
-                                            </div>
-                                    </Link>
-                                );
-                            })}
+                    </div>
+                ) : controllers.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                        {controllers.map((controller, index) => {
+                            const isLast = controllers.length === index + 1;
+                            return (
+                                <Link
+                                    href={`/controllers/${controller.id}`}
+                                    key={controller.id}
+                                    ref={isLast ? lastCardRef : null}
+                                    className="block group h-full"
+                                >
+                                    <ControllerCard controller={controller} className="h-full" />
+                                </Link>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="text-center py-16 px-6 rounded-xl border border-dashed border-border/60 bg-white/60">
+                        <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                            {isEn
+                                ? "No controllers found. Try adjusting your search or brand filter."
+                                : "Keine Controller gefunden. Passen Sie Suche oder Markenfilter an."}
+                        </p>
+                    </div>
+                )}
+
+                {loading && controllers.length > 0 && (
+                    <div className="flex items-center justify-center py-8">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <Spinner className="h-4 w-4" />
+                            <span className="text-sm">
+                                {isEn ? "Loading more…" : "Weitere werden geladen…"}
+                            </span>
                         </div>
-                    ) : (
-                        <div className="text-center py-12 text-gray-500">
-                            No controllers found. Try adjusting your search or brand filter.
-                        </div>
-                    )}
-                    {loading && controllers.length > 0 && (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="flex items-center gap-2">
-                                <Spinner className="h-5 w-5" />
-                                <span>Loading more controllers...</span>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </main>
         </div>
     );

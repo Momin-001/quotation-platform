@@ -1,13 +1,16 @@
 "use client";
 
-import BreadCrumb from "@/components/user/BreadCrumb";
-import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+    LegalPageLayout,
+    renderLegalSections,
+} from "@/components/guest/LegalPageLayout";
 
 const CONTENT = {
     en: {
         title: "Imprint",
         breadcrumb: "Imprint",
+        intro: "Legal notice (Imprint) for this website.",
         sections: [
             {
                 title: "Provider of this website",
@@ -25,11 +28,11 @@ const CONTENT = {
                 lines: ["Email: info@proledall.eu", "Phone: +49 1520 2071165"],
             },
             {
-                title: "VAT identification number according to § 27 a of the German VAT Act",
+                title: "VAT identification number according to ~ 27 a of the German VAT Act",
                 lines: ["DE298057613"],
             },
             {
-                title: "Person responsible for editorial content according to § 18 para. 2 MStV",
+                title: "Person responsible for editorial content according to ~ 18 para. 2 MStV",
                 lines: [
                     "Dipl. Ing. Mohammed Abahssain",
                     "Krügerstraße 3 | 67065 Ludwigshafen, Germany",
@@ -69,6 +72,7 @@ const CONTENT = {
     de: {
         title: "Impressum",
         breadcrumb: "Impressum",
+        intro: "Rechtliche Anbieterkennzeichnung (Impressum) für diese Website.",
         sections: [
             {
                 title: "Anbieter dieser Website",
@@ -86,11 +90,11 @@ const CONTENT = {
                 lines: ["E-Mail: info@proledall.eu", "Telefon: +4915202071165"],
             },
             {
-                title: "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz",
+                title: "Umsatzsteuer-Identifikationsnummer gemäß ~ 27 a Umsatzsteuergesetz",
                 lines: ["DE298057613"],
             },
             {
-                title: "Redaktionell verantwortlich gemäß § 18 Abs. 2 MStV",
+                title: "Redaktionell verantwortlich gemäß ~ 18 Abs. 2 MStV",
                 lines: [
                     "Dipl. Ing. Mohammed Abahssain",
                     "Krügerstraße 3 | 67065 Ludwigshafen Deutschland",
@@ -113,7 +117,9 @@ const CONTENT = {
             },
             {
                 title: "Online-Streitbeilegung (OS)",
-                paragraphs: ["Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:"],
+                paragraphs: [
+                    "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:",
+                ],
                 link: {
                     href: "https://ec.europa.eu/consumers/odr/",
                     label: "https://ec.europa.eu/consumers/odr/",
@@ -129,74 +135,21 @@ const CONTENT = {
 
 export default function ImprintPage() {
     const { language } = useLanguage();
-    const langKey = language === "en" ? "en" : "de";
-    const copy = CONTENT[langKey];
+    const isEn = language === "en";
+    const copy = CONTENT[isEn ? "en" : "de"];
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <BreadCrumb
-                title={copy.title}
-                breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: copy.breadcrumb },
-                ]}
-            />
-
-            <main className="container mx-auto px-4 py-10 max-w-4xl">
-                <div className="bg-white border rounded-lg p-6 md:p-10 space-y-8">
-                    <header className="space-y-1">
-                        <h1 className="text-2xl md:text-3xl font-bold">{copy.title}</h1>
-                        <p className="text-sm text-muted-foreground">
-                            {language === "en"
-                                ? "Legal notice (Imprint) for this website."
-                                : "Rechtliche Anbieterkennzeichnung (Impressum) für diese Website."}
-                        </p>
-                    </header>
-
-                    <div className="space-y-7">
-                        {copy.sections.map((section) => (
-                            <section key={section.title} className="space-y-2">
-                                <h2 className="text-lg font-semibold">{section.title}</h2>
-
-                                {section.paragraphs?.length ? (
-                                    <div className="space-y-3 text-sm md:text-base leading-relaxed">
-                                        {section.paragraphs.map((p, idx) => (
-                                            <p key={idx}>{p}</p>
-                                        ))}
-                                    </div>
-                                ) : null}
-
-                                {section.lines?.length ? (
-                                    <div className="space-y-1 text-sm md:text-base">
-                                        {section.lines.map((line) => (
-                                            <p key={line}>{line}</p>
-                                        ))}
-                                    </div>
-                                ) : null}
-
-                                {section.link ? (
-                                    <div className="space-y-2 text-sm md:text-base">
-                                        <Link
-                                            href={section.link.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary underline break-all"
-                                        >
-                                            {section.link.label}
-                                        </Link>
-                                        {section.afterLink?.map((p, idx) => (
-                                            <p key={idx} className="leading-relaxed">
-                                                {p}
-                                            </p>
-                                        ))}
-                                    </div>
-                                ) : null}
-                            </section>
-                        ))}
-                    </div>
-                </div>
-            </main>
-        </div>
+        <LegalPageLayout
+            breadcrumbTitle={copy.title}
+            breadcrumbs={[
+                { label: isEn ? "Home" : "Startseite", href: "/" },
+                { label: copy.breadcrumb },
+            ]}
+            documentTitle={copy.title}
+            intro={copy.intro}
+            isEn={isEn}
+        >
+            {renderLegalSections(copy.sections, isEn)}
+        </LegalPageLayout>
     );
 }
-

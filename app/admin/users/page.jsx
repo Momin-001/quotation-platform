@@ -220,7 +220,7 @@ export default function AdminUsersPage() {
         <div className="space-y-6">
 
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">User Management</h1>
+                <h1 className="text-2xl font-bold ">User Management</h1>
                 <p className="text-sm">
                     View and manage all users in the system.
                 </p>
@@ -373,7 +373,7 @@ export default function AdminUsersPage() {
 
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow >
                             <TableHead className="p-4 text-white whitespace-nowrap">Full Name</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Email</TableHead>
@@ -401,7 +401,7 @@ export default function AdminUsersPage() {
                                     <TableRow
                                         key={user.id}
                                         ref={isLastElement ? lastUserElementRef : null}
-                                        className="even:bg-[#E7F1FF] font-open-sans"
+                                        className="even:bg-[#E7F1FF] "
                                     >
                                         <TableCell className="p-4 whitespace-nowrap">{user.fullName}</TableCell>
                                         <TableCell className="p-4 whitespace-nowrap">{user.email}</TableCell>

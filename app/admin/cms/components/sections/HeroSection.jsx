@@ -22,7 +22,7 @@ export default function HeroSection({
 
     return (
         <div className="space-y-6">
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
+            <h2 className="text-sm font-bold text-primary  mb-6">
                 SECTION 1 — HERO SECTION
             </h2>
 

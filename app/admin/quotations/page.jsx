@@ -96,7 +96,7 @@ export default function AdminQuotationsPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Quotations</h1>
+                <h1 className="text-2xl font-bold ">Quotations</h1>
                 <p className="text-sm text-gray-600">
                     View and manage all quotations in the system. Total: {total}
                 </p>
@@ -146,7 +146,7 @@ export default function AdminQuotationsPage() {
             {/* Table */}
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Quotation #</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Customer</TableHead>
@@ -169,7 +169,7 @@ export default function AdminQuotationsPage() {
                             quotations.map((quotation, index) => (
                                 <TableRow
                                     key={quotation.id}
-                                    className={`font-open-sans ${index % 2 === 0 ? "bg-white" : "bg-[#EAF6FF]"}`}
+                                    className={` ${index % 2 === 0 ? "bg-white" : "bg-[#EAF6FF]"}`}
                                 >
                                     <TableCell className="p-4 whitespace-nowrap font-medium">
                                         {quotation.quotationNumber}

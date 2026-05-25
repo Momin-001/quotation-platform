@@ -16,18 +16,16 @@ import { toast } from "sonner";
 
 export default function FAQSection({ homepageData, faqsData = null, showAll = false }) {
     const { language } = useLanguage();
-    const [openValue, setOpenValue] = useState("0"); // First FAQ open by default
+    const [openValue, setOpenValue] = useState("0");
     const [faqs, setFaqs] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Get text based on current language with fallback
     const getText = (field) => {
         if (!homepageData) return "";
         const key = language === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 
-    // Fetch FAQs if not provided as prop
     useEffect(() => {
         if (faqsData) {
             setFaqs(faqsData);
@@ -52,33 +50,30 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
         }
     }, [faqsData, showAll]);
 
-    // Map FAQs to the format needed
     const faqItems = faqs.map((faq) => ({
         title: language === "en" ? faq.titleEn : faq.titleDe,
         description: language === "en" ? faq.descriptionEn : faq.descriptionDe,
     }));
 
     return (
-        <section className="w-full bg-linear-to-br from-white to-blue-100 py-16 lg:py-24">
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    {/* Left Section - Heading */}
-                    <div className="space-y-4">
-                        <p className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold mb-4 font-archivo">
+        <section className="w-full bg-linear-to-br from-white to-blue-50 py-16 md:py-20 lg:py-24">
+            <div className="container mx-auto px-4 lg:px-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+                    <div className="space-y-3 lg:sticky lg:top-32">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold  text-foreground leading-tight tracking-tight">
                             {getText("faqTitle")}
-                        </p>
-                        <h2 className="text-lg md:text-xl max-w-3xl mx-auto font-normal font-open-sans">
-                            {getText("faqSubtitle")}
                         </h2>
+                        <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-md">
+                            {getText("faqSubtitle")}
+                        </p>
                     </div>
 
-                    {/* Right Section - FAQ Accordion */}
-                    <div className="space-y-4">
+                    <div>
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 text-muted-foreground">
                                     <Spinner className="h-5 w-5" />
-                                    <span>Loading FAQs...</span>
+                                    <span className="text-sm">Loading FAQs...</span>
                                 </div>
                             </div>
                         ) : faqItems.length > 0 ? (
@@ -89,7 +84,7 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                     defaultValue="0"
                                     value={openValue}
                                     onValueChange={setOpenValue}
-                                    className="space-y-4"
+                                    className="space-y-3"
                                 >
                                     {faqItems.map((faq, index) => {
                                         const isOpen = openValue === index.toString();
@@ -97,32 +92,32 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                             <AccordionItem
                                                 key={index}
                                                 value={index.toString()}
-                                                className={`bg-white rounded-sm border border-gray-300 overflow-hidden transition-all duration-300 ${
-                                                    isOpen ? "shadow-lg border-primary" : "shadow-sm"
+                                                className={`bg-white rounded-lg border overflow-hidden transition-all duration-300 ${
+                                                    isOpen ? "shadow-md border-primary/40" : "shadow-sm border-gray-200"
                                                 }`}
                                             >
                                                 <AccordionTrigger
-                                                    className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
+                                                    className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 transition-colors [&>svg]:hidden"
                                                 >
-                                                    <h3 className={`text-[21px] font-open-sans pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}>
+                                                    <h3 className={`text-[15px] sm:text-base pr-4 leading-snug ${isOpen ? "font-semibold text-foreground" : "font-normal text-foreground/80"}`}>
                                                         {faq.title}
                                                     </h3>
                                                     <div
                                                         className={`shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
                                                             isOpen
                                                                 ? "bg-primary text-primary-foreground"
-                                                                : "bg-gray-300 text-primary-foreground"
+                                                                : "bg-gray-200 text-foreground/60"
                                                         }`}
                                                     >
                                                         {isOpen ? (
-                                                            <X className="h-4 w-4" />
+                                                            <X className="h-3.5 w-3.5" />
                                                         ) : (
-                                                            <Plus className="h-4 w-4" />
+                                                            <Plus className="h-3.5 w-3.5" />
                                                         )}
                                                     </div>
                                                 </AccordionTrigger>
-                                                <AccordionContent className="p-6 pt-0">
-                                                    <p className="leading-relaxed font-open-sans font-normal text-[19px]">
+                                                <AccordionContent className="px-5 pb-5 pt-0">
+                                                    <p className="text-sm sm:text-[15px] leading-relaxed text-muted-foreground">
                                                         {faq.description}
                                                     </p>
                                                 </AccordionContent>
@@ -131,9 +126,9 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                     })}
                                 </Accordion>
                                 {!showAll && (
-                                    <div className="pt-4 text-center">
+                                    <div className="pt-5 text-center">
                                         <Link href="/faqs">
-                                            <Button variant="link" className="text-blue-600 hover:text-blue-700">
+                                            <Button variant="link" className="text-primary hover:text-primary/80">
                                                 View All FAQs
                                                 <ArrowRight className="h-4 w-4" />
                                             </Button>
@@ -142,8 +137,8 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                                 )}
                             </>
                         ) : (
-                            <div className="text-center py-12 text-gray-500">
-                                No FAQs available.
+                            <div className="text-center py-12 text-muted-foreground">
+                                <p className="text-sm">No FAQs available.</p>
                             </div>
                         )}
                     </div>
@@ -152,4 +147,3 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
         </section>
     );
 }
-

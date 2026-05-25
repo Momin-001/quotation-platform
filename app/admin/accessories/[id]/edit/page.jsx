@@ -35,7 +35,7 @@ export default async function EditAccessoryPage({ params }) {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Edit Accessory</h1>
+                <h1 className="text-2xl font-bold ">Edit Accessory</h1>
                 <p className="text-sm text-muted-foreground">
                     Update the accessory details below.
                 </p>

@@ -256,7 +256,7 @@ export default function FooterTab({ onDataChange, onValidationChange, onSaveHand
 
     return (
         <div className="space-y-12">
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
+            <h2 className="text-sm font-bold text-primary  mb-6">
             SECTION 1 — FOOTER SECTION
             </h2>
 

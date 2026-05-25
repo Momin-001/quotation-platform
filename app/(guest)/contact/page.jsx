@@ -6,14 +6,19 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useState } from "react";
 import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
 import { toast } from "sonner";
-import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
-import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import {
+    AuthPageShell,
+    AuthField,
+    authInputClass,
+    authInputErrorClass,
+    authTextareaClass,
+} from "@/components/guest/AuthPageShell";
 
 const formSchema = z.object({
     name: z.string().min(2, "Name is too short"),
@@ -23,9 +28,10 @@ const formSchema = z.object({
 });
 
 export default function ContactPage() {
+    const { language } = useLanguage();
+    const isEn = language === "en";
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
-    const { language } = useLanguage();
 
     const {
         register,
@@ -38,7 +44,7 @@ export default function ContactPage() {
 
     const onSubmit = async (data) => {
         if (!captchaVal) {
-            toast.error("Please complete the captcha");
+            toast.error(isEn ? "Please complete the captcha" : "Bitte lösen Sie das Captcha");
             return;
         }
         setLoading(true);
@@ -51,9 +57,12 @@ export default function ContactPage() {
             const response = await res.json();
 
             if (!response.success) {
-                throw new Error(response.message || "Failed to send message");
+                throw new Error(response.message || (isEn ? "Failed to send message" : "Nachricht konnte nicht gesendet werden"));
             }
-            toast.success(response.message || "Message sent successfully!");
+            toast.success(
+                response.message ||
+                    (isEn ? "Message sent successfully!" : "Nachricht erfolgreich gesendet!")
+            );
             reset();
             setCaptchaVal(null);
         } catch (error) {
@@ -64,117 +73,95 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <BreadCrumb
-                title={language === "en" ? "Contact Us" : "Kontakt"}
-                breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: language === "en" ? "Contact Us" : "Kontakt" },
-                ]}
-            />
+        <AuthPageShell
+            breadcrumbTitle={isEn ? "Contact us" : "Kontakt"}
+            breadcrumbs={[
+                { label: isEn ? "Home" : "Startseite", href: "/" },
+                { label: isEn ? "Contact us" : "Kontakt" },
+            ]}
+            title={isEn ? "Get in touch" : "Kontakt aufnehmen"}
+            description={
+                isEn
+                    ? "Send us your question or project details — our team will respond as soon as possible."
+                    : "Senden Sie uns Ihre Frage oder Projektdetails — unser Team meldet sich schnellstmöglich."
+            }
+        >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <AuthField
+                    label={isEn ? "Full name" : "Vollständiger Name"}
+                    htmlFor="name"
+                    required
+                    error={errors.name?.message}
+                >
+                    <Input
+                        id="name"
+                        {...register("name")}
+                        placeholder={isEn ? "Your name" : "Ihr Name"}
+                        className={cn(authInputClass, errors.name && authInputErrorClass)}
+                    />
+                </AuthField>
 
-            <main className="grow relative">
-                <div className="absolute inset-0 z-0">
-                    <div
-                        className="w-full h-full bg-cover bg-center"
-                        style={{ backgroundImage: "url('/placeholder-bg.jpg')" }}
+                <AuthField
+                    label={isEn ? "Email address" : "E-Mail-Adresse"}
+                    htmlFor="email"
+                    required
+                    error={errors.email?.message}
+                >
+                    <Input
+                        id="email"
+                        {...register("email")}
+                        type="email"
+                        placeholder={isEn ? "you@company.com" : "ihre@firma.de"}
+                        className={cn(authInputClass, errors.email && authInputErrorClass)}
+                    />
+                </AuthField>
+
+                <AuthField
+                    label={isEn ? "Subject" : "Betreff"}
+                    htmlFor="subject"
+                    required
+                    error={errors.subject?.message}
+                >
+                    <Input
+                        id="subject"
+                        {...register("subject")}
+                        placeholder={isEn ? "How can we help?" : "Worum geht es?"}
+                        className={cn(authInputClass, errors.subject && authInputErrorClass)}
+                    />
+                </AuthField>
+
+                <AuthField
+                    label={isEn ? "Message" : "Nachricht"}
+                    htmlFor="message"
+                    required
+                    error={errors.message?.message}
+                >
+                    <Textarea
+                        id="message"
+                        {...register("message")}
+                        placeholder={isEn ? "Your message" : "Ihre Nachricht"}
+                        rows={6}
+                        className={cn(authTextareaClass, errors.message && authInputErrorClass)}
+                    />
+                </AuthField>
+
+                <div className="pt-1 overflow-x-auto">
+                    <ReCAPTCHA
+                        sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "your-site-key"}
+                        onChange={setCaptchaVal}
                     />
                 </div>
 
-                <div className="relative z-10 container mx-auto px-4 py-16 flex justify-center">
-                    <Card className="w-full max-w-lg shadow-xl border-none px-6 py-10 bg-white dark:bg-card">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-medium">
-                                {language === "en" ? "Contact Us" : "Kontakt"}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                <div className="space-y-1">
-                                    <Label>
-                                        Full Name
-                                        <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        {...register("name")}
-                                        placeholder="Your name"
-                                        className={errors.name ? "border-red-500" : ""}
-                                    />
-                                    {errors.name && (
-                                        <p className="text-xs text-red-500">{errors.name.message}</p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-1">
-                                    <Label>
-                                        Full Email
-                                        <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        {...register("email")}
-                                        type="email"
-                                        placeholder="email@example.com"
-                                        className={errors.email ? "border-red-500" : ""}
-                                    />
-                                    {errors.email && (
-                                        <p className="text-xs text-red-500">{errors.email.message}</p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-1">
-                                    <Label>
-                                        Subject
-                                        <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        {...register("subject")}
-                                        placeholder="Subject"
-                                        className={errors.subject ? "border-red-500" : ""}
-                                    />
-                                    {errors.subject && (
-                                        <p className="text-xs text-red-500">{errors.subject.message}</p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-1">
-                                    <Label>
-                                        Message
-                                        <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        {...register("message")}
-                                        placeholder="Your message"
-                                        rows={6}
-                                        className={errors.message ? "border-red-500 min-h-[140px]" : "min-h-[140px]"}
-                                    />
-                                    {errors.message && (
-                                        <p className="text-xs text-red-500">{errors.message.message}</p>
-                                    )}
-                                </div>
-
-                                <div className="pt-2">
-                                    <ReCAPTCHA
-                                        sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "your-site-key"}
-                                        onChange={setCaptchaVal}
-                                    />
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    size="lg"
-                                    className="w-full bg-primary hover:bg-primary/90 mt-4"
-                                    disabled={loading}
-                                >
-                                    {loading
-                                        ?  "Sending..."
-                                        : "Send message"
-                                        }
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </div>
-            </main>
-        </div>
+                <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+                    {loading
+                        ? isEn
+                            ? "Sending…"
+                            : "Wird gesendet…"
+                        : isEn
+                          ? "Send message"
+                          : "Nachricht senden"}
+                </Button>
+            </form>
+        </AuthPageShell>
     );
 }

@@ -9,8 +9,15 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileText, ArrowLeft } from "lucide-react";
-import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers";
-import { formatEnquiryNumber } from "@/lib/helpers";
+import {
+    calculateQuotationOfferTotals,
+    formatCurrency,
+    formatEnquiryNumber,
+    formatDate,
+    getStatusLabel,
+    getQuotationStatusColor,
+} from "@/lib/helpers";
+import { cn } from "@/lib/utils";
 import UserQuotationChat from "@/components/user/Quotation/UserQuotationChat";
 import ProductItemDisplay from "@/components/common/ProductItemDisplay";
 import {
@@ -35,18 +42,20 @@ function OfferTotalsSummary({ item, label, color, quotationTaxPercentage }) {
     const colorClass = color === "green" ? "text-green-700" : "text-blue-700";
 
     return (
-        <div className="mt-6 pt-4 space-y-1.5 text-sm border-t border-gray-300">
-            <div className="flex justify-between pt-2">
+        <div className="mt-6 pt-4 space-y-2 text-sm border-t border-gray-300">
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-baseline">
                 <span className="text-gray-600">Total Net:</span>
-                <span className="font-medium">{formatCurrency(offerNet)}</span>
+                <span className="font-medium tabular-nums">{formatCurrency(offerNet)}</span>
             </div>
-            <div className="flex justify-between">
-                <span className="text-gray-600">+ ({taxPercentage}%) VAT on</span>
-                <span className="font-medium">{formatCurrency(tax)}</span>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-baseline">
+                <span className="text-gray-600 break-words">+ ({taxPercentage}%) VAT on</span>
+                <span className="font-medium tabular-nums">{formatCurrency(tax)}</span>
             </div>
-            <div className="flex justify-between border-t border-gray-300 pt-2">
-                <span className="text-lg font-semibold text-gray-900">{label} Total</span>
-                <span className={`text-2xl font-bold ${colorClass}`}>{formatCurrency(offerTotal)}</span>
+            <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-baseline border-t border-gray-300 pt-3">
+                <span className="text-base sm:text-lg font-semibold text-gray-900">{label} Total</span>
+                <span className={`text-xl sm:text-2xl font-bold tabular-nums ${colorClass}`}>
+                    {formatCurrency(offerTotal)}
+                </span>
             </div>
         </div>
     );
@@ -57,6 +66,7 @@ export default function QuotationDetailPage() {
     const router = useRouter();
     const { user } = useAuth();
     const { language } = useLanguage();
+    const isEn = language === "en";
     const [quotation, setQuotation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
@@ -171,59 +181,78 @@ export default function QuotationDetailPage() {
 
     const { mainProduct, alternativeProduct } = quotation;
     const quotationTax = quotation.taxPercentage ?? "19";
+    const validUntil = format(
+        new Date(new Date(quotation.createdAt).getTime() + 30 * 24 * 60 * 60 * 1000),
+        "MMM dd, yyyy"
+    );
 
     return (
         <div className="min-h-screen bg-gray-50">
             <BreadCrumb
-                title={language === "en" ? "Quotation Details" : "Angebot Details"}
+                title={isEn ? "Quotation details" : "Angebotsdetails"}
                 breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: language === "en" ? "Quotations" : "Angebote", href: "/user/my-quotations" },
-                    { label: quotation.quotationNumber }
+                    { label: isEn ? "Home" : "Startseite", href: "/" },
+                    { label: isEn ? "Quotations" : "Angebote", href: "/user/my-quotations" },
+                    { label: quotation.quotationNumber },
                 ]}
             />
 
-            <div className="container mx-auto px-4 py-8 space-y-6">
-                {/* Back Button */}
+            <main className="container mx-auto px-4 lg:px-6 py-6 sm:py-8 space-y-6">
                 <Button
                     onClick={() => router.push("/user/my-quotations")}
                     variant="ghost"
-                    className="p-0!"
+                    className="h-auto p-0 text-sm font-medium text-primary hover:text-primary/80 -ml-1"
                 >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Quotations
+                    <ArrowLeft className="h-4 w-4 mr-2 shrink-0" />
+                    {isEn ? "Back to quotations" : "Zurück zu Angeboten"}
                 </Button>
 
-                {/* Header Info */}
-                <div className="container mx-auto space-y-6 bg-gray-100 rounded-lg border shadow-sm p-4">
-                <div className="p-2">
-                    <p className="text-primary text-lg underline font-archivo font-bold">
-                        {formatEnquiryNumber(quotation.enquiry?.id || "", quotation.createdAt)}
-                    </p>
-                    <h1 className="text-xl font-bold font-archivo text-gray-900">
-                        Quotation {quotation.quotationNumber}
-                    </h1>
-                    
+                {/* Header */}
+                <div className="rounded-xl border border-border/60 bg-white shadow-sm p-4 sm:p-6 space-y-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 space-y-1">
+                            <p className="text-sm font-medium text-primary break-all">
+                                {formatEnquiryNumber(quotation.enquiry?.id || "", quotation.createdAt)}
+                            </p>
+                            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight break-words">
+                                {isEn ? "Quotation" : "Angebot"} {quotation.quotationNumber}
+                            </h1>
+                            <p className="text-xs text-muted-foreground">
+                                {isEn ? "Created" : "Erstellt"}: {formatDate(quotation.createdAt)}
+                            </p>
+                        </div>
+                        <span
+                            className={cn(
+                                "self-start shrink-0 text-xs font-medium px-2.5 py-1 rounded-md",
+                                getQuotationStatusColor(quotation.status)
+                            )}
+                        >
+                            {getStatusLabel(quotation.status)}
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border/60">
+                        <div className="min-w-0">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                                {isEn ? "Project" : "Projekt"}
+                            </p>
+                            <p className="font-medium text-foreground mt-0.5 break-words">
+                                {mainProduct?.product?.productName || "N/A"}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                                {isEn ? "Valid until" : "Gültig bis"}
+                            </p>
+                            <p className="font-medium text-foreground mt-0.5">{validUntil}</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Project Info */}
-                <div className="grid grid-cols-3 gap-4 px-6 py-2">
-                    <div>
-                        <p className="text-sm text-gray-500">Project</p>
-                        <p className="font-medium">{mainProduct?.product?.productName || "N/A"}</p>
-                    </div>
-                    <div>
-                        <p className="text-sm text-gray-500">Valid Until</p>
-                        <p className="font-medium">
-                            {format(new Date(new Date(quotation.createdAt).getTime() + 30 * 24 * 60 * 60 * 1000), "MMM dd, yyyy")}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="bg-primary-foreground/80 rounded-lg border shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-border/60 bg-white shadow-sm overflow-hidden">
                     {/* Main Product Section */}
-                    <div className="p-6 border-b">
-                        <h3 className="text-xl font-semibold text-blue-700 mb-4">Main Product</h3>
+                    <div className="p-4 sm:p-6 border-b border-border/60">
+                        <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-4">Main Product</h3>
                         {mainProduct.product && (
                             <>
                                 <ProductItemDisplay
@@ -243,7 +272,7 @@ export default function QuotationDetailPage() {
 
                                 {/* Main Product Additional Items (included in total) */}
                                 {mainProduct.additionalItems && mainProduct.additionalItems.length > 0 && (
-                                    <div className="mt-4 ml-8 border-l-3 border-purple-300 pl-4 space-y-2">
+                                    <div className="mt-4 ml-0 sm:ml-4 lg:ml-8 border-l-2 sm:border-l-3 border-purple-300 pl-3 sm:pl-4 space-y-2">
                                         <h5 className="text-sm font-semibold text-purple-600">Additional Products</h5>
                                         {mainProduct.additionalItems.map((add, addIndex) => (
                                             <div key={addIndex} className="bg-purple-50/50 rounded-lg px-3 py-2">
@@ -268,7 +297,7 @@ export default function QuotationDetailPage() {
 
                                 {/* Main Product Optional Items (included in offer net + VAT) */}
                                 {mainProduct.optionalItems && mainProduct.optionalItems.length > 0 && (
-                                    <div className="mt-4 ml-8 border-l-3 border-blue-300 pl-4 space-y-2">
+                                    <div className="mt-4 ml-0 sm:ml-4 lg:ml-8 border-l-2 sm:border-l-3 border-blue-300 pl-3 sm:pl-4 space-y-2">
                                         <h5 className="text-sm font-semibold text-blue-600">Optional Products</h5>
                                         {mainProduct.optionalItems.map((opt, optIndex) => (
                                             <div key={optIndex} className="bg-blue-50/50 rounded-lg px-3 py-2">
@@ -334,8 +363,8 @@ export default function QuotationDetailPage() {
 
                     {/* Alternative Product Section */}
                     {alternativeProduct?.product && (
-                        <div className="p-6 border-b bg-green-50/30">
-                            <h3 className="text-xl font-semibold text-green-700 mb-4">Alternative Product</h3>
+                        <div className="p-4 sm:p-6 border-b border-border/60 bg-green-50/30">
+                            <h3 className="text-lg sm:text-xl font-semibold text-green-700 mb-4">Alternative Product</h3>
                             <ProductItemDisplay
                                 product={alternativeProduct.product}
                                 quantity={
@@ -353,7 +382,7 @@ export default function QuotationDetailPage() {
 
                             {/* Alternative Product Additional Items (included in total) */}
                             {alternativeProduct.additionalItems && alternativeProduct.additionalItems.length > 0 && (
-                                <div className="mt-4 ml-8 border-l-3 border-purple-300 pl-4 space-y-2">
+                                <div className="mt-4 ml-0 sm:ml-4 lg:ml-8 border-l-2 sm:border-l-3 border-purple-300 pl-3 sm:pl-4 space-y-2">
                                     <h5 className="text-sm font-semibold text-purple-600">Additional Products</h5>
                                     {alternativeProduct.additionalItems.map((add, addIndex) => (
                                         <div key={addIndex} className="bg-purple-50 rounded-lg px-3 py-2">
@@ -378,7 +407,7 @@ export default function QuotationDetailPage() {
 
                             {/* Alternative Product Optional Items (included in offer net + VAT) */}
                             {alternativeProduct.optionalItems && alternativeProduct.optionalItems.length > 0 && (
-                                <div className="mt-4 ml-8 border-l-3 border-green-300 pl-4 space-y-2">
+                                <div className="mt-4 ml-0 sm:ml-4 lg:ml-8 border-l-2 sm:border-l-3 border-green-300 pl-3 sm:pl-4 space-y-2">
                                     <h5 className="text-sm font-semibold text-green-600">Optional Products</h5>
                                     {alternativeProduct.optionalItems.map((opt, optIndex) => (
                                         <div key={optIndex} className="bg-green-50 rounded-lg px-3 py-2">
@@ -413,59 +442,88 @@ export default function QuotationDetailPage() {
 
                 </div>
 
-                {/* Action Buttons */}
-                <div className="p-4 border-b border-black/20">
-                    <h3 className="text-xl font-bold font-open-sans mb-4">Actions</h3>
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Show action buttons if not disabled */}
-                        {!quotation.buttonsDisabled ? (
+                {/* Actions */}
+                <div className="rounded-xl border border-border/60 bg-white shadow-sm p-4 sm:p-6 space-y-4">
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground">
+                        {isEn ? "Actions" : "Aktionen"}
+                    </h3>
+
+                    {quotation.buttonsDisabled && (
+                        <div className="rounded-lg bg-muted/50 border border-border/60 px-4 py-3 space-y-1">
+                            <p className="text-sm text-foreground">
+                                <span className="text-muted-foreground">
+                                    {isEn ? "Status" : "Status"}:{" "}
+                                </span>
+                                <span
+                                    className={cn(
+                                        "inline-flex text-xs font-medium px-2 py-0.5 rounded-md align-middle",
+                                        getQuotationStatusColor(quotation.status)
+                                    )}
+                                >
+                                    {getStatusLabel(quotation.status)}
+                                </span>
+                            </p>
+                            {quotation.buttonsDisabledReason && (
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                    {quotation.buttonsDisabledReason}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                        {!quotation.buttonsDisabled && (
                             <>
                                 <Button
                                     variant="secondary"
                                     size="lg"
+                                    className="w-full sm:w-auto"
                                     onClick={() => openConfirmDialog("accept")}
                                     disabled={actionLoading !== null || pdfLoading}
                                 >
-                                    {actionLoading === "accept" ? <Spinner className="h-4 w-4 mr-2" /> : null}
-                                    Accept
+                                    {actionLoading === "accept" ? (
+                                        <Spinner className="h-4 w-4 mr-2" />
+                                    ) : null}
+                                    {isEn ? "Accept" : "Annehmen"}
                                 </Button>
                                 <Button
                                     onClick={() => openConfirmDialog("reject")}
                                     disabled={actionLoading !== null || pdfLoading}
                                     variant="destructive"
                                     size="lg"
+                                    className="w-full sm:w-auto"
                                 >
-                                    {actionLoading === "reject" ? <Spinner className="h-4 w-4 mr-2" /> : null}
-                                    Reject
+                                    {actionLoading === "reject" ? (
+                                        <Spinner className="h-4 w-4 mr-2" />
+                                    ) : null}
+                                    {isEn ? "Reject" : "Ablehnen"}
                                 </Button>
                                 <Button
                                     onClick={() => openConfirmDialog("request_revision")}
                                     disabled={actionLoading !== null || pdfLoading}
-                                    className="bg-[#FFE62E] text-black hover:bg-[#FFE62E]/90"
+                                    className="w-full sm:w-auto bg-[#FFE62E] text-black hover:bg-[#FFE62E]/90"
                                     size="lg"
                                 >
-                                    {actionLoading === "request_revision" ? <Spinner className="h-4 w-4 mr-2" /> : null}
-                                    Request Revision
+                                    {actionLoading === "request_revision" ? (
+                                        <Spinner className="h-4 w-4 mr-2" />
+                                    ) : null}
+                                    {isEn ? "Request revision" : "Überarbeitung anfordern"}
                                 </Button>
                             </>
-                        ) : (
-                            <div className="text-sm text-gray-600">
-                                <p>
-                                    Status: <span className="font-semibold capitalize">{quotation.status.replace("_", " ")}</span>
-                                </p>
-                                {quotation.buttonsDisabledReason && (
-                                    <p className="text-xs text-gray-500 mt-1">{quotation.buttonsDisabledReason}</p>
-                                )}
-                            </div>
                         )}
                         <Button
                             onClick={handleDownloadPDF}
                             variant="default"
                             size="lg"
+                            className="w-full sm:w-auto"
                             disabled={pdfLoading}
                         >
-                            {pdfLoading ? <Spinner className="h-4 w-4 mr-2" /> : <FileText className="h-4 w-4 mr-2" />}
-                            Download PDF
+                            {pdfLoading ? (
+                                <Spinner className="h-4 w-4 mr-2" />
+                            ) : (
+                                <FileText className="h-4 w-4 mr-2" />
+                            )}
+                            {isEn ? "Download PDF" : "PDF herunterladen"}
                         </Button>
                     </div>
                 </div>
@@ -480,11 +538,16 @@ export default function QuotationDetailPage() {
                                 {pendingAction ? confirmMessages[pendingAction]?.description : ""}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                             <AlertDialogAction
+                                className={cn(
+                                    "w-full sm:w-auto",
+                                    pendingAction === "reject"
+                                        ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        : undefined
+                                )}
                                 onClick={() => pendingAction && handleAction(pendingAction)}
-                                className={pendingAction === "reject" ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
                             >
                                 Confirm
                             </AlertDialogAction>
@@ -492,16 +555,16 @@ export default function QuotationDetailPage() {
                     </AlertDialogContent>
                 </AlertDialog>
 
-                {/* Chat Section */}
-                <UserQuotationChat
-                    quotationId={params.id}
-                    currentUserName={user?.fullName}
-                    chatDisabled={quotation.chatDisabled}
-                    chatDisabledReason={quotation.chatDisabledReason}
-                    currentUserId={user?.id}
-                />
-            </div>
-            </div>
+                <div className="rounded-xl border border-border/60 bg-white shadow-sm p-4 sm:p-6">
+                    <UserQuotationChat
+                        quotationId={params.id}
+                        currentUserName={user?.fullName}
+                        chatDisabled={quotation.chatDisabled}
+                        chatDisabledReason={quotation.chatDisabledReason}
+                        currentUserId={user?.id}
+                    />
+                </div>
+            </main>
         </div>
     );
 }

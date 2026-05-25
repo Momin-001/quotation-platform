@@ -2,19 +2,47 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+Copy environment variables and configure socket settings:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Required for real-time chat (see `.env.example`):
+
+| Variable | Description |
+|----------|-------------|
+| `SOCKET_PORT` | Port for the dedicated Socket.IO server (default `3001`) |
+| `NEXT_PUBLIC_SOCKET_URL` | Browser WebSocket URL (e.g. `http://localhost:3001`) |
+| `SOCKET_SERVER_URL` | Next.js server-side URL to call internal emit API |
+| `SOCKET_CORS_ORIGIN` | Allowed browser origin for socket CORS (e.g. `http://localhost:3000`) |
+| `SOCKET_INTERNAL_SECRET` | Shared secret for Next → socket internal API |
+
+Run the development servers (Next.js + socket server):
+
+```bash
+npm install
+npm run dev
+```
+
+- Next.js app: [http://localhost:3000](http://localhost:3000)
+- Socket server: port `3001` (configurable via `SOCKET_PORT`)
+
+Run processes separately if needed:
+
+```bash
+npm run dev:next
+npm run dev:socket
+```
+
+Production (after `npm run build`):
+
+```bash
+npm run start
+npm run start:socket
+```
+
+Or use PM2 with `ecosystem.config.cjs` to run both apps.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

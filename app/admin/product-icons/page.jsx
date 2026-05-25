@@ -161,7 +161,7 @@ export default function ProductIconsPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Product Icons</h1>
+                <h1 className="text-2xl font-bold ">Product Icons</h1>
                 <p className="text-sm">
                     Create and manage feature icons (e.g. High Contrast, Energy Saving) that can be assigned to products.
                 </p>
@@ -251,7 +251,7 @@ export default function ProductIconsPage() {
 
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Image</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Name</TableHead>
@@ -271,7 +271,7 @@ export default function ProductIconsPage() {
                             </TableRow>
                         ) : filteredIcons.length > 0 ? (
                             filteredIcons.map((icon) => (
-                                <TableRow key={icon.id} className="even:bg-[#EAF6FF] font-open-sans">
+                                <TableRow key={icon.id} className="even:bg-[#EAF6FF] ">
                                     <TableCell className="p-4 whitespace-nowrap">
                                         <div className="relative h-12 w-12">
                                             <Image

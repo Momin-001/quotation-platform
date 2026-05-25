@@ -202,7 +202,7 @@ export default function CertificatesPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Certificates Management</h1>
+                <h1 className="text-2xl font-bold ">Certificates Management</h1>
                 <p className="text-sm">
                     Create, manage certificates that can be assigned to products.
                 </p>
@@ -312,7 +312,7 @@ export default function CertificatesPage() {
             {/* Table */}
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Image</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Name</TableHead>
@@ -334,7 +334,7 @@ export default function CertificatesPage() {
                             filteredCertificates.map((certificate) => (
                                 <TableRow
                                     key={certificate.id}
-                                    className="even:bg-[#EAF6FF] font-open-sans"
+                                    className="even:bg-[#EAF6FF] "
                                 >
                                     <TableCell className="p-4 whitespace-nowrap">
                                         <div className="relative h-12 w-20">

@@ -27,7 +27,7 @@ export default function QuotationBuilderSection({
     return (
         <div className={`${bgColor} rounded-xl p-6 border-2 ${borderColor}`}>
             <div className="flex items-center justify-between gap-3 mb-4">
-                <h2 className={`text-xl font-bold font-archivo ${titleColor}`}>{title}</h2>
+                <h2 className={`text-xl font-bold  ${titleColor}`}>{title}</h2>
                 {productData && onRemoveSection ? (
                     <Button
                         type="button"

@@ -161,7 +161,7 @@ export default function NavbarTab({ onDataChange, onValidationChange, onSaveHand
 
     return (
         <div className="space-y-6">
-            <h2 className="text-sm font-bold text-primary font-open-sans mb-6">
+            <h2 className="text-sm font-bold text-primary  mb-6">
                 SECTION 1 — NAVBAR
             </h2>
             

@@ -1,10 +1,10 @@
-import HeroSection from "@/components/guest/HeroSection";
-import ValueBlocksSection from "@/components/guest/ValueBlocksSection";
-import HowItWorksSection from "@/components/guest/HowItWorksSection";
-import PreSelectedFiltersSection from "@/components/guest/PreSelectedFiltersSection";
-import FAQSection from "@/components/guest/FAQSection";
-import PartnersSection from "@/components/guest/PartnersSection";
-import MarketingPartnersSection from "@/components/guest/MarketingPartnersSection";
+import HeroSection from "@/components/guest/Homepage/HeroSection";
+import ValueBlocksSection from "@/components/guest/Homepage/ValueBlocksSection";
+import HowItWorksSection from "@/components/guest/Homepage/HowItWorksSection";
+import PreSelectedFiltersSection from "@/components/guest/Homepage/PreSelectedFiltersSection";
+import FAQSection from "@/components/guest/Homepage/FAQSection";
+import PartnersSection from "@/components/guest/Homepage/PartnersSection";
+import MarketingPartnersSection from "@/components/guest/Homepage/MarketingPartnersSection";
 import BlogsSection from "@/components/guest/BlogsSection";
 import { BASE_URL } from "@/lib/constants";
 
@@ -142,11 +142,12 @@ const defaultHomepageData = {
 };
 
 async function getHomeData() {
+  const revalidateTime  = 900;
     const [homepageRes, partnersRes, faqsRes, blogsRes] = await Promise.all([
-      fetch(`${BASE_URL}/api/homepage`, { cache: "no-store" }),
-      fetch(`${BASE_URL}/api/partners`, { cache: "no-store" }),
-      fetch(`${BASE_URL}/api/faqs?limit=6`, { cache: "no-store" }),
-      fetch(`${BASE_URL}/api/blogs?limit=6`, { cache: "no-store" }),
+      fetch(`${BASE_URL}/api/homepage`, { next: { revalidate: revalidateTime } }),
+      fetch(`${BASE_URL}/api/partners`, { next: { revalidate: revalidateTime } }),
+      fetch(`${BASE_URL}/api/faqs?limit=6`, { next: { revalidate: revalidateTime } }),
+      fetch(`${BASE_URL}/api/blogs?limit=6`, { next: { revalidate: revalidateTime } }),
     ]);
   
     const homepageJson = await homepageRes.json();
@@ -176,10 +177,10 @@ async function getHomeData() {
         <ValueBlocksSection homepageData={homepageData} />
         <HowItWorksSection homepageData={homepageData} />
         <PartnersSection homepageData={homepageData} partners={technologyPartners} />
+        <PreSelectedFiltersSection homepageData={homepageData} />
         {marketingPartners.length > 0 && (
           <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} />
         )}
-        <PreSelectedFiltersSection homepageData={homepageData} />
         <BlogsSection homepageData={homepageData} blogs={blogs} />
         <FAQSection homepageData={homepageData} faqsData={faqs} />
       </div>

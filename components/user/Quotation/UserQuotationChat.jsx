@@ -12,7 +12,6 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
         connectionError,
         joinRoom,
         leaveRoom,
-        sendMessage: socketSendMessage,
         onNewMessage,
         onUserTyping,
         startTyping,
@@ -165,14 +164,10 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
             const response = await res.json();
 
             if (response.success) {
-                // Broadcast via Socket.IO for real-time delivery
-                socketSendMessage({
-                    quotationId,
-                    message: messageText,
-                    messageId: response.data.id,
-                    senderId: currentUserId,
-                    senderRole: "user",
-                    createdAt: response.data.createdAt,
+                setMessages((prev) => {
+                    const exists = prev.some((m) => m.id === response.data.id);
+                    if (exists) return prev;
+                    return [...prev, response.data];
                 });
             } else {
                 toast.error(response.message || "Failed to send message");
@@ -198,9 +193,11 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
     return (
         <div className="px-4">
             {/* Header with connection status */}
-            <div className="pb-4 flex items-center justify-between">
-                <h3 className="text-xl font-bold font-open-sans">Conversation with Admin</h3>
-                <div className="flex items-center gap-2">
+            <div className="pb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="text-lg sm:text-xl font-bold leading-tight">
+                    Conversation with Admin
+                </h3>
+                <div className="flex items-center gap-2 shrink-0">
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
                             <Wifi className="h-3 w-3" />
@@ -225,7 +222,7 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
             {/* Messages Container */}
          <div
   ref={messagesContainerRef}
-  className="h-80 overflow-y-auto p-6 space-y-6 rounded-lg border bg-primary-foreground/80"
+  className="h-64 sm:h-80 overflow-y-auto p-4 sm:p-6 space-y-6 rounded-lg border bg-primary-foreground/80"
 >
   {loading ? (
     <div className="flex items-center justify-center h-full">
@@ -265,7 +262,7 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
           )}
 
           {/* MESSAGE CONTENT */}
-          <div className="max-w-[70%] font-open-sans">
+          <div className="max-w-[min(85%,20rem)] sm:max-w-[70%] min-w-0">
             <div
               className={`flex flex-col items-center gap-1 mb-2 ${
                 isUser ? "items-end" : "items-start"
@@ -329,20 +326,20 @@ export default function UserQuotationChat({ quotationId, chatDisabled, chatDisab
                             {chatDisabledReason || "Chat is disabled for this quotation"}
                         </div>
                     ) : (
-                        <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                        <form onSubmit={handleSendMessage} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <input
                                 type="text"
                                 value={newMessage}
                                 onChange={handleInputChange}
                                 placeholder="Write your message..."
-                                className="flex-1 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder:font-archivo placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
+                                className="flex-1 min-w-0 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
                                 disabled={sending}
                             />
                             <Button
                                 type="submit"
                                 size="lg"
                                 disabled={sending || !newMessage.trim()}
-                                className="px-4"
+                                className="w-full sm:w-auto shrink-0 px-4"
                             >
                                 {sending ? <Spinner className="h-4 w-4" /> :
                                     <span>Send</span>

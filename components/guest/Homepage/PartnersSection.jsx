@@ -8,7 +8,7 @@ import Marquee from "react-fast-marquee";
 export default function PartnersSection({ homepageData, partners = [] }) {
     const { language } = useLanguage();
     const [pauseOnHover, setPauseOnHover] = useState(true);
-    const [speed, setSpeed] = useState(50); // Adjust speed as needed (20-100)
+    const [speed, setSpeed] = useState(50);
 
     const handlePartnerClick = async (partnerId, websiteUrl) => {
         try {
@@ -27,19 +27,17 @@ export default function PartnersSection({ homepageData, partners = [] }) {
     };
 
     return (
-        <section className="w-full bg-white py-14 lg:py-16">
-            <div className="container mx-auto px-4">
-                {/* Header Section */}
-                <div className="text-center mb-12 lg:mb-16">
-                    <h2 className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold mb-4 font-archivo">
+        <section className="w-full bg-gray-50 py-16 md:py-20 lg:py-24">
+            <div className="container mx-auto px-4 lg:px-6">
+                <div className="text-center mb-10 md:mb-14">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold  text-foreground leading-tight tracking-tight">
                         {getText("partnersTitle")}
                     </h2>
-                    <p className="text-lg md:text-xl max-w-3xl mx-auto text-primary-background font-normal font-open-sans">
+                    <p className="mt-3 md:mt-4 text-base md:text-lg max-w-2xl mx-auto text-muted-foreground leading-relaxed">
                         {getText("partnersSubtitle")}
                     </p>
                 </div>
 
-                {/* Marquee Container */}
                 {partners.length > 0 ? (
                     <div className="overflow-hidden relative">
                         <Marquee
@@ -52,25 +50,25 @@ export default function PartnersSection({ homepageData, partners = [] }) {
                             {partners.map((partner) => (
                                 <div
                                     key={partner.id}
-                                    className="shrink-0 bg-gray-100 rounded-lg hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-center mx-4 w-[330px] h-[100px]"
+                                    className="shrink-0 bg-white border border-gray-100 rounded-lg shadow-md transition-shadow duration-300 cursor-pointer flex items-center justify-center mx-3 w-[240px] h-[80px]"
                                     onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
                                     onMouseEnter={() => setPauseOnHover(true)}
                                 >
                                     <Image
                                         src={partner.logoUrl}
                                         alt={partner.name}
-                                        width={200}
-                                        height={200}
+                                        width={180}
+                                        height={180}
                                         priority
-                                        className="object-contain w-[200px] h-[80px]"
+                                        className="object-contain w-[140px] h-[60px]"
                                     />
                                 </div>
                             ))}
                         </Marquee>
                     </div>
                 ) : (
-                    <div className="text-center text-gray-500 py-12">
-                        <p>No partners available</p>
+                    <div className="text-center text-muted-foreground py-12">
+                        <p className="text-sm">No partners available</p>
                     </div>
                 )}
             </div>

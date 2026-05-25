@@ -35,7 +35,7 @@ export default function QuotationPreview({
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Editor
                     </Button>
-                    <h1 className="text-2xl font-bold font-archivo">Quotation {quotationId}</h1>
+                    <h1 className="text-2xl font-bold ">Quotation {quotationId}</h1>
                     <p className="text-gray-500">Preview · MwSt {taxRate}% je Angebot (auf Nettosumme)</p>
                 </div>
             </div>

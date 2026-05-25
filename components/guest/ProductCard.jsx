@@ -26,78 +26,77 @@ function formatSpecialTypes(product) {
     return formatEnumLabel(product.specialTypes);
 }
 
-/**
- * Single product card for listing and related sections.
- * - **listing** (default): plain card; wrap with `<Link href={...}>` on the listing page.
- * - **related**: eye icon opens detail page; shows Design + Special Types; card itself is not a link.
- */
 export default function ProductCard({ product, className = "", variant = "listing" }) {
     const isRelated = variant === "related";
 
     return (
-        <div
+        <article
             className={cn(
-                "bg-white border rounded-lg overflow-hidden",
+                "flex flex-col h-full bg-white border border-border/60 rounded-xl overflow-hidden transition-all duration-300",
+                "hover:shadow-lg hover:border-primary/25 hover:-translate-y-0.5",
                 isRelated && "shadow-sm",
                 className
             )}
         >
-            <div className="relative aspect-square bg-gray-100">
+            <div className="relative aspect-square bg-white overflow-hidden border-b border-border/40">
                 {product.images && product.images.length > 0 ? (
                     <Image
                         src={product.images[0]}
                         alt={product.productName}
                         fill
-                        className="object-contain"
+                        className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.02]"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        No Image
+                    <div className="w-full h-full flex items-center justify-center bg-muted/20 text-muted-foreground/60">
+                        <span className="text-xs font-medium">No Image</span>
                     </div>
                 )}
                 {isRelated ? (
                     <Link
                         href={`/products/${product.id}`}
-                        className="absolute top-2 right-2 z-10 flex h-14 w-14 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
+                        className="absolute top-2.5 right-2.5 z-10 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
                         aria-label="View product details"
                     >
-                        <Eye className="h-5 w-5" />
+                        <Eye className="h-4 w-4" />
                     </Link>
                 ) : null}
             </div>
-            <div className="p-4">
+
+            <div className="flex flex-col flex-1 p-4 sm:p-5 gap-2">
                 <h3
                     className={cn(
-                        "font-bold font-open-sans text-xl mb-1",
-                        isRelated && "uppercase"
+                        "font-semibold  text-base sm:text-lg leading-snug line-clamp-2 text-foreground",
+                        isRelated && "uppercase tracking-wide"
                     )}
                 >
                     {product.productName}
                 </h3>
                 <p
                     className={cn(
-                        "text-lg font-open-sans mb-1",
-                        isRelated && "text-gray-600"
+                        "text-xs sm:text-sm text-muted-foreground font-mono tracking-tight",
+                        isRelated && "text-foreground/70"
                     )}
                 >
                     {product.productNumber}
                 </p>
-                <p className="text-sm font-semibold font-open-sans bg-secondary text-white uppercase rounded-md px-4 py-1 w-fit">
+                <span className="inline-flex self-start text-[11px] sm:text-xs font-semibold uppercase tracking-wide bg-secondary text-primary-foreground rounded-md px-2.5 py-1 mt-0.5">
                     {product.areaOfUse || "N/A"}
-                </p>
+                </span>
+
                 {isRelated ? (
-                    <div className="grid grid-cols-2 gap-3 mt-3  font-open-sans">
+                    <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-border/50">
                         <div>
-                            <p className="text-lg">Design</p>
-                            <p className="font-bold text-lg">{formatDesign(product.design)}</p>
+                            <p className="text-xs text-muted-foreground mb-0.5">Design</p>
+                            <p className="text-sm font-semibold text-foreground">{formatDesign(product.design)}</p>
                         </div>
                         <div>
-                            <p className="text-lg">Special Types</p>
-                            <p className="font-bold text-lg">{formatSpecialTypes(product)}</p>
+                            <p className="text-xs text-muted-foreground mb-0.5">Special Types</p>
+                            <p className="text-sm font-semibold text-foreground">{formatSpecialTypes(product)}</p>
                         </div>
                     </div>
                 ) : null}
             </div>
-        </div>
+        </article>
     );
 }

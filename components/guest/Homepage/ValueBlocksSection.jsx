@@ -6,14 +6,12 @@ import { CheckCircle2, FileSpreadsheet, Eye, ShieldCheck, Grid3X3 } from "lucide
 export default function ValueBlocksSection({ homepageData }) {
     const { language } = useLanguage();
 
-    // Get text based on current language with fallback
     const getText = (field) => {
         if (!homepageData) return "";
         const key = language === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 
-    // Value blocks data
     const valueBlocks = [
         {
             icon: CheckCircle2,
@@ -38,42 +36,36 @@ export default function ValueBlocksSection({ homepageData }) {
     ];
 
     return (
-        <section className="w-full bg-gray-50 py-16 lg:py-24">
-            <div className="container mx-auto px-4">
-                {/* Header Section */}
-                <div className="text-center mb-12 lg:mb-16">
-                    <h2 className="text-4xl md:text-5xl lg:text-[55px] text-black font-bold mb-4 font-archivo">
+        <section className="w-full bg-gray-50 py-16 md:py-20 lg:py-24">
+            <div className="container mx-auto px-4 lg:px-6">
+                <div className="text-center mb-10 md:mb-14 lg:mb-16">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold  text-foreground leading-tight tracking-tight">
                         {getText("valueBlocksTitle")}
                     </h2>
-                    <p className="text-lg md:text-xl max-w-3xl mx-auto text-primary-background font-normal font-open-sans">
+                    <p className="mt-3 md:mt-4 text-base md:text-lg max-w-2xl mx-auto text-muted-foreground leading-relaxed">
                         {getText("valueBlocksSubtitle")}
                     </p>
                 </div>
 
-                {/* Value Blocks Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                     {valueBlocks.map((block, index) => {
                         const IconComponent = block.icon;
                         return (
                             <div
                                 key={index}
-                                className="rounded-lg p-6 lg:p-6 flex flex-col items-start space-y-4 hover:shadow-lg transition-shadow"
+                                className="rounded-xl p-6 lg:p-7 flex flex-col items-start space-y-4 hover:shadow-md transition-shadow duration-300 bg-white"
                             >
-                                {/* Icon */}
-                                <div className="text-secondary mb-2">
-                                    <IconComponent className="h-10 w-10" strokeWidth={1} />
+                                <div className="text-secondary">
+                                    <IconComponent className="h-9 w-9 lg:h-10 lg:w-10" strokeWidth={1.2} />
                                 </div>
 
-                                {/* Title */}
-                                <h3 className="text-xl font-bold font-archivo">
+                                <h3 className="text-lg font-semibold  text-foreground leading-snug">
                                     {block.title}
                                 </h3>
 
-                                {/* Separator Line */}
-                                <div className="w-8 rounded-full h-1 bg-[#4BA3FF]"></div>
+                                <div className="w-8 rounded-full h-0.5 bg-primary/50"></div>
 
-                                {/* Description */}
-                                <p className="text-[#2C2C2C] text-xl font-normal font-open-sans">
+                                <p className="text-[15px] text-muted-foreground leading-relaxed">
                                     {block.description}
                                 </p>
                             </div>
@@ -84,4 +76,3 @@ export default function ValueBlocksSection({ homepageData }) {
         </section>
     );
 }
-

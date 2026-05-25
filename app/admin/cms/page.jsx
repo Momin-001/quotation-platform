@@ -75,7 +75,7 @@ export default function CMSPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Manage CMS Pages</h1>
+                <h1 className="text-2xl font-bold ">Manage CMS Pages</h1>
                 <p className="text-sm text-muted-foreground">
                     Edit website content blocks such as homepage, case studies, and blog posts.
                 </p>

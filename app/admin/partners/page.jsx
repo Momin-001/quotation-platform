@@ -208,7 +208,7 @@ export default function PartnersPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Partners & Manufacturers</h1>
+                <h1 className="text-2xl font-bold ">Partners & Manufacturers</h1>
                 <p className="text-sm">
                     Create, manage product affiliates such as gree patch, brighttown level, UV strings, and more.
                 </p>
@@ -321,7 +321,7 @@ export default function PartnersPage() {
             {/* Table */}
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Logo</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Name</TableHead>
@@ -345,7 +345,7 @@ export default function PartnersPage() {
                             filteredPartners.map((partner) => (
                                 <TableRow
                                     key={partner.id}
-                                    className="even:bg-[#EAF6FF] font-open-sans"
+                                    className="even:bg-[#EAF6FF] "
                                 >
                                     <TableCell className="p-4 whitespace-nowrap">
                                         <div className="relative h-12 w-20">

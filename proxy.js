@@ -12,10 +12,45 @@ export async function proxy(request) {
     const adminPaths = ["/admin"];
     const userPaths = ["/user"];
 
-    const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
-    const isAdminPath = adminPaths.some((path) => pathname.startsWith(path));
-    const isUserPath = userPaths.some((path) => pathname.startsWith(path));
+    const authPages = [
+        "/login",
+        "/register",
+        "/reset-password",
+        "/forgot-password",
+    ];
 
+    const isProtected = protectedPaths.some((path) =>
+        pathname.startsWith(path)
+    );
+
+    const isAdminPath = adminPaths.some((path) =>
+        pathname.startsWith(path)
+    );
+
+    const isUserPath = userPaths.some((path) =>
+        pathname.startsWith(path)
+    );
+
+    const isAuthPage = authPages.some((path) =>
+        pathname.startsWith(path)
+    );
+
+    // Handle logged-in users trying to access auth pages
+    if (isAuthPage && token) {
+        try {
+            const { payload } = await jwtVerify(token, secret);
+
+            if (payload.role === "admin" || payload.role === "super_admin") {
+                return NextResponse.redirect(new URL("/admin", request.url));
+            }
+            return NextResponse.redirect(new URL("/", request.url));
+        
+        } catch (err) {
+            // Invalid token → allow access to auth pages
+        }
+    }
+
+    // Handle protected routes
     if (isProtected) {
         if (!token) {
             return NextResponse.redirect(new URL("/login", request.url));
@@ -23,15 +58,19 @@ export async function proxy(request) {
 
         try {
             const { payload } = await jwtVerify(token, secret);
+
             if (isAdminPath && payload.role !== "admin" && payload.role !== "super_admin") {
                 return NextResponse.redirect(new URL("/", request.url));
             }
+
             if (pathname.startsWith("/admin/cms") && payload.role !== "super_admin") {
                 return NextResponse.redirect(new URL("/admin", request.url));
             }
+
             if (isUserPath && payload.role !== "user") {
                 return NextResponse.redirect(new URL("/", request.url));
             }
+
         } catch (err) {
             return NextResponse.redirect(new URL("/login", request.url));
         }
@@ -41,5 +80,13 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/api/auth/me", "/user/:path*"],
+    matcher: [
+        "/admin/:path*",
+        "/api/auth/me",
+        "/user/:path*",
+        "/login",
+        "/register",
+        "/reset-password",
+        "/forgot-password",
+    ],
 };

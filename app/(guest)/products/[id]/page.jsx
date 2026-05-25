@@ -13,7 +13,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
-import { Download, ShoppingCart, FileText, Wrench } from "lucide-react";
+import { ShoppingCart, FileText, Wrench } from "lucide-react";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/carousel";
 import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
 import RelatedProductsSection from "@/components/guest/RelatedProductsSection";
+import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -67,15 +68,15 @@ export default function ProductDetailPage() {
             if (!res.ok) {
                 throw new Error("Failed to generate datasheet");
             }
-            
+
             // Wait for the full response to be received
             const blob = await res.blob();
-            
+
             // Verify blob is not empty
             if (blob.size === 0) {
                 return;
             }
-            
+
             // Create download link (sanitize filename so extension is preserved)
             const safeName = String(product.productNumber || "datasheet").replace(/[/\\:*?"<>|]/g, "_").trim() || "datasheet";
             const filename = `${safeName}_datasheet.pdf`;
@@ -85,16 +86,16 @@ export default function ProductDetailPage() {
             a.download = filename;
             a.style.display = "none";
             document.body.appendChild(a);
-            
+
             // Trigger download
             a.click();
-            
+
             // Clean up after a short delay to ensure download starts
             setTimeout(() => {
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
             }, 100);
-            
+
             toast.success("Datasheet downloaded successfully");
         } catch (error) {
             toast.error(error.message || "Failed to download datasheet");
@@ -133,16 +134,26 @@ export default function ProductDetailPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Spinner className="h-8 w-8" />
+            <div className="min-h-[50vh] flex items-center justify-center bg-gray-50">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <Spinner className="h-6 w-6" />
+                    <span className="text-sm">
+                        {language === "en" ? "Loading product…" : "Produkt wird geladen…"}
+                    </span>
+                </div>
             </div>
         );
     }
 
     if (!product) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-lg">Product not found</p>
+            <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 bg-gray-50 px-4">
+                <p className="text-base text-muted-foreground">
+                    {language === "en" ? "Product not found" : "Produkt nicht gefunden"}
+                </p>
+                <Button variant="outline" size="default" onClick={() => router.push("/products")}>
+                    {language === "en" ? "Back to Products" : "Zurück zu Produkten"}
+                </Button>
             </div>
         );
     }
@@ -156,7 +167,7 @@ export default function ProductDetailPage() {
 
     // Format enum values for display
     const formatEnum = (value) => {
-        if (!value) 
+        if (!value)
             return "N/A";
         return value
             .split("_")
@@ -164,18 +175,46 @@ export default function ProductDetailPage() {
             .join(" ");
     };
 
+    const accordionPanel = "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";
+    const accordionTriggerClass =
+        "text-sm sm:text-base font-semibold tracking-wide bg-primary/10 hover:no-underline hover:bg-primary/15 px-4 py-3.5 text-foreground data-[state=open]:bg-primary/15";
+    const accordionContentClass = "bg-muted/20 px-4 pt-3 pb-4 border-t border-border/40";
+
     const SpecRow = ({ label, value, unit }) => {
         const displayValue = value ?? "N/A";
         return (
-            <div className="flex text-md font-normal justify-between items-baseline gap-4 py-1">
-                <span className="shrink-0">{label}</span>
-                <div className="flex items-baseline justify-end gap-3 min-w-0 flex-1">
-                    <span className="text-right">{String(displayValue)}</span>
-                    <span className="w-10 shrink-0"> {unit ? unit : ""}</span>
+            <div className="flex text-sm justify-between items-baseline gap-4 py-1">
+                <span className="text-muted-foreground shrink-0 pr-2">{label}</span>
+                <div className="flex items-baseline justify-end gap-2 min-w-0 flex-1 text-right">
+                    <span className="font-medium text-foreground">{String(displayValue)}</span>
+                    <span className="text-xs text-muted-foreground w-14 shrink-0 tabular-nums">
+                        {unit || ""}
+                    </span>
                 </div>
             </div>
         );
     };
+
+    const DownloadButton = ({ onClick, disabled, loading, label }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+        >
+            {loading ? (
+                <>
+                    <Spinner className="h-4 w-4" />
+                    <span>{language === "en" ? "Generating…" : "Wird erstellt…"}</span>
+                </>
+            ) : (
+                <>
+                    <FileText className="h-4 w-4 text-destructive/80 shrink-0" />
+                    <span>{label}</span>
+                </>
+            )}
+        </button>
+    );
 
     return (
         <>
@@ -185,91 +224,106 @@ export default function ProductDetailPage() {
                     { label: language === "en" ? "Products" : "Produkte", href: "/products" },
                     { label: product.productName }
                 ]} />
-            <div className="min-h-screen bg-gray-50 font-open-sans">
-                <div className="container mx-auto px-4 py-8">
-                    {/* Make the left grid take less width then the right grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                        {/* Left Side - Image Gallery */}
+            <div className="min-h-screen bg-gray-50">
+                <div className="container mx-auto px-4 lg:px-6 py-6 sm:py-8 lg:py-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mb-10 lg:mb-14">
                         <div className="space-y-4">
-                            {/* Main Selected Image */}
-                            <div className="relative aspect-square overflow-hidden rounded-lg">
+                            {/* Main Image */}
+                            <div className="relative aspect-square overflow-hidden ">
                                 {selectedImage ? (
                                     <Image
                                         src={selectedImage}
                                         alt={product.productName}
                                         fill
                                         className="object-contain"
+                                        priority
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
-                                        No Image
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/30">
+                                        <span className="text-sm">No Image</span>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Image Carousel */}
+                            {/* Image Gallery */}
                             {product.images.length > 0 && (
                                 <Carousel
-                                    opts={{
-                                        align: "center",
-                                        slidesToScroll: 1,
-                                    }}
-                                    className="w-full relative"
+                                    opts={{ align: "start", slidesToScroll: 1 }}
+                                    className="w-full relative px-1"
                                 >
-                                    <CarouselContent>
+                                    <CarouselContent className="-ml-2">
                                         {product.images.map((image, index) => (
-                                            <CarouselItem 
-                                                key={index} 
-                                                className="py-2 basis-1/3 md:basis-1/4"
+                                            <CarouselItem
+                                                key={index}
+                                                className="pl-2 basis-1/4 sm:basis-1/5 md:basis-1/6"
                                             >
                                                 <button
+                                                    type="button"
                                                     onClick={() => setSelectedImageIndex(index)}
-                                                    className="relative aspect-square overflow-hidden rounded-lg w-full"
+                                                    className={cn(
+                                                        "relative aspect-square overflow-hidden rounded-lg w-full border-2 bg-white transition-all",
+                                                        selectedImageIndex === index
+                                                            ? "border-primary shadow-md ring-2 ring-primary/20"
+                                                            : "border-border/60 hover:border-primary/40"
+                                                    )}
                                                 >
                                                     <Image
                                                         src={image}
                                                         alt={`${product.productName} ${index + 1}`}
                                                         fill
-                                                        className="object-contain"
+                                                        className="object-contain p-1.5"
+                                                        sizes="80px"
                                                     />
                                                 </button>
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>
-                                    {product.images.length > 3 && (
+                                    {product.images.length > 4 && (
                                         <>
-                                            <CarouselPrevious className="left-2" />
-                                            <CarouselNext className="right-2" />
+                                            <CarouselPrevious className="left-0 h-8 w-8 border-primary/30 text-primary" />
+                                            <CarouselNext className="right-0 h-8 w-8 border-primary/30 text-primary" />
                                         </>
                                     )}
                                 </Carousel>
                             )}
+
+
                         </div>
 
-                        {/* Right Side - Product Info */}
-                        <div className="space-y-8">
-                            <div className="space-y-6">
+                        <div className="space-y-6 lg:space-y-8">
+                            <div className="bg-white rounded-xl border border-border/60 p-5 sm:p-6 lg:p-7 shadow-sm space-y-5">
                                 <div>
-                                    <h1 className="text-3xl font-bold mb-2">{product.productName}</h1>
-                                    <p className="text-xl font-semibold mb-2">{product.productNumber}</p>
+                                    <h1 className="text-2xl sm:text-3xl font-bold ound leading-tight tracking-tight mb-2">
+                                        {product.productName}
+                                    </h1>
+                                    <p className="text-sm sm:text-base font-mono text-muted-foreground mb-3">
+                                        {product.productNumber}
+                                    </p>
                                     {product.areaOfUse && (
-                                        <span className="inline-block bg-secondary text-white px-4 py-2 rounded-md text-lg font-semibold mb-4">
-                                            {product.areaOfUse.toUpperCase()}
+                                        <span className="inline-block bg-secondary text-primary-foreground text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-md mb-4">
+                                            {product.areaOfUse}
                                         </span>
                                     )}
                                     {product.productDescription && (
-                                        <p className="mb-4 font-normal text-xl">{product.productDescription}</p>
+                                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                                            {product.productDescription}
+                                        </p>
                                     )}
                                 </div>
 
-                                {/* Features */}
                                 {product.features && product.features.length > 0 && (
-                                    <div>
-                                        <h2 className="text-2xl font-bold mb-2">Features</h2>
-                                        <ul className="space-y-1 px-2">
+                                    <div className="pt-4 border-t border-border/50">
+                                        <h2 className="text-sm font-semibold  uppercase tracking-wide text-foreground mb-3">
+                                            {language === "en" ? "Features" : "Merkmale"}
+                                        </h2>
+                                        <ul className="space-y-2">
                                             {product.features.map((feature, index) => (
-                                                <li key={index} className="flex items-start gap-2 font-normal text-xl">
-                                                    <span>•</span>
+                                                <li
+                                                    key={index}
+                                                    className="flex items-start gap-2.5 text-sm text-foreground/90 leading-relaxed"
+                                                >
+                                                    <span className="text-primary mt-1 shrink-0">•</span>
                                                     <span>{feature}</span>
                                                 </li>
                                             ))}
@@ -277,150 +331,150 @@ export default function ProductDetailPage() {
                                     </div>
                                 )}
 
-                                
-                                    <div className="mt-4 space-y-1">
-                                        {product.stockPieces > 0 && 
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-xl">Stock:</span>
-                                            <span className="font-normal text-xl">
-                                                {product.stockPieces} pieces
-                                            </span>
-                                        </div>
-                                        }
-                                        {product.leadtimeDays > 0 && 
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-xl">Lead Time:</span>
-                                            <span className="font-normal text-xl">
-                                                {product.leadtimeDays} days
-                                            </span>
-                                        </div>
-                                        }
-                                    </div>
-                            </div>
-
-                            {/* Downloads */}
-                            {isAuthenticated && isUser && (
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4">
-                                <div>
-                                    <h3 className="text-lg font-bold">Downloads</h3>
-                                    <p className="text-sm text-gray-800">Product Datasheet</p>
-                                </div>
-
-                                <div className="mt-4 md:mt-0">
-                                    <button
-                                        onClick={handleDownloadDatasheet}
-                                        disabled={datasheetLoading}
-                                        className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                                    >
-                                        {datasheetLoading ? (
-                                            <>
-                                                <Spinner className="h-5 w-5 mr-2 text-blue-600" />
-                                                <span>Generating…</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FileText className="h-5 w-5 mr-2 text-red-500" />
-                                                <span>Product Datasheet</span>
-                                            </>
+                                {(product.stockPieces > 0 || product.leadtimeDays > 0) && (
+                                    <div className="flex flex-wrap gap-4 pt-2">
+                                        {product.stockPieces > 0 && (
+                                            <div className="rounded-lg bg-muted/40 px-3 py-2">
+                                                <span className="text-xs text-muted-foreground block">
+                                                    {language === "en" ? "Stock" : "Lager"}
+                                                </span>
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {product.stockPieces}{" "}
+                                                    {language === "en" ? "pieces" : "Stück"}
+                                                </span>
+                                            </div>
                                         )}
-                                    </button>
-                                </div>
-                            </div>
-                            )}
-                            {/* Action Buttons */}
-                            
-                            {isAuthenticated && isUser && (
-                            <div className="flex gap-3">
-                                <Button
-                                    variant="secondary"
-                                    size="lg"
-                                    onClick={() => {
-                                        if (product) {
-                                            addToCart({
-                                                id: product.id,
-                                                productName: product.productName,
-                                                productNumber: product.productNumber,
-                                                imageUrl: product.images?.[0] || null,
-                                                categoryName: product.categoryName,
-                                            });
-                                            toast.success("Product added to cart");
-                                        }
-                                    }}
-                                >
-                                    Add to Cart
-                                </Button>
-                                <Button  onClick={() => {
-                                        if (product) {
-                                            addToCart({
-                                                id: product.id,
-                                                productName: product.productName,
-                                                productNumber: product.productNumber,
-                                                imageUrl: product.images?.[0] || null,
-                                                categoryName: product.categoryName,
-                                            });
-                                            router.push("/user/cart");
-                                        }
-                                    }} variant="default" size="lg">
-                                    <FileText className="h-5 w-5 mr-2" />
-                                    Get a Quote
-                                </Button>
-                                {product.productType === "LED Display Single Cabinet" && (
-                                    <Button onClick={() => router.push("/leditor")} size="lg" variant="outline" className="text-primary hover:bg-primary/10 border-primary">
-                                        <Wrench className="h-5 w-5 mr-2" />
-                                        Get Custom Solution
-                                    </Button>
+                                        {product.leadtimeDays > 0 && (
+                                            <div className="rounded-lg bg-muted/40 px-3 py-2">
+                                                <span className="text-xs text-muted-foreground block">
+                                                    {language === "en" ? "Lead time" : "Lieferzeit"}
+                                                </span>
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {product.leadtimeDays}{" "}
+                                                    {language === "en" ? "days" : "Tage"}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {isAuthenticated && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div>
+                                            <h3 className="text-sm font-semibold  uppercase tracking-wide text-foreground">
+                                                {language === "en" ? "Downloads" : "Downloads"}
+                                            </h3>
+                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                {language === "en" ? "Product datasheet (PDF)" : "Produktdatenblatt (PDF)"}
+                                            </p>
+                                        </div>
+                                        <DownloadButton
+                                            onClick={handleDownloadDatasheet}
+                                            disabled={datasheetLoading}
+                                            loading={datasheetLoading}
+                                            label={language === "en" ? "Product Datasheet" : "Produktdatenblatt"}
+                                        />
+                                    </div>
+                                )}
+                                {isAuthenticated && isUser && (
+                                    <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
+                                        <Button
+                                            variant="secondary"
+                                            size="lg"
+                                            className="flex-1 sm:flex-none min-w-[140px]"
+                                            onClick={() => {
+                                                addToCart({
+                                                    id: product.id,
+                                                    productName: product.productName,
+                                                    productNumber: product.productNumber,
+                                                    imageUrl: product.images?.[0] || null,
+                                                    categoryName: product.categoryName,
+                                                });
+                                                toast.success(
+                                                    language === "en"
+                                                        ? "Product added to cart"
+                                                        : "Produkt zum Warenkorb hinzugefügt"
+                                                );
+                                            }}
+                                        >
+                                            <ShoppingCart className="h-4 w-4 mr-2" />
+                                            {language === "en" ? "Add to Cart" : "In den Warenkorb"}
+                                        </Button>
+                                        <Button
+                                            size="lg"
+                                            className="flex-1 sm:flex-none min-w-[140px]"
+                                            onClick={() => {
+                                                addToCart({
+                                                    id: product.id,
+                                                    productName: product.productName,
+                                                    productNumber: product.productNumber,
+                                                    imageUrl: product.images?.[0] || null,
+                                                    categoryName: product.categoryName,
+                                                });
+                                                router.push("/user/cart");
+                                            }}
+                                        >
+                                            <FileText className="h-4 w-4 mr-2" />
+                                            {language === "en" ? "Get a Quote" : "Angebot anfordern"}
+                                        </Button>
+                                        {product.productType === "LED Display Single Cabinet" && (
+                                            <Button
+                                                onClick={() => router.push("/leditor")}
+                                                size="lg"
+                                                variant="outline"
+                                                className="flex-1 sm:flex-none min-w-[140px] text-primary border-primary hover:bg-primary/5"
+                                            >
+                                                <Wrench className="h-4 w-4 mr-2" />
+                                                {language === "en" ? "Custom Solution" : "Individuelle Lösung"}
+                                            </Button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
-                            )}
+                        </div>
+                    </div>
 
-                            {/* Product feature icons — card: icon + divider + label (inside one frame) */}
+                    <div className="space-y-4">
+
+                        <div className="bg-white rounded-xl border border-border/60 p-3 shadow-sm space-y-5">
                             {product.productIcons && product.productIcons.length > 0 && (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 items-stretch">
+                                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-2">
                                     {product.productIcons.map((icon) => (
-                                        <div
-                                            key={icon.id}
-                                            className="flex h-full min-h-0 flex-col"
-                                        >
-                                            <div className="flex w-full shrink-0 items-center justify-center border border-gray-800 rounded-lg bg-white p-3 shadow-sm h-20">
-                                                <div className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
+                                        <div key={icon.id} className="flex flex-col items-center text-center pb-2">
+                                            <div className="flex w-full items-center justify-center aspect-square max-h-[60px]">
+                                                <div className="relative h-12 w-12">
                                                     <Image
                                                         src={icon.imageUrl}
                                                         alt={icon.name}
                                                         fill
-                                                        sizes="(max-width: 640px) 96px, 112px"
+                                                        sizes="44px"
                                                         className="object-contain"
                                                     />
                                                 </div>
                                             </div>
-                                            <div
-                                                className="mt-2 w-full shrink-0 border-t border-gray-800"
-                                                aria-hidden
-                                            />
-                                            <p className="mt-2 px-1 text-center text-[13px] font-semibold leading-snug line-clamp-2 font-open-sans">
+                                            <p className="text-xs leading-snug line-clamp-2">
                                                 {icon.name}
                                             </p>
                                         </div>
                                     ))}
                                 </div>
                             )}
-                        </div>
-                    </div>
+                                </div>
 
-                    {/* Product Specifications */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                         {/* Left Column */}
                         <div className="space-y-4">
                             {/* Basic Information */}
-                            <Accordion type="single" defaultValue="basic-info" collapsible className="rounded-lg">
-                                <AccordionItem value="basic-info">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Basic Information
+                            <Accordion type="single" defaultValue="basic-info" collapsible className={accordionPanel}>
+                                <AccordionItem value="basic-info" className="border-0">
+                                    <AccordionTrigger className={accordionTriggerClass}>
+                                        {language === "en" ? "Basic Information" : "Grundinformationen"}
                                     </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                    <AccordionContent className={accordionContentClass}>
                                         <div>
                                             <SpecRow label="Product Type" value={product.productType} />
                                             <SpecRow label="Design" value={product.design} />
-                                            <SpecRow label="Special Types" value={product.specialTypes } />
+                                            <SpecRow label="Special Types" value={product.specialTypes} />
                                             <SpecRow label="Application" value={Array.isArray(product.application) ? product.application.join(", ") : product.application} />
                                             <SpecRow label="Category" value={product.areaOfUse} />
                                             <SpecRow label="Service" value={product.support} />
@@ -430,12 +484,12 @@ export default function ProductDetailPage() {
                             </Accordion>
 
                             {/* Physical Specifications */}
-                            <Accordion type="single" defaultValue="physical-specs" collapsible className="rounded-lg">
-                                <AccordionItem value="physical-specs">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Physical Specifications
+                            <Accordion type="single" defaultValue="physical-specs" collapsible className={accordionPanel}>
+                                <AccordionItem value="physical-specs" className="border-0">
+                                    <AccordionTrigger className={accordionTriggerClass}>
+                                        {language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}
                                     </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                    <AccordionContent className={accordionContentClass}>
                                         <div>
                                             <SpecRow label="Pixel Pitch" value={product.pixelPitch} unit="mm" />
                                             <SpecRow label="Pixel Technology" value={product.pixelTechnology} />
@@ -452,154 +506,119 @@ export default function ProductDetailPage() {
                             </Accordion>
                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
-                            {/* Electrical Specifications */}
-                            <Accordion type="single" defaultValue="electrical-specs" collapsible className="rounded-lg">
-                                <AccordionItem value="electrical-specs">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Electrical Specifications
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                        <div>
-                                            <SpecRow label="Input Voltage" value={product.inputVoltage} unit="V(AC)" />
-                                            <SpecRow label="Power Consumption (Max)" value={product.powerConsumptionMax} unit="W" />
-                                            <SpecRow label="Power Consumption (Typical)" value={product.powerConsumptionTypical} unit="W" />
-                                            <SpecRow label="Driving Method" value={formatEnum(product.drivingMethod)} />
-                                            <SpecRow label="Current Gain Control" value={product.currentGainControl} />
-                                            <SpecRow label="Power Redundancy" value={formatEnum(product.powerRedundancy)} />
-                                            <SpecRow label="Memory on Module" value={formatEnum(product.memoryOnModule)} />
-                                            <SpecRow label="Smart Module" value={formatEnum(product.smartModule)} />
-                                            <SpecRow label="MTBF Power Supply" value={product.mtbfPowerSupply} unit="hours" />
-                                            <SpecRow
-                                                label="Control System"
-                                                value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
-                                            />
-                                            <SpecRow label="Receiving Card" value={product.receivingCard} />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            {/* Operating Conditions */}
-                            <Accordion type="single" defaultValue="operating-conditions" collapsible className="rounded-lg">
-                                <AccordionItem value="operating-conditions">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Operating Conditions
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                        <div>
-                                            <SpecRow label="Operating Temperature" value={product.operatingTemperature} unit="°C" />
-                                            <SpecRow label="Operating Humidity" value={product.operatingHumidity} unit="%" />
-                                            <SpecRow label="Cooling" value={formatEnum(product.cooling)} />
-                                            <SpecRow label="Heat Dissipation" value={product.heatDissipation} unit="W" />
-                                            <SpecRow label="Monitoring Function" value={product.monitoringFunctionEn} />
+                                {/* Electrical Specifications */}
+                                <Accordion type="single" defaultValue="electrical-specs" collapsible className={accordionPanel}>
+                                    <AccordionItem value="electrical-specs" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}
+                                        </AccordionTrigger>
+                                        <AccordionContent className={accordionContentClass}>
+                                            <div>
+                                                <SpecRow label="Input Voltage" value={product.inputVoltage} unit="V(AC)" />
+                                                <SpecRow label="Power Consumption (Max)" value={product.powerConsumptionMax} unit="W" />
+                                                <SpecRow label="Power Consumption (Typical)" value={product.powerConsumptionTypical} unit="W" />
+                                                <SpecRow label="Driving Method" value={formatEnum(product.drivingMethod)} />
+                                                <SpecRow label="Current Gain Control" value={product.currentGainControl} />
+                                                <SpecRow label="Power Redundancy" value={formatEnum(product.powerRedundancy)} />
+                                                <SpecRow label="Memory on Module" value={formatEnum(product.memoryOnModule)} />
+                                                <SpecRow label="Smart Module" value={formatEnum(product.smartModule)} />
+                                                <SpecRow label="MTBF Power Supply" value={product.mtbfPowerSupply} unit="hours" />
+                                                <SpecRow
+                                                    label="Control System"
+                                                    value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
+                                                />
+                                                <SpecRow label="Receiving Card" value={product.receivingCard} />
                                             </div>
                                         </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
+                                    </AccordionItem>
+                                </Accordion>
 
-                            {/* Downloads */}
-                            <Accordion type="single" defaultValue="downloads" collapsible className="rounded-lg">
-                                <AccordionItem value="downloads">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                       Downloads
+                                {/* Operating Conditions */}
+                                <Accordion type="single" defaultValue="operating-conditions" collapsible className={accordionPanel}>
+                                    <AccordionItem value="operating-conditions" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {language === "en" ? "Operating Conditions" : "Betriebsbedingungen"}
                                         </AccordionTrigger>
-                                        <AccordionContent className="bg-gray-100 px-4 pb-4 pt-2">
-                                        <div className="space-y-3">
-                                            {/* Product Datasheet */}
-                                            <div className="flex items-center justify-between gap-4 py-1">
-                                                <p className="text-sm text-gray-800">Product Datasheet</p>
-                                                <button
-                                                    onClick={handleDownloadDatasheet}
-                                                    disabled={datasheetLoading}
-                                                    className="flex items-center cursor-pointer font-bold text-blue-600 hover:text-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
-                                                >
-                                                    {datasheetLoading ? (
-                                                        <>
-                                                            <Spinner className="h-5 w-5 mr-2 text-blue-600" />
-                                                            <span>Generating…</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
-                                                            <span>Product Datasheet</span>
-                                                        </>
-                                                    )}
-                                                </button>
+                                        <AccordionContent className={accordionContentClass}>
+                                            <div>
+                                                <SpecRow label="Operating Temperature" value={product.operatingTemperature} unit="°C" />
+                                                <SpecRow label="Operating Humidity" value={product.operatingHumidity} unit="%" />
+                                                <SpecRow label="Cooling" value={formatEnum(product.cooling)} />
+                                                <SpecRow label="Heat Dissipation" value={product.heatDissipation} unit="W" />
+                                                <SpecRow label="Monitoring Function" value={product.monitoringFunctionEn} />
                                             </div>
-                                            {product.installationManualUrl && (
-                                                <div className="flex items-center justify-between gap-4 py-1">
-                                                    <p className="text-sm text-gray-800">Installation Manual</p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDownloadPdf("installationManual", "Installation_Manual.pdf")}
-                                                        disabled={pdfDownloading !== null}
-                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
-                                                    >
-                                                        {pdfDownloading === "installationManual" ? (
-                                                            <>
-                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
-                                                                <span>Downloading…</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
-                                                                <span>Installation Manual</span>
-                                                            </>
-                                                        )}
-                                                    </button>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+
+                                {/* Downloads */}
+                                <Accordion type="single" defaultValue="downloads" collapsible className={accordionPanel}>
+                                    <AccordionItem value="downloads" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {language === "en" ? "Downloads" : "Downloads"}
+                                        </AccordionTrigger>
+                                        <AccordionContent className={accordionContentClass}>
+                                            <div className="space-y-3 divide-y divide-border/30">
+                                                <div className="flex items-center justify-between gap-4 py-2 first:pt-0">
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {language === "en" ? "Product Datasheet" : "Produktdatenblatt"}
+                                                    </p>
+                                                    <DownloadButton
+                                                        onClick={handleDownloadDatasheet}
+                                                        disabled={datasheetLoading}
+                                                        loading={datasheetLoading}
+                                                        label={language === "en" ? "Download" : "Herunterladen"}
+                                                    />
                                                 </div>
-                                            )}
-                                           
-                                            {product.maintenanceGuideUrl && (
-                                                <div className="flex items-center justify-between gap-4 py-1">
-                                                    <p className="text-sm text-gray-800">Maintenance Guide</p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDownloadPdf("maintenanceGuide", "Maintenance_Guide.pdf")}
-                                                        disabled={pdfDownloading !== null}
-                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
-                                                    >
-                                                        {pdfDownloading === "maintenanceGuide" ? (
-                                                            <>
-                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
-                                                                <span>Downloading…</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
-                                                                <span>Maintenance Guide</span>
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {product.certificatesPdfUrl && (
-                                                <div className="flex items-center justify-between gap-4 py-1">
-                                                    <p className="text-sm text-gray-800">Certificates PDF</p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleDownloadPdf("certificatesPdf", "Certificates.pdf")}
-                                                        disabled={pdfDownloading !== null}
-                                                        className="flex items-center text-blue-600 hover:text-blue-700 font-medium underline shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
-                                                    >
-                                                        {pdfDownloading === "certificatesPdf" ? (
-                                                            <>
-                                                                <Spinner className="h-5 w-5 mr-2 text-blue-600 shrink-0" />
-                                                                <span>Downloading…</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FileText className="h-5 w-5 mr-2 text-red-500 shrink-0" />
-                                                                <span>Certificates PDF</span>
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
+                                                {product.installationManualUrl && (
+                                                    <div className="flex items-center justify-between gap-4 py-2">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {language === "en" ? "Installation Manual" : "Installationsanleitung"}
+                                                        </p>
+                                                        <DownloadButton
+                                                            onClick={() =>
+                                                                handleDownloadPdf("installationManual", "Installation_Manual.pdf")
+                                                            }
+                                                            disabled={pdfDownloading !== null}
+                                                            loading={pdfDownloading === "installationManual"}
+                                                            label={language === "en" ? "Download" : "Herunterladen"}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {product.maintenanceGuideUrl && (
+                                                    <div className="flex items-center justify-between gap-4 py-2">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {language === "en" ? "Maintenance Guide" : "Wartungsanleitung"}
+                                                        </p>
+                                                        <DownloadButton
+                                                            onClick={() =>
+                                                                handleDownloadPdf("maintenanceGuide", "Maintenance_Guide.pdf")
+                                                            }
+                                                            disabled={pdfDownloading !== null}
+                                                            loading={pdfDownloading === "maintenanceGuide"}
+                                                            label={language === "en" ? "Download" : "Herunterladen"}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {product.certificatesPdfUrl && (
+                                                    <div className="flex items-center justify-between gap-4 py-2">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {language === "en" ? "Certificates PDF" : "Zertifikate PDF"}
+                                                        </p>
+                                                        <DownloadButton
+                                                            onClick={() =>
+                                                                handleDownloadPdf("certificatesPdf", "Certificates.pdf")
+                                                            }
+                                                            disabled={pdfDownloading !== null}
+                                                            loading={pdfDownloading === "certificatesPdf"}
+                                                            label={language === "en" ? "Download" : "Herunterladen"}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
 
                             </RestrictedContentOverlay>
 
@@ -608,21 +627,21 @@ export default function ProductDetailPage() {
                         {/* Right Column */}
                         <div className="space-y-4">
                             {/* LED Specifications */}
-                            <Accordion type="single" defaultValue="led-specs" collapsible className="rounded-lg">
-                                <AccordionItem value="led-specs">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        LED Specifications
+                            <Accordion type="single" defaultValue="led-specs" collapsible className={accordionPanel}>
+                                <AccordionItem value="led-specs" className="border-0">
+                                    <AccordionTrigger className={accordionTriggerClass}>
+                                        {language === "en" ? "LED Specifications" : "LED-Spezifikationen"}
                                     </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                    <AccordionContent className={accordionContentClass}>
                                         <div>
                                             <SpecRow label="LED Technology" value={formatEnum(product.ledTechnology)} />
                                             <SpecRow label="Pixel Configuration" value={product.pixelConfiguration} />
                                             <SpecRow label="LED Lifespan" value={product.ledLifespan} unit="hours" />
 
                                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-                                            <SpecRow label="Chip Bonding" value={formatEnum(product.chipBonding)} />
-                                            <SpecRow label="LED Chip Manufacturer" value={product.ledChipManufacturer} />
-                                            <SpecRow label="LED Modules per Cabinet" value={product.ledModulesPerCabinet} />
+                                                <SpecRow label="Chip Bonding" value={formatEnum(product.chipBonding)} />
+                                                <SpecRow label="LED Chip Manufacturer" value={product.ledChipManufacturer} />
+                                                <SpecRow label="LED Modules per Cabinet" value={product.ledModulesPerCabinet} />
                                             </RestrictedContentOverlay>
                                         </div>
                                     </AccordionContent>
@@ -630,31 +649,31 @@ export default function ProductDetailPage() {
                             </Accordion>
 
                             {/* Display Performance */}
-                            <Accordion type="single" defaultValue="display-performance" collapsible className="rounded-lg">
-                                <AccordionItem value="display-performance">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Display Performance
+                            <Accordion type="single" defaultValue="display-performance" collapsible className={accordionPanel}>
+                                <AccordionItem value="display-performance" className="border-0">
+                                    <AccordionTrigger className={accordionTriggerClass}>
+                                        {language === "en" ? "Display Performance" : "Display-Leistung"}
                                     </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
+                                    <AccordionContent className={accordionContentClass}>
                                         <div>
                                             <SpecRow label="Refresh Rate" value={product.refreshRate} unit="Hz" />
                                             <SpecRow label="Brightness Value" value={product.brightnessValue} unit="cd/m²" />
 
                                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-                                            <SpecRow label="Scan Rate" value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null} />
-                                            <SpecRow label="Video Rate" value={product.videoRate} />
-                                            <SpecRow label="Colour Depth" value={product.colourDepth} unit="bit" />
-                                            <SpecRow
-                                                label="Greyscale Processing"
-                                                value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
-                                            />
-                                            <SpecRow label="Number of Colours" value={product.numberOfColours ? `${product.numberOfColours} billion` : null} />
-                                            <SpecRow label="Viewing Angle (Horizontal)" value={product.viewingAngleHorizontal} />
-                                            <SpecRow label="Viewing Angle (Vertical)" value={product.viewingAngleVertical} />
-                                            <SpecRow
-                                                label="Contrast Ratio"
-                                                value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
-                                            />
+                                                <SpecRow label="Scan Rate" value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null} />
+                                                <SpecRow label="Video Rate" value={product.videoRate} />
+                                                <SpecRow label="Colour Depth" value={product.colourDepth} unit="bit" />
+                                                <SpecRow
+                                                    label="Greyscale Processing"
+                                                    value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
+                                                />
+                                                <SpecRow label="Number of Colours" value={product.numberOfColours ? `${product.numberOfColours} billion` : null} />
+                                                <SpecRow label="Viewing Angle (Horizontal)" value={product.viewingAngleHorizontal} />
+                                                <SpecRow label="Viewing Angle (Vertical)" value={product.viewingAngleVertical} />
+                                                <SpecRow
+                                                    label="Contrast Ratio"
+                                                    value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
+                                                />
                                             </RestrictedContentOverlay>
                                         </div>
                                     </AccordionContent>
@@ -663,85 +682,90 @@ export default function ProductDetailPage() {
 
                             <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
-                            {/* Calibration */}
-                            <Accordion type="single" defaultValue="calibration" collapsible className="rounded-lg">
-                                <AccordionItem value="calibration">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Calibration
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                        <div>
-                                            <SpecRow label="Calibration Method" value={formatEnum(product.calibrationMethod)} />
-                                            <SpecRow label="White Point Calibration" value={product.whitePointCalibration} />
-                                            <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
-
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            {/* Certifications & Standards */}
-                            {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
-                                <Accordion type="single" defaultValue="certifications" collapsible className="rounded-lg">
-                                    <AccordionItem value="certifications">
-                                        <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                            Certifications & Standards
+                                {/* Calibration */}
+                                <Accordion type="single" defaultValue="calibration" collapsible className={accordionPanel}>
+                                    <AccordionItem value="calibration" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {language === "en" ? "Calibration" : "Kalibrierung"}
                                         </AccordionTrigger>
-                                        <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                            {product.productCertificates && product.productCertificates.length > 0 && (
-                                                <div className="mb-4">
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {product.productCertificates.map((cert) => (
-                                                            <div key={cert.id} className="flex items-center gap-2 bg-white p-2 px-4 rounded-md">
-                                                                <Image
-                                                                    src={cert.imageUrl}
-                                                                    alt={cert.name}
-                                                                    width={40}
-                                                                    height={40}
-                                                                    className="object-contain"
-                                                                />
-                                                                <span className="text-sm">{cert.name}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                        <AccordionContent className={accordionContentClass}>
                                             <div>
-                                                <SpecRow label="Additional Certification" value={product.additionalCertification} />
-                                                <SpecRow label="EMC" value={product.emc} />
-                                                <SpecRow label="Safety" value={product.safety} />
+                                                <SpecRow label="Calibration Method" value={formatEnum(product.calibrationMethod)} />
+                                                <SpecRow label="White Point Calibration" value={product.whitePointCalibration} />
+                                                <SpecRow label="DCI-P3 Coverage" value={product.dciP3Coverage} unit="%" />
+
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
-                            )}
-                           
-                            {/* Warranty & Support */}
-                            <Accordion type="single" defaultValue="warranty" collapsible className="rounded-lg">
-                                <AccordionItem value="warranty">
-                                    <AccordionTrigger className="font-bold text-2xl bg-blue-100 px-4">
-                                        Warranty & Support
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-4 pb-2 bg-gray-100 px-4">
-                                        <div>
-                                            <SpecRow label="Warranty Period" value={product.warrantyPeriod} unit="months" />
-                                            <SpecRow
-                                                label={`Support During Warranty (${language === "de" ? "DE" : "EN"})`}
-                                                value={getLocalizedField(product.supportDuringWarrantyEn, product.supportDuringWarrantyDe)}
-                                            />
-                                            <SpecRow
-                                                label={`Support After Warranty (${language === "de" ? "DE" : "EN"})`}
-                                                value={getLocalizedField(product.supportAfterWarrantyEn, product.supportAfterWarrantyDe)}
-                                            />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                            
+
+                                {/* Certifications & Standards */}
+                                {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
+                                    <Accordion type="single" defaultValue="certifications" collapsible className={accordionPanel}>
+                                        <AccordionItem value="certifications" className="border-0">
+                                            <AccordionTrigger className={accordionTriggerClass}>
+                                                {language === "en" ? "Certifications & Standards" : "Zertifizierungen & Normen"}
+                                            </AccordionTrigger>
+                                            <AccordionContent className={accordionContentClass}>
+                                                {product.productCertificates && product.productCertificates.length > 0 && (
+                                                    <div className="mb-4 pb-3 border-b border-border/30">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {product.productCertificates.map((cert) => (
+                                                                <div
+                                                                    key={cert.id}
+                                                                    className="flex items-center gap-2 bg-white border border-border/50 p-2 px-3 rounded-lg shadow-sm"
+                                                                >
+                                                                    <Image
+                                                                        src={cert.imageUrl}
+                                                                        alt={cert.name}
+                                                                        width={36}
+                                                                        height={36}
+                                                                        className="object-contain"
+                                                                    />
+                                                                    <span className="text-xs sm:text-sm font-medium text-foreground">
+                                                                        {cert.name}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <SpecRow label="Additional Certification" value={product.additionalCertification} />
+                                                    <SpecRow label="EMC" value={product.emc} />
+                                                    <SpecRow label="Safety" value={product.safety} />
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
+
+                                {/* Warranty & Support */}
+                                <Accordion type="single" defaultValue="warranty" collapsible className={accordionPanel}>
+                                    <AccordionItem value="warranty" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {language === "en" ? "Warranty & Support" : "Garantie & Support"}
+                                        </AccordionTrigger>
+                                        <AccordionContent className={accordionContentClass}>
+                                            <div>
+                                                <SpecRow label="Warranty Period" value={product.warrantyPeriod} unit="months" />
+                                                <SpecRow
+                                                    label={`Support During Warranty (${language === "de" ? "DE" : "EN"})`}
+                                                    value={getLocalizedField(product.supportDuringWarrantyEn, product.supportDuringWarrantyDe)}
+                                                />
+                                                <SpecRow
+                                                    label={`Support After Warranty (${language === "de" ? "DE" : "EN"})`}
+                                                    value={getLocalizedField(product.supportAfterWarrantyEn, product.supportAfterWarrantyDe)}
+                                                />
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+
                             </RestrictedContentOverlay>
                         </div>
                     </div>
-
+                    </div>
                     <RelatedProductsSection productId={product.id} language={language} />
                 </div>
             </div>

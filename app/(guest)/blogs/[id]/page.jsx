@@ -77,10 +77,10 @@ export default function BlogDetailPage() {
             <main className="flex-1 bg-white">
                 <article className="container mx-auto px-4 py-10 lg:py-16 max-w-7xl">
                     {/* Header */}
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 font-archivo leading-tight">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900  leading-tight">
                         {blog.title}
                     </h1>
-                    <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-sm text-gray-500 font-open-sans">
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-sm text-gray-500">
                         <span>by <span className="font-medium text-gray-700">{blog.authorName}</span></span>
                         <span className="text-gray-300">•</span>
                         <span>{formattedDate}</span>
@@ -104,7 +104,7 @@ export default function BlogDetailPage() {
                     {/* Main Content */}
                     {blog.mainContentHtml && (
                         <div
-                            className="prose prose-lg max-w-none mt-10 font-open-sans"
+                            className="prose prose-lg max-w-none mt-10"
                             dangerouslySetInnerHTML={{ __html: blog.mainContentHtml }}
                         />
                     )}
@@ -148,7 +148,7 @@ export default function BlogDetailPage() {
                                 <div key={block.id || index}>
                                     {block.textHtml && (
                                         <div
-                                            className="prose prose-lg max-w-none font-open-sans"
+                                            className="prose prose-lg max-w-none"
                                             dangerouslySetInnerHTML={{ __html: block.textHtml }}
                                         />
                                     )}

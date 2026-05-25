@@ -46,7 +46,7 @@ export default function EditBlogPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-1">
-                <h1 className="text-2xl font-bold font-archivo">Edit Blog</h1>
+                <h1 className="text-2xl font-bold ">Edit Blog</h1>
                 <p className="text-sm text-muted-foreground">
                     Update the blog post details below.
                 </p>

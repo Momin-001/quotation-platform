@@ -37,7 +37,7 @@ import {
 
 const CARD_CLASS =
     "bg-white rounded-xl border border-border shadow-sm p-5 hover:shadow-md transition-shadow";
-const STAT_NUMBER_CLASS = "text-2xl font-bold font-archivo text-foreground";
+const STAT_NUMBER_CLASS = "text-2xl font-bold  text-foreground";
 const LABEL_CLASS = "text-sm text-muted-foreground font-medium";
 
 // Blue/teal palette for donut charts (no orange)
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-bold font-archivo text-foreground">
+                <h1 className="text-2xl font-bold  text-foreground">
                     Dashboard
                 </h1>
                 <p className="text-muted-foreground mt-1">
@@ -249,7 +249,7 @@ export default function AdminDashboard() {
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className={`${CARD_CLASS}`}>
-                    <h3 className="font-semibold font-archivo text-foreground mb-4 flex items-center gap-2">
+                    <h3 className="font-semibold  text-foreground mb-4 flex items-center gap-2">
                         <BarChart3 className="h-5 w-5 text-primary" />
                         Enquiries by Status
                     </h3>
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                     )}
                 </div>
                 <div className={CARD_CLASS}>
-                    <h3 className="font-semibold font-archivo text-foreground mb-4 flex items-center gap-2">
+                    <h3 className="font-semibold  text-foreground mb-4 flex items-center gap-2">
                         <PieChart className="h-5 w-5 text-primary" />
                         Quotations by Status
                     </h3>

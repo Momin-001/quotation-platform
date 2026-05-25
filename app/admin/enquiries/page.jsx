@@ -103,7 +103,7 @@ export default function AdminEnquiriesPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Customer Enquiries</h1>
+                <h1 className="text-2xl font-bold ">Customer Enquiries</h1>
                 <p className="text-sm">
                     View and manage all customer enquiries in the system.
                 </p>
@@ -137,7 +137,7 @@ export default function AdminEnquiriesPage() {
             {/* Table */}
             <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableHeader className="bg-secondary font-archivo">
+                    <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Enquiry ID</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Customer Name</TableHead>
@@ -160,7 +160,7 @@ export default function AdminEnquiriesPage() {
                             enquiries.map((enquiry, index) => (
                                 <TableRow
                                     key={enquiry.id}
-                                    className={`font-open-sans ${index % 2 === 0 ? "bg-white" : "bg-[#EAF6FF]"}`}
+                                    className={` ${index % 2 === 0 ? "bg-white" : "bg-[#EAF6FF]"}`}
                                 >
                                     <TableCell className="p-4 whitespace-nowrap font-medium">
                                         <div className="flex items-center gap-2">

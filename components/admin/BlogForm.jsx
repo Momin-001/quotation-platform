@@ -164,7 +164,7 @@ export default function BlogForm({ initialData = null }) {
         <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Info */}
             <div className="bg-white rounded-lg border p-6 space-y-4">
-                <h2 className="text-lg font-semibold font-archivo">Basic Information</h2>
+                <h2 className="text-lg font-semibold ">Basic Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="title">Title *</Label>
@@ -189,7 +189,7 @@ export default function BlogForm({ initialData = null }) {
 
             {/* Main Image */}
             <div className="bg-white rounded-lg border p-6 space-y-4">
-                <h2 className="text-lg font-semibold font-archivo">Main Image *</h2>
+                <h2 className="text-lg font-semibold ">Main Image *</h2>
                 <div className="flex items-start gap-4">
                     <label
                         htmlFor="mainImage"
@@ -229,7 +229,7 @@ export default function BlogForm({ initialData = null }) {
 
             {/* Main Content */}
             <div className="bg-white rounded-lg border p-6 space-y-4">
-                <h2 className="text-lg font-semibold font-archivo">Main Content</h2>
+                <h2 className="text-lg font-semibold ">Main Content</h2>
                 <p className="text-sm text-muted-foreground">
                     Write the main body of your blog post. This appears below the main image.
                 </p>
@@ -240,7 +240,7 @@ export default function BlogForm({ initialData = null }) {
 
             {/* Partner Advertisement */}
             <div className="bg-white rounded-lg border p-6 space-y-4">
-                <h2 className="text-lg font-semibold font-archivo">Partner Advertisement</h2>
+                <h2 className="text-lg font-semibold ">Partner Advertisement</h2>
                 <p className="text-sm text-muted-foreground">
                     Optional partner ad image with a clickable link to their website.
                 </p>
@@ -288,7 +288,7 @@ export default function BlogForm({ initialData = null }) {
             <div className="bg-white rounded-lg border p-6 space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="space-y-2">
-                        <h2 className="text-lg font-semibold font-archivo">Additional Content Blocks</h2>
+                        <h2 className="text-lg font-semibold ">Additional Content Blocks</h2>
                         <p className="text-sm text-muted-foreground mt-1">
                             Add numbered text sections, each with an optional image below.
                         </p>

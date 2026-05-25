@@ -19,58 +19,50 @@ export default function UserHeader() {
     };
 
     const linkClass = (href) =>
-        `hover:underline whitespace-nowrap transition-colors ${
-            isActive(href) ? "font-semibold underline underline-offset-4" : ""
+        `text-sm sm:text-[15px] whitespace-nowrap transition-colors duration-200 ${
+            isActive(href)
+                ? "font-semibold text-primary-foreground"
+                : "font-normal text-primary-foreground/85 hover:text-primary-foreground"
         }`;
-    // Only show this header if user is authenticated
+
     if (!isAuthenticated || isUser === false) {
         return null;
     }
 
+    const cartCount = getTotalItems();
+
     return (
-        <div className="w-full bg-primary text-primary-foreground">
-            {/* Horizontal scroll container for small screens */}
-            <div className="container mx-auto px-4 py-3 overflow-x-auto">
-                <div className="min-w-max flex justify-between items-center gap-6 font-open-sans text-lg font-normal">
-                    {/* Navigation Links */}
-                    <div className="flex items-center gap-6">
-                        <Link
-                            href="/user/my-enquiries"
-                            className={linkClass("/user/my-enquiries")}
-                        >
+        <div className="w-full bg-primary text-primary-foreground border-b border-white/10">
+            <div className="container mx-auto px-4 lg:px-6 py-2.5 sm:py-3 overflow-x-auto">
+                <div className="min-w-max flex items-center justify-between gap-4 sm:gap-6 ">
+                    <nav className="flex items-center gap-4 sm:gap-6" aria-label="Account navigation">
+                        <Link href="/user/my-enquiries" className={linkClass("/user/my-enquiries")}>
                             {language === "en" ? "My Enquiries" : "Meine Anfragen"}
                         </Link>
-                        <Link
-                            href="/user/my-quotations"
-                            className={linkClass("/user/my-quotations")}
-                        >
+                        <Link href="/user/my-quotations" className={linkClass("/user/my-quotations")}>
                             {language === "en" ? "My Quotations" : "Meine Angebote"}
                         </Link>
-                        <Link
-                            href="/user/account-settings"
-                            className={linkClass("/user/account-settings")}
-                        >
+                        <Link href="/user/account-settings" className={linkClass("/user/account-settings")}>
                             {language === "en" ? "My Account" : "Mein Konto"}
                         </Link>
-                    </div>
+                    </nav>
 
-                    {/* Spacer so cart isn't glued to links */}
-
-                    {/* Cart */}
                     <Link
                         href="/user/cart"
-                        className={`flex items-center gap-2 hover:underline relative whitespace-nowrap transition-colors ${
-                            isActive("/user/cart") ? "font-semibold underline underline-offset-4" : ""
+                        className={`flex items-center gap-2 text-sm sm:text-[15px] whitespace-nowrap transition-colors duration-200 ${
+                            isActive("/user/cart")
+                                ? "font-semibold text-primary-foreground"
+                                : "font-normal text-primary-foreground/85 hover:text-primary-foreground"
                         }`}
                     >
-                        <div className="relative">
-                            <ShoppingCart className="h-5 w-5" />
-                            {getTotalItems() > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {getTotalItems()}
+                        <span className="relative flex shrink-0">
+                            <ShoppingCart className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-destructive text-primary-foreground text-[10px] font-semibold leading-none rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-0.5">
+                                    {cartCount > 99 ? "99+" : cartCount}
                                 </span>
                             )}
-                        </div>
+                        </span>
                         <span>{language === "en" ? "My Cart" : "Mein Warenkorb"}</span>
                     </Link>
                 </div>

@@ -14,7 +14,6 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
         connectionError,
         joinRoom,
         leaveRoom,
-        sendMessage: socketSendMessage,
         onNewMessage,
         onUserTyping,
         startTyping,
@@ -165,14 +164,10 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
             const response = await res.json();
 
             if (response.success) {
-                // Broadcast via Socket.IO for real-time delivery
-                socketSendMessage({
-                    quotationId,
-                    message: messageText,
-                    messageId: response.data.id,
-                    senderId: user.id,
-                    senderRole: "admin",
-                    createdAt: response.data.createdAt,
+                setMessages((prev) => {
+                    const exists = prev.some((m) => m.id === response.data.id);
+                    if (exists) return prev;
+                    return [...prev, response.data];
                 });
             } else {
                 toast.error(response.message || "Failed to send message");
@@ -199,7 +194,7 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
         <div className="bg-white rounded-lg border shadow-sm p-4">
             {/* Header with connection status */}
             <div className="pb-4 flex items-center justify-between">
-                <h3 className="text-xl font-bold font-open-sans">Conversation with Customer</h3>
+                <h3 className="text-xl font-bold ">Conversation with Customer</h3>
                 <div className="flex items-center gap-2">
                     {isConnected ? (
                         <span className="flex items-center gap-1.5 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -261,7 +256,7 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                                 )}
 
                                 {/* MESSAGE */}
-                                <div className="max-w-[70%] font-open-sans">
+                                <div className="max-w-[70%] ">
                                     <div
                                         className={`flex flex-col items-center gap-1 mb-2 ${isAdmin ? "items-end" : "items-start"
                                             }`}
@@ -333,7 +328,7 @@ export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisa
                             value={newMessage}
                             onChange={handleInputChange}
                             placeholder="Write your message..."
-                            className="flex-1 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder:font-archivo placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
+                            className="flex-1 px-4 py-3 border border-black/40 placeholder:text-gray-500 placeholder: placeholder:text-sm placeholder:font-medium rounded-md focus:outline-none"
                             disabled={sending}
                         />
                         <Button

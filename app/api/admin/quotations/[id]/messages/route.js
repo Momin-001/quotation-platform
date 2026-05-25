@@ -3,6 +3,10 @@ import { quotations, quotationMessages, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth-helpers";
+import {
+    emitToQuotationRoom,
+    buildNewMessagePayload,
+} from "@/lib/socket-emit";
 
 // Helper function to check if chat is disabled
 // Chat is disabled when:
@@ -137,6 +141,12 @@ export async function POST(req, { params }) {
                 message: message.trim(),
             })
             .returning();
+
+        await emitToQuotationRoom(
+            id,
+            "new-message",
+            buildNewMessagePayload(newMessage)
+        );
 
         return successResponse("Message sent successfully", newMessage);
     } catch (error) {

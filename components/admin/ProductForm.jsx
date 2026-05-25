@@ -626,7 +626,7 @@ export default function ProductForm({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Basic Information</h2>
+                <h2 className="text-lg font-semibold ">Basic Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Product Name */}
                     {renderInput("Product Name *", "productName", "text", { required: true })}
@@ -671,7 +671,7 @@ export default function ProductForm({
 
             {/* Pixel Configuration Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Pixel Configuration</h2>
+                <h2 className="text-lg font-semibold ">Pixel Configuration</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Pixel Pitch */}
                    
@@ -685,7 +685,7 @@ export default function ProductForm({
 
             {/* Cabinet Dimensions Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Cabinet Dimensions</h2>
+                <h2 className="text-lg font-semibold ">Cabinet Dimensions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderInput("Cabinet Width (mm)", "cabinetWidth", "number", { required: true, step: "0.01", placeholder: "e.g., 500.00" })}
                     {renderInput("Cabinet Height (mm)", "cabinetHeight", "number", { required: true, step: "0.01", placeholder: "e.g., 500.00" })}
@@ -698,7 +698,7 @@ export default function ProductForm({
 
             {/* LED Technology Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">LED Technology</h2>
+                <h2 className="text-lg font-semibold ">LED Technology</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderSelect("LED Technology *", "ledTechnology", ["SMD", "SMD+GOB", "IMD", "COB", "DIP", "LOB", "Other"])}
                     {ledTechnology === "Other" && renderInput("LED Technology Other", "ledTechnologyOther", "text", { required: true })}
@@ -710,7 +710,7 @@ export default function ProductForm({
 
             {/* Display Properties Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Display Properties</h2>
+                <h2 className="text-lg font-semibold ">Display Properties</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderInput("Viewing Angle Horizontal", "viewingAngleHorizontal", "text", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
                     {renderInput("Viewing Angle Vertical", "viewingAngleVertical", "text", { required: true, step: "0.01", placeholder: "e.g., 160°" })}
@@ -727,7 +727,7 @@ export default function ProductForm({
 
             {/* Control & Calibration Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Control & Calibration</h2>
+                <h2 className="text-lg font-semibold ">Control & Calibration</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderSelect("Current Gain Control *", "currentGainControl", ["4", "8"])}
                     {renderSelect("Video Rate *", "videoRate", ["50/60", "120", "240"])}
@@ -740,7 +740,7 @@ export default function ProductForm({
 
             {/* Power & Performance Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Power & Performance</h2>
+                <h2 className="text-lg font-semibold ">Power & Performance</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderInput("Power Consumption Max (W)", "powerConsumptionMax", "number", { required: true, step: "0.01", placeholder: "e.g., 500" })}
                     {renderInput("Power Consumption Typical (W)", "powerConsumptionTypical", "number", { required: true, step: "0.01", placeholder: "e.g., 300" })}
@@ -760,7 +760,7 @@ export default function ProductForm({
 
             {/* Operating Conditions Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Operating Conditions</h2>
+                <h2 className="text-lg font-semibold ">Operating Conditions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderInput("Operating Temperature", "operatingTemperature", "text", { required: true, placeholder: "e.g., -40°C to 55°C" })}
                     {renderInput("Operating Humidity", "operatingHumidity", "text", { required: true, placeholder: "e.g., 10% to 80% RH" })}
@@ -772,7 +772,7 @@ export default function ProductForm({
 
             {/* OEM, Pricing & Stock Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">OEM, Pricing & Stock</h2>
+                <h2 className="text-lg font-semibold ">OEM, Pricing & Stock</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderInput("OEM/Brand", "oemBrand", "text", { placeholder: "e.g., LEDALL" })}
                     {renderInput("LED Driver", "ledDriver", "text", { placeholder: "e.g., MBI5252" })}
@@ -788,7 +788,7 @@ export default function ProductForm({
 
             {/* Support & Warranty Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Support & Warranty</h2>
+                <h2 className="text-lg font-semibold ">Support & Warranty</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {renderSelect("Support *", "support", ["Frontendside", "Backside", "Frontside and Backside"]) }
                     {renderInput("Warranty Period (months)", "warrantyPeriod", "number", { step: "1", placeholder: "e.g., 24" })}
@@ -803,7 +803,7 @@ export default function ProductForm({
 
             {/* Features Section */}
             <div className="space-y-4 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Product Features</h2>
+                <h2 className="text-lg font-semibold ">Product Features</h2>
                 <div className="space-y-4">
                     <div className="flex gap-2">
                         <Input
@@ -859,7 +859,7 @@ export default function ProductForm({
 
             {/* File Uploads Section */}
             <div className="space-y-6 py-4">
-                <h2 className="text-lg font-semibold font-archivo">Media</h2>
+                <h2 className="text-lg font-semibold ">Media</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Product Images */}

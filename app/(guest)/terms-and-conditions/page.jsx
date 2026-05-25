@@ -1,17 +1,23 @@
 "use client";
 
-import BreadCrumb from "@/components/user/BreadCrumb";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+    LegalPageLayout,
+    renderLegalSections,
+    slugifySectionId,
+} from "@/components/guest/LegalPageLayout";
 
 const CONTENT = {
     en: {
         title: "Terms and Conditions",
         breadcrumb: "Terms and Conditions",
-        heading: "GENERAL TERMS AND CONDITIONS OF BUSINESS, CONSULTING AND PLACEMENT (GTC)",
-        subheading: "ProLEDALL platform – Owner: Dipl.-Ing. Mohammed Abahssain, 67065 Ludwigshafen am Rhein",
+        heading:
+            "General Terms and Conditions of Business, Consulting and Placement (GTC)",
+        subheading:
+            "ProLEDALL platform – Owner: Dipl.-Ing. Mohammed Abahssain, 67065 Ludwigshafen am Rhein",
         sections: [
             {
-                title: "§ 1  Scope of application, exclusion of third-party terms and conditions",
+                title: "~ 1  Scope of application, exclusion of third-party terms and conditions",
                 paragraphs: [
                     "All our offers, consulting services, analyses, and the use of the ProLEDALL platform are based on these terms and conditions. ProLEDALL functions as a specialized expert platform for the manufacturer-neutral selection, evaluation, and presentation of LED display systems, as well as an interface for OEM communication. These terms and conditions apply only to businesses as defined in Section 14 of the German Civil Code (BGB), legal entities under public law, or special funds under public law (hereinafter referred to as \"Customer\").",
                     "The platform's purpose: ProLEDALL offers customers technical expertise in the form of product testing, specification analysis, and SaaS-supported system selection. ProLEDALL handles communication with OEMs, selects high-quality products according to OEM specifications, and prepares them for professional users.",
@@ -19,7 +25,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 2  Contract conclusion, scope of services of the platform, mediation",
+                title: "~ 2  Contract conclusion, scope of services of the platform, mediation",
                 paragraphs: [
                     "Combined offers: ProLEDALL creates project offers that can include both specialist planning/consulting (ProLEDALL) and the delivery and, if applicable, installation of the hardware (implementation partner). Upon acceptance of such an offer by the customer, separate contractual relationships are established – unless explicitly agreed otherwise.",
                     "a) A consulting and engineering contract with ProLEDALL",
@@ -31,7 +37,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 3  Compensation model, SaaS services and billing",
+                title: "~ 3  Compensation model, SaaS services and billing",
                 paragraphs: [
                     "Free of charge for customers: The use of the ProLEDALL platform, access to specialist articles, blog content and basic support in product selection (AI-supported selection) are generally free of charge for the customer, unless a paid individual consultation has been expressly agreed upon.",
                     "Refinancing via implementation partners: ProLEDALL (Ledall Media Engineering) refinances the operation of the platform, the ongoing evaluation of OEM products, and the further development of the AI selection tools through SaaS (Software-as-a-Service) service fees and marketing contributions from participating implementation partners. No commission is payable to the customer.",
@@ -41,7 +47,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 4  Intellectual property, usage rights and content",
+                title: "~ 4  Intellectual property, usage rights and content",
                 paragraphs: [
                     "Copyright protection: All content provided on the ProLEDALL platform, in particular blog articles, technical contributions, OEM evaluations, product tests, graphics, databases, and the logic of the AI-supported filtering and selection tools, is protected by copyright. All rights are held exclusively by ProLEDALL (Ledall Media Engineering) or its owner, Dipl.-Ing. Mohammed Abahssain.",
                     "Customer Use: The customer is entitled to use the information provided on the platform for their own internal use within the scope of project planning. Any further use, in particular reproduction, distribution, making publicly available, or commercial exploitation (e.g., as a consulting service to third parties), is prohibited without the express written consent of ProLEDALL.",
@@ -51,7 +57,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 5  Liability and warranty",
+                title: "~ 5  Liability and warranty",
                 paragraphs: [
                     "Liability for consulting and planning: ProLEDALL is liable for the professional preparation of plans and engineering services in accordance with recognized engineering standards. No liability is assumed for the accuracy of technical data and specifications provided by OEMs (manufacturers), provided that ProLEDALL has checked this data for plausibility with due commercial diligence.",
                     "Exclusion of liability for defects in hardware: Since ProLEDALL is not the seller of the LED systems or other hardware, any warranty or liability for defects on the delivered products is excluded by ProLEDALL. Claims due to product defects, delivery delays, or faulty installation must be made exclusively against the respective implementation partner.",
@@ -61,7 +67,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 6  Customer's duty to cooperate",
+                title: "~ 6  Customer's duty to cooperate",
                 paragraphs: [
                     "Professional advice and planning by ProLEDALL requires that the customer provides all necessary information, documents (e.g. building plans, load registers, electricity connection data) and permits in a timely and complete manner.",
                     "Delays caused by late submission or incorrect information provided by the customer are not the responsibility of ProLEDALL.",
@@ -69,7 +75,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 7  Secrecy and confidentiality",
+                title: "~ 7  Secrecy and confidentiality",
                 paragraphs: [
                     "Both parties undertake to treat as strictly confidential all information received in the course of the cooperation which is marked as confidential or which is recognizable as a trade secret by its nature.",
                     "This applies in particular to technical specifications of the OEMs, pricing models of the implementation partners, and internal project details of the customer.",
@@ -77,27 +83,27 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 8  Reference advertising",
+                title: "~ 8  Reference advertising",
                 paragraphs: [
                     "ProLEDALL is entitled to name the customer and the completed project anonymously or – after consultation – by name as a reference on the platform, in blog posts or on social networks after successful completion.",
                     "The customer may object in writing at any time if they assert a legitimate interest (e.g. confidentiality in military or security projects).",
                 ],
             },
             {
-                title: "§ 9  Customer protection",
+                title: "~ 9  Customer protection",
                 paragraphs: [
                     "The customer undertakes not to enter into any direct or indirect business relationships with manufacturers (OEMs), suppliers or implementation partners that have become known to him in the course of using the platform or through services of ProLEDALL, during the term of the business relationship and for a period of 24 months after its termination, provided that this business relationship is attributable to a mediation, recommendation or other involvement of ProLEDALL.",
                     "In the event of a breach, ProLEDALL is entitled to demand a reasonable contractual penalty. The right to claim further damages remains reserved.",
                 ],
             },
             {
-                title: "§ 10  Platform development and changes",
+                title: "~ 10  Platform development and changes",
                 paragraphs: [
                     "ProLEDALL reserves the right to modify, further develop, or restrict the content, functions, structure, and technical components of the platform at any time, provided this is reasonable for the user. There is no entitlement to the continuous availability of specific functions or content.",
                 ],
             },
             {
-                title: "§ 11  Changes to the Terms and Conditions",
+                title: "~ 11  Changes to the Terms and Conditions",
                 paragraphs: [
                     "ProLEDALL reserves the right to amend these Terms and Conditions at any time with effect for the future, in particular in the case of:",
                     "a) Changes to the business model",
@@ -107,7 +113,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 12  Place of performance, jurisdiction, applicable law",
+                title: "~ 12  Place of performance, jurisdiction, applicable law",
                 paragraphs: [
                     "The place of performance for all claims arising from the business relationship between the customer and us is Ludwigshafen am Rhein.",
                     "The exclusive place of jurisdiction for all claims arising from the business relationship is Ludwigshafen am Rhein. However, we are also entitled to sue the customer at their general place of jurisdiction.",
@@ -120,19 +126,21 @@ const CONTENT = {
     de: {
         title: "AGB",
         breadcrumb: "AGB",
-        heading: "ALLGEMEINE GESCHÄFTS-, BERATUNGS- UND VERMITTLUNGSBEDINGUNGEN (AGB)",
-        subheading: "der Plattform ProLEDALL – Inhaber: Dipl.-Ing. Mohammed Abahssain 67065 Ludwigshafen am Rhein",
+        heading:
+            "Allgemeine Geschäfts-, Beratungs- und Vermittlungsbedingungen (AGB)",
+        subheading:
+            "der Plattform ProLEDALL – Inhaber: Dipl.-Ing. Mohammed Abahssain 67065 Ludwigshafen am Rhein",
         sections: [
             {
-                title: "§ 1  Anwendungsbereich, Ausschluss fremder Geschäftsbedingungen",
+                title: "~ 1  Anwendungsbereich, Ausschluss fremder Geschäftsbedingungen",
                 paragraphs: [
-                    "Alle unsere Angebote, Beratungsleistungen, Analysen sowie die Nutzung der Plattform ProLEDALL basieren auf diesen Bedingungen. ProLEDALL fungiert als spezialisierte Experten-Plattform für die herstellerneutrale Selektion, Evaluation und Präsentation von LED-Display-Systemen sowie als Schnittstelle zur OEM-Kommunikation. Diese Bedingungen gelten nur gegenüber Unternehmern im Sinne des § 14 BGB, einer juristischen Person des öffentlichen Rechts oder einem öffentlich-rechtlichen Sondervermögen (nachfolgend „Kunde“ genannt).",
+                    "Alle unsere Angebote, Beratungsleistungen, Analysen sowie die Nutzung der Plattform ProLEDALL basieren auf diesen Bedingungen. ProLEDALL fungiert als spezialisierte Experten-Plattform für die herstellerneutrale Selektion, Evaluation und Präsentation von LED-Display-Systemen sowie als Schnittstelle zur OEM-Kommunikation. Diese Bedingungen gelten nur gegenüber Unternehmern im Sinne des ~ 14 BGB, einer juristischen Person des öffentlichen Rechts oder einem öffentlich-rechtlichen Sondervermögen (nachfolgend „Kunde“ genannt).",
                     "Gegenstand der Plattform: ProLEDALL bietet dem Kunden technisches Know-how in Form von Produkttests, Spezifikations-Auswertungen und einer SaaS-gestützten Systemauswahl. ProLEDALL übernimmt die Kommunikation mit OEMs, selektiert Qualitätsprodukte nach OEM-Spezifikationen und bereitet diese für professionelle Anwender auf.",
                     "Netzwerk und Realisierung: Angebote werden von ProLEDALL in enger Kooperation mit spezialisierten Realisierungspartnern (insbesondere der LEDALL GmbH) erstellt. ProLEDALL übernimmt hierbei die technische Fachplanung und das Engineering. Die vertragliche Umsetzung hinsichtlich des Kaufs der Hardware sowie etwaiger Installationsleistungen erfolgt – je nach gewähltem Leistungsumfang – direkt mit dem im Angebot benannten Realisierungspartner.",
                 ],
             },
             {
-                title: "§ 2  Vertragsschluss, Leistungsumfang der Plattform, Vermittlung",
+                title: "~ 2  Vertragsschluss, Leistungsumfang der Plattform, Vermittlung",
                 paragraphs: [
                     "Kombinierte Angebote: ProLEDALL erstellt Projektangebote, die sowohl die Fachplanung/Beratung (ProLEDALL) als auch die Lieferung und ggf. Montage der Hardware (Realisierungspartner) umfassen können. Mit der Annahme eines solchen Angebots durch den Kunden entstehen – sofern nicht explizit anders vereinbart – getrennte Vertragsverhältnisse:",
                     "a) Ein Beratungs- und Engineeringvertrag mit ProLEDALL",
@@ -144,7 +152,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 3  Vergütungsmodell, SaaS-Services und Abrechnung",
+                title: "~ 3  Vergütungsmodell, SaaS-Services und Abrechnung",
                 paragraphs: [
                     "Kostenfreiheit für Kunden: Die Nutzung der Plattform ProLEDALL, der Zugriff auf Fachartikel, Blog-Inhalte sowie die grundlegende Unterstützung bei der Produktauswahl (KI-gestützte Selektion) sind für den Kunden grundsätzlich kostenfrei, sofern nicht ausdrücklich eine kostenpflichtige Individualberatung vereinbart wurde.",
                     "Refinanzierung über Realisierungspartner: ProLEDALL (Ledall Media Engineering) refinanziert den Betrieb der Plattform, die ständige Evaluation von OEM-Produkten sowie die Weiterentwicklung der KI-Selektionstools durch SaaS-Servicegebühren (Software-as-a-Service) und Marketing-Beiträge der teilnehmenden Realisierungspartner. Ein Provisionsanspruch gegenüber dem Kunden besteht nicht.",
@@ -154,7 +162,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 4  Geistiges Eigentum, Nutzungsrechte und Inhalte",
+                title: "~ 4  Geistiges Eigentum, Nutzungsrechte und Inhalte",
                 paragraphs: [
                     "Urheberrechtsschutz: Sämtliche auf der Plattform ProLEDALL bereitgestellten Inhalte, insbesondere Blog-Artikel, Fachbeiträge, OEM-Evaluierungen, Produkttests, Grafiken, Datenbanken sowie die Logik der KI-gestützten Filter- und Selektionstools, sind urheberrechtlich geschützt. Alle Rechte liegen ausschließlich bei ProLEDALL (Ledall Media Engineering) bzw. dem Inhaber Dipl.-Ing. Mohammed Abahssain.",
                     "Nutzung durch den Kunden: Der Kunde ist berechtigt, die auf der Plattform zur Verfügung gestellten Informationen für den eigenen internen Gebrauch im Rahmen der Projektplanung zu nutzen. Eine darüber hinausgehende Nutzung, insbesondere die Vervielfältigung, Verbreitung, öffentliche Zugänglichmachung oder die gewerbliche Weiterverwertung (z. B. als eigene Beratungsleistung gegenüber Dritten), ist ohne ausdrückliche schriftliche Zustimmung von ProLEDALL untersagt.",
@@ -164,7 +172,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 5  Haftung und Gewährleistung",
+                title: "~ 5  Haftung und Gewährleistung",
                 paragraphs: [
                     "Haftung für Beratung und Planung: ProLEDALL haftet für die fachgerechte Erstellung von Planungen und Engineering-Leistungen nach den anerkannten Regeln der Technik. Eine Haftung für die Richtigkeit der von OEMs (Herstellern) zur Verfügung gestellten technischen Daten und Spezifikationen wird nicht übernommen, sofern ProLEDALL diese Daten mit kaufmännischer Sorgfalt auf Plausibilität geprüft hat.",
                     "Ausschluss der Sachmängelhaftung für Hardware: Da ProLEDALL nicht Verkäufer der LED-Systeme oder sonstiger Hardware ist, ist jegliche Gewährleistung oder Sachmängelhaftung durch ProLEDALL für die gelieferten Produkte ausgeschlossen. Ansprüche wegen Produktmängeln, Lieferverzögerungen oder fehlerhafter Montage sind ausschließlich gegenüber dem jeweiligen Realisierungspartner geltend zu machen.",
@@ -174,7 +182,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 6  Mitwirkungspflichten des Kunden",
+                title: "~ 6  Mitwirkungspflichten des Kunden",
                 paragraphs: [
                     "Die fachgerechte Beratung und Planung durch ProLEDALL setzt voraus, dass der Kunde alle erforderlichen Informationen, Unterlagen (z. B. Baupläne, Lastenverzeichnisse, Stromanschlussdaten) und Genehmigungen rechtzeitig und vollständig zur Verfügung stellt.",
                     "Verzögerungen, die durch verspätete Beibringung oder fehlerhafte Angaben des Kunden entstehen, gehen nicht zu Lasten von ProLEDALL.",
@@ -182,7 +190,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 7  Geheimhaltung und Vertraulichkeit",
+                title: "~ 7  Geheimhaltung und Vertraulichkeit",
                 paragraphs: [
                     "Beide Parteien verpflichten sich, alle im Rahmen der Zusammenarbeit erhaltenen Informationen, die als vertraulich gekennzeichnet oder ihrer Natur nach als Geschäftsgeheimnis erkennbar sind, streng vertraulich zu behandeln.",
                     "Dies gilt insbesondere für technische Spezifikationen der OEMs, Preismodelle der Realisierungspartner sowie interne Projektinterna des Kunden.",
@@ -190,27 +198,27 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 8  Referenzwerbung",
+                title: "~ 8  Referenzwerbung",
                 paragraphs: [
                     "ProLEDALL ist berechtigt, den Kunden sowie das realisierte Projekt nach erfolgreichem Abschluss anonymisiert oder – nach Rücksprache – namentlich als Referenz auf der Plattform, in Blog-Beiträgen oder in sozialen Netzwerken zu nennen.",
                     "Der Kunde kann dieser Nutzung jederzeit schriftlich widersprechen, sofern er ein berechtigtes Interesse (z. B. Geheimhaltung bei Militär- oder Sicherheits-Projekten) geltend macht.",
                 ],
             },
             {
-                title: "§ 9  Kundenschutz",
+                title: "~ 9  Kundenschutz",
                 paragraphs: [
                     "Der Kunde verpflichtet sich, während der Dauer der Geschäftsbeziehung sowie für einen Zeitraum von 24 Monaten nach deren Beendigung keine direkten oder indirekten Geschäftsbeziehungen mit Herstellern (OEM), Lieferanten oder Realisierungspartnern einzugehen, die ihm im Rahmen der Nutzung der Plattform oder durch Leistungen von ProLEDALL bekannt geworden sind, sofern diese Geschäftsbeziehung auf eine Vermittlung, Empfehlung oder sonstige Mitwirkung von ProLEDALL zurückzuführen ist.",
                     "Im Falle eines Verstoßes ist ProLEDALL berechtigt, eine angemessene Vertragsstrafe zu verlangen. Die Geltendmachung eines darüberhinausgehenden Schadens bleibt vorbehalten.",
                 ],
             },
             {
-                title: "§ 10  Plattformentwicklung und Änderungen",
+                title: "~ 10  Plattformentwicklung und Änderungen",
                 paragraphs: [
                     "ProLEDALL behält sich vor, Inhalte, Funktionen, Strukturen sowie technische Komponenten der Plattform jederzeit zu ändern, weiterzuentwickeln oder einzuschränken, soweit dies für den Nutzer zumutbar ist. Ein Anspruch auf die dauerhafte Verfügbarkeit bestimmter Funktionen oder Inhalte besteht nicht.",
                 ],
             },
             {
-                title: "§ 11  Änderung der AGB",
+                title: "~ 11  Änderung der AGB",
                 paragraphs: [
                     "ProLEDALL behält sich vor, diese AGB jederzeit mit Wirkung für die Zukunft anzupassen, insbesondere bei:",
                     "a) Änderungen des Geschäftsmodells",
@@ -220,7 +228,7 @@ const CONTENT = {
                 ],
             },
             {
-                title: "§ 12  Erfüllungsort, Gerichtsstand, Anwendbares Recht",
+                title: "~ 12  Erfüllungsort, Gerichtsstand, Anwendbares Recht",
                 paragraphs: [
                     "Erfüllungsort für alle Ansprüche aus der Geschäftsbeziehung zwischen dem Kunden und uns ist Ludwigshafen am Rhein.",
                     "Ausschließlicher Gerichtsstand für alle Ansprüche aus der Geschäftsbeziehung ist Ludwigshafen am Rhein. Wir sind jedoch auch berechtigt, den Kunden an seinem allgemeinen Gerichtsstand zu verklagen.",
@@ -234,41 +242,29 @@ const CONTENT = {
 
 export default function TermsAndConditionsPage() {
     const { language } = useLanguage();
-    const langKey = language === "en" ? "en" : "de";
-    const copy = CONTENT[langKey];
+    const isEn = language === "en";
+    const copy = CONTENT[isEn ? "en" : "de"];
+
+    const tocSections = copy.sections.map((section, index) => ({
+        ...section,
+        id: slugifySectionId(section.title, index),
+        tocLabel: section.title.match(/~\s*\d+/)?.[0] || `~ ${index + 1}`,
+    }));
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <BreadCrumb
-                title={copy.title}
-                breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: copy.breadcrumb },
-                ]}
-            />
-
-            <main className="container mx-auto px-4 py-10 max-w-5xl">
-                <div className="bg-white border rounded-lg p-6 md:p-10 space-y-8">
-                    <header className="space-y-2">
-                        <h1 className="text-2xl md:text-3xl font-bold">{copy.heading}</h1>
-                        <p className="text-sm md:text-base text-muted-foreground">{copy.subheading}</p>
-                    </header>
-
-                    <div className="space-y-8">
-                        {copy.sections.map((section) => (
-                            <section key={section.title} className="space-y-3">
-                                <h2 className="text-lg md:text-xl font-semibold">{section.title}</h2>
-                                <div className="space-y-3 text-sm md:text-base leading-relaxed">
-                                    {section.paragraphs.map((p, idx) => (
-                                        <p key={idx}>{p}</p>
-                                    ))}
-                                </div>
-                            </section>
-                        ))}
-                    </div>
-                </div>
-            </main>
-        </div>
+        <LegalPageLayout
+            breadcrumbTitle={copy.title}
+            breadcrumbs={[
+                { label: isEn ? "Home" : "Startseite", href: "/" },
+                { label: copy.breadcrumb },
+            ]}
+            documentTitle={copy.heading}
+            documentSubtitle={copy.subheading}
+            showToc
+            sections={tocSections}
+            isEn={isEn}
+        >
+            {renderLegalSections(tocSections, isEn)}
+        </LegalPageLayout>
     );
 }
-

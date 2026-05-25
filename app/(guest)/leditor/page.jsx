@@ -41,13 +41,123 @@ import {
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
+import Image from "next/image";
 import { useFooter } from "@/context/FooterContext";
+import { cn } from "@/lib/utils";
+
+const leditorAccordionPanel =
+    "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";
+const leditorAccordionTrigger =
+    "text-sm sm:text-base font-semibold  tracking-wide bg-primary/10 hover:no-underline hover:bg-primary/15 px-4 sm:px-6 py-3.5 text-foreground data-[state=open]:bg-primary/15";
+const leditorAccordionContent =
+    "bg-muted/20 px-4 sm:px-6 pt-4 pb-6 border-t border-border/40";
+const readOnlyInputClass = "h-10 text-sm bg-muted/30 border-border/60";
+
+function LeditorSectionAccordion({ value, title, children, className }) {
+    return (
+        <Accordion
+            type="single"
+            defaultValue={value}
+            collapsible
+            className={cn(leditorAccordionPanel, className)}
+        >
+            <AccordionItem value={value} className="border-0">
+                <AccordionTrigger className={leditorAccordionTrigger}>{title}</AccordionTrigger>
+                <AccordionContent className={leditorAccordionContent}>{children}</AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    );
+}
 
 const enquirySchema = z.object({
     message: z.string().min(10, "Please enter a message (at least 10 characters)"),
     privacy: z.boolean().refine((val) => val === true, "Please agree to the Privacy Policy and Terms & Conditions"),
     captcha: z.union([z.string(), z.any()]).refine((val) => !!val, "Please complete the captcha"),
 });
+
+function ControllerSummaryPanel({ controller, isEn, onRemove }) {
+    const brand = controller.brandDisplay || controller.brandName || "N/A";
+    const specs = [
+        {
+            label: isEn ? "SKU" : "Artikelnr.",
+            value: controller.controllerNumber,
+        },
+        {
+            label: isEn ? "Brand" : "Marke",
+            value: brand,
+        },
+        {
+            label: isEn ? "Max. pixel capacity" : "Max. Pixelkapazität",
+            value:
+                controller.pixelCapacity != null
+                    ? controller.pixelCapacity.toLocaleString()
+                    : null,
+        },
+        {
+            label: isEn ? "Max. width/height" : "Max. Breite/Höhe",
+            value:
+                controller.maxWidthHeight != null
+                    ? `${controller.maxWidthHeight.toLocaleString()} px`
+                    : null,
+        },
+        {
+            label: isEn ? "Max. layers" : "Max. Layer",
+            value: controller.maximumLayers,
+        },
+        {
+            label: isEn ? "HDR support" : "HDR",
+            value: controller.hdrSupport,
+        },
+    ].filter((row) => row.value != null && row.value !== "");
+
+    return (
+        <div className="rounded-xl border border-border/60 bg-white p-4 space-y-4 h-full">
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {isEn ? "Selected controller" : "Ausgewählter Controller"}
+                    </p>
+                    <h3 className="text-base font-semibold text-foreground leading-snug mt-1">
+                        {controller.interfaceName}
+                    </h3>
+                </div>
+                <button
+                    type="button"
+                    onClick={onRemove}
+                    className="shrink-0 text-muted-foreground hover:text-destructive transition-colors p-1"
+                    aria-label={isEn ? "Remove controller" : "Controller entfernen"}
+                >
+                    <X className="h-4 w-4" />
+                </button>
+            </div>
+            {controller.images?.[0] ? (
+                <div className="relative aspect-4/3 max-h-36 rounded-lg border border-border/40 bg-muted/20 overflow-hidden">
+                    <Image
+                        src={controller.images[0]}
+                        alt={controller.interfaceName || "Controller"}
+                        fill
+                        className="object-contain p-2"
+                        sizes="360px"
+                    />
+                </div>
+            ) : null}
+            <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-sm">
+                {specs.map((row) => (
+                    <div key={row.label} className="flex gap-3 py-0.5">
+                        <dt className="text-muted-foreground shrink-0">{row.label}</dt>
+                        <dd className="font-medium text-foreground text-right">{row.value}</dd>
+                    </div>
+                ))}
+            </dl>
+            <Link
+                href={`/controllers/${controller.id}`}
+                className="inline-block text-sm font-medium text-primary hover:text-primary/80"
+            >
+                {isEn ? "View full specifications →" : "Alle Spezifikationen →"}
+            </Link>
+        </div>
+    );
+}
 
 function MultiCheckbox({ label, options, value = [], onChange }) {
     const toggle = (opt) => {
@@ -60,9 +170,12 @@ function MultiCheckbox({ label, options, value = [], onChange }) {
     return (
         <div className="space-y-2">
             <Label>{label}</Label>
-            <div className="flex flex-wrap gap-x-5 gap-y-3 pt-1">
+            <div className="flex flex-wrap gap-x-4 gap-y-2.5 pt-0.5">
                 {options.map((opt) => (
-                    <Label key={opt} className="cursor-pointer font-normal mb-0 flex items-center gap-2">
+                    <Label
+                        key={opt}
+                        className="cursor-pointer font-normal text-sm flex items-center gap-2"
+                    >
                         <Checkbox
                             checked={value.includes(opt)}
                             onCheckedChange={() => toggle(opt)}
@@ -80,6 +193,7 @@ export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
     const { language } = useLanguage();
+    const isEn = language === "en";
     const { privacyPolicyPdfUrl } = useFooter();
     // Data states
     const [categories, setCategories] = useState([]);
@@ -213,19 +327,6 @@ export default function LeditorPage() {
             setUserPreviewImageLoaded(false);
         };
     }, [userPreviewImageUrl]);
-
-    // Accordion open sections
-    const [accordionSections, setAccordionSections] = useState([
-        "preview",
-        "selection",
-        "screen-info",
-        "installation-service",
-        "additional-config",
-        "controller-selection",
-        "file-upload",
-        "notes-submission",
-        "submit-enquiry",
-    ]);
 
     // Fetch products from API
     const fetchProducts = useCallback(async () => {
@@ -520,7 +621,7 @@ export default function LeditorPage() {
         ctx.restore();
 
         ctx.fillStyle = "#64748b";
-        ctx.font = "12px font-open-sans";
+        ctx.font = "12px";
         ctx.textAlign = "center";
         const cabLabel = `${cabInfo.countH} × ${cabInfo.countV} Cabinets`;
         ctx.fillText(cabLabel, ledX + drawW / 2, ledBottomY + 18);
@@ -567,11 +668,17 @@ export default function LeditorPage() {
         };
     }, [controllerDropdownOpen]);
 
-    const handleSelectController = (controller) => {
-        setSelectedController(controller);
+    const handleSelectController = async (controller) => {
         setControllerSearch("");
         setControllerResults([]);
         setControllerDropdownOpen(false);
+        try {
+            const res = await fetch(`/api/controllers/${controller.id}`);
+            const json = await res.json();
+            setSelectedController(json.success ? json.data : controller);
+        } catch {
+            setSelectedController(controller);
+        }
     };
 
     const handleRemoveController = () => {
@@ -665,748 +772,917 @@ export default function LeditorPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             <BreadCrumb
-                title={language === "en" ? "Leditor" : "Leditor"}
+                title="Leditor"
                 breadcrumbs={[
-                    { label: language === "en" ? "Home" : "Startseite", href: "/" },
-                    { label: language === "en" ? "Leditor" : "Leditor" },
+                    { label: isEn ? "Home" : "Startseite", href: "/" },
+                    { label: "Leditor" },
                 ]}
             />
 
-            <div className="container mx-auto px-4 py-8 space-y-8">
-                <Accordion
-                    type="multiple"
-                    value={accordionSections}
-                    onValueChange={setAccordionSections}
-                    className="space-y-8"
+            <div className="container mx-auto px-4 lg:px-6 py-6 sm:py-8 space-y-4">
+                <LeditorSectionAccordion
+                    value="preview"
+                    title={isEn ? "Preview" : "Vorschau"}
                 >
-                    {/* ===== SECTION 1: PREVIEW ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="preview" defaultValue="preview" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
-                                        Preview
-                                    </h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6">
-                                    <div className="flex flex-col lg:flex-row gap-6 items-start">
-                                        <div className="flex-1 w-full flex items-center justify-center rounded-lg bg-gray-50 border p-4 min-h-[360px]">
-                                            <canvas
-                                                ref={canvasRef}
-                                                className="max-w-full"
+                    <div className="flex flex-col lg:flex-row gap-6 items-start">
+                        <div className="flex-1 w-full flex items-center justify-center rounded-lg bg-muted/20 border border-border/60 p-4 min-h-[320px] sm:min-h-[360px]">
+                            <canvas
+                                ref={canvasRef}
+                                className="max-w-full"
+                            />
+                        </div>
+                        {selectedProduct && (
+                            <div className="w-full lg:w-72 shrink-0 rounded-xl border border-border/60 bg-white p-4 sm:p-5 space-y-4 shadow-sm">
+                                <h3 className="text-sm font-semibold  uppercase tracking-wide text-foreground/90">
+                                    {isEn ? "Screen size" : "Bildschirmgröße"}
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label>{isEn ? "Width (m)" : "Breite (m)"}</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0"
+                                                onClick={() => adjustScreenWidth(-1)}
+                                            >
+                                                <Minus className="h-4 w-4" />
+                                            </Button>
+                                            <Input
+                                                type="number"
+                                                step="0.001"
+                                                value={config.screenWidth}
+                                                onChange={(e) =>
+                                                    setConfig((prev) => ({
+                                                        ...prev,
+                                                        screenWidth: parseFloat(e.target.value) || 0,
+                                                    }))
+                                                }
+                                                className="text-center flex-1 h-10 text-sm"
                                             />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0"
+                                                onClick={() => adjustScreenWidth(1)}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                        {selectedProduct && (
-                                            <div className="w-full lg:w-72 shrink-0 rounded-lg border bg-white p-4 space-y-4">
-                                                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Screen Size</h3>
-                                                <div className="space-y-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm">Width (m)</Label>
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-9 w-9 shrink-0"
-                                                                onClick={() => adjustScreenWidth(-1)}
-                                                            >
-                                                                <Minus className="h-4 w-4" />
-                                                            </Button>
-                                                            <Input
-                                                                type="number"
-                                                                step="0.001"
-                                                                value={config.screenWidth}
-                                                                onChange={(e) =>
-                                                                    setConfig((prev) => ({
-                                                                        ...prev,
-                                                                        screenWidth: parseFloat(e.target.value) || 0,
-                                                                    }))
-                                                                }
-                                                                className="text-center flex-1"
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-9 w-9 shrink-0"
-                                                                onClick={() => adjustScreenWidth(1)}
-                                                            >
-                                                                <Plus className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm">Height (m)</Label>
-                                                        <div className="flex items-center gap-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-9 w-9 shrink-0"
-                                                                onClick={() => adjustScreenHeight(-1)}
-                                                            >
-                                                                <Minus className="h-4 w-4" />
-                                                            </Button>
-                                                            <Input
-                                                                type="number"
-                                                                step="0.001"
-                                                                value={config.screenHeight}
-                                                                onChange={(e) =>
-                                                                    setConfig((prev) => ({
-                                                                        ...prev,
-                                                                        screenHeight: parseFloat(e.target.value) || 0,
-                                                                    }))
-                                                                }
-                                                                className="text-center flex-1"
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-9 w-9 shrink-0"
-                                                                onClick={() => adjustScreenHeight(1)}
-                                                            >
-                                                                <Plus className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p className="text-sm text-gray-500">
-                                                    Change width/height to see the LED preview update live.
-                                                </p>
-                                                <div className="space-y-2 pt-2 border-t">
-                                                    <Label className="text-sm">Preview with your own image</Label>
-                                                    <p className="text-sm text-gray-500">
-                                                        Upload an image to see how it would look on the screen.
-                                                    </p>
-                                                    <div className="flex items-center gap-2">
-                                                        <label className="flex items-center w-full justify-center h-10 px-4 border rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors text-sm font-medium">
-                                                            <span className="mr-2">+</span>
-                                                            {userPreviewImageUrl ? "Change image" : "Upload image"}
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                onChange={(e) => {
-                                                                    const file = e.target.files?.[0];
-                                                                    if (file) {
-                                                                        if (userPreviewImageUrl) URL.revokeObjectURL(userPreviewImageUrl);
-                                                                        setUserPreviewImageUrl(URL.createObjectURL(file));
-                                                                    }
-                                                                }}
-                                                            />
-                                                        </label>
-                                                        {userPreviewImageUrl && (
-                                                            <Button
-                                                                type="button"
-
-                                                                onClick={() => {
-                                                                    URL.revokeObjectURL(userPreviewImageUrl);
-                                                                    setUserPreviewImageUrl(null);
-                                                                }}
-                                                            >
-                                                                Clear
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>{isEn ? "Height (m)" : "Höhe (m)"}</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0"
+                                                onClick={() => adjustScreenHeight(-1)}
+                                            >
+                                                <Minus className="h-4 w-4" />
+                                            </Button>
+                                            <Input
+                                                type="number"
+                                                step="0.001"
+                                                value={config.screenHeight}
+                                                onChange={(e) =>
+                                                    setConfig((prev) => ({
+                                                        ...prev,
+                                                        screenHeight: parseFloat(e.target.value) || 0,
+                                                    }))
+                                                }
+                                                className="text-center flex-1 h-10 text-sm"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9 shrink-0"
+                                                onClick={() => adjustScreenHeight(1)}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {isEn
+                                        ? "Change width or height to update the LED preview live."
+                                        : "Breite oder Höhe anpassen, um die LED-Vorschau live zu aktualisieren."}
+                                </p>
+                                <div className="space-y-2 pt-2 border-t border-border/40">
+                                    <Label>
+                                        {isEn ? "Preview with your own image" : "Vorschau mit eigenem Bild"}
+                                    </Label>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {isEn
+                                            ? "Upload an image to see how it would look on the screen."
+                                            : "Laden Sie ein Bild hoch, um die Darstellung auf dem Screen zu sehen."}
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <label className="flex items-center w-full justify-center h-10 px-4 border border-border/60 rounded-lg cursor-pointer bg-muted/20 hover:bg-muted/40 transition-colors text-sm font-medium ">
+                                            <span className="mr-2">+</span>
+                                            {userPreviewImageUrl
+                                                ? isEn
+                                                    ? "Change image"
+                                                    : "Bild ändern"
+                                                : isEn
+                                                    ? "Upload image"
+                                                    : "Bild hochladen"}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        if (userPreviewImageUrl) URL.revokeObjectURL(userPreviewImageUrl);
+                                                        setUserPreviewImageUrl(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                        {userPreviewImageUrl && (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    URL.revokeObjectURL(userPreviewImageUrl);
+                                                    setUserPreviewImageUrl(null);
+                                                }}
+                                            >
+                                                {isEn ? "Clear" : "Entfernen"}
+                                            </Button>
                                         )}
                                     </div>
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
+                            </div>
+                        )}
                     </div>
+                </LeditorSectionAccordion>
 
-                    {/* ===== SECTION 2: SELECT A MODEL CONFIGURATION ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="selection" defaultValue="selection" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
-                                        Select a model configuration
-                                    </h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-4">
-                                    <div className="flex flex-wrap justify-center items-center gap-2">
-                                        <Button
-                                            onClick={() => handleCategoryChange("all")}
-                                            variant={selectedCategory === "all" ? "default" : "outline"}
-                                            className={`font-open-sans font-semibold uppercase text-xl ${selectedCategory === "all" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
-                                        >
-                                            ALL
-                                        </Button>
-                                        {categories.map((cat) => (
-                                            <Button
-                                                key={cat.id}
-                                                onClick={() => handleCategoryChange(cat.id)}
-                                                variant={selectedCategory === cat.id ? "default" : "outline"}
-                                                className={`font-open-sans font-semibold uppercase text-xl ${selectedCategory === cat.id ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                <LeditorSectionAccordion
+                    value="selection"
+                    title={isEn ? "Select a model configuration" : "Modellkonfiguration wählen"}
+                >
+                    <div className="space-y-4">
+
+
+                        <div className="relative w-full">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                            <Input
+                                type="text"
+                                placeholder={
+                                    isEn ? "Search by product name…" : "Nach Produktname suchen…"
+                                }
+                                value={search}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                className="pl-10 h-10 sm:h-11 text-sm rounded-lg border-border/80 shadow-sm placeholder:text-muted-foreground"
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Button
+                                onClick={() => handleCategoryChange("all")}
+                                variant={selectedCategory === "all" ? "default" : "outline"}
+                                size="sm"
+                                className={cn(
+                                    "tracking-wide",
+                                    selectedCategory === "all"
+                                        ? ""
+                                        : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                                )}
+                            >
+                                {isEn ? "All" : "Alle"}
+                            </Button>
+                            {categories.map((cat) => (
+                                <Button
+                                    key={cat.id}
+                                    onClick={() => handleCategoryChange(cat.id)}
+                                    variant={selectedCategory === cat.id ? "default" : "outline"}
+                                    size="sm"
+                                    className={cn(
+                                        "tracking-wide",
+                                        selectedCategory === cat.id
+                                            ? ""
+                                            : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                                    )}
+                                >
+                                    {cat.name}
+                                </Button>
+                            ))}
+                        </div>
+
+                        {loading ? (
+                            <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
+                                <Spinner className="h-6 w-6" />
+                                <span className="text-sm">
+                                    {isEn ? "Loading products…" : "Produkte werden geladen…"}
+                                </span>
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="text-center py-12 px-4 rounded-xl border border-dashed border-border/60 bg-white/60">
+                                <Monitor className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                                <p className="text-sm text-muted-foreground">
+                                    {isEn ? "No products found." : "Keine Produkte gefunden."}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="border border-border/60 rounded-xl overflow-x-auto shadow-sm">
+                                <Table className="min-w-full text-sm">
+                                    <TableHeader className="bg-muted/30">
+                                        <TableRow>
+                                            <TableHead className="px-4 py-3 font-semibold  text-foreground whitespace-nowrap">
+                                                {isEn ? "Product name" : "Produktname"}
+                                            </TableHead>
+                                            <TableHead className="px-4 py-3 font-semibold  text-foreground whitespace-nowrap">
+                                                {isEn ? "Pitch" : "Pitch"}
+                                            </TableHead>
+                                            <TableHead className="px-4 py-3 font-semibold  text-foreground whitespace-nowrap">
+                                                {isEn ? "Brightness" : "Helligkeit"}
+                                            </TableHead>
+                                            <TableHead className="px-4 py-3 font-semibold  text-foreground whitespace-nowrap">
+                                                {isEn ? "Resolution (H × V)" : "Auflösung (H × V)"}
+                                            </TableHead>
+                                            <TableHead className="px-4 py-3 font-semibold  text-foreground whitespace-nowrap">
+                                                {isEn ? "Refresh rate" : "Bildwiederholrate"}
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {products.map((product) => (
+                                            <TableRow
+                                                key={product.id}
+                                                onClick={() => handleSelectProduct(product)}
+                                                className={cn(
+                                                    "cursor-pointer transition-colors",
+                                                    selectedProduct?.id === product.id
+                                                        ? "bg-primary/5 border-l-4 border-l-primary"
+                                                        : "hover:bg-muted/20"
+                                                )}
                                             >
-                                                {cat.name}
-                                            </Button>
+                                                <TableCell className="px-4 py-3 font-medium text-foreground">
+                                                    {product.productName}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-muted-foreground">
+                                                    {product.pixelPitch ? `${product.pixelPitch} mm` : "N/A"}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-muted-foreground">
+                                                    {product.brightnessValue
+                                                        ? `${product.brightnessValue} nits`
+                                                        : "N/A"}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-muted-foreground">
+                                                    {product.cabinetResolutionHorizontal &&
+                                                        product.cabinetResolutionVertical
+                                                        ? `${product.cabinetResolutionHorizontal} × ${product.cabinetResolutionVertical}`
+                                                        : "N/A"}
+                                                </TableCell>
+                                                <TableCell className="px-4 py-3 text-muted-foreground">
+                                                    {product.refreshRate ? `${product.refreshRate} Hz` : "N/A"}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+
+                        {pagination.totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-3 pt-2 flex-wrap">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                    {isEn ? "Previous" : "Zurück"}
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                    {isEn ? "Page" : "Seite"} {pagination.page} {isEn ? "of" : "von"}{" "}
+                                    {pagination.totalPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setPage((p) => Math.min(pagination.totalPages, p + 1))
+                                    }
+                                    disabled={page === pagination.totalPages}
+                                >
+                                    {isEn ? "Next" : "Weiter"}
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </LeditorSectionAccordion>
+
+                <LeditorSectionAccordion
+                    value="screen-info"
+                    title={isEn ? "Screen information" : "Screen-Informationen"}
+                    className="scroll-mt-24"
+                >
+                    <div id="screen-info-section" className="space-y-6">
+                        {!selectedProduct ? (
+                            <div className="text-center py-12 px-4 rounded-xl border border-dashed border-border/60">
+                                <Monitor className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+                                <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                                    {isEn
+                                        ? "Select a product from the table above to configure your LED screen."
+                                        : "Wählen Sie oben ein Produkt aus, um Ihren LED-Screen zu konfigurieren."}
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                <h3 className="text-sm font-semibold  uppercase tracking-wide text-foreground/90">
+                                    {isEn ? "Cabinet specifications" : "Cabinet-Spezifikationen"}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "LED technology" : "LED-Technologie"}</Label>
+                                        <Input
+                                            value={`${config.ledTechnology} ${config.ledTechnologyOther ? `- ${config.ledTechnologyOther}` : ""}`}
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Brightness (nits)" : "Helligkeit (nits)"}</Label>
+                                        <Input value={config.brightnessValue} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Pixel pitch (mm)" : "Pixelabstand (mm)"}</Label>
+                                        <Input value={config.pixelPitch} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Refresh rate (Hz)" : "Bildwiederholrate (Hz)"}</Label>
+                                        <Input value={config.refreshRate} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Cabinet width (mm)" : "Cabinet-Breite (mm)"}</Label>
+                                        <Input value={config.cabinetWidth} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Cabinet height (mm)" : "Cabinet-Höhe (mm)"}</Label>
+                                        <Input value={config.cabinetHeight} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                </div>
+
+                                <h3 className="text-sm font-semibold  uppercase tracking-wide text-foreground/90 pt-2">
+                                    {isEn ? "Custom LED summary" : "Individuelle LED-Zusammenfassung"}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Total resolution" : "Gesamtauflösung"}</Label>
+                                        <Input
+                                            value={
+                                                computed.totalResH && computed.totalResV
+                                                    ? `${computed.totalResH} × ${computed.totalResV} px`
+                                                    : "N/A"
+                                            }
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Total weight" : "Gesamtgewicht"}</Label>
+                                        <Input
+                                            value={computed.totalWeight ? `${computed.totalWeight} kg` : "N/A"}
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Display area" : "Anzeigefläche"}</Label>
+                                        <Input
+                                            value={computed.displayArea ? `${computed.displayArea} m²` : "N/A"}
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Dimension" : "Abmessung"}</Label>
+                                        <Input value={computed.dimension} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>
+                                            {isEn ? "Power consumption max (kW)" : "Max. Leistungsaufnahme (kW)"}
+                                        </Label>
+                                        <Input
+                                            value={computed.powerMax ? `${computed.powerMax} kW` : "N/A"}
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>
+                                            {isEn ? "Power consumption typical (kW)" : "Typ. Leistungsaufnahme (kW)"}
+                                        </Label>
+                                        <Input
+                                            value={computed.powerTypical ? `${computed.powerTypical} kW` : "N/A"}
+                                            readOnly
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label>{isEn ? "Total cabinets" : "Cabinets gesamt"}</Label>
+                                        <Input value={`${computed.totalCabinets}`} readOnly className={readOnlyInputClass} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </LeditorSectionAccordion>
+
+                <LeditorSectionAccordion
+                    value="installation-service"
+                    title={isEn ? "Installation & service" : "Installation & Service"}
+                >
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            <MultiCheckbox
+                                label={isEn ? "Installation and service" : "Installation und Service"}
+                                options={[
+                                    "Schedule a free consultation appointment",
+                                    "Preparation of tender documents",
+                                ]}
+                                value={installationData.installationAndService}
+                                onChange={(val) =>
+                                    setInstallationData((p) => ({ ...p, installationAndService: val }))
+                                }
+                            />
+                            <MultiCheckbox
+                                label={isEn ? "Service access" : "Servicezugang"}
+                                options={["Front service", "Rear service", "Not sure"]}
+                                value={installationData.serviceAccess}
+                                onChange={(val) =>
+                                    setInstallationData((p) => ({ ...p, serviceAccess: val }))
+                                }
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium">{isEn ? "Mounting method" : "Montageart"}</Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                                {[
+                                    "Wall Mount",
+                                    "Hanging / Rigging",
+                                    "Ground Support",
+                                    "Freestanding Structure",
+                                ].map((opt) => (
+                                    <label
+                                        key={opt}
+                                        className={cn(
+                                            "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
+                                            installationData.mountingMethod === opt
+                                                ? "border-primary/50 bg-primary/5 text-foreground"
+                                                : "border-border/60 bg-white hover:border-primary/30"
+                                        )}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="mountingMethod"
+                                            value={opt}
+                                            checked={installationData.mountingMethod === opt}
+                                            onChange={(e) => setInstallationData((p) => ({ ...p, mountingMethod: e.target.value }))}
+                                            className="accent-primary shrink-0"
+                                        />
+                                        <span className="leading-snug">{opt}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="ipRating" className="text-sm font-medium">
+                                    {isEn ? "IP rating" : "IP-Schutzart"}
+                                </Label>
+                                <Input
+                                    id="ipRating"
+                                    value={installationData.ipRating}
+                                    onChange={(e) =>
+                                        setInstallationData((p) => ({ ...p, ipRating: e.target.value }))
+                                    }
+                                    placeholder="e.g. IP65"
+                                    className="h-10 text-sm"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">{isEn ? "Power redundancy" : "Stromredundanz"}</Label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {["Required", "Not Required"].map((opt) => (
+                                            <label
+                                                key={opt}
+                                                className={cn(
+                                                    "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
+                                                    installationData.powerRedundancy === opt
+                                                        ? "border-primary/50 bg-primary/5 text-foreground"
+                                                        : "border-border/60 bg-white hover:border-primary/30"
+                                                )}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="powerRedundancy"
+                                                    value={opt}
+                                                    checked={installationData.powerRedundancy === opt}
+                                                    onChange={(e) => setInstallationData((p) => ({ ...p, powerRedundancy: e.target.value }))}
+                                                    className="accent-primary shrink-0"
+                                                />
+                                                <span className="leading-snug">{opt}</span>
+                                            </label>
                                         ))}
                                     </div>
-
-                                    <div className="relative max-w-md">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-700" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search by product name..."
-                                            value={search}
-                                            onChange={(e) => handleSearch(e.target.value)}
-                                            className="pl-10"
-                                        />
-                                    </div>
-
-                                    {loading ? (
-                                        <div className="flex items-center justify-center py-12">
-                                            <Spinner className="h-8 w-8" />
-                                        </div>
-                                    ) : products.length === 0 ? (
-                                        <div className="text-center py-12 text-gray-500">
-                                            <Monitor className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                            <p>No products found.</p>
-                                        </div>
-                                    ) : (
-                                        <div className="border rounded-lg overflow-x-auto">
-                                            <Table className="min-w-full">
-                                                <TableHeader className="bg-gray-50 font-archivo text-lg">
-                                                    <TableRow>
-                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
-                                                            Product Name
-                                                        </TableHead>
-                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
-                                                            Pitch
-                                                        </TableHead>
-                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
-                                                            Brightness
-                                                        </TableHead>
-                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
-                                                            Resolution (H x V)
-                                                        </TableHead>
-                                                        <TableHead className="p-4 font-bold whitespace-nowrap">
-                                                            Refresh Rate
-                                                        </TableHead>
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                    {products.map((product) => (
-                                                        <TableRow
-                                                            key={product.id}
-                                                            onClick={() => handleSelectProduct(product)}
-                                                            className={`cursor-pointer font-archivo font-normal text-lg transition-colors ${selectedProduct?.id === product.id
-                                                                ? "bg-blue-50 border-l-4 border-l-blue-500"
-                                                                : "hover:bg-gray-50"
-                                                                }`}
-                                                        >
-                                                            <TableCell className="p-4 font-medium">
-                                                                {product.productName}
-                                                            </TableCell>
-                                                            <TableCell className="p-4">
-                                                                {product.pixelPitch ? `${product.pixelPitch}mm` : "N/A"}
-                                                            </TableCell>
-                                                            <TableCell className="p-4">
-                                                                {product.brightnessValue ? `${product.brightnessValue} nits` : "N/A"}
-                                                            </TableCell>
-                                                            <TableCell className="p-4">
-                                                                {product.cabinetResolutionHorizontal && product.cabinetResolutionVertical
-                                                                    ? `${product.cabinetResolutionHorizontal} × ${product.cabinetResolutionVertical}`
-                                                                    : "N/A"}
-                                                            </TableCell>
-                                                            <TableCell className="p-4">
-                                                                {product.refreshRate ? `${product.refreshRate} Hz` : "N/A"}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </div>
-                                    )}
-
-                                    {pagination.totalPages > 1 && (
-                                        <div className="flex items-center justify-center gap-4 pt-2">
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                                disabled={page === 1}
+                                </div>
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">{isEn ? "Operating hours" : "Betriebszeiten"}</Label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {["24/7 Operation"].map((opt) => (
+                                            <label
+                                                key={opt}
+                                                className={cn(
+                                                    "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
+                                                    installationData.operatingHours === opt
+                                                        ? "border-primary/50 bg-primary/5 text-foreground"
+                                                        : "border-border/60 bg-white hover:border-primary/30"
+                                                )}
                                             >
-                                                <ChevronLeft className="h-4 w-4" />
-                                                Previous
-                                            </Button>
-                                            <span className="text-md text-gray-800">
-                                                Page {pagination.page} of {pagination.totalPages}
-                                            </span>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-                                                disabled={page === pagination.totalPages}
-                                            >
-                                                Next
-                                                <ChevronRight className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
-
-                    {/* ===== SECTION 3: SCREEN INFORMATION ===== */}
-                    <div
-                        id="screen-info-section"
-                        className="bg-white rounded-xl border shadow-sm overflow-hidden"
-                    >
-                        <AccordionItem value="screen-info" defaultValue="screen-info" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
-                                        Screen Information
-                                    </h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-6">
-                                    {!selectedProduct ? (
-                                        <div className="text-center py-12 text-gray-500">
-                                            <Monitor className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                                            <p>
-                                                Please select a product from the table
-                                                above to configure your LED screen.
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="space-y-2">
-                                                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Cabinet Specifications</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                <div className="space-y-2">
-                                                    <Label>LED Technology</Label>
-                                                    <Input
-                                                        value={`${config.ledTechnology} ${config.ledTechnologyOther ? `- ${config.ledTechnologyOther}` : ""}`}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Brightness (nits)</Label>
-                                                    <Input value={config.brightnessValue} readOnly className="bg-gray-100" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Pixel Pitch (mm)</Label>
-                                                    <Input value={config.pixelPitch} readOnly className="bg-gray-100" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Refresh Rate (Hz)</Label>
-                                                    <Input value={config.refreshRate} readOnly className="bg-gray-100" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Cabinet Width (mm)</Label>
-                                                    <Input value={config.cabinetWidth} readOnly className="bg-gray-100" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Cabinet Height (mm)</Label>
-                                                    <Input value={config.cabinetHeight} readOnly className="bg-gray-100" />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2 pt-4">
-                                                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Custom LED Summary</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                <div className="space-y-2">
-                                                    <Label>Total Resolution</Label>
-                                                    <Input
-                                                        value={
-                                                            computed.totalResH && computed.totalResV
-                                                                ? `${computed.totalResH} × ${computed.totalResV} px`
-                                                                : "N/A"
-                                                        }
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Total Weight</Label>
-                                                    <Input
-                                                        value={computed.totalWeight ? `${computed.totalWeight} kg` : "N/A"}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Display Area</Label>
-                                                    <Input
-                                                        value={computed.displayArea ? `${computed.displayArea} m²` : "N/A"}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Dimension</Label>
-                                                    <Input value={computed.dimension} readOnly className="bg-gray-100" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Power Consumption Max (kW)</Label>
-                                                    <Input
-                                                        value={computed.powerMax ? `${computed.powerMax} kW` : "N/A"}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Power Consumption Typical (kW)</Label>
-                                                    <Input
-                                                        value={computed.powerTypical ? `${computed.powerTypical} kW` : "N/A"}
-                                                        readOnly
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Total Cabinets</Label>
-                                                    <Input value={`${computed.totalCabinets}`} readOnly className="bg-gray-100" />
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
-
-                    {/* ===== SECTION 4: INSTALLATION & SERVICE ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="installation-service" defaultValue="installation-service" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Installation & Service</h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <MultiCheckbox
-                                            label="Installation and Service"
-                                            options={["Schedule a free consultation appointment", "Preparation of tender documents"]}
-                                            value={installationData.installationAndService}
-                                            onChange={(val) => setInstallationData((p) => ({ ...p, installationAndService: val }))}
-                                        />
-                                        <MultiCheckbox
-                                            label="Service Access"
-                                            options={["Front service", "Rear service", "Not sure"]}
-                                            value={installationData.serviceAccess}
-                                            onChange={(val) => setInstallationData((p) => ({ ...p, serviceAccess: val }))}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Mounting Method</Label>
-                                            <div className="flex flex-wrap gap-4 pt-1">
-                                                {["Wall Mount", "Hanging / Rigging", "Ground Support", "Freestanding Structure"].map((val) => (
-                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
-                                                        <input
-                                                            type="radio"
-                                                            name="mountingMethod"
-                                                            value={val}
-                                                            checked={installationData.mountingMethod === val}
-                                                            onChange={(e) => setInstallationData((p) => ({ ...p, mountingMethod: e.target.value }))}
-                                                            className="accent-secondary"
-                                                        />
-                                                        <span>{val}</span>
-                                                    </Label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="ipRating">IP Rating (Weather Protection)</Label>
-                                            <Input
-                                                id="ipRating"
-                                                value={installationData.ipRating}
-                                                onChange={(e) => setInstallationData((p) => ({ ...p, ipRating: e.target.value }))}
-                                                placeholder="e.g. IP65"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Power Redundancy</Label>
-                                            <div className="flex flex-wrap gap-4 pt-1">
-                                                {["Required", "Not Required"].map((val) => (
-                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
-                                                        <input
-                                                            type="radio"
-                                                            name="powerRedundancy"
-                                                            value={val}
-                                                            checked={installationData.powerRedundancy === val}
-                                                            onChange={(e) => setInstallationData((p) => ({ ...p, powerRedundancy: e.target.value }))}
-                                                            className="accent-secondary"
-                                                        />
-                                                        <span>{val}</span>
-                                                    </Label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>Operating Hours</Label>
-                                            <div className="flex flex-wrap gap-4 pt-1">
-                                                {["24/7 Operation"].map((val) => (
-                                                    <Label key={val} className="cursor-pointer font-normal mb-0">
-                                                        <input
-                                                            type="radio"
-                                                            name="operatingHours"
-                                                            value={val}
-                                                            checked={installationData.operatingHours === val}
-                                                            onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
-                                                            className="accent-secondary"
-                                                        />
-                                                        <span>{val}</span>
-                                                    </Label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Structural Constraints */}
-                                    <div className="space-y-2 pt-2">
-                                        <Label>Structural Constraints / Installation Space</Label>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className="text-sm text-gray-500">Width</span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="mm"
-                                                value={structuralConstraints.width}
-                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, width: e.target.value }))}
-                                                className="w-28"
-                                            />
-                                            <span className="text-gray-400">×</span>
-                                            <span className="text-sm text-gray-500">Height</span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="mm"
-                                                value={structuralConstraints.height}
-                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, height: e.target.value }))}
-                                                className="w-28"
-                                            />
-                                            <span className="text-gray-400">×</span>
-                                            <span className="text-sm text-gray-500">Depth</span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="mm"
-                                                value={structuralConstraints.depth}
-                                                onChange={(e) => setStructuralConstraints((p) => ({ ...p, depth: e.target.value }))}
-                                                className="w-28"
-                                            />
-                                            <span className="text-sm text-gray-500">mm</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Viewing Distance */}
-                                    <div className="space-y-2">
-                                        <Label>Viewing Distance</Label>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className="text-sm text-gray-500">Min.</span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="m"
-                                                value={viewingDistance.min}
-                                                onChange={(e) => setViewingDistance((p) => ({ ...p, min: e.target.value }))}
-                                                className="w-28"
-                                            />
-                                            <span className="text-sm text-gray-500">m</span>
-                                            <span className="text-gray-400 mx-2">—</span>
-                                            <span className="text-sm text-gray-500">Max.</span>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                placeholder="m"
-                                                value={viewingDistance.max}
-                                                onChange={(e) => setViewingDistance((p) => ({ ...p, max: e.target.value }))}
-                                                className="w-28"
-                                            />
-                                            <span className="text-sm text-gray-500">m</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
-
-                    {/* ===== SECTION 5: ADDITIONAL CONFIGURATION ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="additional-config" defaultValue="additional-config" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Additional Configuration</h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <MultiCheckbox
-                                            label="Controller Configuration"
-                                            options={["Synchronous", "Asynchronous"]}
-                                            value={controllerConfig}
-                                            onChange={setControllerConfig}
-                                        />
-                                        <MultiCheckbox
-                                            label="Network Connection"
-                                            options={["LAN", "WLAN (Wi-Fi)", "3G Mobile"]}
-                                            value={networkConnection}
-                                            onChange={setNetworkConnection}
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <MultiCheckbox
-                                            label="Signal Source Inputs"
-                                            options={["HDMI", "DVI", "12G-SDI", "3G-DP", "10G Fiber"]}
-                                            value={signalSourceInputs}
-                                            onChange={setSignalSourceInputs}
-                                        />
-                                        <MultiCheckbox
-                                            label="Additional Services"
-                                            options={["Approval process", "Leasing", "Installation", "Extended warranty"]}
-                                            value={additionalServices}
-                                            onChange={setAdditionalServices}
-                                        />
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
-
-                    {/* ===== SECTION 6: CONTROLLER SELECTION ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="controller-selection" defaultValue="controller-selection" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">Controller Selection</h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-4">
-                                    <Label>Select a Controller</Label>
-                                    <div ref={controllerSearchRef} className="relative max-w-lg">
-                                        <button
-                                            ref={controllerTriggerRef}
-                                            type="button"
-                                            onClick={() => setControllerDropdownOpen((prev) => !prev)}
-                                            className="w-full flex items-center justify-between px-3 py-2.5 text-sm border rounded-lg bg-white hover:border-gray-400 transition-colors text-left"
-                                        >
-                                            <span className="text-gray-400">
-                                                {selectedController ? selectedController.interfaceName : "- Select Controller"}
-                                            </span>
-                                            <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
-                                        </button>
-                                        {controllerDropdownOpen && controllerDropdownRect && typeof document !== "undefined" && createPortal(
-                                            <>
-                                                <div
-                                                    className="fixed inset-0 z-100"
-                                                    onClick={() => setControllerDropdownOpen(false)}
-                                                    aria-hidden
+                                                <input
+                                                    type="radio"
+                                                    name="operatingHours"
+                                                    value={opt}
+                                                    checked={installationData.operatingHours === opt}
+                                                    onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
+                                                    className="accent-primary shrink-0"
                                                 />
-                                                <div
-                                                    className="fixed z-101 bg-white border rounded-lg shadow-lg"
-                                                    style={{
-                                                        top: controllerDropdownRect.bottom + 4,
-                                                        left: controllerDropdownRect.left,
-                                                        width: Math.max(controllerDropdownRect.width, 280),
-                                                        minWidth: 280,
-                                                    }}
-                                                >
-                                                    <div className="p-2 border-b">
-                                                        <div className="relative">
-                                                            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                                            <input
-                                                                type="text"
-                                                                value={controllerSearch}
-                                                                onChange={(e) => setControllerSearch(e.target.value)}
-                                                                placeholder="Search controllers..."
-                                                                className="w-full pl-8 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-secondary"
-                                                                autoFocus
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="max-h-60 overflow-y-auto">
-                                                        {controllerLoading && controllerResults.length === 0 ? (
-                                                            <div className="flex items-center justify-center py-4">
-                                                                <Spinner className="h-5 w-5" />
-                                                                <span className="ml-2 text-sm text-gray-500">Loading...</span>
-                                                            </div>
-                                                        ) : controllerResults.length === 0 ? (
-                                                            <div className="px-4 py-3 text-sm text-gray-500">No controllers found</div>
-                                                        ) : (
-                                                            controllerResults.map((ctrl) => (
-                                                                <button
-                                                                    key={ctrl.id}
-                                                                    type="button"
-                                                                    onClick={() => handleSelectController(ctrl)}
-                                                                    className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors"
-                                                                >
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="font-medium">{ctrl.interfaceName}</span>
-                                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 shrink-0">Controller</span>
-                                                                    </div>
-                                                                    <p className="text-xs text-gray-500 mt-0.5">{ctrl.brandDisplay || ctrl.brandName}</p>
-                                                                </button>
-                                                            ))
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </>,
-                                            document.body
-                                        )}
+                                                <span className="leading-snug">{opt}</span>
+                                            </label>
+                                        ))}
                                     </div>
-                                    {selectedController && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1.5 rounded-full text-sm">
-                                                <span>{selectedController.interfaceName}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={handleRemoveController}
-                                                    className="hover:text-red-600 transition-colors"
-                                                >
-                                                    <X className="h-3.5 w-3.5" />
-                                                </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 pt-1 border-t border-border/40">
+                            <div className="space-y-2 pt-4">
+                                <Label className="text-sm font-medium">
+                                    {isEn
+                                        ? "Structural constraints / installation space"
+                                        : "Bauliche Einschränkungen / Einbauraum"}
+                                </Label>
+                                <div className="flex items-end gap-3">
+                                    {[
+                                        { key: "width", label: isEn ? "Width" : "Breite" },
+                                        { key: "height", label: isEn ? "Height" : "Höhe" },
+                                        { key: "depth", label: isEn ? "Depth" : "Tiefe" },
+                                    ].map(({ key, label }, i) => (
+                                        <div key={key} className="flex items-end gap-2">
+                                            {i > 0 ? (
+                                                <span className="text-muted-foreground pb-2.5">×</span>
+                                            ) : null}
+                                            <div className="space-y-1">
+                                                <span className="text-xs text-muted-foreground">{label}</span>
+                                                <Input
+                                                    type="number"
+                                                    step="0.01"
+                                                    placeholder="mm"
+                                                    value={structuralConstraints[key]}
+                                                    onChange={(e) =>
+                                                        setStructuralConstraints((p) => ({
+                                                            ...p,
+                                                            [key]: e.target.value,
+                                                        }))
+                                                    }
+                                                    className="h-10 text-sm w-full"
+                                                />
                                             </div>
                                         </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-2 pt-4">
+                                <Label className="text-sm font-medium">
+                                    {isEn ? "Viewing distance" : "Betrachtungsabstand"}
+                                </Label>
+                                <div className="flex flex-wrap items-end gap-3">
+                                    <div className="space-y-1 flex-1">
+                                        <span className="text-xs text-muted-foreground">
+                                            {isEn ? "Minimum" : "Minimum"}
+                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="mm"
+                                                value={viewingDistance.min}
+                                                onChange={(e) =>
+                                                    setViewingDistance((p) => ({
+                                                        ...p,
+                                                        min: e.target.value,
+                                                    }))
+                                                }
+                                                className="h-10 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1 flex-1">
+                                        <span className="text-xs text-muted-foreground">
+                                            {isEn ? "Maximum" : "Maximum"}
+                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="mm"
+                                                value={viewingDistance.max}
+                                                onChange={(e) =>
+                                                    setViewingDistance((p) => ({
+                                                        ...p,
+                                                        max: e.target.value,
+                                                    }))
+                                                }
+                                                className="h-10 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </LeditorSectionAccordion>
+
+                <LeditorSectionAccordion
+                    value="additional-config"
+                    title={isEn ? "Additional configuration" : "Zusätzliche Konfiguration"}
+                >
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <MultiCheckbox
+                                label="Controller Configuration"
+                                options={["Synchronous", "Asynchronous"]}
+                                value={controllerConfig}
+                                onChange={setControllerConfig}
+                            />
+                            <MultiCheckbox
+                                label="Network Connection"
+                                options={["LAN", "WLAN (Wi-Fi)", "3G Mobile"]}
+                                value={networkConnection}
+                                onChange={setNetworkConnection}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <MultiCheckbox
+                                label="Signal Source Inputs"
+                                options={["HDMI", "DVI", "12G-SDI", "3G-DP", "10G Fiber"]}
+                                value={signalSourceInputs}
+                                onChange={setSignalSourceInputs}
+                            />
+                            <MultiCheckbox
+                                label="Additional Services"
+                                options={["Approval process", "Leasing", "Installation", "Extended warranty"]}
+                                value={additionalServices}
+                                onChange={setAdditionalServices}
+                            />
+                        </div>
+                    </div>
+                </LeditorSectionAccordion>
+
+                <LeditorSectionAccordion
+                    value="controller-selection"
+                    title={isEn ? "Controller selection" : "Controller-Auswahl"}
+                >
+                    <div className="flex flex-col gap-5 items-stretch">
+                        <div className="space-y-2 min-w-0">
+                            <Label className="text-sm font-medium">
+                                {isEn ? "Select a controller (optional)" : "Controller auswählen (optional)"}
+                            </Label>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                {isEn
+                                    ? "Choose a video processor to include with your custom screen enquiry."
+                                    : "Wählen Sie einen Videoprozessor für Ihre individuelle Screen-Anfrage."}
+                            </p>
+                            <div ref={controllerSearchRef} className="relative">
+                                <button
+                                    ref={controllerTriggerRef}
+                                    type="button"
+                                    onClick={() => setControllerDropdownOpen((prev) => !prev)}
+                                    className="w-full flex items-center justify-between px-3 h-10 text-sm border border-border/60 rounded-lg bg-white hover:border-primary/40 transition-colors text-left shadow-sm"
+                                >
+                                    <span
+                                        className={cn(
+                                            "truncate pr-2",
+                                            selectedController
+                                                ? "text-foreground font-medium"
+                                                : "text-muted-foreground"
+                                        )}
+                                    >
+                                        {selectedController
+                                            ? selectedController.interfaceName
+                                            : isEn
+                                                ? "Search and select…"
+                                                : "Suchen und auswählen…"}
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+                                </button>
+                                {controllerDropdownOpen &&
+                                    controllerDropdownRect &&
+                                    typeof document !== "undefined" &&
+                                    createPortal(
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-100"
+                                                onClick={() => setControllerDropdownOpen(false)}
+                                                aria-hidden
+                                            />
+                                            <div
+                                                className="fixed z-101 bg-white border border-border/60 rounded-xl shadow-lg"
+                                                style={{
+                                                    top: controllerDropdownRect.bottom + 4,
+                                                    left: controllerDropdownRect.left,
+                                                    width: Math.max(
+                                                        controllerDropdownRect.width,
+                                                        280
+                                                    ),
+                                                    minWidth: 280,
+                                                }}
+                                            >
+                                                <div className="p-2 border-b border-border/40">
+                                                    <div className="relative">
+                                                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                        <input
+                                                            type="text"
+                                                            value={controllerSearch}
+                                                            onChange={(e) =>
+                                                                setControllerSearch(e.target.value)
+                                                            }
+                                                            placeholder={
+                                                                isEn
+                                                                    ? "Search by name or brand…"
+                                                                    : "Nach Name oder Marke…"
+                                                            }
+                                                            className="w-full pl-9 pr-3 h-9 text-sm border border-border/60 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
+                                                            autoFocus
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="max-h-60 overflow-y-auto">
+                                                    {controllerLoading &&
+                                                        controllerResults.length === 0 ? (
+                                                        <div className="flex items-center justify-center py-4">
+                                                            <Spinner className="h-5 w-5" />
+                                                            <span className="ml-2 text-sm text-muted-foreground">
+                                                                {isEn ? "Loading…" : "Wird geladen…"}
+                                                            </span>
+                                                        </div>
+                                                    ) : controllerResults.length === 0 ? (
+                                                        <div className="px-4 py-3 text-sm text-muted-foreground">
+                                                            {isEn
+                                                                ? "No controllers found"
+                                                                : "Keine Controller gefunden"}
+                                                        </div>
+                                                    ) : (
+                                                        controllerResults.map((ctrl) => (
+                                                            <button
+                                                                key={ctrl.id}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleSelectController(ctrl)
+                                                                }
+                                                                className="w-full text-left px-4 py-3 hover:bg-primary/5 border-b border-border/40 last:border-b-0 transition-colors"
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-semibold text-foreground truncate">
+                                                                        {ctrl.interfaceName}
+                                                                    </span>
+                                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-secondary text-primary-foreground shrink-0">
+                                                                        {ctrl.brandDisplay ||
+                                                                            ctrl.brandName}
+                                                                    </span>
+                                                                </div>
+                                                                {ctrl.controllerNumber ? (
+                                                                    <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                                                                        {ctrl.controllerNumber}
+                                                                    </p>
+                                                                ) : null}
+                                                            </button>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </>,
+                                        document.body
+                                    )}
+                            </div>
+                        </div>
+                        <div>
+                            {selectedController ? (
+                                <ControllerSummaryPanel
+                                    controller={selectedController}
+                                    isEn={isEn}
+                                    onRemove={handleRemoveController}
+                                />
+                            ) : (
+                                <div className="rounded-xl border border-dashed border-border/60 bg-white/80 p-5 h-full flex flex-col justify-center text-center">
+                                    <Monitor className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {isEn
+                                            ? "Your selected controller will appear here with key specifications."
+                                            : "Der gewählte Controller wird hier mit den wichtigsten Daten angezeigt."}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </LeditorSectionAccordion>
+
+                <LeditorSectionAccordion
+                    value="notes-submission"
+                    title={isEn ? "Notes & submission" : "Notizen & Absenden"}
+                    className="scroll-mt-24"
+                >
+                    <div id="submit-enquiry-section">
+                        {isAuthenticated ? (
+                            <form
+                                onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
+                                className="space-y-5"
+                            >
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-sm font-medium">
+                                            {isEn ? "Your name" : "Ihr Name"}
+                                        </Label>
+                                        <Input
+                                            value={user?.fullName || ""}
+                                            disabled
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-sm font-medium">
+                                            {isEn ? "Your email" : "Ihre E-Mail"}
+                                        </Label>
+                                        <Input
+                                            value={user?.email || ""}
+                                            disabled
+                                            className={readOnlyInputClass}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label htmlFor="enquiry-message" className="text-sm font-medium">
+                                        {isEn ? "Your message" : "Ihre Nachricht"}
+                                        <span className="text-destructive ml-0.5">*</span>
+                                    </Label>
+                                    <Textarea
+                                        id="enquiry-message"
+                                        {...register("message")}
+                                        placeholder={
+                                            isEn
+                                                ? "Describe your custom LED screen requirements…"
+                                                : "Beschreiben Sie Ihre individuellen LED-Anforderungen…"
+                                        }
+                                        rows={4}
+                                        className={cn(
+                                            "text-sm min-h-[100px] resize-y",
+                                            errors.message && "border-destructive"
+                                        )}
+                                    />
+                                    {errors.message && (
+                                        <p className="text-xs text-destructive">
+                                            {errors.message.message}
+                                        </p>
                                     )}
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
 
-                    {/* ===== SECTION 7: FILE UPLOAD ===== */}
-                    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <AccordionItem value="file-upload" defaultValue="file-upload" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">File Upload</h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-4">
-                                    <Label>Upload Reference Files</Label>
-                                    <Label className="flex items-center gap-2 cursor-pointer border rounded-lg px-4 py-3 max-w-sm hover:bg-gray-50">
-                                        <Upload className="h-4 w-4 text-gray-500" />
-                                        <span className="text-sm text-gray-600">Attach</span>
+                                <div className="rounded-lg border shadow-xs bg-white p-4 space-y-3">
+                                    <div>
+                                        <p className="text-sm font-medium text-foreground">
+                                            {isEn ? "Reference files" : "Referenzdateien"}
+                                            <span className="text-muted-foreground font-normal ml-1">
+                                                ({isEn ? "optional" : "optional"})
+                                            </span>
+                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            {isEn
+                                                ? "Plans, photos, or drawings (PDF, JPG, PNG, DWG)"
+                                                : "Pläne, Fotos oder Zeichnungen (PDF, JPG, PNG, DWG)"}
+                                        </p>
+                                    </div>
+                                    <Label className="inline-flex items-center gap-2 cursor-pointer border border-border/60 rounded-lg px-4 py-2.5 hover:bg-muted/20 transition-colors text-sm font-medium w-fit">
+                                        <Upload className="h-4 w-4 text-muted-foreground" />
+                                        {isEn ? "Attach files" : "Dateien anhängen"}
                                         <input
                                             type="file"
                                             multiple
@@ -1415,153 +1691,130 @@ export default function LeditorPage() {
                                             className="hidden"
                                         />
                                     </Label>
-                                    <p className="text-sm text-secondary">Accepted file types: PDF, JPG, PNG, DWG</p>
                                     {uploadedFiles.length > 0 && (
-                                        <div className="space-y-2 mt-2">
+                                        <ul className="space-y-2">
                                             {uploadedFiles.map((file, idx) => (
-                                                <div key={idx} className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-2">
-                                                    <FileText className="h-4 w-4 text-gray-500 shrink-0" />
-                                                    <span className="text-sm flex-1 truncate">{file.name}</span>
-                                                    <span className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</span>
+                                                <li
+                                                    key={idx}
+                                                    className="flex items-center gap-3 bg-muted/20 border border-border/60 rounded-lg px-3 py-2"
+                                                >
+                                                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                                    <span className="text-sm flex-1 truncate text-foreground">
+                                                        {file.name}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground shrink-0">
+                                                        {(file.size / 1024).toFixed(1)} KB
+                                                    </span>
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveFile(idx)}
-                                                        className="text-red-500 hover:text-red-700 transition-colors"
+                                                        className="text-destructive hover:text-destructive/80 transition-colors shrink-0"
+                                                        aria-label={
+                                                            isEn ? "Remove file" : "Datei entfernen"
+                                                        }
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </button>
-                                                </div>
+                                                </li>
                                             ))}
-                                        </div>
+                                        </ul>
                                     )}
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </div>
 
-                    {/* ===== SECTION 8: NOTES & SUBMISSION ===== */}
-                    <div
-                        id="submit-enquiry-section"
-                        className="bg-white rounded-xl border shadow-sm overflow-hidden"
-                    >
-                        <AccordionItem value="notes-submission" defaultValue="notes-submission" className="border-0">
-                            <AccordionTrigger className="w-full flex items-center justify-between px-6 py-4 hover:no-underline">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1 h-6 bg-secondary rounded-full" />
-                                    <h2 className="text-[22px] font-semibold font-open-sans text-black">
-                                        Notes & Submission
-                                    </h2>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-6 pb-6 space-y-6">
-                                    {isAuthenticated ? (
-                                        <form
-                                            onSubmit={rhfHandleSubmit(onSubmitEnquiry)}
-                                            className="space-y-4 max-w-2xl"
+                                <div className="space-y-2">
+                                    <div className="flex items-start gap-2.5">
+                                        <Controller
+                                            name="privacy"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    id="privacy-leditor"
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                    className="mt-0.5"
+                                                />
+                                            )}
+                                        />
+                                        <Label
+                                            htmlFor="privacy-leditor"
+                                            className="text-sm text-muted-foreground leading-relaxed font-normal cursor-pointer"
                                         >
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <Label>Your Name</Label>
-                                                    <Input
-                                                        value={user?.fullName || ""}
-                                                        disabled
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Your Email</Label>
-                                                    <Input
-                                                        value={user?.email || ""}
-                                                        disabled
-                                                        className="bg-gray-100"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label htmlFor="enquiry-message">Your Message*</Label>
-                                                <Textarea
-                                                    id="enquiry-message"
-                                                    {...register("message")}
-                                                    placeholder="Describe your custom LED screen requirements..."
-                                                    rows={4}
-                                                    className={errors.message ? "border-red-500" : ""}
-                                                />
-                                                {errors.message && (
-                                                    <p className="text-sm text-red-500">{errors.message.message}</p>
-                                                )}
-                                            </div>
-
-                                            <div className="flex flex-col">
-                                                <div className="flex items-start gap-2">
-                                                <Controller
-                                                    name="privacy"
-                                                    control={control}
-                                                    render={({ field }) => (
-                                                        <Checkbox
-                                                            id="privacy-leditor"
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
-                                                    )}
-                                                />
-                                                <Label className="text-sm">
-                                                    I agree to the <Link href={privacyPolicyPdfUrl || "#"} target="_blank" className="font-bold hover:underline">Privacy Policy</Link> and <Link href="/terms-and-conditions" target="_blank" className="font-bold hover:underline">Terms & Conditions</Link>.
-                                                </Label>
-                                                </div>
-                                               
-
-                                                {errors.privacy && (
-                                                    <p className="text-sm text-red-500">{errors.privacy.message}</p>
-                                                )}
-                                            
-                                            </div>
-
-                                            <div>
-                                                <ReCAPTCHA
-                                                    sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                                                    onChange={(val) => setValue("captcha", val || "", { shouldValidate: true })}
-                                                />
-                                                {errors.captcha && (
-                                                    <p className="text-sm text-red-500 mt-1">{errors.captcha.message}</p>
-                                                )}
-                                            </div>
-
-                                            <Button
-                                                type="submit"
-                                                disabled={isSubmitting}
-                                                className="w-full md:w-auto px-10"
-                                                size="lg"
+                                            {isEn ? "I agree to the" : "Ich stimme der"}{" "}
+                                            <Link
+                                                href={privacyPolicyPdfUrl || "#"}
+                                                target="_blank"
+                                                className="font-semibold text-primary hover:text-primary/80"
                                             >
-                                                {isSubmitting ? (
-                                                    <>
-                                                        <Spinner className="h-4 w-4 mr-2" />
-                                                        Submitting...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Send className="h-4 w-4 mr-2" />
-                                                        Submit Enquiry
-                                                    </>
-                                                )}
-                                            </Button>
-                                        </form>
-                                    ) : (
-                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                                            <p className="text-primary text-lg mb-4">
-                                                Please login to submit your custom LED enquiry.
-                                            </p>
-                                            <Button size="lg" variant="default" onClick={() => router.push("/login")}>
-                                                Login to Continue
-                                            </Button>
-                                        </div>
+                                                {isEn ? "Privacy Policy" : "Datenschutzerklärung"}
+                                            </Link>{" "}
+                                            {isEn ? "and" : "und den"}{" "}
+                                            <Link
+                                                href="/terms-and-conditions"
+                                                target="_blank"
+                                                className="font-semibold text-primary hover:text-primary/80"
+                                            >
+                                                {isEn ? "Terms & Conditions" : "AGB"}
+                                            </Link>
+                                            .
+                                        </Label>
+                                    </div>
+                                    {errors.privacy && (
+                                        <p className="text-xs text-destructive pl-6">
+                                            {errors.privacy.message}
+                                        </p>
                                     )}
                                 </div>
-                            </AccordionContent>
-                        </AccordionItem>
+
+                                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-1">
+                                    <div className="min-w-0">
+                                        <ReCAPTCHA
+                                            sitekey={NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                                            onChange={(val) =>
+                                                setValue("captcha", val || "", {
+                                                    shouldValidate: true,
+                                                })
+                                            }
+                                        />
+                                        {errors.captcha && (
+                                            <p className="text-xs text-destructive mt-1">
+                                                {errors.captcha.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="w-full sm:w-auto shrink-0"
+                                        size="lg"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Spinner className="h-4 w-4 mr-2" />
+                                                {isEn ? "Submitting…" : "Wird gesendet…"}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="h-4 w-4 mr-2" />
+                                                {isEn ? "Submit enquiry" : "Anfrage absenden"}
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
+                                <p className="text-sm text-foreground mb-4 leading-relaxed">
+                                    {isEn
+                                        ? "Please sign in to submit your custom LED enquiry."
+                                        : "Bitte melden Sie sich an, um Ihre individuelle LED-Anfrage zu senden."}
+                                </p>
+                                <Button size="lg" onClick={() => router.push("/login")}>
+                                    {isEn ? "Sign in to continue" : "Anmelden"}
+                                </Button>
+                            </div>
+                        )}
                     </div>
-                </Accordion>
+                </LeditorSectionAccordion>
             </div>
         </div>
     );

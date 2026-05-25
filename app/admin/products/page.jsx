@@ -266,7 +266,7 @@ export default function ProductsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold font-archivo">Products Management</h1>
+                    <h1 className="text-2xl font-bold ">Products Management</h1>
                     <p className="text-sm text-muted-foreground">
                         View and manage all products, controllers, and accessories.
                     </p>
@@ -315,7 +315,7 @@ export default function ProductsPage() {
 
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                         <Table className="min-w-full">
-                            <TableHeader className="bg-secondary font-archivo">
+                            <TableHeader className="bg-secondary ">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
@@ -340,7 +340,7 @@ export default function ProductsPage() {
                                     </TableRow>
                                 ) : filteredProducts.length > 0 ? (
                                     filteredProducts.map((product) => (
-                                        <TableRow key={product.id} className="even:bg-[#EAF6FF] font-open-sans">
+                                        <TableRow key={product.id} className="even:bg-[#EAF6FF] ">
                                             <TableCell className="p-4 whitespace-nowrap">{product.productName}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{product.productNumber}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{product.productType}</TableCell>
@@ -408,7 +408,7 @@ export default function ProductsPage() {
 
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                         <Table className="min-w-full">
-                            <TableHeader className="bg-secondary font-archivo">
+                            <TableHeader className="bg-secondary ">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Brand</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Interface</TableHead>
@@ -430,7 +430,7 @@ export default function ProductsPage() {
                                     </TableRow>
                                 ) : filteredControllers.length > 0 ? (
                                     filteredControllers.map((controller) => (
-                                        <TableRow key={controller.id} className="even:bg-[#EAF6FF] font-open-sans">
+                                        <TableRow key={controller.id} className="even:bg-[#EAF6FF] ">
                                             <TableCell className="p-4 whitespace-nowrap">{controller.brandName || "N/A"}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{controller.interfaceName || "N/A"}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">
@@ -509,7 +509,7 @@ export default function ProductsPage() {
 
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
                         <Table className="min-w-full">
-                            <TableHeader className="bg-secondary font-archivo">
+                            <TableHeader className="bg-secondary ">
                                 <TableRow>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
                                     <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
@@ -534,7 +534,7 @@ export default function ProductsPage() {
                                     </TableRow>
                                 ) : filteredAccessories.length > 0 ? (
                                     filteredAccessories.map((accessory) => (
-                                        <TableRow key={accessory.id} className="even:bg-[#EAF6FF] font-open-sans">
+                                        <TableRow key={accessory.id} className="even:bg-[#EAF6FF] ">
                                             <TableCell className="p-4 whitespace-nowrap">{accessory.productName}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">{accessory.productNumber}</TableCell>
                                             <TableCell className="p-4 whitespace-nowrap">

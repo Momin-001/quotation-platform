@@ -17,7 +17,6 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-    SheetClose,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
@@ -136,20 +135,23 @@ function FiltersAccordion({
     isAuthenticated,
 }) {
     const { language } = useLanguage();
-    
+
+    const sectionTitle =
+        "text-sm font-semibold  uppercase tracking-wide text-foreground/90 mb-3";
+    const fieldLabel =
+        "text-xs font-medium text-muted-foreground font-normal mb-1.5";
+
     return (
-        <div className="space-y-6">
-            
-            {/* Product Information */}
-            <div className="border-t pt-4 first:border-t-0 first:pt-0">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+        <div className="space-y-5">
+            <div className="border-t border-border/60 pt-5 first:border-t-0 first:pt-0">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "Product Information" : "Produktinformation"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-10"}`}>
                     <div>
-                        <Label className="font-normal">{language === "en" ? "Design" : "Design"}</Label>
+                        <Label className={fieldLabel}>{language === "en" ? "Design" : "Design"}</Label>
                         <Select value={design} onValueChange={setDesign}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Fix">Fix</SelectItem>
                                 <SelectItem value="Mobil">Mobil</SelectItem>
@@ -157,9 +159,9 @@ function FiltersAccordion({
                         </Select>
                     </div>
                     <div className={`${isAuthenticated ? "" : "mb-10"}`}>
-                        <Label className="font-normal">{language === "en" ? "Application" : "Anwendung"}</Label>
+                        <Label className={fieldLabel}>{language === "en" ? "Application" : "Anwendung"}</Label>
                         <Select value={application} onValueChange={setApplication}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="DOOH">DOOH</SelectItem>
                                 <SelectItem value="Indoor Signage">Indoor Signage</SelectItem>
@@ -177,9 +179,9 @@ function FiltersAccordion({
 
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Product Type" : "Produkttyp"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Product Type" : "Produkttyp"}</Label>
                             <Select value={productType} onValueChange={setProductType}>
-                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="AIO Systems">AIO Systems</SelectItem>
                                     <SelectItem value="LED Display Single Cabinet">LED Display Single Cabinet</SelectItem>
@@ -188,9 +190,9 @@ function FiltersAccordion({
                         </div>
 
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Special Types" : "Spezialtypen"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Special Types" : "Spezialtypen"}</Label>
                             <Select value={specialTypes} onValueChange={setSpecialTypes}>
-                                <SelectTrigger><SelectValue placeholder="Standard" /></SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Standard" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Transparent">Transparent</SelectItem>
                                     <SelectItem value="Curved">Curved</SelectItem>
@@ -204,8 +206,8 @@ function FiltersAccordion({
             </div>
 
             {/* Physical Specifications */}
-            <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+            <div className="border-t border-border/60 pt-5">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "Physical Specifications" : "Physikalische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
@@ -230,16 +232,16 @@ function FiltersAccordion({
             </div>
 
             {/* LED Specifications */}
-            <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+            <div className="border-t border-border/60 pt-5">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "LED Specifications" : "LED-Spezifikationen"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <div className="space-y-3">
                         <div>
-                            <Label className="font-normal">{language === "en" ? "LED Technology" : "LED-Technologie"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "LED Technology" : "LED-Technologie"}</Label>
                             <Select value={ledTechnology} onValueChange={setLedTechnology}>
-                                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="SMD">SMD</SelectItem>
                                     <SelectItem value="SMD+GOB">SMD+GOB</SelectItem>
@@ -252,9 +254,9 @@ function FiltersAccordion({
                             </Select>
                         </div>
                         <div className={`${isAuthenticated ? "" : "mb-14"}`}>
-                            <Label className="font-normal">{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "LED Lifespan" : "LED-Lebensdauer"}</Label>
                             <Select value={ledLifespan || undefined} onValueChange={setLedLifespan}>
-                                <SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm">
                                         <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -268,9 +270,9 @@ function FiltersAccordion({
                         </div>
                         <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                             <div>
-                                <Label className="font-normal">{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</Label>
+                                <Label className={fieldLabel}>{language === "en" ? "Chip-Bonding" : "Chip-Bonding"}</Label>
                                 <Select value={chipBonding} onValueChange={setChipBonding}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Gold Wire">Gold Wire</SelectItem>
                                         <SelectItem value="Copper Wire">Copper Wire</SelectItem>
@@ -284,16 +286,16 @@ function FiltersAccordion({
             </div>
 
             {/* Optical Specifications */}
-            <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+            <div className="border-t border-border/60 pt-5">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "Optical Specifications" : "Optische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Brightness Value" : "Helligkeitswert"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Brightness Value" : "Helligkeitswert"}</Label>
                             <Select value={brightnessValue || undefined} onValueChange={setBrightnessValue}>
-                                <SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm">
                                         <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -306,9 +308,9 @@ function FiltersAccordion({
                             </Select>
                         </div>
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Contrast Ratio" : "Kontrastverhältnis"}</Label>
                             <Select value={contrastRatio || undefined} onValueChange={setContrastRatio}>
-                                <SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm">
                                         <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -325,16 +327,16 @@ function FiltersAccordion({
             </div>
 
             {/* Electrical Specifications */}
-            <div className="border-t pt-4">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+            <div className="border-t border-border/60 pt-5">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "Electrical Specifications" : "Elektrische Spezifikationen"}
                 </h3>
                 <div className="space-y-3">
                     <div className="space-y-3">
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Refresh Rate" : "Aktualisierungsrate"}</Label>
                             <Select value={refreshRate || undefined} onValueChange={setRefreshRate}>
-                                <SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm">
                                         <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -378,9 +380,9 @@ function FiltersAccordion({
                                 </p>
                             )}
                             <div>
-                                <Label className="font-normal">{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</Label>
+                                <Label className={fieldLabel}>{language === "en" ? "Power Redundancy" : "Leistungsredundanz"}</Label>
                                 <Select value={powerRedundancy} onValueChange={setPowerRedundancy}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
@@ -388,9 +390,9 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <Label className="font-normal">{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</Label>
+                                <Label className={fieldLabel}>{language === "en" ? "Memory on Module" : "Speicher auf Modul"}</Label>
                                 <Select value={memoryOnModule} onValueChange={setMemoryOnModule}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
@@ -398,9 +400,9 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <Label className="font-normal">{language === "en" ? "Smart Module" : "Smart Modul"}</Label>
+                                <Label className={fieldLabel}>{language === "en" ? "Smart Module" : "Smart Modul"}</Label>
                                 <Select value={smartModule} onValueChange={setSmartModule}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Optional">Optional</SelectItem>
                                         <SelectItem value="No">No</SelectItem>
@@ -408,9 +410,9 @@ function FiltersAccordion({
                                 </Select>
                             </div>
                             <div>
-                                <Label className="font-normal">{language === "en" ? "Control System" : "Steuersystem"}</Label>
+                                <Label className={fieldLabel}>{language === "en" ? "Control System" : "Steuersystem"}</Label>
                                 <Select value={controlSystem} onValueChange={setControlSystem}>
-                                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger size="sm" className="w-full h-9 text-sm"><SelectValue placeholder="Select" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Colorlight">Colorlight</SelectItem>
                                         <SelectItem value="Novastar">Novastar</SelectItem>
@@ -426,16 +428,16 @@ function FiltersAccordion({
             </div>
 
             {/* Warranty */}
-            <div className="border-t pt-4 pb-10">
-                <h3 className="font-open-sans font-bold text-xl mb-4">
+            <div className="border-t border-border/60 pt-5 pb-6">
+                <h3 className={sectionTitle}>
                     {language === "en" ? "Warranty" : "Garantie"}
                 </h3>
                 <div className={`space-y-3 ${isAuthenticated ? "" : "pb-14"}`}>
                     <RestrictedContentOverlay isAuthenticated={isAuthenticated}>
                         <div>
-                            <Label className="font-normal">{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</Label>
+                            <Label className={fieldLabel}>{language === "en" ? "Warranty Period (Months)" : "Garantiezeitraum (Monate)"}</Label>
                             <Select value={warrantyPeriod || undefined} onValueChange={setWarrantyPeriod}>
-                                <SelectTrigger>
+                                <SelectTrigger size="sm" className="w-full h-9 text-sm">
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -820,25 +822,28 @@ function ProductsPageContent() {
                     { label: language === "en" ? "Home" : "Startseite", href: "/" },
                     { label: language === "en" ? "Products" : "Produkte" }
                 ]} />
-            <main className="flex-1 container mx-auto px-4 py-8">
-                {/* Search Bar */}
-                <div className="mb-6">
+            <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
+                <div className="mb-6 sm:mb-8">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 text-gray-800" />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={language === "en" ? "Search Products by Name or Product Number" : "Produkte nach Name oder Produktnummer suchen"}
-                            className="pl-12 placeholder:text-gray-700"
+                            placeholder={language === "en" ? "Search by name or product number…" : "Nach Name oder Produktnummer suchen…"}
+                            className="pl-10 h-10 sm:h-11 text-sm rounded-lg border-border/80 shadow-sm placeholder:text-muted-foreground"
                         />
                     </div>
                 </div>
 
-                {/* Category Tabs */}
-                <div className="mb-6 flex flex-wrap gap-2">
+                <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
                     <Button
                         variant={selectedCategory === "" ? "default" : "outline"}
-                        className={`font-open-sans font-semibold uppercase ${selectedCategory === "" ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                        size="sm"
+                        className={`${
+                            selectedCategory === ""
+                                ? ""
+                                : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                        }`}
                         onClick={() => setSelectedCategory("")}
                     >
                         {language === "en" ? "All" : "Alle"}
@@ -847,20 +852,25 @@ function ProductsPageContent() {
                         <Button
                             key={category.id}
                             variant={selectedCategory === category.id ? "default" : "outline"}
+                            size="sm"
                             onClick={() => setSelectedCategory(category.id)}
-                            className={`uppercase font-open-sans font-semibold ${category.id === selectedCategory ? "" : "border-primary text-primary hover:bg-primary hover:text-white"}`}
+                            className={`${
+                                category.id === selectedCategory
+                                    ? ""
+                                    : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                            }`}
                         >
                             {category.name}
                         </Button>
                     ))}
                 </div>
 
-                {/* Mobile Filter Button */}
-                <div className="lg:hidden mb-4">
+                <div className="lg:hidden mb-5">
                     <Button
                         variant="outline"
+                        size="default"
                         onClick={() => setSheetOpen(true)}
-                        className="w-full border-primary text-primary hover:bg-primary hover:text-white"
+                        className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
                     >
                         <FilterIcon className="w-4 h-4 mr-2" />
                         {language === "en" ? "Filters" : "Filter"}
@@ -869,19 +879,19 @@ function ProductsPageContent() {
 
                 {/* Mobile Filter Sheet */}
                 <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                    <SheetContent side="left" className="w-[320px] sm:w-[380px] p-0 flex flex-col">
-                        <SheetHeader className="px-5 pt-5 pb-3 border-b">
-                            <div className="flex items-center justify-between">
-                                <SheetTitle className="font-bold flex items-center gap-2">
-                                    <FilterIcon className="w-4 h-4" />
+                    <SheetContent side="left" className="w-[min(100vw,380px)] p-0 flex flex-col">
+                        <SheetHeader className="px-5 pt-5 pb-4 border-b border-border/60">
+                            <div className="flex items-center justify-between gap-3">
+                                <SheetTitle className="text-base font-semibold  flex items-center gap-2">
+                                    <FilterIcon className="w-4 h-4 text-primary" />
                                     {language === "en" ? "Filters" : "Filter"}
                                 </SheetTitle>
-                                <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
+                                <Button variant="ghost" size="sm" className="text-xs text-primary h-8" onClick={clearFilters}>
                                     {language === "en" ? "Clear All" : "Alle löschen"}
                                 </Button>
                             </div>
                         </SheetHeader>
-                        <div className="flex-1 overflow-y-auto px-5 py-4">
+                        <div className="flex-1 overflow-y-auto px-5 py-5">
                             <FiltersAccordion
                                 key={filtersMountKey}
                                 productType={productType} setProductType={setProductType}
@@ -906,28 +916,27 @@ function ProductsPageContent() {
                                 isAuthenticated={isAuthenticated}
                             />
                         </div>
-                        <div className="px-5 py-4 border-t">
-                            <Button className="w-full" onClick={() => setSheetOpen(false)}>
+                        <div className="px-5 py-4 border-t border-border/60 bg-muted/20">
+                            <Button className="w-full" size="default" onClick={() => setSheetOpen(false)}>
                                 {language === "en" ? "Show Results" : "Ergebnisse anzeigen"}
                             </Button>
                         </div>
                     </SheetContent>
                 </Sheet>
 
-                {/* Main Content: Filters + Products */}
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Left Sidebar - Filters (desktop only) */}
-                    <div className="hidden lg:flex w-76 shrink-0 flex-col sticky top-20 h-full">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-bold flex items-center gap-2">
-                                <FilterIcon className="w-4 h-4" />
-                                {language === "en" ? "Filters" : "Filter"}
-                            </h3>
-                            <Button className="font-bold" variant="ghost" size="sm" onClick={clearFilters}>
-                                {language === "en" ? "Clear All" : "Alle löschen"}
-                            </Button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(100vh-100px)]">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                    <aside className="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col sticky top-24 self-start">
+                        <div className="rounded-xl border border-border/60 bg-gray-50/80 p-5 shadow-sm">
+                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/60">
+                                <h3 className="text-sm font-semibold  uppercase tracking-wide flex items-center gap-2 text-foreground">
+                                    <FilterIcon className="w-4 h-4 text-primary" />
+                                    {language === "en" ? "Filters" : "Filter"}
+                                </h3>
+                                <Button variant="ghost" size="sm" className="text-xs text-primary h-8 px-2" onClick={clearFilters}>
+                                    {language === "en" ? "Clear" : "Löschen"}
+                                </Button>
+                            </div>
+                            <div className="overflow-y-auto pr-1 max-h-[calc(100vh-11rem)]">
                             <FiltersAccordion
                                 key={filtersMountKey}
                                 productType={productType} setProductType={setProductType}
@@ -951,27 +960,29 @@ function ProductsPageContent() {
                                 warrantyPeriod={warrantyPeriod} setWarrantyPeriod={setWarrantyPeriod}
                                 isAuthenticated={isAuthenticated}
                             />
+                            </div>
                         </div>
-                    </div>
+                    </aside>
 
-                    {/* Right Side - Product Grid */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                         {!filterBoundsReady ? (
-                            <div className="flex items-center justify-center h-64">
-                                <div className="flex items-center gap-2">
-                                    <Spinner className="h-6 w-6" />
-                                    <span>Loading…</span>
+                            <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/60 bg-muted/20">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Spinner className="h-5 w-5" />
+                                    <span className="text-sm">Loading…</span>
                                 </div>
                             </div>
                         ) : loading && products.length === 0 ? (
-                            <div className="flex items-center justify-center h-64">
-                                <div className="flex items-center gap-2">
-                                    <Spinner className="h-6 w-6" />
-                                    <span>Loading products...</span>
+                            <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/60 bg-muted/20">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Spinner className="h-5 w-5" />
+                                    <span className="text-sm">
+                                        {language === "en" ? "Loading products…" : "Produkte werden geladen…"}
+                                    </span>
                                 </div>
                             </div>
                         ) : products.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
                                 {products.map((product, index) => {
                                     const isLastElement = products.length === index + 1;
                                     return (
@@ -979,23 +990,29 @@ function ProductsPageContent() {
                                             key={product.id}
                                             href={`/products/${product.id}`}
                                             ref={isLastElement ? lastProductElementRef : null}
-                                            className="block rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                                            className="block group h-full"
                                         >
-                                            <ProductCard product={product} />
+                                            <ProductCard product={product} className="h-full" />
                                         </Link>
                                     );
                                 })}
                             </div>
                         ) : (
-                            <div className="text-center py-12 text-gray-500">
-                                No products found. Try adjusting your filters.
+                            <div className="text-center py-16 px-6 rounded-xl border border-dashed border-border/60 bg-muted/20">
+                                <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                                    {language === "en"
+                                        ? "No products found. Try adjusting your filters or search."
+                                        : "Keine Produkte gefunden. Passen Sie Filter oder Suche an."}
+                                </p>
                             </div>
                         )}
                         {loading && products.length > 0 && (
                             <div className="flex items-center justify-center py-8">
-                                <div className="flex items-center gap-2">
-                                    <Spinner className="h-5 w-5" />
-                                    <span>Loading more products...</span>
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Spinner className="h-4 w-4" />
+                                    <span className="text-sm">
+                                        {language === "en" ? "Loading more…" : "Weitere werden geladen…"}
+                                    </span>
                                 </div>
                             </div>
                         )}

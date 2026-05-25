@@ -33,7 +33,7 @@ export default async function EditControllerPage({ params }) {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h1 className="text-2xl font-bold font-archivo">Edit Controller</h1>
+                <h1 className="text-2xl font-bold ">Edit Controller</h1>
                 <p className="text-sm text-muted-foreground">
                     Update the controller details below.
                 </p>

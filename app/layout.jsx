@@ -1,4 +1,4 @@
-import { Archivo, Geist, Geist_Mono, Open_Sans } from "next/font/google"; // Corrected imports
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/context/AuthContext";
@@ -17,16 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-});
-
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
-  subsets: ["latin"],
-});
-
 export const metadata = {
   title: "ProLEDALL",
   description: "ProLedAll is a platform for buying and selling LEDs",
@@ -39,7 +29,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${archivo.variable} ${openSans.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader
           color="#2563eb"

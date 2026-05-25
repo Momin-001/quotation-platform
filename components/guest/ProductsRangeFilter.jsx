@@ -18,9 +18,6 @@ function parseIntInput(s, fallback) {
     return Number.isNaN(n) ? fallback : n;
 }
 
-/**
- * Dual-thumb range: two inputs + slider. `integer` uses whole steps; otherwise 2 dp decimals.
- */
 export function ProductsRangeFilter({
     label,
     unit,
@@ -75,29 +72,29 @@ export function ProductsRangeFilter({
     };
 
     return (
-        <div className={cn("space-y-2", className)}>
-            <label className="text-md font-open-sans font-normal mb-1 block">{label}</label>
+        <div className={cn("space-y-2.5", className)}>
+            <label className="text-xs font-medium text-muted-foreground block">{label}</label>
             <div className="flex items-center gap-2 flex-wrap">
                 <Input
                     type="text"
                     inputMode={integer ? "numeric" : "decimal"}
-                    className="w-24 min-w-0"
+                    className="w-22 min-w-0 h-9 text-sm"
                     value={value.min}
                     disabled={disabled}
                     onChange={(e) => onChange({ min: e.target.value, max: value.max })}
                     onBlur={onBlurMin}
                 />
-                <span className="text-muted-foreground">-</span>
+                <span className="text-xs text-muted-foreground">–</span>
                 <Input
                     type="text"
                     inputMode={integer ? "numeric" : "decimal"}
-                    className="w-24 min-w-0"
+                    className="w-22 min-w-0 h-9 text-sm"
                     value={value.max}
                     disabled={disabled}
                     onChange={(e) => onChange({ min: value.min, max: e.target.value })}
                     onBlur={onBlurMax}
                 />
-                {unit ? <span className="text-sm text-muted-foreground">{unit}</span> : null}
+                {unit ? <span className="text-xs text-muted-foreground">{unit}</span> : null}
             </div>
             <Slider
                 min={bMin}
@@ -106,7 +103,7 @@ export function ProductsRangeFilter({
                 value={[lo, hi]}
                 onValueChange={handleSlider}
                 disabled={disabled || !Number.isFinite(bMin) || !Number.isFinite(bMax) || bMin >= bMax}
-                className="pt-2 pb-1"
+                className="pt-1 pb-0.5"
             />
         </div>
     );
