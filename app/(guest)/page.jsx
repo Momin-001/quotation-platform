@@ -6,7 +6,7 @@ import FAQSection from "@/components/guest/Homepage/FAQSection";
 import PartnersSection from "@/components/guest/Homepage/PartnersSection";
 import MarketingPartnersSection from "@/components/guest/Homepage/MarketingPartnersSection";
 import BlogsSection from "@/components/guest/BlogsSection";
-import { BASE_URL } from "@/lib/constants";
+import { getGuestHomeData } from "@/lib/guest-cms-data";
 
 const defaultHomepageData = {
     // Hero Section
@@ -141,35 +141,9 @@ const defaultHomepageData = {
     blogsSectionSubtitleDe: "Expertenwissen, um fundierte Entscheidungen zu treffen",
 };
 
-async function getHomeData() {
-  const revalidateTime  = 900;
-    const [homepageRes, partnersRes, faqsRes, blogsRes] = await Promise.all([
-      fetch(`${BASE_URL}/api/homepage`, { next: { revalidate: revalidateTime } }),
-      fetch(`${BASE_URL}/api/partners`, { next: { revalidate: revalidateTime } }),
-      fetch(`${BASE_URL}/api/faqs?limit=6`, { next: { revalidate: revalidateTime } }),
-      fetch(`${BASE_URL}/api/blogs?limit=6`, { next: { revalidate: revalidateTime } }),
-    ]);
-  
-    const homepageJson = await homepageRes.json();
-    const partnersJson = await partnersRes.json();
-    const faqsJson = await faqsRes.json();
-    const blogsJson = await blogsRes.json();
-    const blogs = blogsJson?.data || [];
-    const allPartners = partnersJson?.data || [];
-    const technologyPartners = allPartners.filter((p) => !p.type || p.type === "technology");
-    const marketingPartners = allPartners.filter((p) => p.type === "marketing");
-
-    return {
-      homepageData: homepageJson?.data ? { ...defaultHomepageData, ...homepageJson.data } : defaultHomepageData,
-      technologyPartners,
-      marketingPartners,
-      faqs: faqsJson?.data || [],
-      blogs,
-    };
-  }
-  
-  export default async function Home() {
-    const { homepageData, technologyPartners, marketingPartners, faqs, blogs } = await getHomeData();
+export default async function Home() {
+    const { homepageData, technologyPartners, marketingPartners, faqs, blogs } =
+        await getGuestHomeData(defaultHomepageData);
   
     return (
       <div className="min-h-screen">
