@@ -1,107 +1,30 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-    ClipboardCheck,
-    FileText,
-    Handshake,
-    TrendingUp,
-} from "lucide-react";
-import Link from "next/link";
-
-const COPY = {
-    en: {
-        title: "How to become a partner",
-        subtitle: "It's easy to join our partner network and start growing together.",
-        ctaTitle: "Ready to join our partner network?",
-        ctaSubtitle:
-            "Submit your application today and take the first step towards a successful partnership.",
-        ctaButton: "Submit an application",
-        steps: [
-            {
-                number: "1",
-                title: "Submit application",
-                description:
-                    "Fill out the partner application form with your company information.",
-            },
-            {
-                number: "2",
-                title: "Review & approval",
-                description: "Our team will review your application and get back to you.",
-            },
-            {
-                number: "3",
-                title: "Partnership agreement",
-                description:
-                    "Once approved, we'll set up our partnership terms and agreement.",
-            },
-            {
-                number: "4",
-                title: "Grow together",
-                description:
-                    "Access partner resources and start your journey with PROLEDALL.",
-            },
-        ],
-    },
-    de: {
-        title: "So werden Sie Partner",
-        subtitle:
-            "Der Einstieg in unser Partnernetzwerk ist einfach — gemeinsam wachsen wir weiter.",
-        ctaTitle: "Bereit für unser Partnernetzwerk?",
-        ctaSubtitle:
-            "Reichen Sie Ihre Bewerbung noch heute ein und machen Sie den ersten Schritt zu einer erfolgreichen Partnerschaft.",
-        ctaButton: "Bewerbung einreichen",
-        steps: [
-            {
-                number: "1",
-                title: "Bewerbung einreichen",
-                description:
-                    "Füllen Sie das Partnerbewerbungsformular mit Ihren Unternehmensdaten aus.",
-            },
-            {
-                number: "2",
-                title: "Prüfung & Freigabe",
-                description:
-                    "Unser Team prüft Ihre Bewerbung und meldet sich bei Ihnen.",
-            },
-            {
-                number: "3",
-                title: "Partnerschaftsvereinbarung",
-                description:
-                    "Nach der Freigabe legen wir die Partnerschaftsbedingungen und Vereinbarung fest.",
-            },
-            {
-                number: "4",
-                title: "Gemeinsam wachsen",
-                description:
-                    "Nutzen Sie Partnerressourcen und starten Sie Ihre Reise mit PROLEDALL.",
-            },
-        ],
-    },
-};
+import { ClipboardCheck, FileText, Handshake, TrendingUp } from "lucide-react";
 
 const STEP_ICONS = [FileText, ClipboardCheck, Handshake, TrendingUp];
 
 export default function BecomePartnerHowToSection() {
-    const { language } = useLanguage();
-    const isEn = language === "en";
-    const copy = COPY[isEn ? "en" : "de"];
+    const t = useTranslations("BecomePartner.howTo");
+    const steps = t.raw("steps");
 
     return (
         <section className="w-full bg-white pt-16 md:pt-20 lg:pt-24">
             <div className="container mx-auto px-4 lg:px-6">
                 <div className="text-center mb-10 md:mb-14 lg:mb-16">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight">
-                        {copy.title}
+                        {t("title")}
                     </h2>
                     <p className="mt-3 md:mt-4 text-base md:text-lg max-w-2xl mx-auto text-muted-foreground leading-relaxed">
-                        {copy.subtitle}
+                        {t("subtitle")}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                    {copy.steps.map((step, index) => {
+                    {steps.map((step, index) => {
                         const IconComponent = STEP_ICONS[index];
                         return (
                             <div
@@ -141,15 +64,15 @@ export default function BecomePartnerHowToSection() {
 
                         <div className="flex-1 space-y-1 text-center md:text-left">
                             <h3 className="text-lg md:text-xl font-bold text-foreground leading-snug">
-                                {copy.ctaTitle}
+                                {t("ctaTitle")}
                             </h3>
                             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                                {copy.ctaSubtitle}
+                                {t("ctaSubtitle")}
                             </p>
                         </div>
 
                         <Button asChild size="lg" className="w-full md:w-auto shrink-0">
-                            <Link href="/become-partner/submit">{copy.ctaButton}</Link>
+                            <Link href="/become-partner/submit">{t("ctaButton")}</Link>
                         </Button>
                     </div>
                 </div>

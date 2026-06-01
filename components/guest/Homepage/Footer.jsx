@@ -1,24 +1,22 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { Facebook, Linkedin, Send, Twitter, Youtube, Instagram, ArrowUp, Phone, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import Image from "next/image";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLocale, useTranslations } from "next-intl";
 import { getPdfPreviewUrl } from "@/lib/cloudinaryPdfUrls";
 import { useFooter } from "@/context/FooterContext";
+import { cmsField } from "@/lib/i18n/cms";
 
 export default function Footer({ footerData }) {
-    const { language } = useLanguage();
+    const locale = useLocale();
+    const t = useTranslations("Home.footer");
     const footerCtx = useFooter();
     const effectiveFooterData = footerCtx?.footerData || footerData;
 
-    const getText = (field) => {
-        if (!effectiveFooterData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
-        return effectiveFooterData[key] || effectiveFooterData[`${field}En`] || "";
-    };
+    const getText = (field) => cmsField(effectiveFooterData, field, locale);
 
     const getQuickLinks = () => {
         if (!effectiveFooterData) return [];
@@ -139,11 +137,11 @@ export default function Footer({ footerData }) {
                         </h3>
                         <div className="flex flex-col gap-3">
                             <Input
-                                placeholder={language === "en" ? "Your Email Address" : "Ihre E-Mail-Adresse"}
+                                placeholder={t("emailPlaceholder")}
                                 className="h-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-sm"
                             />
                             <Button variant="secondary" size="default" className="w-fit">
-                                {language === "en" ? "Subscribe" : "Abonnieren"}
+                                {t("subscribe")}
                             </Button>
                         </div>
                     </div>

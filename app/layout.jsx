@@ -2,7 +2,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/context/AuthContext";
-import { LanguageProvider } from "@/context/LanguageContext";
 import { CartProvider } from "@/context/CartContext";
 import { SocketProvider } from "@/context/SocketContext";
 import { Toaster } from "sonner";
@@ -38,13 +37,11 @@ export default function RootLayout({ children }) {
           easing="ease"
         />
         <AuthProvider>
-          <LanguageProvider>
-            <CartProvider>
-              <SocketProvider>
-                {children}
-              </SocketProvider>
-            </CartProvider>
-          </LanguageProvider>
+          <CartProvider>
+            <SocketProvider>
+              {children}
+            </SocketProvider>
+          </CartProvider>
         </AuthProvider>
         <Toaster />
       </body>

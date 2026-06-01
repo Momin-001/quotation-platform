@@ -1,8 +1,14 @@
+"use client";
+
+import { Link } from "@/i18n/navigation";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export const RestrictedContentOverlay = ({ children, isAuthenticated, register = true }) => {
+    const t = useTranslations("RestrictedContent");
+    const tCommon = useTranslations("Common");
+
     if (isAuthenticated) return children;
     return (
         <div className="relative min-h-[100px]">
@@ -18,11 +24,11 @@ export const RestrictedContentOverlay = ({ children, isAuthenticated, register =
                             </div>
                         </div>
                         <p className="font-semibold text-foreground mb-3 text-xs sm:text-sm leading-relaxed">
-                            Full specifications are available to registered customers only.
+                            {t("message")}
                         </p>
                         <Link href="/register">
                             <Button size="sm" className="w-full">
-                                REGISTER
+                                {tCommon("register")}
                             </Button>
                         </Link>
                     </div>

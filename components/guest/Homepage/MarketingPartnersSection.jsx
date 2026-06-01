@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 import Marquee from "react-fast-marquee";
 
 export default function MarketingPartnersSection({ homepageData, partners = [] }) {
-    const { language } = useLanguage();
+    const locale = useLocale();
     const [pauseOnHover, setPauseOnHover] = useState(true);
     const [speed, setSpeed] = useState(50);
 
@@ -22,7 +22,7 @@ export default function MarketingPartnersSection({ homepageData, partners = [] }
 
     const getText = (field) => {
         if (!homepageData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
+        const key = locale === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 

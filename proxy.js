@@ -1,41 +1,100 @@
+import createMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { JWT_SECRET } from "@/lib/constants";
+import { routing } from "./i18n/routing";
 
 const secret = new TextEncoder().encode(JWT_SECRET);
+const intlMiddleware = createMiddleware(routing);
+
+const AUTH_PAGES = ["/login", "/register", "/reset-password", "/forgot-password"];
+
+function getLocaleFromPathname(pathname) {
+    if (pathname === "/de" || pathname.startsWith("/de/")) {
+        return "de";
+    }
+    return "en";
+}
+
+function stripLocalePrefix(pathname) {
+    if (pathname === "/de") return "/";
+    if (pathname.startsWith("/de/")) {
+        const rest = pathname.slice(3);
+        return rest ? `/${rest}` : "/";
+    }
+    return pathname;
+}
+
+function localizedPath(path, locale) {
+    if (locale === "de") {
+        return path === "/" ? "/de" : `/de${path}`;
+    }
+    return path;
+}
+
+async function verifyAdminAccess(request, pathname) {
+    const token = request.cookies.get("token")?.value;
+
+    if (!token) {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    try {
+        const { payload } = await jwtVerify(token, secret);
+
+        if (payload.role !== "admin" && payload.role !== "super_admin") {
+            return NextResponse.redirect(new URL("/", request.url));
+        }
+
+        if (pathname.startsWith("/admin/cms") && payload.role !== "super_admin") {
+            return NextResponse.redirect(new URL("/admin", request.url));
+        }
+
+        return null;
+    } catch {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+}
 
 export async function proxy(request) {
-    const token = request.cookies.get("token")?.value;
     const { pathname } = request.nextUrl;
 
-    const protectedPaths = ["/admin", "/api/auth/me", "/user"];
-    const adminPaths = ["/admin"];
-    const userPaths = ["/user"];
+    if (pathname === "/en" || pathname.startsWith("/en/")) {
+        const path = pathname.replace(/^\/en/, "") || "/";
+        return NextResponse.redirect(new URL(path, request.url));
+    }
 
-    const authPages = [
-        "/login",
-        "/register",
-        "/reset-password",
-        "/forgot-password",
-    ];
+    if (pathname.startsWith("/admin")) {
+        const denied = await verifyAdminAccess(request, pathname);
+        return denied ?? NextResponse.next();
+    }
 
-    const isProtected = protectedPaths.some((path) =>
-        pathname.startsWith(path)
+    if (pathname === "/api/auth/me") {
+        const token = request.cookies.get("token")?.value;
+        if (!token) {
+            return NextResponse.redirect(new URL("/login", request.url));
+        }
+        try {
+            await jwtVerify(token, secret);
+        } catch {
+            return NextResponse.redirect(new URL("/login", request.url));
+        }
+        return NextResponse.next();
+    }
+
+    if (pathname.startsWith("/api") || pathname.startsWith("/_next") || pathname.includes(".")) {
+        return NextResponse.next();
+    }
+
+    const logicalPath = stripLocalePrefix(pathname);
+    const locale = getLocaleFromPathname(pathname);
+    const token = request.cookies.get("token")?.value;
+
+    const isAuthPage = AUTH_PAGES.some(
+        (path) => logicalPath === path || logicalPath.startsWith(`${path}/`),
     );
+    const isUserPath = logicalPath.startsWith("/user");
 
-    const isAdminPath = adminPaths.some((path) =>
-        pathname.startsWith(path)
-    );
-
-    const isUserPath = userPaths.some((path) =>
-        pathname.startsWith(path)
-    );
-
-    const isAuthPage = authPages.some((path) =>
-        pathname.startsWith(path)
-    );
-
-    // Handle logged-in users trying to access auth pages
     if (isAuthPage && token) {
         try {
             const { payload } = await jwtVerify(token, secret);
@@ -43,50 +102,35 @@ export async function proxy(request) {
             if (payload.role === "admin" || payload.role === "super_admin") {
                 return NextResponse.redirect(new URL("/admin", request.url));
             }
-            return NextResponse.redirect(new URL("/", request.url));
-        
-        } catch (err) {
-            // Invalid token → allow access to auth pages
+            return NextResponse.redirect(new URL(localizedPath("/", locale), request.url));
+        } catch {
+            // Invalid token — allow auth pages
         }
     }
 
-    // Handle protected routes
-    if (isProtected) {
+    if (isUserPath) {
         if (!token) {
-            return NextResponse.redirect(new URL("/login", request.url));
+            return NextResponse.redirect(
+                new URL(localizedPath("/login", locale), request.url),
+            );
         }
 
         try {
             const { payload } = await jwtVerify(token, secret);
 
-            if (isAdminPath && payload.role !== "admin" && payload.role !== "super_admin") {
-                return NextResponse.redirect(new URL("/", request.url));
+            if (payload.role !== "user") {
+                return NextResponse.redirect(new URL(localizedPath("/", locale), request.url));
             }
-
-            if (pathname.startsWith("/admin/cms") && payload.role !== "super_admin") {
-                return NextResponse.redirect(new URL("/admin", request.url));
-            }
-
-            if (isUserPath && payload.role !== "user") {
-                return NextResponse.redirect(new URL("/", request.url));
-            }
-
-        } catch (err) {
-            return NextResponse.redirect(new URL("/login", request.url));
+        } catch {
+            return NextResponse.redirect(
+                new URL(localizedPath("/login", locale), request.url),
+            );
         }
     }
 
-    return NextResponse.next();
+    return intlMiddleware(request);
 }
 
 export const config = {
-    matcher: [
-        "/admin/:path*",
-        "/api/auth/me",
-        "/user/:path*",
-        "/login",
-        "/register",
-        "/reset-password",
-        "/forgot-password",
-    ],
+    matcher: ["/((?!_next|_vercel|.*\\..*).*)"],
 };

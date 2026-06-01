@@ -1,8 +1,8 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +12,13 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { cmsField } from "@/lib/i18n/cms";
 import { cn } from "@/lib/utils";
 
-function BlogCard({ blog, isEn }) {
+function BlogCard({ blog, locale }) {
+    const t = useTranslations("Home.blogs");
     const date = new Date(blog.createdAt);
-    const month = date.toLocaleString(isEn ? "en" : "de", { month: "short" }).toUpperCase();
+    const month = date.toLocaleString(locale, { month: "short" }).toUpperCase();
     const day = date.getDate();
 
     return (
@@ -24,7 +26,7 @@ function BlogCard({ blog, isEn }) {
             <article
                 className={cn(
                     "flex flex-col h-full bg-white border border-border/60 rounded-xl overflow-hidden",
-                    "transition-all duration-300 hover:shadow-lg hover:border-primary/25 hover:-translate-y-0.5"
+                    "transition-all duration-300 hover:shadow-lg hover:border-primary/25 hover:-translate-y-0.5",
                 )}
             >
                 <div className="relative overflow-hidden aspect-4/3 bg-muted/20">
@@ -38,9 +40,7 @@ function BlogCard({ blog, isEn }) {
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground/60">
-                            <span className="text-xs font-medium">
-                                {isEn ? "No image" : "Kein Bild"}
-                            </span>
+                            <span className="text-xs font-medium">{t("noImage")}</span>
                         </div>
                     )}
                     <div className="absolute top-3 left-3 bg-secondary text-primary-foreground rounded-md px-3 py-1.5 text-center leading-tight min-w-[52px] shadow-sm">
@@ -55,7 +55,7 @@ function BlogCard({ blog, isEn }) {
                         {blog.title}
                     </h3>
                     <span className="mt-3 text-sm font-medium text-primary group-hover:text-primary/80 shrink-0">
-                        {isEn ? "Read more →" : "Weiterlesen →"}
+                        {t("readMore")}
                     </span>
                 </div>
             </article>
@@ -64,25 +64,14 @@ function BlogCard({ blog, isEn }) {
 }
 
 export default function BlogsSection({ homepageData, blogs }) {
-    const { language } = useLanguage();
-    const isEn = language === "en";
-
-    const getText = (field) => {
-        if (!homepageData) return "";
-        const key = isEn ? `${field}En` : `${field}De`;
-        return homepageData[key] || homepageData[`${field}En`] || "";
-    };
+    const locale = useLocale();
+    const t = useTranslations("Home.blogs");
 
     if (!blogs?.length) return null;
 
-    const title =
-        getText("blogsSectionTitle") ||
-        (isEn ? "Blogs & insights" : "Blog & Einblicke");
+    const title = cmsField(homepageData, "blogsSectionTitle", locale) || t("titleFallback");
     const subtitle =
-        getText("blogsSectionSubtitle") ||
-        (isEn
-            ? "Expert knowledge to help you make informed decisions."
-            : "Fachwissen für fundierte Entscheidungen.");
+        cmsField(homepageData, "blogsSectionSubtitle", locale) || t("subtitleFallback");
 
     return (
         <section className="w-full bg-primary-foreground py-16 md:py-20 lg:py-24">
@@ -107,7 +96,7 @@ export default function BlogsSection({ homepageData, blogs }) {
                                     key={blog.id}
                                     className="pl-4 md:pl-5 basis-full sm:basis-1/2 lg:basis-1/3"
                                 >
-                                    <BlogCard blog={blog} isEn={isEn} />
+                                    <BlogCard blog={blog} locale={locale} />
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
@@ -116,13 +105,13 @@ export default function BlogsSection({ homepageData, blogs }) {
                                 <CarouselPrevious
                                     className={cn(
                                         "left-0 md:-left-1 h-10 w-10 rounded-full border-primary/50 text-primary",
-                                        "hover:bg-primary hover:text-primary-foreground shadow-sm"
+                                        "hover:bg-primary hover:text-primary-foreground shadow-sm",
                                     )}
                                 />
                                 <CarouselNext
                                     className={cn(
                                         "right-0 md:-right-1 h-10 w-10 rounded-full border-primary/50 text-primary",
-                                        "hover:bg-primary hover:text-primary-foreground shadow-sm"
+                                        "hover:bg-primary hover:text-primary-foreground shadow-sm",
                                     )}
                                 />
                             </>
@@ -133,7 +122,7 @@ export default function BlogsSection({ homepageData, blogs }) {
                 <div className="text-center mt-8 md:mt-10">
                     <Button asChild size="lg">
                         <Link href="/blogs">
-                            {isEn ? "View all articles" : "Alle Beiträge ansehen"}
+                            {t("viewAll")}
                             <ArrowRight className="h-4 w-4 ml-2" />
                         </Link>
                     </Button>

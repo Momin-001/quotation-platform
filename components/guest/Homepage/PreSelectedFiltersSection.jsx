@@ -1,8 +1,8 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLocale } from "next-intl";
 import { categoryToShowcaseCard } from "@/lib/category-helpers";
 
 function CategoryCard({ card, presetLabel, categoryId }) {
@@ -81,8 +81,8 @@ function CategoryCard({ card, presetLabel, categoryId }) {
 }
 
 export default function PreSelectedFiltersSection({ homepageData }) {
-    const { language } = useLanguage();
-    const lang = language === "de" ? "de" : "en";
+    const locale = useLocale();
+    const lang = locale === "de" ? "de" : "en";
 
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -93,7 +93,7 @@ export default function PreSelectedFiltersSection({ homepageData }) {
 
     const getText = (field) => {
         if (!homepageData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
+        const key = locale === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 

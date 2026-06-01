@@ -1,0 +1,88 @@
+{
+  "hero": {
+    "overline": "Partner werden",
+    "title": "ProLEDALL Partnerprogramm",
+    "description": "Werden Sie Teil unseres globalen Partnernetzwerks und profitieren Sie von exklusiven Vorteilen, Support und Geschäftsmöglichkeiten.",
+    "tagline": "Zeit sparen, Risiken ausschließen, Projekte skalieren.",
+    "primaryButton": "Bewerbung einreichen",
+    "secondaryButton": "Partner-Login"
+  },
+  "valueBlocks": {
+    "title": "Warum Partner von ProLEDALL werden?",
+    "subtitle": "ProLEDALL bietet Ihnen hochwertige Produkte, professionellen Support und starke Ressourcen für Ihr Wachstum.",
+    "blocks": [
+      {
+        "title": "Hochwertige Produkte",
+        "description": "Zuverlässige, zertifizierte und innovative LED-Display-Lösungen."
+      },
+      {
+        "title": "Wettbewerbsvorteile",
+        "description": "Wettbewerbsfähige Preise und flexible Partnerschaftsbedingungen."
+      },
+      {
+        "title": "Professioneller Support",
+        "description": "Dedizierter technischer und vertrieblicher Support in Ihren Projekten."
+      },
+      {
+        "title": "Globale Chancen",
+        "description": "Erweitern Sie Ihr Geschäft mit Zugang zu internationalen Märkten."
+      }
+    ]
+  },
+  "opportunities": {
+    "title": "Partnermöglichkeiten",
+    "subtitle": "Wir suchen motivierte Partner, die mit uns auf globalen Märkten wachsen möchten.",
+    "ctaButton": "Partner werden",
+    "cards": [
+      {
+        "title": "Distributoren",
+        "description": "Vertreiben Sie PROLEDALL-Produkte in Ihrem lokalen Markt und wachsen Sie mit uns."
+      },
+      {
+        "title": "Wiederverkäufer",
+        "description": "Verkaufen Sie unsere hochwertigen LED-Displays und Lösungen an Ihre Kunden."
+      },
+      {
+        "title": "Systemintegratoren",
+        "description": "Integrieren Sie PROLEDALL-Produkte nahtlos in Ihre Lösungen und Projekte."
+      },
+      {
+        "title": "Projektauftragnehmer",
+        "description": "Realisieren Sie LED-Display-Projekte und liefern Sie gemeinsam herausragende Ergebnisse."
+      },
+      {
+        "title": "Einzelhändler",
+        "description": "Verkaufen Sie PROLEDALL-Produkte über Ihre Einzelhandelskanäle und Filialen."
+      }
+    ]
+  },
+  "howTo": {
+    "title": "So werden Sie Partner",
+    "subtitle": "Der Einstieg in unser Partnernetzwerk ist einfach — gemeinsam wachsen wir weiter.",
+    "ctaTitle": "Bereit für unser Partnernetzwerk?",
+    "ctaSubtitle": "Reichen Sie Ihre Bewerbung noch heute ein und machen Sie den ersten Schritt zu einer erfolgreichen Partnerschaft.",
+    "ctaButton": "Bewerbung einreichen",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Bewerbung einreichen",
+        "description": "Füllen Sie das Partnerbewerbungsformular mit Ihren Unternehmensdaten aus."
+      },
+      {
+        "number": "2",
+        "title": "Prüfung & Freigabe",
+        "description": "Unser Team prüft Ihre Bewerbung und meldet sich bei Ihnen."
+      },
+      {
+        "number": "3",
+        "title": "Partnerschaftsvereinbarung",
+        "description": "Nach der Freigabe legen wir die Partnerschaftsbedingungen und Vereinbarung fest."
+      },
+      {
+        "number": "4",
+        "title": "Gemeinsam wachsen",
+        "description": "Nutzen Sie Partnerressourcen und starten Sie Ihre Reise mit PROLEDALL."
+      }
+    ]
+  }
+}

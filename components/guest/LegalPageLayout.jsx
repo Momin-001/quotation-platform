@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 function slugifySectionId(title, index) {
     const paraMatch = title.match(/§\s*(\d+)/);
@@ -10,7 +11,7 @@ function slugifySectionId(title, index) {
     return `section-${index + 1}`;
 }
 
-function formatContactLine(line, isEn) {
+function formatContactLine(line) {
     const emailMatch = line.match(/^(E-?Mail|Email):\s*(.+)$/i);
     if (emailMatch) {
         const addr = emailMatch[2].trim();
@@ -72,16 +73,18 @@ export function LegalSection({ id, title, children, className }) {
     );
 }
 
-export function LegalTableOfContents({ sections, isEn }) {
+export function LegalTableOfContents({ sections }) {
+    const t = useTranslations("Legal");
+
     if (!sections?.length) return null;
 
     return (
         <nav
-            aria-label={isEn ? "Table of contents" : "Inhaltsverzeichnis"}
+            aria-label={t("tableOfContentsAria")}
             className="rounded-xl border border-border/60 bg-muted/25 p-4 sm:p-5 mb-8"
         >
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                {isEn ? "Contents" : "Inhalt"}
+                {t("contents")}
             </p>
             <ol className="grid grid-cols-4 sm:grid-cols-6 gap-x-6 gap-y-2 text-sm">
                 {sections.map((section, index) => {
@@ -113,7 +116,6 @@ export function LegalPageLayout({
     intro,
     showToc = false,
     sections = [],
-    isEn = true,
     children,
 }) {
     return (
@@ -140,7 +142,7 @@ export function LegalPageLayout({
 
                         <div className="px-5 sm:px-8 md:px-10 py-6 sm:py-8 md:py-10">
                             {showToc && sections.length > 0 ? (
-                                <LegalTableOfContents sections={sections} isEn={isEn} />
+                                <LegalTableOfContents sections={sections} />
                             ) : null}
                             {children}
                         </div>
@@ -151,7 +153,7 @@ export function LegalPageLayout({
     );
 }
 
-export function renderLegalSections(sections, isEn) {
+export function renderLegalSections(sections) {
     return sections.map((section, index) => {
         const id = section.id || slugifySectionId(section.title, index);
 
@@ -169,7 +171,7 @@ export function renderLegalSections(sections, isEn) {
                         )}
                     >
                         {section.lines.map((line) => (
-                            <div key={line}>{formatContactLine(line, isEn)}</div>
+                            <div key={line}>{formatContactLine(line)}</div>
                         ))}
                     </div>
                 ) : null}

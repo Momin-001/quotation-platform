@@ -1,14 +1,14 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { useLocale } from "next-intl";
 import { CheckCircle2, FileSpreadsheet, Eye, ShieldCheck, Grid3X3 } from "lucide-react";
 
 export default function ValueBlocksSection({ homepageData }) {
-    const { language } = useLanguage();
+    const locale = useLocale();
 
     const getText = (field) => {
         if (!homepageData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
+        const key = locale === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 

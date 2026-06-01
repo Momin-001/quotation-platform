@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { Label } from "@/components/ui/label";

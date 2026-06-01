@@ -1,0 +1,88 @@
+{
+  "hero": {
+    "overline": "Become a partner",
+    "title": "ProLEDALL Partner Program",
+    "description": "Join our global network of partners and access exclusive benefits, support, and business opportunities.",
+    "tagline": "Save time, eliminate risks, scale projects.",
+    "primaryButton": "Submit an application",
+    "secondaryButton": "Partner login"
+  },
+  "valueBlocks": {
+    "title": "Why partner with ProLEDALL?",
+    "subtitle": "ProLEDALL provides you with high-quality products, professional support, and powerful resources to help you grow your business.",
+    "blocks": [
+      {
+        "title": "High-quality products",
+        "description": "Reliable, certified, and innovative LED display solutions."
+      },
+      {
+        "title": "Competitive advantages",
+        "description": "Competitive pricing and flexible partnership policies."
+      },
+      {
+        "title": "Professional support",
+        "description": "Dedicated technical and sales support throughout your projects."
+      },
+      {
+        "title": "Global opportunities",
+        "description": "Expand your business with access to international markets."
+      }
+    ]
+  },
+  "opportunities": {
+    "title": "Partner opportunities",
+    "subtitle": "We are looking for motivated partners to grow with us in global markets.",
+    "ctaButton": "Become a partner",
+    "cards": [
+      {
+        "title": "Distributors",
+        "description": "Distribute PROLEDALL products in your local market and grow your business."
+      },
+      {
+        "title": "Resellers",
+        "description": "Resell our high-quality LED displays and solutions to your customers."
+      },
+      {
+        "title": "System integrators",
+        "description": "Integrate PROLEDALL products into your solutions and projects seamlessly."
+      },
+      {
+        "title": "Project contractors",
+        "description": "Work on LED display projects and deliver outstanding results together."
+      },
+      {
+        "title": "Retailers",
+        "description": "Sell PROLEDALL products through your retail channels and stores."
+      }
+    ]
+  },
+  "howTo": {
+    "title": "How to become a partner",
+    "subtitle": "It's easy to join our partner network and start growing together.",
+    "ctaTitle": "Ready to join our partner network?",
+    "ctaSubtitle": "Submit your application today and take the first step towards a successful partnership.",
+    "ctaButton": "Submit an application",
+    "steps": [
+      {
+        "number": "1",
+        "title": "Submit application",
+        "description": "Fill out the partner application form with your company information."
+      },
+      {
+        "number": "2",
+        "title": "Review & approval",
+        "description": "Our team will review your application and get back to you."
+      },
+      {
+        "number": "3",
+        "title": "Partnership agreement",
+        "description": "Once approved, we'll set up our partnership terms and agreement."
+      },
+      {
+        "number": "4",
+        "title": "Grow together",
+        "description": "Access partner resources and start your journey with PROLEDALL."
+      }
+    ]
+  }
+}

@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -6,7 +7,6 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import Link from "next/link";
 import { Fragment } from "react";
 
 export default function BreadCrumb({ title, breadcrumbs }) {

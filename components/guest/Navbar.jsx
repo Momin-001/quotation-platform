@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { cmsField } from "@/lib/i18n/cms";
 import UserAvatar from "@/components/common/UserAvatar";
 import {
     DropdownMenu,
@@ -22,13 +21,21 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 export default function Navbar({ navbarData }) {
     const { isAuthenticated, loading } = useAuth();
-    const { language, setLanguage } = useLanguage();
+    const locale = useLocale();
+    const t = useTranslations("Navbar");
+    const tCommon = useTranslations("Common");
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
+
+    const switchLocale = (nextLocale) => {
+        router.replace(pathname, { locale: nextLocale });
+    };
 
     const isActive = (href) => {
         if (!pathname) return false;
@@ -42,11 +49,8 @@ export default function Navbar({ navbarData }) {
     const mobileNavLinkClass = (href) =>
         `block py-2.5 hover:text-primary transition-colors duration-200 ${isActive(href) ? "text-primary font-semibold" : "text-foreground/80"}`;
 
-    const getNavText = (itemNumber) => {
-        if (!navbarData) return "";
-        const key = language === "en" ? `navItem${itemNumber}En` : `navItem${itemNumber}De`;
-        return navbarData[key] || navbarData[`navItem${itemNumber}En`] || "";
-    };
+    const getNavText = (itemNumber) =>
+        cmsField(navbarData, `navItem${itemNumber}`, locale);
 
     return (
         <nav className="w-full border-b border-border/60 bg-background/95 backdrop-blur-sm sticky top-0 left-0 right-0 z-50 ">
@@ -92,12 +96,12 @@ export default function Navbar({ navbarData }) {
                             <>
                                 <Link href="/register">
                                     <Button variant="default">
-                                        REGISTER
+                                        {tCommon("register")}
                                     </Button>
                                 </Link>
                                 <Link href="/login">
                                     <Button variant="outline" className="text-primary border-primary hover:bg-primary/5">
-                                        LOGIN
+                                        {tCommon("login")}
                                     </Button>
                                 </Link>
                             </>
@@ -111,8 +115,8 @@ export default function Navbar({ navbarData }) {
                                     className="border-border px-2.5 gap-1.5"
                                 >
                                     <Image
-                                        src={language === "en" ? "/us.svg" : "/de.svg"}
-                                        alt={language === "en" ? "English" : "German"}
+                                        src={locale === "en" ? "/us.svg" : "/de.svg"}
+                                        alt={locale === "en" ? t("englishAlt") : t("germanAlt")}
                                         width={22}
                                         height={16}
                                         className="shrink-0"
@@ -123,17 +127,17 @@ export default function Navbar({ navbarData }) {
                             <DropdownMenuContent align="end" className="min-w-36 p-1">
                                 <DropdownMenuItem
                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                    onClick={() => setLanguage("en")}
+                                    onClick={() => switchLocale("en")}
                                 >
-                                    <Image src="/us.svg" alt="English" width={22} height={16} className="shrink-0" />
-                                    <span>English</span>
+                                    <Image src="/us.svg" alt={t("englishAlt")} width={22} height={16} className="shrink-0" />
+                                    <span>{t("english")}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                    onClick={() => setLanguage("de")}
+                                    onClick={() => switchLocale("de")}
                                 >
-                                    <Image src="/de.svg" alt="German" width={22} height={16} className="shrink-0" />
-                                    <span>German</span>
+                                    <Image src="/de.svg" alt={t("germanAlt")} width={22} height={16} className="shrink-0" />
+                                    <span>{t("german")}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -149,7 +153,7 @@ export default function Navbar({ navbarData }) {
                             <SheetContent side="right" className="w-72 flex flex-col p-0">
                                 <SheetHeader className="shrink-0 p-5 border-b">
                                     <SheetTitle className="flex items-center gap-2">
-                                        <span className=" text-base font-semibold text-foreground">Menu</span>
+                                        <span className=" text-base font-semibold text-foreground">{t("menu")}</span>
                                     </SheetTitle>
                                 </SheetHeader>
 
@@ -184,12 +188,12 @@ export default function Navbar({ navbarData }) {
                                             <div className="grid grid-cols-1 gap-2.5">
                                                 <Link href="/register" onClick={() => setMobileOpen(false)}>
                                                     <Button size="sm" className="w-full">
-                                                        REGISTER
+                                                        {tCommon("register")}
                                                     </Button>
                                                 </Link>
                                                 <Link href="/login" onClick={() => setMobileOpen(false)}>
                                                     <Button size="sm" variant="outline" className="w-full text-primary border-primary hover:bg-primary/5">
-                                                        LOGIN
+                                                        {tCommon("login")}
                                                     </Button>
                                                 </Link>
                                             </div>
@@ -207,13 +211,13 @@ export default function Navbar({ navbarData }) {
                                                 >
                                                     <span className="flex items-center gap-3">
                                                         <Image
-                                                            src={language === "en" ? "/us.svg" : "/de.svg"}
-                                                            alt={language === "en" ? "English" : "German"}
+                                                            src={locale === "en" ? "/us.svg" : "/de.svg"}
+                                                            alt={locale === "en" ? t("englishAlt") : t("germanAlt")}
                                                             width={24}
                                                             height={18}
                                                             className="shrink-0"
                                                         />
-                                                        <span>Language</span>
+                                                        <span>{t("language")}</span>
                                                     </span>
                                                     <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
                                                 </Button>
@@ -221,14 +225,14 @@ export default function Navbar({ navbarData }) {
                                             <DropdownMenuContent align="end" className="min-w-36 p-1">
                                                 <DropdownMenuItem
                                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                                    onClick={() => setLanguage("en")}
+                                                    onClick={() => switchLocale("en")}
                                                 >
                                                     <Image src="/us.svg" alt="English" width={22} height={16} className="shrink-0" />
                                                     <span>English</span>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                                    onClick={() => setLanguage("de")}
+                                                    onClick={() => switchLocale("de")}
                                                 >
                                                     <Image src="/de.svg" alt="German" width={22} height={16} className="shrink-0" />
                                                     <span>German</span>

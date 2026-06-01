@@ -8,121 +8,154 @@ const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
 export const revalidate = 3600;
 
 function latestModified(dates, fallback) {
-  if (!dates.length) return fallback;
-  return new Date(Math.max(...dates.map((d) => new Date(d).getTime())));
+    if (!dates.length) return fallback;
+    return new Date(Math.max(...dates.map((d) => new Date(d).getTime())));
 }
 
 function pageEntry(path, { lastModified, changeFrequency, priority }) {
-  return {
-    url: path ? `${siteUrl}${path}` : siteUrl,
-    lastModified,
-    changeFrequency,
-    priority,
-  };
+    return {
+        url: path ? `${siteUrl}${path}` : siteUrl,
+        lastModified,
+        changeFrequency,
+        priority,
+    };
+}
+
+/** English (default) + German (/de) sitemap entries for the same logical path. */
+function localizedPageEntries(path, options) {
+    const dePath = path ? `/de${path}` : "/de";
+    return [pageEntry(path, options), pageEntry(dePath, options)];
 }
 
 /** @returns {Promise<import('next').MetadataRoute.Sitemap>} */
 export default async function sitemap() {
-  const now = new Date();
+    const now = new Date();
 
-  const entries = [
-    pageEntry("", { lastModified: now, changeFrequency: "weekly", priority: 1.0 }),
-    pageEntry("/products", { lastModified: now, changeFrequency: "weekly", priority: 0.9 }),
-    pageEntry("/leditor", { lastModified: now, changeFrequency: "monthly", priority: 0.85 }),
-    pageEntry("/become-partner", { lastModified: now, changeFrequency: "monthly", priority: 0.8 }),
-    pageEntry("/contact", { lastModified: now, changeFrequency: "yearly", priority: 0.7 }),
-    pageEntry("/faqs", { lastModified: now, changeFrequency: "monthly", priority: 0.65 }),
-    pageEntry("/imprint", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
-    pageEntry("/terms-and-conditions", { lastModified: now, changeFrequency: "yearly", priority: 0.3 }),
-  ];
-
-  try {
-    const [productRows, blogRows, controllerRows] = await Promise.all([
-      db
-        .select({ id: products.id, updatedAt: products.updatedAt })
-        .from(products)
-        .where(eq(products.isActive, true)),
-      db
-        .select({ id: blogs.id, updatedAt: blogs.updatedAt })
-        .from(blogs),
-      db
-        .select({ id: controllers.id, updatedAt: controllers.updatedAt })
-        .from(controllers)
-        .where(eq(controllers.isActive, true)),
-    ]);
-
-    if (productRows.length > 0) {
-      const productLastMod = latestModified(
-        productRows.map((p) => p.updatedAt),
-        now,
-      );
-      entries[1] = pageEntry("/products", {
-        lastModified: productLastMod,
-        changeFrequency: "weekly",
-        priority: 0.9,
-      });
-
-      for (const product of productRows) {
-        entries.push(
-          pageEntry(`/products/${product.id}`, {
-            lastModified: product.updatedAt ?? now,
-            changeFrequency: "monthly",
-            priority: 0.75,
-          }),
-        );
-      }
-    }
-
-    if (blogRows.length > 0) {
-      const blogLastMod = latestModified(
-        blogRows.map((b) => b.updatedAt),
-        now,
-      );
-      entries.push(
-        pageEntry("/blogs", {
-          lastModified: blogLastMod,
-          changeFrequency: "weekly",
-          priority: 0.8,
+    const entries = [
+        ...localizedPageEntries("", { lastModified: now, changeFrequency: "weekly", priority: 1.0 }),
+        ...localizedPageEntries("/products", {
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.9,
         }),
-      );
-
-      for (const blog of blogRows) {
-        entries.push(
-          pageEntry(`/blogs/${blog.id}`, {
-            lastModified: blog.updatedAt ?? now,
+        ...localizedPageEntries("/leditor", {
+            lastModified: now,
             changeFrequency: "monthly",
+            priority: 0.85,
+        }),
+        ...localizedPageEntries("/become-partner", {
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 0.8,
+        }),
+        ...localizedPageEntries("/contact", {
+            lastModified: now,
+            changeFrequency: "yearly",
             priority: 0.7,
-          }),
-        );
-      }
-    }
-
-    if (controllerRows.length > 0) {
-      const controllerLastMod = latestModified(
-        controllerRows.map((c) => c.updatedAt),
-        now,
-      );
-      entries.push(
-        pageEntry("/controllers", {
-          lastModified: controllerLastMod,
-          changeFrequency: "weekly",
-          priority: 0.8,
         }),
-      );
-
-      for (const controller of controllerRows) {
-        entries.push(
-          pageEntry(`/controllers/${controller.id}`, {
-            lastModified: controller.updatedAt ?? now,
+        ...localizedPageEntries("/faqs", {
+            lastModified: now,
             changeFrequency: "monthly",
-            priority: 0.75,
-          }),
-        );
-      }
-    }
-  } catch (error) {
-    console.error("sitemap: failed to fetch dynamic routes", error);
-  }
+            priority: 0.65,
+        }),
+        ...localizedPageEntries("/imprint", {
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+        }),
+        ...localizedPageEntries("/terms-and-conditions", {
+            lastModified: now,
+            changeFrequency: "yearly",
+            priority: 0.3,
+        }),
+    ];
 
-  return entries;
+    try {
+        const [productRows, blogRows, controllerRows] = await Promise.all([
+            db
+                .select({ id: products.id, updatedAt: products.updatedAt })
+                .from(products)
+                .where(eq(products.isActive, true)),
+            db.select({ id: blogs.id, updatedAt: blogs.updatedAt }).from(blogs),
+            db
+                .select({ id: controllers.id, updatedAt: controllers.updatedAt })
+                .from(controllers)
+                .where(eq(controllers.isActive, true)),
+        ]);
+
+        if (productRows.length > 0) {
+            const productLastMod = latestModified(
+                productRows.map((p) => p.updatedAt),
+                now,
+            );
+            const productOptions = {
+                lastModified: productLastMod,
+                changeFrequency: "weekly",
+                priority: 0.9,
+            };
+            entries.splice(2, 2, ...localizedPageEntries("/products", productOptions));
+
+            for (const product of productRows) {
+                const opts = {
+                    lastModified: product.updatedAt ?? now,
+                    changeFrequency: "monthly",
+                    priority: 0.75,
+                };
+                entries.push(
+                    ...localizedPageEntries(`/products/${product.id}`, opts),
+                );
+            }
+        }
+
+        if (blogRows.length > 0) {
+            const blogLastMod = latestModified(
+                blogRows.map((b) => b.updatedAt),
+                now,
+            );
+            const blogListOptions = {
+                lastModified: blogLastMod,
+                changeFrequency: "weekly",
+                priority: 0.8,
+            };
+            entries.push(...localizedPageEntries("/blogs", blogListOptions));
+
+            for (const blog of blogRows) {
+                entries.push(
+                    ...localizedPageEntries(`/blogs/${blog.id}`, {
+                        lastModified: blog.updatedAt ?? now,
+                        changeFrequency: "monthly",
+                        priority: 0.7,
+                    }),
+                );
+            }
+        }
+
+        if (controllerRows.length > 0) {
+            const controllerLastMod = latestModified(
+                controllerRows.map((c) => c.updatedAt),
+                now,
+            );
+            entries.push(
+                ...localizedPageEntries("/controllers", {
+                    lastModified: controllerLastMod,
+                    changeFrequency: "weekly",
+                    priority: 0.8,
+                }),
+            );
+
+            for (const controller of controllerRows) {
+                entries.push(
+                    ...localizedPageEntries(`/controllers/${controller.id}`, {
+                        lastModified: controller.updatedAt ?? now,
+                        changeFrequency: "monthly",
+                        priority: 0.75,
+                    }),
+                );
+            }
+        }
+    } catch (error) {
+        console.error("sitemap: failed to fetch dynamic routes", error);
+    }
+
+    return entries;
 }

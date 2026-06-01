@@ -1,19 +1,19 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { PhoneCall, Pencil } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+
 
 export default function HeroSection({ homepageData }) {
-    const { language } = useLanguage();
+    const locale = useLocale();
     const router = useRouter();
 
     const getText = (field) => {
         if (!homepageData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
+        const key = locale === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 

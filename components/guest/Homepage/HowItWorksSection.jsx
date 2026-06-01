@@ -1,16 +1,16 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 import { MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function HowItWorksSection({ homepageData }) {
-    const { language } = useLanguage();
+    const locale = useLocale();
 
     const getText = (field) => {
         if (!homepageData) return "";
-        const key = language === "en" ? `${field}En` : `${field}De`;
+        const key = locale === "en" ? `${field}En` : `${field}De`;
         return homepageData[key] || homepageData[`${field}En`] || "";
     };
 
