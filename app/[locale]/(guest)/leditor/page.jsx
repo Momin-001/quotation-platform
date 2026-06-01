@@ -44,6 +44,18 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useFooter } from "@/context/FooterContext";
 import { cn } from "@/lib/utils";
+import {
+    ADDITIONAL_SERVICES_OPTIONS,
+    CONTROLLER_CONFIG_OPTIONS,
+    INSTALLATION_SERVICE_OPTIONS,
+    MOUNTING_METHOD_OPTIONS,
+    NETWORK_CONNECTION_OPTIONS,
+    OPERATING_HOURS_OPTIONS,
+    POWER_REDUNDANCY_OPTIONS,
+    SERVICE_ACCESS_OPTIONS,
+    SIGNAL_SOURCE_OPTIONS,
+    mapLeditorOptions,
+} from "@/lib/leditor/form-options";
 
 const leditorAccordionPanel =
     "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";
@@ -154,29 +166,35 @@ function ControllerSummaryPanel({ controller, onRemove }) {
     );
 }
 
+function normalizeCheckboxOption(opt) {
+    if (typeof opt === "string") return { value: opt, label: opt };
+    return opt;
+}
+
 function MultiCheckbox({ label, options, value = [], onChange }) {
-    const toggle = (opt) => {
-        if (value.includes(opt)) {
-            onChange(value.filter((v) => v !== opt));
+    const normalized = options.map(normalizeCheckboxOption);
+    const toggle = (optValue) => {
+        if (value.includes(optValue)) {
+            onChange(value.filter((v) => v !== optValue));
         } else {
-            onChange([...value, opt]);
+            onChange([...value, optValue]);
         }
     };
     return (
         <div className="space-y-2">
             <Label>{label}</Label>
             <div className="flex flex-wrap gap-x-4 gap-y-2.5 pt-0.5">
-                {options.map((opt) => (
+                {normalized.map(({ value: optValue, label: optLabel }) => (
                     <Label
-                        key={opt}
+                        key={optValue}
                         className="cursor-pointer font-normal text-sm flex items-center gap-2"
                     >
                         <Checkbox
-                            checked={value.includes(opt)}
-                            onCheckedChange={() => toggle(opt)}
+                            checked={value.includes(optValue)}
+                            onCheckedChange={() => toggle(optValue)}
                             className="data-[state=checked]:bg-secondary data-[state=checked]:text-primary-foreground"
                         />
-                        <span>{opt}</span>
+                        <span>{optLabel}</span>
                     </Label>
                 ))}
             </div>
@@ -191,6 +209,16 @@ export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
     const { privacyPolicyPdfUrl } = useFooter();
+
+    const installationServiceOptions = mapLeditorOptions(t, INSTALLATION_SERVICE_OPTIONS);
+    const serviceAccessOptions = mapLeditorOptions(t, SERVICE_ACCESS_OPTIONS);
+    const mountingMethodOptions = mapLeditorOptions(t, MOUNTING_METHOD_OPTIONS);
+    const powerRedundancyOptions = mapLeditorOptions(t, POWER_REDUNDANCY_OPTIONS);
+    const operatingHoursOptions = mapLeditorOptions(t, OPERATING_HOURS_OPTIONS);
+    const controllerConfigOptions = mapLeditorOptions(t, CONTROLLER_CONFIG_OPTIONS);
+    const networkConnectionOptions = mapLeditorOptions(t, NETWORK_CONNECTION_OPTIONS);
+    const signalSourceOptions = mapLeditorOptions(t, SIGNAL_SOURCE_OPTIONS);
+    const additionalServicesOptions = mapLeditorOptions(t, ADDITIONAL_SERVICES_OPTIONS);
 
     const enquirySchema = useMemo(
         () =>
@@ -1206,10 +1234,7 @@ export default function LeditorPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                             <MultiCheckbox
                                 label={t("installationAndService")}
-                                options={[
-                                    "Schedule a free consultation appointment",
-                                    "Preparation of tender documents",
-                                ]}
+                                options={installationServiceOptions}
                                 value={installationData.installationAndService}
                                 onChange={(val) =>
                                     setInstallationData((p) => ({ ...p, installationAndService: val }))
@@ -1217,7 +1242,7 @@ export default function LeditorPage() {
                             />
                             <MultiCheckbox
                                 label={t("serviceAccess")}
-                                options={["Front service", "Rear service", "Not sure"]}
+                                options={serviceAccessOptions}
                                 value={installationData.serviceAccess}
                                 onChange={(val) =>
                                     setInstallationData((p) => ({ ...p, serviceAccess: val }))
@@ -1228,17 +1253,12 @@ export default function LeditorPage() {
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">{t("mountingMethod")}</Label>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-                                {[
-                                    "Wall Mount",
-                                    "Hanging / Rigging",
-                                    "Ground Support",
-                                    "Freestanding Structure",
-                                ].map((opt) => (
+                                {mountingMethodOptions.map(({ value: optValue, label: optLabel }) => (
                                     <label
-                                        key={opt}
+                                        key={optValue}
                                         className={cn(
                                             "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
-                                            installationData.mountingMethod === opt
+                                            installationData.mountingMethod === optValue
                                                 ? "border-primary/50 bg-primary/5 text-foreground"
                                                 : "border-border/60 bg-white hover:border-primary/30"
                                         )}
@@ -1246,12 +1266,12 @@ export default function LeditorPage() {
                                         <input
                                             type="radio"
                                             name="mountingMethod"
-                                            value={opt}
-                                            checked={installationData.mountingMethod === opt}
+                                            value={optValue}
+                                            checked={installationData.mountingMethod === optValue}
                                             onChange={(e) => setInstallationData((p) => ({ ...p, mountingMethod: e.target.value }))}
                                             className="accent-primary shrink-0"
                                         />
-                                        <span className="leading-snug">{opt}</span>
+                                        <span className="leading-snug">{optLabel}</span>
                                     </label>
                                 ))}
                             </div>
@@ -1276,12 +1296,12 @@ export default function LeditorPage() {
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium">{t("powerRedundancy")}</Label>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {["Required", "Not Required"].map((opt) => (
+                                        {powerRedundancyOptions.map(({ value: optValue, label: optLabel }) => (
                                             <label
-                                                key={opt}
+                                                key={optValue}
                                                 className={cn(
                                                     "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
-                                                    installationData.powerRedundancy === opt
+                                                    installationData.powerRedundancy === optValue
                                                         ? "border-primary/50 bg-primary/5 text-foreground"
                                                         : "border-border/60 bg-white hover:border-primary/30"
                                                 )}
@@ -1289,12 +1309,12 @@ export default function LeditorPage() {
                                                 <input
                                                     type="radio"
                                                     name="powerRedundancy"
-                                                    value={opt}
-                                                    checked={installationData.powerRedundancy === opt}
+                                                    value={optValue}
+                                                    checked={installationData.powerRedundancy === optValue}
                                                     onChange={(e) => setInstallationData((p) => ({ ...p, powerRedundancy: e.target.value }))}
                                                     className="accent-primary shrink-0"
                                                 />
-                                                <span className="leading-snug">{opt}</span>
+                                                <span className="leading-snug">{optLabel}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -1304,12 +1324,12 @@ export default function LeditorPage() {
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium">{t("operatingHours")}</Label>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {["24/7 Operation"].map((opt) => (
+                                        {operatingHoursOptions.map(({ value: optValue, label: optLabel }) => (
                                             <label
-                                                key={opt}
+                                                key={optValue}
                                                 className={cn(
                                                     "flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer text-sm transition-colors",
-                                                    installationData.operatingHours === opt
+                                                    installationData.operatingHours === optValue
                                                         ? "border-primary/50 bg-primary/5 text-foreground"
                                                         : "border-border/60 bg-white hover:border-primary/30"
                                                 )}
@@ -1317,12 +1337,12 @@ export default function LeditorPage() {
                                                 <input
                                                     type="radio"
                                                     name="operatingHours"
-                                                    value={opt}
-                                                    checked={installationData.operatingHours === opt}
+                                                    value={optValue}
+                                                    checked={installationData.operatingHours === optValue}
                                                     onChange={(e) => setInstallationData((p) => ({ ...p, operatingHours: e.target.value }))}
                                                     className="accent-primary shrink-0"
                                                 />
-                                                <span className="leading-snug">{opt}</span>
+                                                <span className="leading-snug">{optLabel}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -1423,28 +1443,28 @@ export default function LeditorPage() {
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <MultiCheckbox
-                                label="Controller Configuration"
-                                options={["Synchronous", "Asynchronous"]}
+                                label={t("labelControllerConfiguration")}
+                                options={controllerConfigOptions}
                                 value={controllerConfig}
                                 onChange={setControllerConfig}
                             />
                             <MultiCheckbox
-                                label="Network Connection"
-                                options={["LAN", "WLAN (Wi-Fi)", "3G Mobile"]}
+                                label={t("labelNetworkConnection")}
+                                options={networkConnectionOptions}
                                 value={networkConnection}
                                 onChange={setNetworkConnection}
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <MultiCheckbox
-                                label="Signal Source Inputs"
-                                options={["HDMI", "DVI", "12G-SDI", "3G-DP", "10G Fiber"]}
+                                label={t("labelSignalSourceInputs")}
+                                options={signalSourceOptions}
                                 value={signalSourceInputs}
                                 onChange={setSignalSourceInputs}
                             />
                             <MultiCheckbox
-                                label="Additional Services"
-                                options={["Approval process", "Leasing", "Installation", "Extended warranty"]}
+                                label={t("labelAdditionalServices")}
+                                options={additionalServicesOptions}
                                 value={additionalServices}
                                 onChange={setAdditionalServices}
                             />

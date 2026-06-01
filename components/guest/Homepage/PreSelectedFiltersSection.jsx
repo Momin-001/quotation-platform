@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import { useLocale } from "next-intl";
 import { categoryToShowcaseCard } from "@/lib/category-helpers";
+import { cmsField } from "@/lib/i18n/cms";
 
 function CategoryCard({ card, presetLabel, categoryId }) {
     const href = categoryId
@@ -91,11 +92,7 @@ export default function PreSelectedFiltersSection({ homepageData }) {
     const [canNext, setCanNext] = useState(false);
     const [autoplayNonce, setAutoplayNonce] = useState(0);
 
-    const getText = (field) => {
-        if (!homepageData) return "";
-        const key = locale === "en" ? `${field}En` : `${field}De`;
-        return homepageData[key] || homepageData[`${field}En`] || "";
-    };
+    const getText = (field) => cmsField(homepageData, field, locale);
 
     useEffect(() => {
         let cancelled = false;

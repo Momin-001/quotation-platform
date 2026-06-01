@@ -5,17 +5,14 @@ import { Button } from "@/components/ui/button";
 import { PhoneCall, Pencil } from "lucide-react";
 import Image from "next/image";
 import { Link, useRouter } from "@/i18n/navigation";
+import { cmsField } from "@/lib/i18n/cms";
 
 
 export default function HeroSection({ homepageData }) {
     const locale = useLocale();
     const router = useRouter();
 
-    const getText = (field) => {
-        if (!homepageData) return "";
-        const key = locale === "en" ? `${field}En` : `${field}De`;
-        return homepageData[key] || homepageData[`${field}En`] || "";
-    };
+    const getText = (field) => cmsField(homepageData, field, locale);
 
     return (
         <section className="relative w-full overflow-hidden">

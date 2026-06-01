@@ -2,17 +2,14 @@
 
 import { Link } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
+import { cmsField } from "@/lib/i18n/cms";
 import { MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HowItWorksSection({ homepageData }) {
     const locale = useLocale();
 
-    const getText = (field) => {
-        if (!homepageData) return "";
-        const key = locale === "en" ? `${field}En` : `${field}De`;
-        return homepageData[key] || homepageData[`${field}En`] || "";
-    };
+    const getText = (field) => cmsField(homepageData, field, locale);
 
     const steps = [
         {

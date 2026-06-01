@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
+import { cmsField } from "@/lib/i18n/cms";
 import Image from "next/image";
 import Marquee from "react-fast-marquee";
 
@@ -20,11 +21,7 @@ export default function PartnersSection({ homepageData, partners = [] }) {
         }
     };
 
-    const getText = (field) => {
-        if (!homepageData) return "";
-        const key = locale === "en" ? `${field}En` : `${field}De`;
-        return homepageData[key] || homepageData[`${field}En`] || "";
-    };
+    const getText = (field) => cmsField(homepageData, field, locale);
 
     return (
         <section className="w-full bg-gray-50 py-16 md:py-20 lg:py-24">
