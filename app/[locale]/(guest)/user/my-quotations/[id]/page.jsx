@@ -51,7 +51,7 @@ function OfferTotalsSummary({ item, label, color, quotationTaxPercentage }) {
                 <span className="font-medium tabular-nums">{formatCurrency(offerNet)}</span>
             </div>
             <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-baseline">
-                <span className="text-gray-600 break-words">
+                <span className="text-gray-600 wrap-break-word">
                     {t("vatOn", { percentage: taxPercentage })}
                 </span>
                 <span className="font-medium tabular-nums">{formatCurrency(tax)}</span>
@@ -220,7 +220,7 @@ export default function QuotationDetailPage() {
                             <p className="text-sm font-medium text-primary break-all">
                                 {formatEnquiryNumber(quotation.enquiry?.id || "", quotation.createdAt)}
                             </p>
-                            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight break-words">
+                            <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight wrap-break-word">
                                 {t("quotation")} {quotation.quotationNumber}
                             </h1>
                             <p className="text-xs text-muted-foreground">
@@ -242,7 +242,7 @@ export default function QuotationDetailPage() {
                             <p className="text-xs text-muted-foreground uppercase tracking-wide">
                                 {t("project")}
                             </p>
-                            <p className="font-medium text-foreground mt-0.5 break-words">
+                            <p className="font-medium text-foreground mt-0.5 wrap-break-word">
                                 {mainProduct?.product?.productName || "N/A"}
                             </p>
                         </div>
