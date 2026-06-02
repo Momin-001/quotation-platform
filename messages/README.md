@@ -6,8 +6,8 @@ This app uses [next-intl](https://next-intl-docs.vercel.app/) for UI copy and UR
 
 | Locale | URL prefix | Example |
 |--------|------------|---------|
-| English (`en`) | none (default) | `/products`, `/leditor` |
-| German (`de`) | `/de` | `/de/products`, `/de/leditor` |
+| German (`de`) | none (default) | `/products`, `/leditor` |
+| English (`en`) | `/en` | `/en/products`, `/en/leditor` |
 
 Configuration lives in `i18n/routing.js`, `i18n/request.js`, and `proxy.js` (middleware). Guest routes live under `app/[locale]/`. Admin (`/admin`) and API (`/api`) are not localized.
 

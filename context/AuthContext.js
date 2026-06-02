@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const AuthContext = createContext({
     user: null,
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
     const [isUser, setIsUser] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         checkUser();
@@ -57,7 +58,13 @@ export const AuthProvider = ({ children }) => {
         setIsUser(userData.role === 'user');
         setIsAdmin(userData.role === 'admin');
         setIsSuperAdmin(userData.role === 'super_admin');
-        router.push(userData.role === 'admin' || userData.role === 'super_admin' ? '/admin' : '/');
+        const localePrefix =
+            pathname === "/en" || (pathname && pathname.startsWith("/en/")) ? "/en" : "";
+        router.push(
+            userData.role === "admin" || userData.role === "super_admin"
+                ? "/admin"
+                : `${localePrefix}/`,
+        );
     };
 
     const logout = async () => {
@@ -72,7 +79,9 @@ export const AuthProvider = ({ children }) => {
         setIsUser(false);
         setIsAdmin(false);
         setIsSuperAdmin(false);
-        router.push("/login");
+        const localePrefix =
+            pathname === "/en" || (pathname && pathname.startsWith("/en/")) ? "/en" : "";
+        router.push(`${localePrefix}/login`);
     };
 
     return (

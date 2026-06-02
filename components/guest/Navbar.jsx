@@ -127,17 +127,17 @@ export default function Navbar({ navbarData }) {
                             <DropdownMenuContent align="end" className="min-w-36 p-1">
                                 <DropdownMenuItem
                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                    onClick={() => switchLocale("en")}
-                                >
-                                    <Image src="/us.svg" alt={t("englishAlt")} width={22} height={16} className="shrink-0" />
-                                    <span>{t("english")}</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
                                     onClick={() => switchLocale("de")}
                                 >
                                     <Image src="/de.svg" alt={t("germanAlt")} width={22} height={16} className="shrink-0" />
                                     <span>{t("german")}</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
+                                    onClick={() => switchLocale("en")}
+                                >
+                                    <Image src="/us.svg" alt={t("englishAlt")} width={22} height={16} className="shrink-0" />
+                                    <span>{t("english")}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -225,17 +225,17 @@ export default function Navbar({ navbarData }) {
                                             <DropdownMenuContent align="end" className="min-w-36 p-1">
                                                 <DropdownMenuItem
                                                     className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                                    onClick={() => switchLocale("en")}
-                                                >
-                                                    <Image src="/us.svg" alt="English" width={22} height={16} className="shrink-0" />
-                                                    <span>English</span>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
                                                     onClick={() => switchLocale("de")}
                                                 >
                                                     <Image src="/de.svg" alt="German" width={22} height={16} className="shrink-0" />
                                                     <span>German</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
+                                                    onClick={() => switchLocale("en")}
+                                                >
+                                                    <Image src="/us.svg" alt="English" width={22} height={16} className="shrink-0" />
+                                                    <span>English</span>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

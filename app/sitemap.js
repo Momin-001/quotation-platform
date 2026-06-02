@@ -21,10 +21,10 @@ function pageEntry(path, { lastModified, changeFrequency, priority }) {
     };
 }
 
-/** English (default) + German (/de) sitemap entries for the same logical path. */
+/** German (default) + English (/en) sitemap entries for the same logical path. */
 function localizedPageEntries(path, options) {
-    const dePath = path ? `/de${path}` : "/de";
-    return [pageEntry(path, options), pageEntry(dePath, options)];
+    const enPath = path ? `/en${path}` : "/en";
+    return [pageEntry(path, options), pageEntry(enPath, options)];
 }
 
 /** @returns {Promise<import('next').MetadataRoute.Sitemap>} */

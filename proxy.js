@@ -5,20 +5,20 @@ import { JWT_SECRET } from "@/lib/constants";
 import { routing } from "./i18n/routing";
 
 const secret = new TextEncoder().encode(JWT_SECRET);
-const intlMiddleware = createMiddleware(routing);
+const intlMiddleware = createMiddleware({ ...routing, localeDetection: false });
 
 const AUTH_PAGES = ["/login", "/register", "/reset-password", "/forgot-password"];
 
 function getLocaleFromPathname(pathname) {
-    if (pathname === "/de" || pathname.startsWith("/de/")) {
-        return "de";
+    if (pathname === "/en" || pathname.startsWith("/en/")) {
+        return "en";
     }
-    return "en";
+    return "de";
 }
 
 function stripLocalePrefix(pathname) {
-    if (pathname === "/de") return "/";
-    if (pathname.startsWith("/de/")) {
+    if (pathname === "/en") return "/";
+    if (pathname.startsWith("/en/")) {
         const rest = pathname.slice(3);
         return rest ? `/${rest}` : "/";
     }
@@ -26,8 +26,8 @@ function stripLocalePrefix(pathname) {
 }
 
 function localizedPath(path, locale) {
-    if (locale === "de") {
-        return path === "/" ? "/de" : `/de${path}`;
+    if (locale === "en") {
+        return path === "/" ? "/en" : `/en${path}`;
     }
     return path;
 }
@@ -59,8 +59,8 @@ async function verifyAdminAccess(request, pathname) {
 export async function proxy(request) {
     const { pathname } = request.nextUrl;
 
-    if (pathname === "/en" || pathname.startsWith("/en/")) {
-        const path = pathname.replace(/^\/en/, "") || "/";
+    if (pathname === "/de" || pathname.startsWith("/de/")) {
+        const path = pathname.replace(/^\/de/, "") || "/";
         return NextResponse.redirect(new URL(path, request.url));
     }
 
