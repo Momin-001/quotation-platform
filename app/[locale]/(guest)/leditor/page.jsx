@@ -6,6 +6,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useRouter } from "@/i18n/navigation";
+import SchemaScript from "@/components/SchemaScript";
+import { BASE_URL } from "@/lib/constants";
 
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -40,7 +42,7 @@ import {
     ChevronDown,
 } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useFooter } from "@/context/FooterContext";
 import { cn } from "@/lib/utils";
@@ -209,6 +211,25 @@ export default function LeditorPage() {
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
     const { privacyPolicyPdfUrl } = useFooter();
+    const locale = useLocale();
+
+    const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+    const canonicalPath = locale === "en" ? "/en/leditor" : "/leditor";
+    const serviceSchema = {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name: "LED Display B2B Matchmaking & Configuration",
+        serviceType: "B2B Procurement Matchmaking",
+        description:
+            "ProLEDALL matches B2B buyers with certified LED manufacturers across Europe. Use LEDITOR to configure your screen dimensions, mounting, IP rating, and controller — then receive multiple comparable quotes.",
+        provider: { "@type": "Organization", name: "ProLEDALL", url: siteUrl },
+        areaServed: { "@type": "Place", name: "Europe" },
+        url: `${siteUrl}${canonicalPath}`,
+        audience: {
+            "@type": "Audience",
+            audienceType: "System Integrators, AV Planners, LED Distributors",
+        },
+    };
 
     const installationServiceOptions = mapLeditorOptions(t, INSTALLATION_SERVICE_OPTIONS);
     const serviceAccessOptions = mapLeditorOptions(t, SERVICE_ACCESS_OPTIONS);
@@ -807,6 +828,7 @@ export default function LeditorPage() {
 
     return (
         <div className="min-h-screen">
+            <SchemaScript data={serviceSchema} />
             <BreadCrumb
                 title={t("title")}
                 breadcrumbs={[
