@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { JWT_SECRET } from "@/lib/constants";
 import { errorResponse, successResponse } from "@/lib/api-response";
 

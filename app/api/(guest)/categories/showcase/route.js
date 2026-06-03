@@ -4,7 +4,7 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 import {
     HOMEPAGE_SHOWCASE_CATEGORY_NAMES,
     orderShowcaseCategories,
-} from "@/lib/category-helpers";
+} from "@/lib/helpers/category-helpers";
 import { or, ilike } from "drizzle-orm";
 
 const showcaseNameFilters = HOMEPAGE_SHOWCASE_CATEGORY_NAMES.map((name) =>

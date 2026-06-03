@@ -1,56 +1,39 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Link, useRouter } from "@/i18n/navigation";
-import { Spinner } from "@/components/ui/spinner";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import BreadCrumb from "@/components/user/BreadCrumb";
-import { toast } from "sonner";
 import {
     formatEnquiryNumber,
     formatDate,
     getStatusLabel,
     getQuotationStatusColor,
-} from "@/lib/helpers";
-import { useTranslations } from "next-intl";
+} from "@/lib/helpers/helpers";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { fetchUserQuotations } from "@/features/quotations/user-quotations";
 import { cn } from "@/lib/utils";
 import { ChevronRight, FileText, Inbox } from "lucide-react";
 
-export default function MyQuotationsPage() {
-    const t = useTranslations("User.quotations");
-    const router = useRouter();
-    const [quotations, setQuotations] = useState([]);
-    const [pendingCount, setPendingCount] = useState(0);
-    const [loading, setLoading] = useState(true);
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/user/my-quotations", validateLocale(locale));
+}
 
-    useEffect(() => {
-        fetchQuotations();
-    }, []);
+export default async function MyQuotationsPage() {
+    const t = await getTranslations("User.quotations");
+    const { user } = await getCurrentUser();
 
-    const fetchQuotations = async () => {
+    let quotations = [];
+    let pendingCount = 0;
+
+    if (user) {
         try {
-            const res = await fetch("/api/user/quotations");
-            const response = await res.json();
-            if (!response.success) {
-                throw new Error(response.message || "Failed to fetch quotations");
-            }
-            setQuotations(response.data.quotations || []);
-            setPendingCount(response.data.pendingCount || 0);
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
+            const data = await fetchUserQuotations(user.id);
+            quotations = data.quotations;
+            pendingCount = data.pendingCount;
+        } catch {
+            quotations = [];
+            pendingCount = 0;
         }
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-[50vh] flex items-center justify-center bg-gray-50">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Spinner className="h-6 w-6" />
-                    <span className="text-sm">{t("loading")}</span>
-                </div>
-            </div>
-        );
     }
 
     return (
@@ -90,12 +73,9 @@ export default function MyQuotationsPage() {
                     <ul className="space-y-3">
                         {quotations.map((quotation) => (
                             <li key={quotation.id}>
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        router.push(`/user/my-quotations/${quotation.id}`)
-                                    }
-                                    className="w-full rounded-xl border border-border/60 bg-white px-4 sm:px-5 py-4 shadow-sm text-left hover:border-primary/40 hover:shadow-md hover:-translate-y-px transition-all group"
+                                <Link
+                                    href={`/user/my-quotations/${quotation.id}`}
+                                    className="w-full rounded-xl border border-border/60 bg-white px-4 sm:px-5 py-4 shadow-sm text-left hover:border-primary/40 hover:shadow-md hover:-translate-y-px transition-all group block"
                                 >
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -133,7 +113,7 @@ export default function MyQuotationsPage() {
                                             <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary hidden sm:block" />
                                         </div>
                                     </div>
-                                </button>
+                                </Link>
                             </li>
                         ))}
                     </ul>

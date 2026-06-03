@@ -27,8 +27,8 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
-import RelatedProductsSection from "@/components/guest/RelatedProductsSection";
+import { RestrictedContentOverlay } from "@/components/guest/Products/RestrictedContentOverlay";
+import RelatedProductsSection from "@/components/guest/Products/RelatedProductsSection";
 import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage() {

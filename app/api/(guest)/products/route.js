@@ -1,6 +1,6 @@
 import { products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { fetchGuestProductsListing } from "@/lib/guest-products-list";
+import { fetchGuestProductsListing } from "@/features/products/guest-products-list";
 import { ilike, or, and, eq, sql, gte, lte, gt, lt, isNotNull } from "drizzle-orm";
 
 /** Numeric brightness from text column (admin stores plain numbers). */

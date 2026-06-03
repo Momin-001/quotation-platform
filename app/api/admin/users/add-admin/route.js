@@ -3,7 +3,7 @@ import { users } from "@/db/schema";
 import { errorResponse, successResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";  
-import { verifySuperAdmin } from "@/lib/auth-helpers";
+import { verifySuperAdmin } from "@/lib/helpers/auth-helpers";
 
 export async function POST(req) {
     try {

@@ -1,19 +1,8 @@
-import { calculateLineNetAfterDiscount, formatCurrency } from "@/lib/helpers";
+import { calculateLineNetAfterDiscount, formatCurrency } from "@/lib/helpers/helpers";
 import Image from "next/image";
 
-/**
- * @param {string|number} [quotationTaxPercentage] - When set, shows note that VAT applies to offer total at this rate (not per line).
- */
-export default function ProductItemDisplay({
-    product,
-    quantity,
-    unitPrice,
-    description,
-    discountPercentage,
-    badge,
-    badgeColor,
-    quotationTaxPercentage,
-}) {
+
+export default function ProductItemDisplay({product, quantity, unitPrice, description, discountPercentage, badge, badgeColor}) {
     const lineNet = calculateLineNetAfterDiscount(unitPrice, quantity, discountPercentage);
 
     const qtyLabel = product?.isCustom ? "Cabinets:" : "Qty:";

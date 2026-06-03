@@ -1,5 +1,5 @@
 import { getMessages, getTranslations } from "next-intl/server";
-import { LegalPageLayout, renderLegalSections } from "@/components/guest/LegalPageLayout";
+import { LegalPageLayout, renderLegalSections } from "@/components/guest/LegalPages/LegalPageLayout";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
 export async function generateMetadata({ params }) {

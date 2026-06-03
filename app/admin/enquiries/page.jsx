@@ -22,7 +22,7 @@ import {
 import { Search, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { formatDate } from "@/lib/helpers";
+import { formatDate } from "@/lib/helpers/helpers";
 
 export default function AdminEnquiriesPage() {
     const [enquiries, setEnquiries] = useState([]);

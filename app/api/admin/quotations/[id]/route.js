@@ -13,7 +13,7 @@ import {
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne, or } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 
 const allowedEnquiryStatuses = ["pending", "in_progress", "expired"];
 async function getProductImage(productId) {

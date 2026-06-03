@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { formatRole } from "@/lib/helpers";
+import { formatRole } from "@/lib/helpers/helpers";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,

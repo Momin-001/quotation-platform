@@ -1,4 +1,4 @@
-import BecomePartnerSubmitForm from "@/components/guest/BecomePartnerSubmitForm";
+import BecomePartnerSubmitForm from "@/components/guest/BecomePartner/Form/BecomePartnerSubmitForm";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
 export async function generateMetadata({ params }) {

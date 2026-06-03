@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { enquiryFiles } from "@/db/schema";
 import { errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import cloudinary from "@/lib/cloudinary";
 
 export async function GET(req, { params }) {

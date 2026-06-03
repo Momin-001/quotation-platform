@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useRouter } from "@/i18n/navigation";
-import SchemaScript from "@/components/SchemaScript";
+import SchemaScript from "@/components/guest/SchemaScript";
 import { BASE_URL } from "@/lib/constants";
 
 import { useAuth } from "@/context/AuthContext";
@@ -57,7 +57,7 @@ import {
     SERVICE_ACCESS_OPTIONS,
     SIGNAL_SOURCE_OPTIONS,
     mapLeditorOptions,
-} from "@/lib/leditor/form-options";
+} from "@/features/leditor/form-options";
 
 const leditorAccordionPanel =
     "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";

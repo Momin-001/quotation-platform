@@ -1,4 +1,4 @@
-import { getOrCreateProductFilterBounds, serializeProductFilterBounds } from "@/lib/product-filter-bounds";
+import { getOrCreateProductFilterBounds, serializeProductFilterBounds } from "@/features/products/product-filter-bounds";
 import { successResponse, errorResponse } from "@/lib/api-response";
 
 export async function GET() {

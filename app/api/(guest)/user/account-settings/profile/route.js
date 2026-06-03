@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { eq, and, ne } from "drizzle-orm";
 
 export async function GET() {

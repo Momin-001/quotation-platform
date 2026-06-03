@@ -8,9 +8,9 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileText, ArrowLeft, ChevronDown, ChevronUp, Save } from "lucide-react";
 import Link from "next/link";
-import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers";
+import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers/helpers";
 import AdminQuotationChat from "@/components/admin/Quotation/AdminQuotationChat";
-import ProductItemDisplay from "@/components/common/ProductItemDisplay";
+import ProductItemDisplay from "@/components/common/Quotation/ProductItemDisplay";
 import { useAuth } from "@/context/AuthContext";
 const RichTextEditor = lazy(() => import("@/components/admin/RichTextEditor"));
 

@@ -9,7 +9,7 @@ import {
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc, ilike, or, and, sql } from "drizzle-orm";
-import { getOrCreateSectionDefaults } from "@/lib/quotation-section-defaults";
+import { getOrCreateSectionDefaults } from "@/features/quotations/quotation-section-defaults";
 // Helper function to generate quotation number
 function generateQuotationNumber() {
     const year = new Date().getFullYear();

@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers";
-import ProductItemDisplay from "@/components/common/ProductItemDisplay";
+import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers/helpers";
+import ProductItemDisplay from "@/components/common/Quotation/ProductItemDisplay";
 
 function mainLineQuantity(product, quantity) {
     return product?.isCustom ? product?.customTotalCabinets : quantity;

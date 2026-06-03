@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { productFilterBounds } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { getOrCreateProductFilterBounds, serializeProductFilterBounds } from "@/lib/product-filter-bounds";
+import { getOrCreateProductFilterBounds, serializeProductFilterBounds } from "@/features/products/product-filter-bounds";
 
 export async function GET() {
     try {

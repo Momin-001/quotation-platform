@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, enquiryFiles, quotations, products } from "@/db/schema";
+import { enquiries, enquiryItems, enquiryFiles } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq, desc, and, ne } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { eq } from "drizzle-orm";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import cloudinary from "@/lib/cloudinary";
 
 // Shared endpoint for both cart and LEDitor enquiries.
@@ -120,51 +120,3 @@ export async function POST(req) {
     }
 }
 
-export async function GET(req) {
-    try {
-        const { user, error } = await getCurrentUser();
-        if (error) {
-            return errorResponse(error, 401);
-        }
-        const { searchParams } = new URL(req.url);
-        const status = searchParams.get("status");
-
-        let whereConditions = eq(enquiries.userId, user.id);
-
-        if (status) {
-            whereConditions = and(whereConditions, eq(enquiries.status, status));
-        }
-
-        const userEnquiries = await db.query.enquiries.findMany({
-            where: whereConditions,
-            orderBy: desc(enquiries.createdAt),
-            with: {
-                quotations: {
-                    where: ne(quotations.status, "draft"),
-                    columns: {
-                        id: true,
-                        quotationNumber: true,
-                    },
-                },
-                items: {
-                    columns: {
-                        isCustom: true,
-                    },
-                    with: {
-                        product: {
-                            columns: {
-                                productName: true,
-                                productNumber: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        return successResponse("Enquiries fetched successfully", userEnquiries);
-    } catch (error) {
-        console.error("GET /api/user/enquiries error:", error);
-        return errorResponse("Failed to fetch enquiries", 500);
-    }
-}

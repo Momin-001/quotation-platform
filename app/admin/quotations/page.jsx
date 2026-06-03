@@ -22,7 +22,7 @@ import {
 import { Search, Filter, Eye, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { getStatusLabel, getQuotationStatusColor, formatDate } from "@/lib/helpers";
+import { getStatusLabel, getQuotationStatusColor, formatDate } from "@/lib/helpers/helpers";
 
 export default function AdminQuotationsPage() {
     const [quotations, setQuotations] = useState([]);

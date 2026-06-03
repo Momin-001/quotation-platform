@@ -6,7 +6,7 @@ import { useState } from "react";
 import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import UserAvatar from "@/components/common/UserAvatar";
+import UserAvatar from "@/components/UserAvatar";
 import {
     Sheet,
     SheetContent,

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { eq, ilike } from "drizzle-orm";
 import * as XLSX from "xlsx";
 

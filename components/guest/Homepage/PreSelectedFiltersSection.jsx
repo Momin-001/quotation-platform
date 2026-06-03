@@ -13,7 +13,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useLocale } from "next-intl";
-import { categoryToShowcaseCard } from "@/lib/category-helpers";
+import { categoryToShowcaseCard } from "@/lib/helpers/category-helpers";
 import { cmsField } from "@/lib/i18n/cms";
 
 function CategoryCard({ card, presetLabel, categoryId }) {

@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { errorResponse } from "@/lib/api-response";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { desc, eq } from "drizzle-orm";
 
 function formatExportRow(user) {

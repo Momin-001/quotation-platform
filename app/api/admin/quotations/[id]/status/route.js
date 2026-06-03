@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { quotations, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 
 // Valid statuses
 const validStatuses = ["draft", "pending", "accepted", "rejected", "revision_requested", "expired", "completed"];

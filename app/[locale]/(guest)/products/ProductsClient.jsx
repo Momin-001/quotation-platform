@@ -25,9 +25,9 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
-import { RestrictedContentOverlay } from "@/components/guest/RestrictedContentOverlay";
-import ProductCard from "@/components/guest/ProductCard";
-import { ProductsRangeFilter } from "@/components/guest/ProductsRangeFilter";
+import { RestrictedContentOverlay } from "@/components/guest/Products/RestrictedContentOverlay";
+import ProductCard from "@/components/guest/Products/ProductCard";
+import { ProductsRangeFilter } from "@/components/guest/Products/ProductsRangeFilter";
 import { Label } from "@/components/ui/label";
 
 const FALLBACK_FILTER_BOUNDS = {

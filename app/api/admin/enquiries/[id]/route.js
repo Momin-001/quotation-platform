@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { enquiries, enquiryItems, enquiryFiles, users, products, productImages, quotations, controllers } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
 function formatEnquiryId(enquiryId, createdAt) {

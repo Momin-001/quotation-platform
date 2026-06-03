@@ -1,5 +1,5 @@
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { fetchGuestControllersListing } from "@/lib/guest-controllers-list";
+import { fetchGuestControllersListing } from "@/features/controllers/guest-controllers-list";
 
 export async function GET(req) {
     try {

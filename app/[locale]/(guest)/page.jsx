@@ -5,9 +5,9 @@ import PreSelectedFiltersSection from "@/components/guest/Homepage/PreSelectedFi
 import FAQSection from "@/components/guest/Homepage/FAQSection";
 import PartnersSection from "@/components/guest/Homepage/PartnersSection";
 import MarketingPartnersSection from "@/components/guest/Homepage/MarketingPartnersSection";
-import BlogsSection from "@/components/guest/BlogsSection";
-import { getGuestHomeData } from "@/lib/guest-cms-data";
-import SchemaScript from "@/components/SchemaScript";
+import BlogsSection from "@/components/guest/Blogs/BlogsSection";
+import { getGuestHomeData } from "@/features/cms/guest-cms-data";
+import SchemaScript from "@/components/guest/SchemaScript";
 import { cmsField } from "@/lib/i18n/cms";
 import { BASE_URL } from "@/lib/constants";
 import {

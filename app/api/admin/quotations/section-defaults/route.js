@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { quotationSectionDefaults } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { getOrCreateSectionDefaults } from "@/lib/quotation-section-defaults";
+import { getOrCreateSectionDefaults } from "@/features/quotations/quotation-section-defaults";
 import { eq } from "drizzle-orm";
 
 export async function GET() {

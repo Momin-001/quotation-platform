@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { quotations, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, and, desc, ne } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 
 // Valid status transitions for user actions
 const validActions = {

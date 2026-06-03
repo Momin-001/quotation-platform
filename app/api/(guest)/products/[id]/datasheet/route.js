@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { products } from "@/db/schema";
 import { errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { generateProductDatasheetReactPDF } from "@/lib/product-datasheet-react-pdf";
+import { generateProductDatasheetReactPDF } from "@/features/products/product-datasheet-react-pdf";
 import { readFile } from "fs/promises";
 import path from "path";
 

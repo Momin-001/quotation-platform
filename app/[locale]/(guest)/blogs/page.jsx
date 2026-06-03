@@ -1,12 +1,10 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { desc } from "drizzle-orm";
 import { Newspaper } from "lucide-react";
 
 import BreadCrumb from "@/components/user/BreadCrumb";
-import { db } from "@/lib/db";
-import { blogs } from "@/db/schema";
+import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { cn } from "@/lib/utils";
 
@@ -70,15 +68,7 @@ export default async function BlogsPage({ params }) {
 
     let blogList = [];
     try {
-        blogList = await db
-            .select({
-                id: blogs.id,
-                title: blogs.title,
-                mainImageUrl: blogs.mainImageUrl,
-                createdAt: blogs.createdAt,
-            })
-            .from(blogs)
-            .orderBy(desc(blogs.createdAt));
+        blogList = await fetchGuestBlogsListing();
     } catch (error) {
         console.error("Blogs page fetch error:", error);
     }

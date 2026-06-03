@@ -19,13 +19,13 @@ import {
     DEFAULT_OFFER_HTML,
     DEFAULT_CONDITIONS_HTML,
     DEFAULT_OPTIONS_HTML,
-} from "@/lib/quotation-section-defaults";
+} from "@/features/quotations/quotation-section-defaults";
 import {
     formatCurrency,
     calculateLineNetAfterDiscount,
     calculateOfferTotalWithQuotationTax,
     collectOfferLinesFromQuotationItem,
-} from "@/lib/helpers";
+} from "@/lib/helpers/helpers";
 import fs from "fs";
 import path from "path";
 

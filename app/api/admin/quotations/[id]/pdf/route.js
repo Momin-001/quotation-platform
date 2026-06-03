@@ -1,7 +1,7 @@
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { errorResponse } from "@/lib/api-response";
-import { getQuotationDataForPDF } from "@/lib/get-quotation-pdf-data";
-import { generateQuotationReactPDF } from "@/lib/quotation-react-pdf";
+import { getQuotationDataForPDF } from "@/features/quotations/get-quotation-pdf-data";
+import { generateQuotationReactPDF } from "@/features/quotations/quotation-react-pdf";
 
 export async function GET(req, { params }) {
     try {

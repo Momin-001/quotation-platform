@@ -1,8 +1,8 @@
-import SchemaScript from "@/components/SchemaScript";
+import SchemaScript from "@/components/guest/SchemaScript";
 import ProductsClient from "./ProductsClient";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { BASE_URL } from "@/lib/constants";
-import { fetchGuestProductsListing } from "@/lib/guest-products-list";
+import { fetchGuestProductsListing } from "@/features/products/guest-products-list";
 
 const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
 const INITIAL_PAGE_SIZE = 10;

@@ -13,7 +13,7 @@ import {
 } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 
 // Helper to get first product image
 async function getProductImage(productId) {

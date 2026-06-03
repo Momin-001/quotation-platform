@@ -1,6 +1,6 @@
 import ControllersClient from "./ControllersClient";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
-import { fetchGuestControllersListing } from "@/lib/guest-controllers-list";
+import { fetchGuestControllersListing } from "@/features/controllers/guest-controllers-list";
 
 const INITIAL_PAGE_SIZE = 10;
 

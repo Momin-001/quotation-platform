@@ -1,4 +1,4 @@
-import ContactForm from "@/components/guest/ContactForm";
+import ContactForm from "@/components/guest/ContactUs/Form/ContactForm";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
 export async function generateMetadata({ params }) {

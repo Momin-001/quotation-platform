@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import SchemaScript from "@/components/SchemaScript";
+import SchemaScript from "@/components/guest/SchemaScript";
 import { BASE_URL } from "@/lib/constants";
 import {
     Breadcrumb,

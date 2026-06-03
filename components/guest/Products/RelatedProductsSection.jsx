@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductCard from "@/components/guest/ProductCard";
+import ProductCard from "@/components/guest/Products/ProductCard";
 
 import { useTranslations } from "next-intl";
 

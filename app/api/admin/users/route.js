@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, ilike, or, ne, and } from "drizzle-orm";
-import { verifySuperAdmin } from "@/lib/auth-helpers";
+import { verifySuperAdmin } from "@/lib/helpers/auth-helpers";
 
 export async function GET(req) {
     try {

@@ -10,7 +10,7 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import ControllerCard from "@/components/guest/ControllerCard";
+import ControllerCard from "@/components/guest/Controllers/ControllerCard";
 
 const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"];
 

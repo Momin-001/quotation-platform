@@ -1,7 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { asc, desc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { navbar, footer, homepage, partners, faqs, blogs } from "@/db/schema";
+import { navbar, footer, homepage, partners, faqs } from "@/db/schema";
+import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 
 const REVALIDATE_SECONDS = 900;
 
@@ -82,22 +83,7 @@ async function fetchFaqsRows(limit) {
 }
 
 async function fetchBlogsRows(limit) {
-    let query = db
-        .select({
-            id: blogs.id,
-            title: blogs.title,
-            authorName: blogs.authorName,
-            mainImageUrl: blogs.mainImageUrl,
-            createdAt: blogs.createdAt,
-        })
-        .from(blogs)
-        .orderBy(desc(blogs.createdAt));
-
-    if (limit && limit > 0) {
-        query = query.limit(limit);
-    }
-
-    return query;
+    return fetchGuestBlogsListing({ limit: limit && limit > 0 ? limit : 0 });
 }
 
 const getCachedNavbarRow = unstable_cache(fetchNavbarRow, ["guest-navbar"], {

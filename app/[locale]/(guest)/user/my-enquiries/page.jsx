@@ -1,23 +1,21 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import BreadCrumb from "@/components/user/BreadCrumb";
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import BreadCrumb from "@/components/user/BreadCrumb";
-import { toast } from "sonner";
 import {
     formatEnquiryNumber,
     formatDate,
     getStatusLabel,
     getEnquiryStatusColor,
-} from "@/lib/helpers";
-import { Link, useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+} from "@/lib/helpers/helpers";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { fetchUserEnquiries } from "@/features/enquiries/user-enquiries";
 import { cn } from "@/lib/utils";
 import { ChevronRight, FileText, Inbox } from "lucide-react";
 
@@ -27,53 +25,41 @@ const enquiryAccordionTrigger =
     "hover:no-underline hover:bg-muted/20 px-4 sm:px-5 py-4 text-foreground data-[state=open]:bg-muted/10";
 const enquiryAccordionContent = "px-4 sm:px-5 pb-4 pt-0 border-t border-border/40 bg-muted/10";
 
-export default function MyEnquiriesPage() {
-    const t = useTranslations("User.enquiries");
-    const [enquiries, setEnquiries] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const router = useRouter();
-
-    useEffect(() => {
-        fetchEnquiries();
-    }, []);
-
-    const fetchEnquiries = async () => {
-        try {
-            const res = await fetch("/api/user/enquiries");
-            const response = await res.json();
-            if (!response.success) {
-                throw new Error(response.message || "Failed to fetch enquiries");
-            }
-            setEnquiries(response.data);
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const activeEnquiries = enquiries.filter(
-        (enquiry) => enquiry.status === "pending" || enquiry.status === "in_progress"
-    );
-
-    const getEnquiryTitle = (enquiry) => {
-        const first = enquiry.items?.[0];
-        if (first?.isCustom) {
-            return t("customLedSolution");
-        }
-        return first?.product?.productName || t("productEnquiry");
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-[50vh] flex items-center justify-center bg-gray-50">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Spinner className="h-6 w-6" />
-                    <span className="text-sm">{t("loading")}</span>
-                </div>
-            </div>
-        );
+function getEnquiryTitle(enquiry, t) {
+    const first = enquiry.items?.[0];
+    if (first?.isCustom) {
+        return t("customLedSolution");
     }
+    return first?.product?.productName || t("productEnquiry");
+}
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/user/my-enquiries", validateLocale(locale));
+}
+
+export default async function MyEnquiriesPage() {
+    const t = await getTranslations("User.enquiries");
+    const { user } = await getCurrentUser();
+
+    let enquiries = [];
+    if (user) {
+        try {
+            enquiries = await fetchUserEnquiries(user.id);
+        } catch {
+            enquiries = [];
+        }
+    }
+
+    const activeEnquiries = enquiries
+        .filter(
+            (enquiry) => enquiry.status === "pending" || enquiry.status === "in_progress"
+        )
+        .map((enquiry) => ({
+            ...enquiry,
+            title: getEnquiryTitle(enquiry, t),
+            hasCustomItems: enquiry.items?.some((item) => item.isCustom) ?? false,
+        }));
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -126,15 +112,15 @@ export default function MyEnquiriesPage() {
                                 collapsible
                                 className={enquiryAccordionPanel}
                             >
-                                <AccordionItem value={enquiry.id} className="border-0">
+                                <AccordionItem value={String(enquiry.id)} className="border-0">
                                     <AccordionTrigger className={enquiryAccordionTrigger}>
                                         <div className="flex flex-1 items-start justify-between gap-4 min-w-0 text-left">
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-2 mb-1">
                                                     <h2 className="text-base sm:text-lg font-semibold text-foreground leading-snug truncate">
-                                                        {getEnquiryTitle(enquiry)}
+                                                        {enquiry.title}
                                                     </h2>
-                                                    {enquiry.items?.some((item) => item.isCustom) && (
+                                                    {enquiry.hasCustomItems && (
                                                         <span className="inline-flex text-[10px] sm:text-xs font-semibold uppercase tracking-wide bg-secondary text-primary-foreground px-2 py-0.5 rounded-md shrink-0">
                                                             {t("custom")}
                                                         </span>
@@ -163,17 +149,12 @@ export default function MyEnquiriesPage() {
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className={enquiryAccordionContent}>
-                                        {enquiry.quotations && enquiry.quotations.length > 0 ? (
+                                        {enquiry.quotations?.length > 0 ? (
                                             <ul className="space-y-2 pt-3">
                                                 {enquiry.quotations.map((quotation) => (
                                                     <li key={quotation.id}>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                router.push(
-                                                                    `/user/my-quotations/${quotation.id}`
-                                                                )
-                                                            }
+                                                        <Link
+                                                            href={`/user/my-quotations/${quotation.id}`}
                                                             className="w-full flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-white px-4 py-3 text-left shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-colors group"
                                                         >
                                                             <div className="flex items-center gap-3 min-w-0">
@@ -190,7 +171,7 @@ export default function MyEnquiriesPage() {
                                                                 </div>
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary shrink-0" />
-                                                        </button>
+                                                        </Link>
                                                     </li>
                                                 ))}
                                             </ul>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { cmsField } from "@/lib/i18n/cms";
-import UserAvatar from "@/components/common/UserAvatar";
+import UserAvatar from "@/components/UserAvatar";
 import {
     DropdownMenu,
     DropdownMenuContent,

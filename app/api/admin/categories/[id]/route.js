@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { parseCategoryFeatures } from "@/lib/category-helpers";
+import { parseCategoryFeatures } from "@/lib/helpers/category-helpers";
 import { eq } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
 

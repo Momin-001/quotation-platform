@@ -2,11 +2,11 @@ import { db } from "@/lib/db";
 import { quotations, quotationMessages, enquiries } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import {
     emitToQuotationRoom,
     buildNewMessagePayload,
-} from "@/lib/socket-emit";
+} from "@/features/socket/socket-emit";
 
 // Helper function to check if chat is disabled
 // Chat is disabled when:
