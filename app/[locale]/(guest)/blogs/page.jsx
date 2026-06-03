@@ -1,17 +1,21 @@
-"use client";
-
 import { Link } from "@/i18n/navigation";
-import { useEffect, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import BreadCrumb from "@/components/user/BreadCrumb";
-import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
+import { desc } from "drizzle-orm";
 import { Newspaper } from "lucide-react";
 
-function BlogCard({ blog, locale }) {
-    const t = useTranslations("Blogs");
+import BreadCrumb from "@/components/user/BreadCrumb";
+import { db } from "@/lib/db";
+import { blogs } from "@/db/schema";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
+import { cn } from "@/lib/utils";
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/blogs", validateLocale(locale));
+}
+
+function BlogCard({ blog, locale, labels }) {
     const date = new Date(blog.createdAt);
     const month = date.toLocaleString(locale, { month: "short" }).toUpperCase();
     const day = date.getDate();
@@ -35,7 +39,7 @@ function BlogCard({ blog, locale }) {
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground/60">
-                            <span className="text-xs font-medium">{t("noImage")}</span>
+                            <span className="text-xs font-medium">{labels.noImage}</span>
                         </div>
                     )}
                     <div className="absolute top-3 left-3 bg-secondary text-primary-foreground rounded-md px-3 py-1.5 text-center leading-tight min-w-[52px] shadow-sm">
@@ -50,7 +54,7 @@ function BlogCard({ blog, locale }) {
                         {blog.title}
                     </h2>
                     <span className="mt-3 text-sm font-medium text-primary group-hover:text-primary/80 shrink-0">
-                        {t("readMore")}
+                        {labels.readMore}
                     </span>
                 </div>
             </article>
@@ -58,28 +62,31 @@ function BlogCard({ blog, locale }) {
     );
 }
 
-export default function BlogsPage() {
-    const locale = useLocale();
-    const t = useTranslations("Blogs");
-    const tCommon = useTranslations("Common");
-    const [blogs, setBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default async function BlogsPage({ params }) {
+    const { locale } = await params;
+    const resolvedLocale = validateLocale(locale);
+    const t = await getTranslations("Blogs");
+    const tCommon = await getTranslations("Common");
 
-    useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                const res = await fetch("/api/blogs");
-                const response = await res.json();
-                if (!response.success) throw new Error(response.message);
-                setBlogs(response.data);
-            } catch (error) {
-                toast.error(error.message || t("fetchFailed"));
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchBlogs();
-    }, [t]);
+    let blogList = [];
+    try {
+        blogList = await db
+            .select({
+                id: blogs.id,
+                title: blogs.title,
+                mainImageUrl: blogs.mainImageUrl,
+                createdAt: blogs.createdAt,
+            })
+            .from(blogs)
+            .orderBy(desc(blogs.createdAt));
+    } catch (error) {
+        console.error("Blogs page fetch error:", error);
+    }
+
+    const labels = {
+        noImage: t("noImage"),
+        readMore: t("readMore"),
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -92,15 +99,15 @@ export default function BlogsPage() {
             />
             <main className="flex-1">
                 <div className="container mx-auto px-4 lg:px-6 py-6 sm:py-10 lg:py-12">
-                    {loading ? (
-                        <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground">
-                            <Spinner className="h-6 w-6" />
-                            <span className="text-sm">{t("loading")}</span>
-                        </div>
-                    ) : blogs.length > 0 ? (
+                    {blogList.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-                            {blogs.map((blog) => (
-                                <BlogCard key={blog.id} blog={blog} locale={locale} />
+                            {blogList.map((blog) => (
+                                <BlogCard
+                                    key={blog.id}
+                                    blog={blog}
+                                    locale={resolvedLocale}
+                                    labels={labels}
+                                />
                             ))}
                         </div>
                     ) : (

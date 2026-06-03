@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
-import { products, productImages, productCertificates, certificates, categories } from "@/db/schema";
+import { products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { desc, ilike, or, and, eq, sql, gte, lte, gt, lt, isNotNull } from "drizzle-orm";
+import { fetchGuestProductsListing } from "@/lib/guest-products-list";
+import { ilike, or, and, eq, sql, gte, lte, gt, lt, isNotNull } from "drizzle-orm";
 
 /** Numeric brightness from text column (admin stores plain numbers). */
 function brightnessNumericSql() {
@@ -302,51 +302,11 @@ export async function GET(req) {
         // Build final where clause
         const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-        // Fetch products with images, certificates, and category
-        const allProducts = await db.query.products.findMany({
-            where: whereClause,
-            orderBy: desc(products.createdAt),
-            limit: limit,
-            offset: offset,
-            columns: {
-                id: true,
-                productName: true,
-                productNumber: true,
-            },
-            with: {
-                areaOfUse: {
-                    columns: {
-                        name: true,
-                    },
-                },
-                images: {
-                    columns: {
-                        imageUrl: true,
-                    },
-                },
-                productCertificates: {
-                    columns: {},
-                    with: {
-                        certificate: {
-                            columns: {
-                                id: true,
-                                name: true,
-                                imageUrl: true,
-                            },
-                        },
-                    },
-                },
-                
-            },
+        const formattedProducts = await fetchGuestProductsListing({
+            limit,
+            offset,
+            whereClause,
         });
-        
-
-        const formattedProducts = allProducts.flatMap((product) => ({
-            ...product,
-            areaOfUse: product.areaOfUse.name,
-            images: product.images.flatMap((image) => image.imageUrl),
-            productCertificates: product.productCertificates.flatMap((certificate) => certificate.certificate),
-        }));
         return successResponse("Products fetched successfully", formattedProducts);
     } catch (error) {
         console.error("GET /api/products error:", error);

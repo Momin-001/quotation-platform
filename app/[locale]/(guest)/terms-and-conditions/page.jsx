@@ -1,22 +1,16 @@
-"use client";
+import { getMessages, getTranslations } from "next-intl/server";
+import { LegalPageLayout, renderLegalSections } from "@/components/guest/LegalPageLayout";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
-import { useMessages, useTranslations } from "next-intl";
-import {
-    LegalPageLayout,
-    renderLegalSections,
-    slugifySectionId,
-} from "@/components/guest/LegalPageLayout";
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/terms-and-conditions", validateLocale(locale));
+}
 
-export default function TermsAndConditionsPage() {
-    const { LegalPages } = useMessages();
-    const tCommon = useTranslations("Common");
-    const copy = LegalPages.terms;
-
-    const tocSections = copy.sections.map((section, index) => ({
-        ...section,
-        id: slugifySectionId(section.title, index),
-        tocLabel: section.title.match(/~\s*\d+/)?.[0] || `~ ${index + 1}`,
-    }));
+export default async function TermsAndConditionsPage() {
+    const messages = await getMessages();
+    const tCommon = await getTranslations("Common");
+    const copy = messages.LegalPages?.terms;
 
     return (
         <LegalPageLayout
@@ -27,10 +21,8 @@ export default function TermsAndConditionsPage() {
             ]}
             documentTitle={copy.heading}
             documentSubtitle={copy.subheading}
-            showToc
-            sections={tocSections}
         >
-            {renderLegalSections(tocSections)}
+            {renderLegalSections(copy.sections)}
         </LegalPageLayout>
     );
 }

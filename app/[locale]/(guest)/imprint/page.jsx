@@ -1,15 +1,16 @@
-"use client";
+import { getMessages, getTranslations } from "next-intl/server";
+import { LegalPageLayout, renderLegalSections } from "@/components/guest/LegalPageLayout";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
-import { useMessages, useTranslations } from "next-intl";
-import {
-    LegalPageLayout,
-    renderLegalSections,
-} from "@/components/guest/LegalPageLayout";
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/imprint", validateLocale(locale));
+}
 
-export default function ImprintPage() {
-    const { LegalPages } = useMessages();
-    const tCommon = useTranslations("Common");
-    const copy = LegalPages.imprint;
+export default async function ImprintPage() {
+    const messages = await getMessages();
+    const tCommon = await getTranslations("Common");
+    const copy = messages.LegalPages?.imprint;
 
     return (
         <LegalPageLayout

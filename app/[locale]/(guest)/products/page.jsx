@@ -1,15 +1,20 @@
 import SchemaScript from "@/components/SchemaScript";
 import ProductsClient from "./ProductsClient";
+import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { BASE_URL } from "@/lib/constants";
-import { db } from "@/lib/db";
-import { products } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { fetchGuestProductsListing } from "@/lib/guest-products-list";
 
 const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+const INITIAL_PAGE_SIZE = 10;
 
 function withLocalePrefix(locale, path) {
     if (locale === "en") return path === "/" ? "/en" : `/en${path}`;
     return path;
+}
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageAlternates("/products", validateLocale(locale));
 }
 
 export default async function ProductsPage({ params }) {
@@ -19,20 +24,15 @@ export default async function ProductsPage({ params }) {
 
     let initialProducts = [];
     try {
-        initialProducts = await db
-            .select({
-                id: products.id,
-                productName: products.productName,
-                productDescription: products.productDescription,
-                oemBrand: products.oemBrand,
-            })
-            .from(products)
-            .where(eq(products.isActive, true))
-            .orderBy(desc(products.createdAt))
-            .limit(10);
+        initialProducts = await fetchGuestProductsListing({
+            limit: INITIAL_PAGE_SIZE,
+            offset: 0,
+        });
     } catch {
         initialProducts = [];
     }
+
+    const initialHasMore = initialProducts.length === INITIAL_PAGE_SIZE;
 
     const itemListSchema = {
         "@context": "https://schema.org",
@@ -65,7 +65,10 @@ export default async function ProductsPage({ params }) {
     return (
         <>
             <SchemaScript data={itemListSchema} />
-            <ProductsClient />
+            <ProductsClient
+                initialProducts={initialProducts}
+                initialHasMore={initialHasMore}
+            />
         </>
     );
 }

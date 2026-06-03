@@ -1,9 +1,5 @@
-"use client";
-
-import { Link } from "@/i18n/navigation";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
 
 function slugifySectionId(title, index) {
     const paraMatch = title.match(/§\s*(\d+)/);
@@ -73,49 +69,12 @@ export function LegalSection({ id, title, children, className }) {
     );
 }
 
-export function LegalTableOfContents({ sections }) {
-    const t = useTranslations("Legal");
-
-    if (!sections?.length) return null;
-
-    return (
-        <nav
-            aria-label={t("tableOfContentsAria")}
-            className="rounded-xl border border-border/60 bg-muted/25 p-4 sm:p-5 mb-8"
-        >
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                {t("contents")}
-            </p>
-            <ol className="grid grid-cols-4 sm:grid-cols-6 gap-x-6 gap-y-2 text-sm">
-                {sections.map((section, index) => {
-                    const id = section.id || slugifySectionId(section.title, index);
-                    const label =
-                        section.tocLabel ||
-                        section.title.replace(/\s+/g, " ").trim().slice(0, 80);
-                    return (
-                        <li key={id}>
-                            <a
-                                href={`#${id}`}
-                                className="text-primary hover:text-primary/80 hover:underline underline-offset-2 leading-snug"
-                            >
-                                {label}
-                            </a>
-                        </li>
-                    );
-                })}
-            </ol>
-        </nav>
-    );
-}
-
 export function LegalPageLayout({
     breadcrumbTitle,
     breadcrumbs,
     documentTitle,
     documentSubtitle,
     intro,
-    showToc = false,
-    sections = [],
     children,
 }) {
     return (
@@ -140,12 +99,7 @@ export function LegalPageLayout({
                             ) : null}
                         </header>
 
-                        <div className="px-5 sm:px-8 md:px-10 py-6 sm:py-8 md:py-10">
-                            {showToc && sections.length > 0 ? (
-                                <LegalTableOfContents sections={sections} />
-                            ) : null}
-                            {children}
-                        </div>
+                        <div className="px-5 sm:px-8 md:px-10 py-6 sm:py-8 md:py-10">{children}</div>
                     </div>
                 </article>
             </main>
@@ -158,7 +112,7 @@ export function renderLegalSections(sections) {
         const id = section.id || slugifySectionId(section.title, index);
 
         return (
-            <LegalSection key={id} id={id} title={section.title} index={index}>
+            <LegalSection key={id} id={id} title={section.title}>
                 {section.paragraphs?.map((p, idx) => (
                     <LegalParagraph key={idx}>{p}</LegalParagraph>
                 ))}
@@ -178,14 +132,14 @@ export function renderLegalSections(sections) {
 
                 {section.link ? (
                     <div className="space-y-3">
-                        <Link
+                        <a
                             href={section.link.href}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex text-sm md:text-[15px] font-medium text-primary hover:text-primary/80 break-all underline underline-offset-2"
                         >
                             {section.link.label}
-                        </Link>
+                        </a>
                         {section.afterLink?.map((p, idx) => (
                             <LegalParagraph key={idx}>{p}</LegalParagraph>
                         ))}
@@ -195,5 +149,3 @@ export function renderLegalSections(sections) {
         );
     });
 }
-
-export { slugifySectionId };

@@ -425,18 +425,36 @@ function FiltersAccordion({
     );
 }
 
-function ProductsPageContent() {
+function isDefaultListingQuery(query) {
+    if (!query) return true;
+    const params = new URLSearchParams(query);
+    if (params.get("page") !== "1") return false;
+    if (params.get("limit") !== "10") return false;
+    for (const [key] of params.entries()) {
+        if (key !== "page" && key !== "limit") return false;
+    }
+    return true;
+}
+
+function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
     const searchParams = useSearchParams();
     const urlCategoryAppliedRef = useRef(false);
     const lastQueryRef = useRef("");
-    const [products, setProducts] = useState([]);
+    const hasInitialListing =
+        initialProducts.length > 0 && !(searchParams.get("categoryId") || "");
+    const initialListingConsumedRef = useRef(false);
+    const [products, setProducts] = useState(() =>
+        hasInitialListing ? initialProducts : []
+    );
     const t = useTranslations("Products.list");
     const tCommon = useTranslations("Common");
     const { isAuthenticated } = useAuth();
     const [categories, setCategories] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(() =>
+        hasInitialListing ? initialHasMore : true
+    );
     const [search, setSearch] = useState("");
     // Initialize directly from URL to avoid the "All" fetch + second filtered fetch.
     const initialUrlCategoryId = searchParams.get("categoryId") || "";
@@ -707,11 +725,19 @@ function ProductsPageContent() {
     useEffect(() => {
         if (!filterBoundsReady) return;
 
-        // Avoid duplicate fetches when debounced state changes but the actual query stays the same
-        // (e.g. initial range defaults coming from filter bounds).
         const query = buildQueryParams(1);
         if (lastQueryRef.current === query) return;
         lastQueryRef.current = query;
+
+        if (
+            hasInitialListing &&
+            !initialListingConsumedRef.current &&
+            isDefaultListingQuery(query)
+        ) {
+            initialListingConsumedRef.current = true;
+            setPage(1);
+            return;
+        }
 
         setPage(1);
         setProducts([]);
@@ -933,14 +959,14 @@ function ProductsPageContent() {
                     </aside>
 
                     <div className="flex-1 min-w-0">
-                        {!filterBoundsReady ? (
+                        {!filterBoundsReady && products.length === 0 ? (
                             <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/60 bg-muted/20">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Spinner className="h-5 w-5" />
                                     <span className="text-sm">{t("loading")}</span>
                                 </div>
                             </div>
-                        ) : loading && products.length === 0 ? (
+                        ) : filterBoundsReady && loading && products.length === 0 ? (
                             <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-border/60 bg-muted/20">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Spinner className="h-5 w-5" />
@@ -989,7 +1015,10 @@ function ProductsPageContent() {
     );
 }
 
-export default function ProductsClient() {
+export default function ProductsClient({
+    initialProducts = [],
+    initialHasMore = false,
+}) {
     return (
         <Suspense
             fallback={
@@ -998,7 +1027,10 @@ export default function ProductsClient() {
                 </div>
             }
         >
-            <ProductsPageContent />
+            <ProductsPageContent
+                initialProducts={initialProducts}
+                initialHasMore={initialHasMore}
+            />
         </Suspense>
     );
 }
