@@ -1,7 +1,8 @@
 import BecomePartnerHeroSection from "@/components/guest/BecomePartner/BecomePartnerHeroSection";
+import BecomePartnerNetworkBar from "@/components/guest/BecomePartner/BecomePartnerNetworkBar";
 import BecomePartnerValueBlocksSection from "@/components/guest/BecomePartner/BecomePartnerValueBlocksSection";
 import BecomePartnerOpportunitiesSection from "@/components/guest/BecomePartner/BecomePartnerOpportunitiesSection";
-import BecomePartnerHowToSection from "@/components/guest/BecomePartner/BecomePartnerHowToSection";
+import BecomePartnerInquirySection from "@/components/guest/BecomePartner/BecomePartnerInquirySection";
 import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 
 export async function generateMetadata({ params }) {
@@ -13,9 +14,10 @@ export default function BecomePartnerPage() {
     return (
         <div className="min-h-screen">
             <BecomePartnerHeroSection />
+            <BecomePartnerNetworkBar />
             <BecomePartnerValueBlocksSection />
             <BecomePartnerOpportunitiesSection />
-            <BecomePartnerHowToSection />
+            <BecomePartnerInquirySection />
         </div>
     );
 }

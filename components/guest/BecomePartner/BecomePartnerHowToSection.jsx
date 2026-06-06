@@ -1,14 +1,10 @@
-"use client";
-
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
 import { ClipboardCheck, FileText, Handshake, TrendingUp } from "lucide-react";
 
 const STEP_ICONS = [FileText, ClipboardCheck, Handshake, TrendingUp];
 
-export default function BecomePartnerHowToSection() {
-    const t = useTranslations("BecomePartner.howTo");
+export default async function BecomePartnerHowToSection() {
+    const t = await getTranslations("BecomePartner.howTo");
     const steps = t.raw("steps");
 
     return (
@@ -51,30 +47,6 @@ export default function BecomePartnerHowToSection() {
                             </div>
                         );
                     })}
-                </div>
-
-                <div className="mt-12 md:mt-16 lg:mt-20 rounded-xl bg-primary/5 border border-primary/10 p-6 md:p-8">
-                    <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary">
-                            <Handshake
-                                className="h-7 w-7 text-primary-foreground"
-                                strokeWidth={1.75}
-                            />
-                        </div>
-
-                        <div className="flex-1 space-y-1 text-center md:text-left">
-                            <h3 className="text-lg md:text-xl font-bold text-foreground leading-snug">
-                                {t("ctaTitle")}
-                            </h3>
-                            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                                {t("ctaSubtitle")}
-                            </p>
-                        </div>
-
-                        <Button asChild size="lg" className="w-full md:w-auto shrink-0">
-                            <Link href="/become-partner/submit">{t("ctaButton")}</Link>
-                        </Button>
-                    </div>
                 </div>
             </div>
         </section>

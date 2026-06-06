@@ -1,14 +1,10 @@
-"use client";
-
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
 import { Monitor, MonitorCog, Network, Store, Tag } from "lucide-react";
 
 const CARD_ICONS = [Network, Tag, MonitorCog, Monitor, Store];
 
-export default function BecomePartnerOpportunitiesSection() {
-    const t = useTranslations("BecomePartner.opportunities");
+export default async function BecomePartnerOpportunitiesSection() {
+    const t = await getTranslations("BecomePartner.opportunities");
     const cards = t.raw("cards");
 
     return (
@@ -23,7 +19,7 @@ export default function BecomePartnerOpportunitiesSection() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 lg:gap-6">
                     {cards.map((card, index) => {
                         const IconComponent = CARD_ICONS[index];
                         return (
@@ -48,16 +44,6 @@ export default function BecomePartnerOpportunitiesSection() {
                             </div>
                         );
                     })}
-                </div>
-
-                <div className="flex justify-center mt-10 md:mt-12 lg:mt-14">
-                    <Button
-                        asChild
-                        size="lg"
-                        className="bg-secondary hover:bg-secondary/90 text-secondary-foreground min-w-[200px]"
-                    >
-                        <Link href="/become-partner/submit">{t("ctaButton")}</Link>
-                    </Button>
                 </div>
             </div>
         </section>

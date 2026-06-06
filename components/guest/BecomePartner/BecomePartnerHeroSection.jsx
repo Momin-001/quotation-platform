@@ -1,12 +1,10 @@
-"use client";
-
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export default function BecomePartnerHeroSection() {
-    const t = useTranslations("BecomePartner.hero");
+export default async function BecomePartnerHeroSection() {
+    const t = await getTranslations("BecomePartner.hero");
 
     return (
         <section className="relative w-full overflow-hidden bg-white">
@@ -31,17 +29,9 @@ export default function BecomePartnerHeroSection() {
                             </p>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                        <div className="pt-2">
                             <Button asChild size="lg" className="w-full sm:w-auto">
-                                <Link href="/become-partner/submit">{t("primaryButton")}</Link>
-                            </Button>
-                            <Button
-                                asChild
-                                size="lg"
-                                variant="outline"
-                                className="w-full sm:w-auto border-secondary text-secondary hover:bg-secondary/5"
-                            >
-                                <Link href="/login">{t("secondaryButton")}</Link>
+                                <Link href="#partner-form-section">{t("primaryButton")}</Link>
                             </Button>
                         </div>
                     </div>

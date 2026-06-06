@@ -16,14 +16,7 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { cn } from "@/lib/utils";
 import { useFooter } from "@/context/FooterContext";
-import {
-    AuthPageShell,
-    AuthField,
-    AuthTextLink,
-    AuthFormFooter,
-    authInputClass,
-    authInputErrorClass,
-} from "@/components/guest/AuthPageShell";
+import { AuthField, authInputClass, authInputErrorClass } from "@/components/guest/AuthPageShell";
 
 export default function BecomePartnerSubmitForm() {
     const t = useTranslations("BecomePartnerSubmit");
@@ -104,17 +97,14 @@ export default function BecomePartnerSubmitForm() {
     };
 
     return (
-        <AuthPageShell
-            breadcrumbTitle={t("breadcrumbTitle")}
-            breadcrumbs={[
-                { label: t("breadcrumbHome"), href: "/" },
-                { label: t("breadcrumbPartner"), href: "/become-partner" },
-                { label: t("breadcrumbApplication") },
-            ]}
-            title={t("title")}
-            description={t("description")}
-            maxWidth="max-w-2xl"
-        >
+        <div className="rounded-xl border border-border/60 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="mb-6 space-y-2">
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground leading-tight tracking-tight">
+                    {t("title")}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t("description")}</p>
+            </div>
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <AuthField
                     label={t("fullName")}
@@ -309,14 +299,7 @@ export default function BecomePartnerSubmitForm() {
                 <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
                     {loading ? t("submitting") : t("submit")}
                 </Button>
-
-                <AuthFormFooter>
-                    {t("backPrefix")}
-                    <AuthTextLink href="/become-partner" className="inline">
-                        {t("backLink")}
-                    </AuthTextLink>
-                </AuthFormFooter>
             </form>
-        </AuthPageShell>
+        </div>
     );
 }

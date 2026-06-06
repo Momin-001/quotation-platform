@@ -1,59 +1,80 @@
 {
   "hero": {
-    "overline": "Become a partner",
-    "title": "ProLEDALL Partner Program",
-    "description": "Join our global network of partners and access exclusive benefits, support, and business opportunities.",
-    "tagline": "Save time, eliminate risks, scale projects.",
-    "primaryButton": "Submit an application",
-    "secondaryButton": "Partner login"
+    "overline": "Partner Program",
+    "title": "Setting new standards in the LED display market together.",
+    "description": "Maximize your project success with German engineering, curated LED systems, and exclusive project protection — for demanding AV and digital signage installations.",
+    "tagline": "Save time. Eliminate risk. Scale your projects.",
+    "primaryButton": "Submit an application"
+  },
+  "networkBar": {
+    "heading": "Partner network for",
+    "audiences": [
+      "System Integrators",
+      "AV Specialists",
+      "AV Planners",
+      "Architects Project",
+      "Contractors"
+    ]
   },
   "valueBlocks": {
-    "title": "Why partner with ProLEDALL?",
+    "title": "Your Competitive Edge with ProLEDALL",
     "subtitle": "ProLEDALL provides you with high-quality products, professional support, and powerful resources to help you grow your business.",
     "blocks": [
       {
-        "title": "High-quality products",
-        "description": "Reliable, certified, and innovative LED display solutions."
+        "title": "Curated LED Portfolio",
+        "description": "Instead of confusing mass-market products, you gain access to technically evaluated OEM systems from qualified manufacturers — vetted for quality, EMC compliance, and long-term reliability."
       },
       {
-        "title": "Competitive advantages",
-        "description": "Competitive pricing and flexible partnership policies."
+        "title": "Engineering Made in Germany",
+        "description": "We act as your external specialist department for LED system planning — from optoelectronic design and system architecture to mechanical integration and standards compliance assurance."
       },
       {
-        "title": "Professional support",
-        "description": "Dedicated technical and sales support throughout your projects."
+        "title": "Real Project Protection",
+        "description": "Register your projects exclusively with us — we guarantee full loyalty, protection against price dumping, and secure special conditions for your active projects throughout their lifecycle."
       },
       {
-        "title": "Global opportunities",
-        "description": "Expand your business with access to international markets."
+        "title": "Demo Systems & Training",
+        "description": "Access demo and test systems at attractive partner rates, alongside hands-on training in digital signage and LED video walls — so you can advise and convince clients on-site with confidence."
       }
     ]
   },
   "opportunities": {
-    "title": "Partner opportunities",
-    "subtitle": "We are looking for motivated partners to grow with us in global markets.",
-    "ctaButton": "Become a partner",
+    "title": "We Strengthen Your Business",
+    "subtitle": "Whether you're an AV system integrator, signage specialist, or architect: ProLEDALL lets you add high-quality LED solutions to your portfolio — with no risk in purchasing or technical specialization.",
     "cards": [
       {
+        "title": "System Integrators",
+        "description": "Integrate ProLEDALL solutions seamlessly into your AV and digital signage projects."
+      },
+      {
+        "title": "Signage Specialists",
+        "description": "Expand your portfolio with professional LED video walls and display solutions."
+      },
+      {
+        "title": "Planners & Architects",
+        "description": "Deliver premium LED installations across construction and interior design projects."
+      },
+      {
         "title": "Distributors",
-        "description": "Distribute PROLEDALL products in your local market and grow your business."
+        "description": "Distribute ProLEDALL products in your target markets and grow your business reach."
       },
       {
-        "title": "Resellers",
-        "description": "Resell our high-quality LED displays and solutions to your customers."
-      },
-      {
-        "title": "System integrators",
-        "description": "Integrate PROLEDALL products into your solutions and projects seamlessly."
-      },
-      {
-        "title": "Project contractors",
-        "description": "Work on LED display projects and deliver outstanding results together."
-      },
-      {
-        "title": "Retailers",
-        "description": "Sell PROLEDALL products through your retail channels and stores."
+        "title": "Retailers & Resellers",
+        "description": "Sell ProLEDALL products through your existing retail channels and stores."
       }
+    ]
+  },
+  "inquiry": {
+    "overline": "Partner inquiry",
+    "title": "Ready to join our network?",
+    "description": "Send us your inquiry — our team will get back to you within 48 hours for an initial conversation.",
+    "benefits": [
+      "Access to technically evaluated OEM systems",
+      "Personal support from our engineering team",
+      "Exclusive project protection & special pricing",
+      "Demo & test systems at attractive partner rates",
+      "Technical training for digital signage & video walls",
+      "Competitive advantages in the European LED market"
     ]
   },
   "howTo": {
