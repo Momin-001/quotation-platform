@@ -12,7 +12,7 @@ import {
 import { Fragment } from "react";
 
 export default function BreadCrumb({ title, breadcrumbs }) {
-    const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+    const siteUrl = BASE_URL || "https://www.proledall.eu";
     const schema =
         breadcrumbs?.length > 0
             ? {

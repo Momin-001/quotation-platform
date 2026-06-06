@@ -10,31 +10,11 @@ import { getGuestHomeData } from "@/features/cms/guest-cms-data";
 import SchemaScript from "@/components/guest/SchemaScript";
 import { cmsField } from "@/lib/i18n/cms";
 import { BASE_URL } from "@/lib/constants";
-import {
-    localeAlternates,
-    openGraphLocale,
-    siteDescription,
-    siteTitle,
-    validateLocale,
-} from "@/lib/i18n/metadata";
+import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
 
 export async function generateMetadata({ params }) {
     const { locale } = await params;
-    const validLocale = validateLocale(locale);
-
-    const title = await siteTitle(validLocale);
-    const description = await siteDescription(validLocale);
-
-    return {
-        title,
-        description,
-        alternates: localeAlternates("", validLocale),
-        openGraph: {
-            locale: openGraphLocale(validLocale),
-            title,
-            description,
-        },
-    };
+    return guestPageMetadata("", validateLocale(locale));
 }
 
 const defaultHomepageData = {
@@ -170,7 +150,7 @@ const defaultHomepageData = {
     blogsSectionSubtitleDe: "Expertenwissen, um fundierte Entscheidungen zu treffen",
 };
 
-const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+const siteUrl = BASE_URL || "https://www.proledall.eu";
 
 function withLocalePrefix(locale, path) {
     if (locale === "en") return path === "/" ? "/en" : `/en${path}`;

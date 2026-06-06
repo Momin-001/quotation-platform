@@ -103,6 +103,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'yearly',
       priority:        0.7,
     },
+    {
+      url:             `${base}/en/imprint`,
+      lastModified:    now,
+      changeFrequency: 'yearly',
+      priority:        0.3,
+    },
+    {
+      url:             `${base}/en/terms-and-conditions`,
+      lastModified:    now,
+      changeFrequency: 'yearly',
+      priority:        0.3,
+    },
 
     // ── PAGES TO ADD LATER (when content is live) ────────────
     // Uncomment these lines only when real content is published

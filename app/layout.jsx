@@ -5,6 +5,9 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { SocketProvider } from "@/context/SocketContext";
 import { Toaster } from "sonner";
+import { BASE_URL } from "@/lib/constants";
+
+const siteUrl = BASE_URL || "https://www.proledall.eu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,10 +20,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ProLEDALL",
-  description: "ProLedAll is a platform for buying and selling LEDs",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "ProLEDALL | B2B LED Display Marktplatz Europa",
+    template: "%s | ProLEDALL",
+  },
+  description:
+    "Europas B2B-Marktplatz für geprüfte LED-Videowände. Anbieter vergleichen, transparente Angebote erhalten und LED-Projekte skalieren.",
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "ProLEDALL",
+    locale: "de_DE",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
   icons: {
-    icon: "/logo.svg" ,
+    icon: "/logo.svg",
   },
 };
 

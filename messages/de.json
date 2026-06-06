@@ -14,10 +14,6 @@
     "captchaRequired": "Bitte lösen Sie das Captcha",
     "privacyPolicy": "Datenschutzerklärung"
   },
-  "Metadata": {
-    "siteTitle": "ProLEDALL",
-    "siteDescription": "ProLedAll ist eine Plattform zum Kaufen und Verkaufen von LEDs"
-  },
   "UserHeader": {
     "navAriaLabel": "Kontonavigation",
     "myEnquiries": "Meine Anfragen",

@@ -13,7 +13,6 @@ import {
     getStatusLabel,
     getEnquiryStatusColor,
 } from "@/lib/helpers/helpers";
-import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { fetchUserEnquiries } from "@/features/enquiries/user-enquiries";
 import { cn } from "@/lib/utils";
@@ -31,11 +30,6 @@ function getEnquiryTitle(enquiry, t) {
         return t("customLedSolution");
     }
     return first?.product?.productName || t("productEnquiry");
-}
-
-export async function generateMetadata({ params }) {
-    const { locale } = await params;
-    return guestPageAlternates("/user/my-enquiries", validateLocale(locale));
 }
 
 export default async function MyEnquiriesPage() {

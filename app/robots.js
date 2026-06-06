@@ -1,6 +1,6 @@
 import { BASE_URL } from "@/lib/constants";
 
-const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+const siteUrl = BASE_URL || "https://www.proledall.eu";
 
 /** @returns {import('next').MetadataRoute.Robots} */
 export default function robots() {

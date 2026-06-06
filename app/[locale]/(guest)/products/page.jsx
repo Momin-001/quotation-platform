@@ -1,20 +1,20 @@
 import SchemaScript from "@/components/guest/SchemaScript";
 import ProductsClient from "./ProductsClient";
-import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { BASE_URL } from "@/lib/constants";
+import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
 import { fetchGuestProductsListing } from "@/features/products/guest-products-list";
 
-const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+const siteUrl = BASE_URL || "https://www.proledall.eu";
 const INITIAL_PAGE_SIZE = 10;
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageMetadata("/products", validateLocale(locale));
+}
 
 function withLocalePrefix(locale, path) {
     if (locale === "en") return path === "/" ? "/en" : `/en${path}`;
     return path;
-}
-
-export async function generateMetadata({ params }) {
-    const { locale } = await params;
-    return guestPageAlternates("/products", validateLocale(locale));
 }
 
 export default async function ProductsPage({ params }) {

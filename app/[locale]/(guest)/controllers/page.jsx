@@ -1,13 +1,7 @@
 import ControllersClient from "./ControllersClient";
-import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { fetchGuestControllersListing } from "@/features/controllers/guest-controllers-list";
 
 const INITIAL_PAGE_SIZE = 10;
-
-export async function generateMetadata({ params }) {
-    const { locale } = await params;
-    return guestPageAlternates("/controllers", validateLocale(locale));
-}
 
 export default async function ControllersPage() {
     let initialControllers = [];

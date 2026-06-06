@@ -45,7 +45,7 @@ export async function POST(req) {
             { expiresIn: "1h" }
         );
 
-        const base = (BASE_URL || "").replace(/\/$/, "");
+        const base = BASE_URL || "";
         if (!base) {
             return errorResponse("Server URL is not configured (NEXT_PUBLIC_BASE_URL).", 500);
         }

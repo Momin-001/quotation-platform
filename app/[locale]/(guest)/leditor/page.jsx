@@ -213,7 +213,7 @@ export default function LeditorPage() {
     const { privacyPolicyPdfUrl } = useFooter();
     const locale = useLocale();
 
-    const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
+    const siteUrl = BASE_URL || "https://www.proledall.eu";
     const canonicalPath = locale === "en" ? "/en/leditor" : "/leditor";
     const serviceSchema = {
         "@context": "https://schema.org",

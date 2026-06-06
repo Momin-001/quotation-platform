@@ -5,13 +5,7 @@ import { Newspaper } from "lucide-react";
 
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
-import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { cn } from "@/lib/utils";
-
-export async function generateMetadata({ params }) {
-    const { locale } = await params;
-    return guestPageAlternates("/blogs", validateLocale(locale));
-}
 
 function BlogCard({ blog, locale, labels }) {
     const date = new Date(blog.createdAt);
@@ -62,7 +56,6 @@ function BlogCard({ blog, locale, labels }) {
 
 export default async function BlogsPage({ params }) {
     const { locale } = await params;
-    const resolvedLocale = validateLocale(locale);
     const t = await getTranslations("Blogs");
     const tCommon = await getTranslations("Common");
 
@@ -95,7 +88,7 @@ export default async function BlogsPage({ params }) {
                                 <BlogCard
                                     key={blog.id}
                                     blog={blog}
-                                    locale={resolvedLocale}
+                                    locale={locale}
                                     labels={labels}
                                 />
                             ))}

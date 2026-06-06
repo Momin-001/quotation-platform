@@ -7,16 +7,10 @@ import {
     getStatusLabel,
     getQuotationStatusColor,
 } from "@/lib/helpers/helpers";
-import { guestPageAlternates, validateLocale } from "@/lib/i18n/metadata";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { fetchUserQuotations } from "@/features/quotations/user-quotations";
 import { cn } from "@/lib/utils";
 import { ChevronRight, FileText, Inbox } from "lucide-react";
-
-export async function generateMetadata({ params }) {
-    const { locale } = await params;
-    return guestPageAlternates("/user/my-quotations", validateLocale(locale));
-}
 
 export default async function MyQuotationsPage() {
     const t = await getTranslations("User.quotations");
