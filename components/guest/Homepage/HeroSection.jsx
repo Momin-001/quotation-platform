@@ -1,23 +1,15 @@
-"use client";
-
-import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { PhoneCall, Pencil } from "lucide-react";
 import Image from "next/image";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { cmsField } from "@/lib/i18n/cms";
 
-
-export default function HeroSection({ homepageData }) {
-    const locale = useLocale();
-    const router = useRouter();
-
+export default function HeroSection({ homepageData, locale }) {
     const getText = (field) => cmsField(homepageData, field, locale);
 
     return (
         <section className="relative w-full overflow-hidden">
             <div className="flex flex-col lg:flex-row min-h-[600px] lg:min-h-[720px]">
-
                 <div className="flex-1 flex items-center justify-center lg:justify-end">
                     <div className="w-full lg:max-w-[680px] space-y-6 lg:space-y-8 px-6 sm:px-8 lg:pr-16 lg:pl-8 py-12 lg:py-16">
                         <div className="space-y-3">
@@ -45,7 +37,11 @@ export default function HeroSection({ homepageData }) {
                                 </Button>
                             </Link>
                             <Link href="/contact">
-                                <Button size="lg" variant="outline" className="w-full sm:w-auto border-secondary text-secondary hover:bg-secondary/5">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="w-full sm:w-auto border-secondary text-secondary hover:bg-secondary/5"
+                                >
                                     {getText("heroSecondaryButton")}
                                 </Button>
                             </Link>
@@ -72,18 +68,18 @@ export default function HeroSection({ homepageData }) {
                             </p>
                         </div>
 
-                        <Button
-                            onClick={() => router.push("/products")}
-                            variant="secondary"
-                            size="lg"
-                            className="sm:mr-12 sm:mb-5  font-bold rounded-full px-6"
-                        >
-                            <Pencil className="h-4 w-4 shrink-0" />
-                            {getText("heroRequestButton")}
-                        </Button>
+                        <Link href="/products">
+                            <Button
+                                variant="secondary"
+                                size="lg"
+                                className="sm:mr-12 sm:mb-5  font-bold rounded-full px-6"
+                            >
+                                <Pencil className="h-4 w-4 shrink-0" />
+                                {getText("heroRequestButton")}
+                            </Button>
+                        </Link>
                     </div>
                 </div>
-
             </div>
         </section>
     );

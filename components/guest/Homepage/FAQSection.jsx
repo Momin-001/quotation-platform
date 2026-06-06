@@ -1,8 +1,5 @@
-"use client";
-
 import { Link } from "@/i18n/navigation";
-import { useState, useEffect } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Plus, X, ArrowRight } from "lucide-react";
 import {
     Accordion,
@@ -10,43 +7,20 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { cmsField } from "@/lib/i18n/cms";
-import { toast } from "sonner";
 
-export default function FAQSection({ homepageData, faqsData = null, showAll = false }) {
-    const locale = useLocale();
-    const t = useTranslations("Home.faq");
-    const [openValue, setOpenValue] = useState("0");
-    const [faqs, setFaqs] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (faqsData) {
-            setFaqs(faqsData);
-            setLoading(false);
-        } else {
-            const fetchFAQs = async () => {
-                try {
-                    const limit = showAll ? "" : "?limit=6";
-                    const res = await fetch(`/api/faqs${limit}`);
-                    const response = await res.json();
-                    if (!response.success) {
-                        throw new Error(response.message || "Failed to fetch FAQs");
-                    }
-                    setFaqs(response.data);
-                } catch (error) {
-                    toast.error(error.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchFAQs();
-        }
-    }, [faqsData, showAll]);
+export default async function FAQSection({
+    homepageData,
+    faqsData = [],
+    locale,
+    showAll = false,
+}) {
+    const t = await getTranslations("Home.faq");
+    const faqs = Array.isArray(faqsData) ? faqsData : [];
 
     const faqItems = faqs.map((faq) => ({
+        id: faq.id,
         title: cmsField(faq, "title", locale),
         description: cmsField(faq, "description", locale),
     }));
@@ -65,63 +39,36 @@ export default function FAQSection({ homepageData, faqsData = null, showAll = fa
                     </div>
 
                     <div>
-                        {loading ? (
-                            <div className="flex items-center justify-center py-12">
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Spinner className="h-5 w-5" />
-                                    <span className="text-sm">{t("loading")}</span>
-                                </div>
-                            </div>
-                        ) : faqItems.length > 0 ? (
+                        {faqItems.length > 0 ? (
                             <>
                                 <Accordion
                                     type="single"
                                     collapsible
                                     defaultValue="0"
-                                    value={openValue}
-                                    onValueChange={setOpenValue}
                                     className="space-y-3"
                                 >
-                                    {faqItems.map((faq, index) => {
-                                        const isOpen = openValue === index.toString();
-                                        return (
-                                            <AccordionItem
-                                                key={index}
-                                                value={index.toString()}
-                                                className={`bg-white rounded-lg border overflow-hidden transition-all duration-300 ${
-                                                    isOpen ? "shadow-md border-primary/40" : "shadow-sm border-gray-200"
-                                                }`}
-                                            >
-                                                <AccordionTrigger
-                                                    className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 transition-colors [&>svg]:hidden"
-                                                >
-                                                    <h3
-                                                        className={`text-[15px] sm:text-base pr-4 leading-snug ${isOpen ? "font-semibold text-foreground" : "font-normal text-foreground/80"}`}
-                                                    >
-                                                        {faq.title}
-                                                    </h3>
-                                                    <div
-                                                        className={`shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
-                                                            isOpen
-                                                                ? "bg-primary text-primary-foreground"
-                                                                : "bg-gray-200 text-foreground/60"
-                                                        }`}
-                                                    >
-                                                        {isOpen ? (
-                                                            <X className="h-3.5 w-3.5" />
-                                                        ) : (
-                                                            <Plus className="h-3.5 w-3.5" />
-                                                        )}
-                                                    </div>
-                                                </AccordionTrigger>
-                                                <AccordionContent className="px-5 pb-5 pt-0">
-                                                    <p className="text-sm sm:text-[15px] leading-relaxed text-muted-foreground">
-                                                        {faq.description}
-                                                    </p>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        );
-                                    })}
+                                    {faqItems.map((faq, index) => (
+                                        <AccordionItem
+                                            key={faq.id ?? index}
+                                            value={index.toString()}
+                                            className="group bg-white rounded-lg border overflow-hidden transition-all duration-300 shadow-sm border-gray-200 data-[state=open]:shadow-md data-[state=open]:border-primary/40"
+                                        >
+                                            <AccordionTrigger className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 transition-colors [&>svg]:hidden">
+                                                <h3 className="text-[15px] sm:text-base pr-4 leading-snug font-normal text-foreground/80 group-data-[state=open]:font-semibold group-data-[state=open]:text-foreground">
+                                                    {faq.title}
+                                                </h3>
+                                                <div className="shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors bg-gray-200 text-foreground/60 group-data-[state=open]:bg-primary group-data-[state=open]:text-primary-foreground">
+                                                    <Plus className="h-3.5 w-3.5 group-data-[state=open]:hidden" />
+                                                    <X className="h-3.5 w-3.5 hidden group-data-[state=open]:block" />
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-5 pb-5 pt-0">
+                                                <p className="text-sm sm:text-[15px] leading-relaxed text-muted-foreground">
+                                                    {faq.description}
+                                                </p>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
                                 </Accordion>
                                 {!showAll && (
                                     <div className="pt-5 text-center">

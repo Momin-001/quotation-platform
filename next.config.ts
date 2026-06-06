@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-
-const withNextIntl = createNextIntlPlugin("./i18n/request.js");
+const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   trailingSlash: false,
@@ -12,16 +11,6 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
-  },
-  async redirects() {
-    return [
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "proledall.eu" }],
-        destination: "https://www.proledall.eu/:path*",
-        permanent: true,
-      },
-    ];
   },
 };
 

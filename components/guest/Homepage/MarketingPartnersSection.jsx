@@ -1,26 +1,7 @@
-"use client";
-
-import { useState } from "react";
-import { useLocale } from "next-intl";
 import { cmsField } from "@/lib/i18n/cms";
-import Image from "next/image";
-import Marquee from "react-fast-marquee";
+import PartnerLogoMarquee from "./PartnerLogoMarquee";
 
-export default function MarketingPartnersSection({ homepageData, partners = [] }) {
-    const locale = useLocale();
-    const [pauseOnHover, setPauseOnHover] = useState(true);
-    const [speed, setSpeed] = useState(50);
-
-    const handlePartnerClick = async (partnerId, websiteUrl) => {
-        try {
-            await fetch(`/api/partners/${partnerId}/click`, {
-                method: "POST",
-            });
-            window.open(websiteUrl, "_blank", "noopener,noreferrer");
-        } catch (error) {
-        }
-    };
-
+export default function MarketingPartnersSection({ homepageData, partners = [], locale }) {
     const getText = (field) => cmsField(homepageData, field, locale);
 
     if (partners.length === 0) return null;
@@ -37,32 +18,7 @@ export default function MarketingPartnersSection({ homepageData, partners = [] }
                     </p>
                 </div>
 
-                <div className="overflow-hidden relative">
-                    <Marquee
-                        speed={speed}
-                        pauseOnHover={pauseOnHover}
-                        pauseOnClick={false}
-                        gradient={false}
-                        className="py-4"
-                    >
-                        {partners.map((partner) => (
-                            <div
-                                key={partner.id}
-                                className="shrink-0 bg-white border border-gray-100 rounded-lg shadow-md transition-shadow duration-300 cursor-pointer flex items-center justify-center mx-3 w-[240px] h-[80px]"
-                                onClick={() => handlePartnerClick(partner.id, partner.websiteUrl)}
-                                onMouseEnter={() => setPauseOnHover(true)}
-                            >
-                                <Image
-                                    src={partner.logoUrl}
-                                    alt={partner.name}
-                                    width={180}
-                                    height={180}
-                                    className="object-contain w-[140px] h-[60px]"
-                                />
-                            </div>
-                        ))}
-                    </Marquee>
-                </div>
+                <PartnerLogoMarquee partners={partners} />
             </div>
         </section>
     );

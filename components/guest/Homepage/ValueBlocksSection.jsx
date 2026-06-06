@@ -1,12 +1,7 @@
-"use client";
-
-import { useLocale } from "next-intl";
 import { CheckCircle2, FileSpreadsheet, Eye, ShieldCheck, Grid3X3 } from "lucide-react";
 import { cmsField } from "@/lib/i18n/cms";
 
-export default function ValueBlocksSection({ homepageData }) {
-    const locale = useLocale();
-
+export default function ValueBlocksSection({ homepageData, locale }) {
     const getText = (field) => cmsField(homepageData, field, locale);
 
     const valueBlocks = [

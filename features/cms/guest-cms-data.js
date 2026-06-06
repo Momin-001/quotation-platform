@@ -3,48 +3,8 @@ import { asc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { navbar, footer, homepage, partners, faqs } from "@/db/schema";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
-
+import { defaultNavbarData, defaultFooterData, defaultHomepageData } from "@/lib/data/default_cms_data";
 const REVALIDATE_SECONDS = 900;
-
-export const defaultNavbarData = {
-    navItem1En: "HOME",
-    navItem1De: "STARTSEITE",
-    navItem2En: "PRODUCTS",
-    navItem2De: "PRODUKTE",
-    navItem3En: "CONTROLLERS",
-    navItem3De: "CONTROLLER",
-    navItem4En: "LEDITOR",
-    navItem4De: "LEDITOR",
-    navItem5En: "BLOGS",
-    navItem5De: "BLOGS",
-    navItem6En: "BECOME PARTNERS",
-    navItem6De: "PARTNER WERDEN",
-};
-
-export const defaultFooterData = {
-    descriptionEn:
-        "PROLEDALL is a platform that allows you to get quotes for your LED products. We are a team of experts who are dedicated to providing the best possible service to our clients.",
-    descriptionDe:
-        "PROLEDALL ist eine Plattform, die es Ihnen ermöglicht, Angebote für Ihre LED-Produkte zu erhalten. Wir sind ein Team von Experten, die sich der Bereitstellung des bestmöglichen Service für unsere Kunden widmen.",
-    ourAddressTitleEn: "Our Address",
-    ourAddressTitleDe: "Unsere Adresse",
-    quickLinksTitleEn: "Quick Links",
-    quickLinksTitleDe: "Schnelllinks",
-    quickLink1En: "About",
-    quickLink1De: "Über uns",
-    quickLink2En: "Blogs",
-    quickLink2De: "Blogs",
-    quickLink3En: "Projects",
-    quickLink3De: "Projekte",
-    quickLink4En: "Contact Us",
-    quickLink4De: "Kontaktieren Sie uns",
-    quickLink5En: "Help",
-    quickLink5De: "Hilfe",
-    newsletterTitleEn: "Newsletter",
-    newsletterTitleDe: "Newsletter",
-    copyrightTextEn: "© Copyright Quotation Platform. All Right Reserved",
-    copyrightTextDe: "© Copyright Quotationsplattform. Alle Rechte vorbehalten",
-};
 
 async function fetchNavbarRow() {
     const [row] = await db.select().from(navbar).limit(1);
@@ -126,7 +86,7 @@ export async function getGuestLayoutData() {
     };
 }
 
-export async function getGuestHomeData(defaultHomepageData) {
+export async function getGuestHomeData() {
     const [homepageRow, allPartners, faqsList, blogsList] = await Promise.all([
         getCachedHomepageRow(),
         getCachedPartnersRows(),
@@ -134,15 +94,11 @@ export async function getGuestHomeData(defaultHomepageData) {
         getCachedBlogsRows(),
     ]);
 
-    const technologyPartners = allPartners.filter(
-        (p) => !p.type || p.type === "technology"
-    );
+    const technologyPartners = allPartners.filter((p) => !p.type || p.type === "technology");
     const marketingPartners = allPartners.filter((p) => p.type === "marketing");
 
     return {
-        homepageData: homepageRow
-            ? { ...defaultHomepageData, ...homepageRow }
-            : defaultHomepageData,
+        homepageData: homepageRow ? { ...defaultHomepageData, ...homepageRow } : defaultHomepageData,
         technologyPartners,
         marketingPartners,
         faqs: faqsList,
