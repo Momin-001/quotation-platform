@@ -4,6 +4,7 @@ import BecomePartnerValueBlocksSection from "@/components/guest/BecomePartner/Be
 import BecomePartnerOpportunitiesSection from "@/components/guest/BecomePartner/BecomePartnerOpportunitiesSection";
 import BecomePartnerInquirySection from "@/components/guest/BecomePartner/BecomePartnerInquirySection";
 import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
+import BreadCrumb from "@/components/user/BreadCrumb";
 
 export async function generateMetadata({ params }) {
     const { locale } = await params;
@@ -13,6 +14,13 @@ export async function generateMetadata({ params }) {
 export default function BecomePartnerPage() {
     return (
         <div className="min-h-screen">
+            <BreadCrumb
+                title="Become a Partner"
+                breadcrumbs={[
+                    { label: "Home", href: "/" },
+                    { label: "Become a Partner", href: "/become-partner" },
+                ]}
+            />
             <BecomePartnerHeroSection />
             <BecomePartnerNetworkBar />
             <BecomePartnerValueBlocksSection />

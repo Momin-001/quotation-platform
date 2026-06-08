@@ -9,6 +9,7 @@ import {
     useRef,
 } from "react";
 import { io } from "socket.io-client";
+import { useAuth } from "@/context/AuthContext";
 
 const SocketContext = createContext(null);
 
@@ -35,6 +36,7 @@ async function fetchSocketToken() {
 }
 
 export function SocketProvider({ children }) {
+    const { isAuthenticated, loading: authLoading } = useAuth();
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [connectionError, setConnectionError] = useState(null);
@@ -43,6 +45,22 @@ export function SocketProvider({ children }) {
     const socketRef = useRef(null);
 
     useEffect(() => {
+        // Wait until auth state is resolved before deciding what to do.
+        if (authLoading) return;
+
+        // Not logged in: make sure any old socket is torn down and clear errors.
+        if (!isAuthenticated) {
+            setConnectionError(null);
+            setIsConnected(false);
+            if (socketRef.current) {
+                socketRef.current.removeAllListeners();
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+            setSocket(null);
+            return;
+        }
+
         let cancelled = false;
 
         async function connect() {
@@ -141,7 +159,7 @@ export function SocketProvider({ children }) {
                 socketRef.current = null;
             }
         };
-    }, []);
+    }, [isAuthenticated, authLoading]);
 
     const joinRoom = useCallback(
         (quotationId, userId, userRole) => {

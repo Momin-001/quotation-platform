@@ -69,7 +69,17 @@ export default function AdminLayout({ children }) {
             {/* Desktop Sidebar: fixed, full height; scrolls only when nav overflows */}
             <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-md border-r flex-col h-screen">
                 <div className="shrink-0 p-4 border-b flex items-center gap-2">
-                    <Image src="/logo-name.png" alt="Logo" width={150} height={150} />
+                    <Link href="/admin" className="shrink-0 flex items-center">
+                        <Image
+                            src="/logo-name.png"
+                            alt="Logo"
+                            width={1024}
+                            height={360}
+                            priority
+                            sizes="150px"
+                            className="h-10 w-auto"
+                        />
+                    </Link>
                 </div>
                 <NavLinks pathname={pathname} />
             </aside>
@@ -87,7 +97,15 @@ export default function AdminLayout({ children }) {
                         <SheetContent side="left" className="w-64 flex flex-col p-0">
                             <SheetHeader className="shrink-0 p-4 border-b">
                                 <SheetTitle className="flex items-center gap-2">
-                                    <Image src="/logo-name.png" alt="Logo" width={100} height={100} />
+                                    <Image
+                                        src="/logo-name.png"
+                                        alt="Logo"
+                                        width={1024}
+                                        height={360}
+                                        priority
+                                        sizes="150px"
+                                        className="h-10 w-auto"
+                                    />
                                 </SheetTitle>
                             </SheetHeader>
                             <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} className="overflow-y-auto" />
