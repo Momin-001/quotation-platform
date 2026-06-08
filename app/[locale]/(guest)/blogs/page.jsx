@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Newspaper } from "lucide-react";
-
+import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 import { cn } from "@/lib/utils";
@@ -52,6 +52,11 @@ function BlogCard({ blog, locale, labels }) {
             </article>
         </Link>
     );
+}
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageMetadata("/blogs", validateLocale(locale));
 }
 
 export default async function BlogsPage({ params }) {
