@@ -175,6 +175,15 @@ export default function ProductDetailPage() {
             .join(" ");
     };
 
+    const requireAuthForCta = (action) => {
+        if (!isAuthenticated) {
+            router.push("/login");
+            return;
+        }
+        if (!isUser) return;
+        action();
+    };
+
     const accordionPanel = "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";
     const accordionTriggerClass =
         "text-sm sm:text-base font-semibold tracking-wide bg-primary/10 hover:no-underline hover:bg-primary/15 px-4 py-3.5 text-foreground data-[state=open]:bg-primary/15";
@@ -376,13 +385,13 @@ export default function ProductDetailPage() {
                                         />
                                     </div>
                                 )}
-                                {isAuthenticated && isUser && (
-                                    <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
-                                        <Button
-                                            variant="secondary"
-                                            size="lg"
-                                            className="flex-1 sm:flex-none min-w-[140px]"
-                                            onClick={() => {
+                                <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
+                                    <Button
+                                        variant="secondary"
+                                        size="lg"
+                                        className="flex-1 sm:flex-none min-w-[140px]"
+                                        onClick={() =>
+                                            requireAuthForCta(() => {
                                                 addToCart({
                                                     id: product.id,
                                                     productName: product.productName,
@@ -391,15 +400,17 @@ export default function ProductDetailPage() {
                                                     categoryName: product.categoryName,
                                                 });
                                                 toast.success(t("addedToCart"));
-                                            }}
-                                        >
-                                            <ShoppingCart className="h-4 w-4 mr-2" />
-                                            {t("addToCart")}
-                                        </Button>
-                                        <Button
-                                            size="lg"
-                                            className="flex-1 sm:flex-none min-w-[140px]"
-                                            onClick={() => {
+                                            })
+                                        }
+                                    >
+                                        <ShoppingCart className="h-4 w-4 mr-2" />
+                                        {t("addToCart")}
+                                    </Button>
+                                    <Button
+                                        size="lg"
+                                        className="flex-1 sm:flex-none min-w-[140px]"
+                                        onClick={() =>
+                                            requireAuthForCta(() => {
                                                 addToCart({
                                                     id: product.id,
                                                     productName: product.productName,
@@ -408,24 +419,26 @@ export default function ProductDetailPage() {
                                                     categoryName: product.categoryName,
                                                 });
                                                 router.push("/user/cart");
-                                            }}
+                                            })
+                                        }
+                                    >
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        {t("getQuote")}
+                                    </Button>
+                                    {product.productType === "LED Display Single Cabinet" && (
+                                        <Button
+                                            onClick={() =>
+                                                requireAuthForCta(() => router.push("/leditor"))
+                                            }
+                                            size="lg"
+                                            variant="outline"
+                                            className="flex-1 sm:flex-none min-w-[140px] text-primary border-primary hover:bg-primary/5"
                                         >
-                                            <FileText className="h-4 w-4 mr-2" />
-                                            {t("getQuote")}
+                                            <Wrench className="h-4 w-4 mr-2" />
+                                            {t("customSolution")}
                                         </Button>
-                                        {product.productType === "LED Display Single Cabinet" && (
-                                            <Button
-                                                onClick={() => router.push("/leditor")}
-                                                size="lg"
-                                                variant="outline"
-                                                className="flex-1 sm:flex-none min-w-[140px] text-primary border-primary hover:bg-primary/5"
-                                            >
-                                                <Wrench className="h-4 w-4 mr-2" />
-                                                {t("customSolution")}
-                                            </Button>
-                                        )}
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

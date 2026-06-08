@@ -138,7 +138,6 @@ export default function Footer({ footerData }) {
                         <div className="flex flex-col gap-3">
                             <Input
                                 placeholder={t("emailPlaceholder")}
-                                className="h-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-sm"
                             />
                             <Button variant="secondary" size="default" className="w-fit">
                                 {t("subscribe")}

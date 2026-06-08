@@ -7,7 +7,7 @@ export default async function BecomePartnerNetworkBar() {
 
     return (
         <section className="w-full bg-[#0F2E4A] text-primary-foreground">
-            <div className="container mx-auto px-4 lg:px-6 py-5 md:py-6">
+            <div className="px-6 lg:px-6 xl:px-0 max-w-7xl mx-auto py-5 md:py-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                     <p className="text-base md:text-lg font-bold shrink-0">{t("heading")}</p>
 

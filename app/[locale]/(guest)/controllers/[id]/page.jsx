@@ -73,6 +73,15 @@ export default function ControllerDetailPage() {
         }
     };
 
+    const requireAuthForCta = (action) => {
+        if (!isAuthenticated) {
+            router.push("/login");
+            return;
+        }
+        if (!isUser) return;
+        action();
+    };
+
     const accordionPanel = "rounded-xl border border-border/60 overflow-hidden bg-white shadow-sm";
     const accordionTriggerClass =
         "text-sm sm:text-base font-semibold  tracking-wide bg-primary/10 hover:no-underline hover:bg-primary/15 px-4 py-3.5 text-foreground data-[state=open]:bg-primary/15";
@@ -306,19 +315,17 @@ export default function ControllerDetailPage() {
                                 </div>
                             )}
 
-                            {isAuthenticated && isUser && (
-                                <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
-                                    <Button
-                                        variant="secondary"
-                                        size="lg"
-                                        className="flex-1 sm:flex-none min-w-[160px]"
-                                        onClick={handleAddToCart}
-                                    >
-                                        <ShoppingCart className="h-4 w-4 mr-2" />
-                                        {t("addToCart")}
-                                    </Button>
-                                </div>
-                            )}
+                            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
+                                <Button
+                                    variant="secondary"
+                                    size="lg"
+                                    className="flex-1 sm:flex-none min-w-[160px]"
+                                    onClick={() => requireAuthForCta(handleAddToCart)}
+                                >
+                                    <ShoppingCart className="h-4 w-4 mr-2" />
+                                    {t("addToCart")}
+                                </Button>
+                            </div>
                             </div>
 
 

@@ -1,8 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { asc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { navbar, footer, homepage, partners, faqs } from "@/db/schema";
+import { navbar, footer, homepage, partners } from "@/db/schema";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
+import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
 import { defaultNavbarData, defaultFooterData, defaultHomepageData } from "@/lib/data/default_cms_data";
 const REVALIDATE_SECONDS = 900;
 
@@ -35,11 +35,7 @@ async function fetchPartnersRows() {
 }
 
 async function fetchFaqsRows(limit) {
-    const rows = await db.select().from(faqs).orderBy(asc(faqs.createdAt));
-    if (limit && limit > 0) {
-        return rows.slice(0, limit);
-    }
-    return rows;
+    return fetchGuestFaqsListing({ limit: limit && limit > 0 ? limit : 0 });
 }
 
 async function fetchBlogsRows(limit) {

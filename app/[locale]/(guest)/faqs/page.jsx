@@ -1,7 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Plus, X } from "lucide-react";
 import {
     Accordion,
@@ -9,45 +6,32 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Spinner } from "@/components/ui/spinner";
 import BreadCrumb from "@/components/user/BreadCrumb";
+import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
 import { cmsField } from "@/lib/i18n/cms";
-import { useLocale } from "next-intl";
-import { toast } from "sonner";
+import { validateLocale } from "@/lib/i18n/metadata";
 
-export default function FAQsPage() {
-    const locale = useLocale();
-    const t = useTranslations("FaqsPage");
-    const tCommon = useTranslations("Common");
-    const [openValue, setOpenValue] = useState("0");
-    const [faqs, setFaqs] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default async function FAQsPage({ params }) {
+    const { locale } = await params;
+    const resolvedLocale = validateLocale(locale);
+    const t = await getTranslations("FaqsPage");
+    const tCommon = await getTranslations("Common");
 
-    useEffect(() => {
-        const fetchFAQs = async () => {
-            try {
-                const res = await fetch("/api/faqs");
-                const response = await res.json();
-                if (!response.success) {
-                    throw new Error(response.message || t("fetchFailed"));
-                }
-                setFaqs(response.data);
-            } catch (error) {
-                toast.error(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchFAQs();
-    }, [t]);
+    let faqs = [];
+    try {
+        faqs = await fetchGuestFaqsListing();
+    } catch (error) {
+        console.error("FAQs page fetch error:", error);
+    }
 
     const faqItems = faqs.map((faq) => ({
-        title: cmsField(faq, "title", locale),
-        description: cmsField(faq, "description", locale),
+        id: faq.id,
+        title: cmsField(faq, "title", resolvedLocale),
+        description: cmsField(faq, "description", resolvedLocale),
     }));
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="flex flex-col min-h-screen">
             <BreadCrumb
                 title={t("breadcrumb")}
                 breadcrumbs={[
@@ -55,83 +39,54 @@ export default function FAQsPage() {
                     { label: t("breadcrumb") },
                 ]}
             />
-            <main className="flex-1">
-                <section className="w-full bg-linear-to-br from-white to-blue-100 py-16 lg:py-24">
-                    <div className="container mx-auto px-4">
+            <main className="flex-1 flex flex-col bg-linear-to-br from-white to-blue-50">
+                <section className="flex-1 w-full py-16 md:py-20 lg:py-24">
+                    <div className="container mx-auto px-4 lg:px-6">
                         <div className="max-w-4xl mx-auto">
-                            <div className="space-y-4 mb-12 text-center">
-                                <p className="text-md font-medium text-blue-600 uppercase tracking-wide">
+                            <div className="space-y-3 mb-10 md:mb-12 text-center">
+                                <p className="text-sm font-medium text-primary uppercase tracking-wide">
                                     {t("overline")}
                                 </p>
-                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight">
                                     {t("title")}
                                 </h2>
                             </div>
 
-                            <div className="space-y-4">
-                                {loading ? (
-                                    <div className="flex items-center justify-center py-12">
-                                        <div className="flex items-center gap-2">
-                                            <Spinner className="h-5 w-5" />
-                                            <span>{t("loading")}</span>
-                                        </div>
-                                    </div>
-                                ) : faqItems.length > 0 ? (
-                                    <Accordion
-                                        type="single"
-                                        collapsible
-                                        defaultValue="0"
-                                        value={openValue}
-                                        onValueChange={setOpenValue}
-                                        className="space-y-4"
-                                    >
-                                        {faqItems.map((faq, index) => {
-                                            const isOpen = openValue === index.toString();
-                                            return (
-                                                <AccordionItem
-                                                    key={index}
-                                                    value={index.toString()}
-                                                    className={`bg-white rounded-sm border border-gray-300 overflow-hidden transition-all duration-300 ${
-                                                        isOpen ? "shadow-lg border-primary" : "shadow-sm"
-                                                    }`}
-                                                >
-                                                    <AccordionTrigger
-                                                        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition-colors [&>svg]:hidden"
-                                                    >
-                                                        <h3
-                                                            className={`text-[21px] pr-4 ${isOpen ? "font-semibold" : "font-normal"}`}
-                                                        >
-                                                            {faq.title}
-                                                        </h3>
-                                                        <div
-                                                            className={`shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors ${
-                                                                isOpen
-                                                                    ? "bg-primary text-primary-foreground"
-                                                                    : "bg-gray-300 text-primary-foreground"
-                                                            }`}
-                                                        >
-                                                            {isOpen ? (
-                                                                <X className="h-4 w-4" />
-                                                            ) : (
-                                                                <Plus className="h-4 w-4" />
-                                                            )}
-                                                        </div>
-                                                    </AccordionTrigger>
-                                                    <AccordionContent className="px-6 pt-0">
-                                                        <p className="leading-relaxed font-normal text-[19px]">
-                                                            {faq.description}
-                                                        </p>
-                                                    </AccordionContent>
-                                                </AccordionItem>
-                                            );
-                                        })}
-                                    </Accordion>
-                                ) : (
-                                    <div className="text-center py-12 text-gray-500">
-                                        {t("empty")}
-                                    </div>
-                                )}
-                            </div>
+                            {faqItems.length > 0 ? (
+                                <Accordion
+                                    type="single"
+                                    collapsible
+                                    defaultValue="0"
+                                    className="space-y-3"
+                                >
+                                    {faqItems.map((faq, index) => (
+                                        <AccordionItem
+                                            key={faq.id}
+                                            value={index.toString()}
+                                            className="group bg-white rounded-lg border overflow-hidden transition-all duration-300 shadow-sm border-gray-200 data-[state=open]:shadow-md data-[state=open]:border-primary/40"
+                                        >
+                                            <AccordionTrigger className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50/50 transition-colors [&>svg]:hidden">
+                                                <h3 className="text-[15px] sm:text-base pr-4 leading-snug font-normal text-foreground/80 group-data-[state=open]:font-semibold group-data-[state=open]:text-foreground">
+                                                    {faq.title}
+                                                </h3>
+                                                <div className="shrink-0 w-6 h-6 rounded flex items-center justify-center transition-colors bg-gray-200 text-foreground/60 group-data-[state=open]:bg-primary group-data-[state=open]:text-primary-foreground">
+                                                    <Plus className="h-3.5 w-3.5 group-data-[state=open]:hidden" />
+                                                    <X className="h-3.5 w-3.5 hidden group-data-[state=open]:block" />
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className="px-5 pb-5 pt-0">
+                                                <p className="text-sm sm:text-[15px] leading-relaxed text-muted-foreground">
+                                                    {faq.description}
+                                                </p>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            ) : (
+                                <div className="text-center py-12 text-muted-foreground">
+                                    <p className="text-sm">{t("empty")}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
