@@ -51,7 +51,7 @@ export default function HeroSection({ homepageData, locale }) {
 
                 <div className="relative h-[400px] sm:h-[500px] lg:h-auto w-full lg:w-[50%] shrink-0">
                     <Image
-                        src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
+                        src={"/hero-led-display.jpg"}
                         alt="LED Display"
                         fill
                         preload
