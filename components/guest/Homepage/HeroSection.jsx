@@ -54,8 +54,11 @@ export default function HeroSection({ homepageData, locale }) {
                         src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
                         alt="LED Display"
                         fill
-                        className="object-cover"
                         priority
+                        fetchPriority="high"
+                        loading="eager"
+                        sizes="100vw"
+                        className="object-cover"
                     />
 
                     <div className="absolute bottom-0 left-0 w-full flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 p-4 sm:p-0 z-10">
