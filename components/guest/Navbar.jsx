@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -13,16 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Menu } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
+
+const MobileNavSheet = dynamic(() => import("./NavbarMobileSheet"), { ssr: false });
 
 export default function Navbar({ navbarData }) {
     const { isAuthenticated, loading } = useAuth();
@@ -45,9 +41,6 @@ export default function Navbar({ navbarData }) {
 
     const navLinkClass = (href) =>
         `hover:text-primary transition-colors duration-200 ${isActive(href) ? "text-primary font-semibold" : "text-foreground/80"}`;
-
-    const mobileNavLinkClass = (href) =>
-        `block py-2.5 hover:text-primary transition-colors duration-200 ${isActive(href) ? "text-primary font-semibold" : "text-foreground/80"}`;
 
     const getNavText = (itemNumber) =>
         cmsField(navbarData, `navItem${itemNumber}`, locale);
@@ -144,105 +137,20 @@ export default function Navbar({ navbarData }) {
                     </div>
 
                     <div className="xl:hidden">
-                        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                            <SheetTrigger asChild>
-                                <Button variant="outline" size="icon-sm" className="border-border">
-                                    <Menu className="h-4 w-4 text-foreground" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="right" className="w-72 flex flex-col p-0">
-                                <SheetHeader className="shrink-0 p-5 border-b">
-                                    <SheetTitle className="flex items-center gap-2">
-                                        <span className=" text-base font-semibold text-foreground">{t("menu")}</span>
-                                    </SheetTitle>
-                                </SheetHeader>
-
-                                <div className="flex-1 overflow-y-auto p-5 space-y-5">
-                                    <div className="space-y-1 text-sm font-medium tracking-wide border-b border-border/60 pb-5">
-                                        <Link href="/" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/")}>
-                                            {getNavText(1)}
-                                        </Link>
-                                        <Link href="/products" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/products")}>
-                                            {getNavText(2)}
-                                        </Link>
-                                        <Link href="/controllers" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/controllers")}>
-                                            {getNavText(3)}
-                                        </Link>
-                                        <Link href="/leditor" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/leditor")}>
-                                            {getNavText(4)}
-                                        </Link>
-                                        <Link href="/blogs" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/blogs")}>
-                                            {getNavText(5)}
-                                        </Link>
-                                        <Link href="/become-partner" onClick={() => setMobileOpen(false)} className={mobileNavLinkClass("/become-partner")}>
-                                            {getNavText(6)}
-                                        </Link>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        {loading ? (
-                                            <div className="flex items-center justify-center py-4">
-                                                <Spinner />
-                                            </div>
-                                        ) : !isAuthenticated ? (
-                                            <div className="grid grid-cols-1 gap-2.5">
-                                                <Link href="/register" onClick={() => setMobileOpen(false)}>
-                                                    <Button size="sm" className="w-full">
-                                                        {tCommon("register")}
-                                                    </Button>
-                                                </Link>
-                                                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                                                    <Button size="sm" variant="outline" className="w-full text-primary border-primary hover:bg-primary/5">
-                                                        {tCommon("login")}
-                                                    </Button>
-                                                </Link>
-                                            </div>
-                                        ) : (
-                                            <div onClick={() => setMobileOpen(false)}>
-                                                <UserAvatar />
-                                            </div>
-                                        )}
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="w-full justify-between border-border"
-                                                >
-                                                    <span className="flex items-center gap-3">
-                                                        <Image
-                                                            src={locale === "en" ? "/us.svg" : "/de.svg"}
-                                                            alt={locale === "en" ? t("englishAlt") : t("germanAlt")}
-                                                            width={24}
-                                                            height={18}
-                                                            className="shrink-0"
-                                                        />
-                                                        <span>{t("language")}</span>
-                                                    </span>
-                                                    <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="min-w-36 p-1">
-                                                <DropdownMenuItem
-                                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                                    onClick={() => switchLocale("de")}
-                                                >
-                                                    <Image src="/de.svg" alt="German" width={22} height={16} className="shrink-0" />
-                                                    <span>German</span>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    className="gap-2.5 py-1.5 px-2.5 text-sm cursor-pointer"
-                                                    onClick={() => switchLocale("en")}
-                                                >
-                                                    <Image src="/us.svg" alt="English" width={22} height={16} className="shrink-0" />
-                                                    <span>English</span>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                        {mobileOpen ? (
+                            <MobileNavSheet
+                                open={mobileOpen}
+                                onOpenChange={setMobileOpen}
+                                navbarData={navbarData}
+                                locale={locale}
+                                isAuthenticated={isAuthenticated}
+                                loading={loading}
+                                switchLocale={switchLocale}
+                            />
+                        ) : null}
+                        <Button variant="outline" size="icon-sm" className="border-border" onClick={() => setMobileOpen(true)}>
+                            <Menu className="h-4 w-4 text-foreground" />
+                        </Button>
                     </div>
                 </div>
             </div>

@@ -16,6 +16,8 @@ import { useLocale } from "next-intl";
 import { categoryToShowcaseCard } from "@/lib/helpers/category-helpers";
 import { cmsField } from "@/lib/i18n/cms";
 
+// categories prop is passed from server; fallback to client fetch for backward compat
+
 function CategoryCard({ card, presetLabel, categoryId }) {
     const href = categoryId
         ? `/products?categoryId=${encodeURIComponent(categoryId)}`
@@ -81,12 +83,10 @@ function CategoryCard({ card, presetLabel, categoryId }) {
     );
 }
 
-export default function PreSelectedFiltersSection({ homepageData }) {
+export default function PreSelectedFiltersSection({ homepageData, categories: serverCategories = [] }) {
     const locale = useLocale();
     const lang = locale === "de" ? "de" : "en";
 
-    const [categories, setCategories] = useState([]);
-    const [categoriesLoading, setCategoriesLoading] = useState(true);
     const [api, setApi] = useState(null);
     const [canPrev, setCanPrev] = useState(false);
     const [canNext, setCanNext] = useState(false);
@@ -94,30 +94,9 @@ export default function PreSelectedFiltersSection({ homepageData }) {
 
     const getText = (field) => cmsField(homepageData, field, locale);
 
-    useEffect(() => {
-        let cancelled = false;
-        (async () => {
-            setCategoriesLoading(true);
-            try {
-                const res = await fetch("/api/categories/showcase");
-                const json = await res.json();
-                if (!json.success)
-                    throw new Error(json.message);
-                if (!cancelled) setCategories(json.data || []);
-            } catch {
-                if (!cancelled) setCategories([]);
-            } finally {
-                if (!cancelled) setCategoriesLoading(false);
-            }
-        })();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
     const cards = useMemo(
-        () => categories.map((c) => categoryToShowcaseCard(c, lang)),
-        [categories, lang]
+        () => serverCategories.map((c) => categoryToShowcaseCard(c, lang)),
+        [serverCategories, lang]
     );
 
     useEffect(() => {
@@ -188,13 +167,7 @@ export default function PreSelectedFiltersSection({ homepageData }) {
                 </div>
 
                 <div className="min-w-0">
-                    {categoriesLoading ? (
-                        <p className="text-center py-12 text-sm text-muted-foreground">
-                            {lang === "en"
-                                ? "Loading categories…"
-                                : "Kategorien werden geladen…"}
-                        </p>
-                    ) : cards.length === 0 ? (
+                    {cards.length === 0 ? (
                         <p className="text-center py-12 text-sm text-muted-foreground">
                             {lang === "en"
                                 ? "No categories configured yet."

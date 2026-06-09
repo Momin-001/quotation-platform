@@ -1,16 +1,33 @@
+import dynamic from "next/dynamic";
 import HeroSection from "@/components/guest/Homepage/HeroSection";
 import ValueBlocksSection from "@/components/guest/Homepage/ValueBlocksSection";
 import HowItWorksSection from "@/components/guest/Homepage/HowItWorksSection";
-import PreSelectedFiltersSection from "@/components/guest/Homepage/PreSelectedFiltersSection";
-import FAQSection from "@/components/guest/Homepage/FAQSection";
-import PartnersSection from "@/components/guest/Homepage/PartnersSection";
-import MarketingPartnersSection from "@/components/guest/Homepage/MarketingPartnersSection";
-import BlogsSection from "@/components/guest/Blogs/BlogsSection";
 import { getGuestHomeData } from "@/features/cms/guest-cms-data";
 import SchemaScript from "@/components/guest/SchemaScript";
 import { cmsField } from "@/lib/i18n/cms";
 import { BASE_URL } from "@/lib/constants";
 import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
+
+const PreSelectedFiltersSection = dynamic(
+    () => import("@/components/guest/Homepage/PreSelectedFiltersSection"),
+    { ssr: true }
+);
+const FAQSection = dynamic(
+    () => import("@/components/guest/Homepage/FAQSection"),
+    { ssr: true }
+);
+const PartnersSection = dynamic(
+    () => import("@/components/guest/Homepage/PartnersSection"),
+    { ssr: true }
+);
+const MarketingPartnersSection = dynamic(
+    () => import("@/components/guest/Homepage/MarketingPartnersSection"),
+    { ssr: true }
+);
+const BlogsSection = dynamic(
+    () => import("@/components/guest/Blogs/BlogsSection"),
+    { ssr: true }
+);
 
 export async function generateMetadata({ params }) {
     const { locale } = await params;
@@ -26,7 +43,7 @@ function withLocalePrefix(locale, path) {
 
 export default async function Home({ params }) {
     const { locale } = await params;
-    const { homepageData, technologyPartners, marketingPartners, faqs, blogs } = await getGuestHomeData();
+    const { homepageData, technologyPartners, marketingPartners, faqs, blogs, showcaseCategories } = await getGuestHomeData();
 
     const organizationSchema = {
         "@context": "https://schema.org",
@@ -93,7 +110,7 @@ export default async function Home({ params }) {
         <ValueBlocksSection homepageData={homepageData} locale={locale} />
         <HowItWorksSection homepageData={homepageData} locale={locale} />
         <PartnersSection homepageData={homepageData} partners={technologyPartners} locale={locale} />
-        <PreSelectedFiltersSection homepageData={homepageData} />
+        <PreSelectedFiltersSection homepageData={homepageData} categories={showcaseCategories} />
         {marketingPartners.length > 0 && (
           <MarketingPartnersSection homepageData={homepageData} partners={marketingPartners} locale={locale} />
         )}

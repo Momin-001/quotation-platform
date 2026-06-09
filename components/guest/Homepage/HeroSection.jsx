@@ -9,7 +9,7 @@ export default function HeroSection({ homepageData, locale }) {
 
     return (
         <section className="relative w-full overflow-hidden">
-            <div className="flex flex-col lg:flex-row min-h-[600px] lg:min-h-[720px]">
+            <div className="flex flex-col-reverse lg:flex-row min-h-[600px] lg:min-h-[720px]">
                 <div className="flex-1 flex items-center justify-center lg:justify-end">
                     <div className="w-full lg:max-w-[680px] space-y-6 lg:space-y-8 px-6 sm:px-8 lg:pr-16 lg:pl-8 py-12 lg:py-16">
                         <div className="space-y-3">
@@ -54,10 +54,9 @@ export default function HeroSection({ homepageData, locale }) {
                         src={homepageData?.heroImageUrl || "/hero-led-display.jpg"}
                         alt="LED Display"
                         fill
-                        priority
+                        preload
                         fetchPriority="high"
-                        loading="eager"
-                        sizes="100vw"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         className="object-cover"
                     />
 

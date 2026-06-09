@@ -1,13 +1,21 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useSocket } from "@/context/SocketContext";
+import { useSocket, SocketProvider } from "@/context/SocketContext";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Wifi, WifiOff, Send } from "lucide-react";
 
-export default function AdminQuotationChat({ quotationId, chatDisabled, chatDisabledReason, currentUserName }) {
+export default function AdminQuotationChat(props) {
+    return (
+        <SocketProvider>
+            <AdminQuotationChatInner {...props} />
+        </SocketProvider>
+    );
+}
+
+function AdminQuotationChatInner({ quotationId, chatDisabled, chatDisabledReason, currentUserName }) {
     const { user } = useAuth();
     const {
         isConnected,

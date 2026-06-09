@@ -1,9 +1,7 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/context/AuthContext";
-import { CartProvider } from "@/context/CartContext";
-import { SocketProvider } from "@/context/SocketContext";
 import { Toaster } from "sonner";
 import { BASE_URL } from "@/lib/constants";
 
@@ -11,11 +9,6 @@ const siteUrl = BASE_URL || "https://www.proledall.eu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -43,7 +36,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} antialiased`}
       >
         <NextTopLoader
           color="#2563eb"
@@ -52,11 +45,7 @@ export default function RootLayout({ children }) {
           easing="ease"
         />
         <AuthProvider>
-          <CartProvider>
-            <SocketProvider>
-              {children}
-            </SocketProvider>
-          </CartProvider>
+          {children}
         </AuthProvider>
         <Toaster />
       </body>
