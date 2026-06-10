@@ -6,8 +6,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET, BASE_URL, SMTP_USER } from "@/lib/constants";
 import { createEmailTransporter } from "@/lib/email-transporter";
 
-const GENERIC_MESSAGE =
-    "If an account exists for this email, you will receive password reset instructions shortly.";
+const GENERIC_MESSAGE ="If an account exists for this email, you will receive password reset instructions shortly.";
 
 export async function POST(req) {
     try {
@@ -45,12 +44,12 @@ export async function POST(req) {
             { expiresIn: "1h" }
         );
 
-        const base = BASE_URL || "";
-        if (!base) {
+        
+        if (!BASE_URL) {
             return errorResponse("Server URL is not configured (NEXT_PUBLIC_BASE_URL).", 500);
         }
 
-        const resetUrl = `${base}/reset-password?token=${encodeURIComponent(token)}`;
+        const resetUrl = `${BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
 
         await transporter.sendMail({
             from: SMTP_USER,

@@ -788,7 +788,7 @@ const QuotationDocument = ({ data }) => {
     const displayDetails = buildDisplayDetailsRows(mainProduct, alternativeProduct);
     const taxPct = parseFloat(quotation?.taxPercentage ?? 19);
 
-    const datasheetBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || ""
+    const datasheetBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     return (
         <Document title={`Angebot ${quotation?.quotationNumber || ""}`}>

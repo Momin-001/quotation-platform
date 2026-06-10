@@ -65,15 +65,17 @@ export async function GET(req, { params }) {
             return errorResponse("Product not found", 404);
         }
 
-        const host = req.headers.get("host") || "localhost:3000";
-        const protocol = req.headers.get("x-forwarded-proto") || "http";
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
         let logoDataUrl = null;
+        let watermarkDataUrl = null;
         try {
             const logoPath = path.join(process.cwd(), "public", "logo-name.png");
+            const watermarkPath = path.join(process.cwd(), "public", "logo.png");
             const logoBuf = await readFile(logoPath);
+            const watermarkBuf = await readFile(watermarkPath);
             logoDataUrl = `data:image/png;base64,${logoBuf.toString("base64")}`;
+            watermarkDataUrl = `data:image/png;base64,${watermarkBuf.toString("base64")}`;
         } catch {
             // logo-name.png missing or unreadable
         }
