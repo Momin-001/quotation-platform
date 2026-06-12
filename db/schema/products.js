@@ -52,7 +52,7 @@ export const products = pgTable("products", {
     // String fields (Point 1)
     productName: text("product_name").notNull(),
     productNumber: text("product_number").notNull(),
-    slug: text("slug"),
+    slug: text("slug").notNull().unique(),
 
     viewingAngleHorizontal: text("viewing_angle_horizontal"),
     viewingAngleVertical: text("viewing_angle_vertical"),
