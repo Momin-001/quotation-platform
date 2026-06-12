@@ -1,5 +1,5 @@
 {
-  "id": "3e419d13-659b-4203-92d7-68a33ffc8ffc",
+  "id": "b7a04ab4-bbe7-4f7f-9ed9-4f8acd447d44",
   "prevId": "e90642db-01b8-4128-b0d7-7d0e8544f58e",
   "version": "7",
   "dialect": "postgresql",
@@ -2348,7 +2348,7 @@
           "name": "slug",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "viewing_angle_horizontal": {
           "name": "viewing_angle_horizontal",
@@ -2883,15 +2883,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "products_slug_unique": {
-          "name": "products_slug_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
