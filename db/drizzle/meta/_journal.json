@@ -71,6 +71,13 @@
       "when": 1781291217069,
       "tag": "0009_fair_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1781292335787,
+      "tag": "0010_neat_scorpion",
+      "breakpoints": true
     }
   ]
 }
