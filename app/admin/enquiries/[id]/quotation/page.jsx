@@ -10,6 +10,7 @@ import { ArrowLeft, Plus, Eye, Percent } from "lucide-react";
 
 import QuotationPreview from "@/components/admin/Quotation/QuotationPreview";
 import QuotationBuilderSection from "@/components/admin/Quotation/QuotationBuilderSection";
+import { getQuotationDefaultUnitPrice, getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
 
 export default function QuotationBuilderPage() {
     const params = useParams();
@@ -69,23 +70,25 @@ export default function QuotationBuilderPage() {
                     ? [{
                         product: items[0].controller,
                         quantity: 1,
-                        unitPrice: "",
+                        unitPrice: getQuotationDefaultUnitPrice(items[0].controller, { isAdditionalItem: true }),
                         discountPercentage: "",
                         description: "",
                     }]
                     : [];
+                const mainProductData = {
+                    id: items[0].productId,
+                    productName: items[0].productName,
+                    productNumber: items[0].productNumber,
+                    pixelPitch: items[0].pixelPitch,
+                    pricePerCabinetUsd: items[0].pricePerCabinetUsd,
+                    imageUrl: items[0].imageUrl || null,
+                    isCustom: items[0].isCustom,
+                    customTotalCabinets: items[0].customTotalCabinets,
+                };
                 setMainProduct({
-                    product: {
-                        id: items[0].productId,
-                        productName: items[0].productName,
-                        productNumber: items[0].productNumber,
-                        pixelPitch: items[0].pixelPitch,
-                        imageUrl: items[0].imageUrl || null,
-                        isCustom: items[0].isCustom,
-                        customTotalCabinets: items[0].customTotalCabinets,
-                    },
+                    product: mainProductData,
                     quantity: items[0].quantity || 1,
-                    unitPrice: "",
+                    unitPrice: getQuotationDefaultUnitPrice(mainProductData),
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
@@ -99,23 +102,25 @@ export default function QuotationBuilderPage() {
                     ? [{
                         product: items[1].controller,
                         quantity: 1,
-                        unitPrice: "",
+                        unitPrice: getQuotationDefaultUnitPrice(items[1].controller, { isAdditionalItem: true }),
                         discountPercentage: "",
                         description: "",
                     }]
                     : [];
+                const altProductData = {
+                    id: items[1].productId,
+                    productName: items[1].productName,
+                    productNumber: items[1].productNumber,
+                    pixelPitch: items[1].pixelPitch,
+                    pricePerCabinetUsd: items[1].pricePerCabinetUsd,
+                    imageUrl: items[1].imageUrl || null,
+                    isCustom: items[1].isCustom,
+                    customTotalCabinets: items[1].customTotalCabinets,
+                };
                 setAlternativeProduct({
-                    product: {
-                        id: items[1].productId,
-                        productName: items[1].productName,
-                        productNumber: items[1].productNumber,
-                        pixelPitch: items[1].pixelPitch,
-                        imageUrl: items[1].imageUrl || null,
-                        isCustom: items[1].isCustom,
-                        customTotalCabinets: items[1].customTotalCabinets,
-                    },
+                    product: altProductData,
                     quantity: items[1].quantity || 1,
-                    unitPrice: "",
+                    unitPrice: getQuotationDefaultUnitPrice(altProductData),
                     discountPercentage: "",
                     description: "",
                     optionalItems: [],
@@ -591,8 +596,14 @@ export default function QuotationBuilderPage() {
                 </Button>
 
                 <h1 className="text-2xl font-bold ">
-                    {editingDraftId ? "Edit Draft Quotation" : "Quotation Builder"} {enquiry?.enquiryId ? formatEnquiryId(enquiry.id) : ""}
+                    {editingDraftId ? "Edit Draft Quotation" : "Quotation Builder"}{" "}
+                    {enquiry?.enquiryId ? formatEnquiryId(enquiry.id) : ""}
                 </h1>
+                {enquiry && (
+                    <p className="text-lg font-semibold text-gray-900 mt-2">
+                        {enquiry.displayTitle || getEnquiryDisplayTitle(enquiry)}
+                    </p>
+                )}
                 <p className="text-gray-600 mt-1">
                     {editingDraftId 
                         ? "Update the draft quotation or send it to the customer" 
@@ -601,6 +612,7 @@ export default function QuotationBuilderPage() {
                 </p>
             </div>
 
+            {/* Tax Rate Section */}
             <section
                 className="rounded-xl border-2 border-blue-200 bg-blue-50/30 p-6"
                 aria-labelledby="quotation-tax-heading"

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Plus, Trash2 } from "lucide-react";
+import { Search, Plus, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -33,7 +33,7 @@ export default function ProductsPage() {
     const [searchProducts, setSearchProducts] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
-
+    const [exporting, setExporting] = useState(false);
     // Controllers state
     const [controllersList, setControllersList] = useState([]);
     const [filteredControllers, setFilteredControllers] = useState([]);
@@ -262,6 +262,38 @@ export default function ProductsPage() {
         }
     };
 
+    const exportProducts = async () => {
+        setExporting(true);
+        try {
+            const res = await fetch("/api/admin/products/export-products");
+            if (!res.ok) {
+                const json = await res.json().catch(() => null);
+                throw new Error(json?.message || "Failed to export products");
+            }
+            const blob = await res.blob();
+            const disposition = res.headers.get("Content-Disposition");
+            const filenameMatch = disposition?.match(/filename="?([^"]+)"?/);
+            const filename =
+                filenameMatch?.[1] ||
+                `products-${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Products exported successfully");
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -311,6 +343,24 @@ export default function ProductsPage() {
                                 ))}
                             </SelectContent>
                         </Select>
+                            <Button 
+                            variant="secondary" 
+                            size="lg" 
+                            onClick={exportProducts} 
+                            disabled={exporting}
+                            >
+                                {exporting ? (
+                                    <>
+                                        <Spinner className="h-4 w-4" />
+                                        Exporting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="h-4 w-4" />
+                                        Export Products
+                                    </>
+                                )}
+                            </Button>
                     </div>
 
                     <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">

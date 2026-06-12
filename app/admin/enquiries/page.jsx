@@ -140,6 +140,7 @@ export default function AdminEnquiriesPage() {
                     <TableHeader className="bg-secondary ">
                         <TableRow>
                             <TableHead className="p-4 text-white whitespace-nowrap">Enquiry ID</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Enquiry title</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Customer Name</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Submitted On</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
@@ -149,7 +150,7 @@ export default function AdminEnquiriesPage() {
                     <TableBody>
                         {loading && enquiries.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={6} className="h-24 text-center">
                                     <div className="flex items-center justify-center gap-2">
                                         <Spinner className="h-5 w-5" />
                                         <span>Loading enquiries...</span>
@@ -171,6 +172,11 @@ export default function AdminEnquiriesPage() {
                                                 </span>
                                             )}
                                         </div>
+                                    </TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap max-w-[240px]">
+                                        <span className="block truncate" title={enquiry.displayTitle}>
+                                            {enquiry.displayTitle}
+                                        </span>
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
                                         {enquiry.customerName}
@@ -194,14 +200,14 @@ export default function AdminEnquiriesPage() {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={6} className="h-24 text-center">
                                     No enquiries found.
                                 </TableCell>
                             </TableRow>
                         )}
                         {loading && enquiries.length > 0 && (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-4">
+                                <TableCell colSpan={6} className="text-center py-4">
                                     <div className="flex items-center justify-center gap-2">
                                         <Spinner className="h-4 w-4" />
                                         <span>Loading more enquiries...</span>

@@ -244,6 +244,7 @@ export default function LeditorPage() {
     const enquirySchema = useMemo(
         () =>
             z.object({
+                projectName: z.string().max(200).optional(),
                 message: z.string().min(10, tVal("messageTooShort")),
                 privacy: z.boolean().refine((val) => val === true, tVal("privacyRequired")),
                 captcha: z.union([z.string(), z.any()]).refine((val) => !!val, tVal("captchaRequired")),
@@ -766,6 +767,7 @@ export default function LeditorPage() {
 
         try {
             const payload = {
+                projectName: data.projectName?.trim() || null,
                 message: data.message.trim(),
                 items: [
                     {
@@ -1664,82 +1666,99 @@ export default function LeditorPage() {
                                         />
                                     </div>
                                 </div>
-
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="enquiry-message" className="text-sm font-medium">
-                                        {t("yourMessage")}
-                                        <span className="text-destructive ml-0.5">*</span>
+                                    <Label htmlFor="enquiry-project-name" className="text-sm font-medium">
+                                        {t("projectName")}
+                                        <span className="text-muted-foreground font-normal ml-1">
+                                            ({t("optional")})
+                                        </span>
                                     </Label>
-                                    <Textarea
-                                        id="enquiry-message"
-                                        {...register("message")}
-                                        placeholder={
-                                            t("messagePlaceholder")
-                                        }
-                                        rows={4}
-                                        className={cn(
-                                            "text-sm min-h-[100px] resize-y",
-                                            errors.message && "border-destructive"
-                                        )}
+                                    <Input
+                                        id="enquiry-project-name"
+                                        {...register("projectName")}
+                                        placeholder={t("projectNamePlaceholder")}
+                                        className="text-sm"
                                     />
-                                    {errors.message && (
-                                        <p className="text-xs text-destructive">
-                                            {errors.message.message}
-                                        </p>
-                                    )}
                                 </div>
-
-                                <div className="rounded-lg border shadow-xs bg-white p-4 space-y-3">
-                                    <div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="enquiry-message" className="text-sm font-medium">
+                                            {t("yourMessage")}
+                                            <span className="text-destructive ml-0.5">*</span>
+                                        </Label>
+                                        <Textarea
+                                            id="enquiry-message"
+                                            {...register("message")}
+                                            placeholder={
+                                                t("messagePlaceholder")
+                                            }
+                                            rows={4}
+                                            className={cn(
+                                                "text-sm min-h-[105px] resize-y",
+                                                errors.message && "border-destructive"
+                                            )}
+                                        />
+                                        {errors.message && (
+                                            <p className="text-xs text-destructive">
+                                                {errors.message.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-1.5">
                                         <p className="text-sm font-medium text-foreground">
                                             {t("referenceFiles")}
                                             <span className="text-muted-foreground font-normal ml-1">
                                                 ({t("optional")})
                                             </span>
                                         </p>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
-                                            {t("referenceFilesHint")}
-                                        </p>
+                                        <div className="rounded-lg border shadow-xs bg-white p-4">
+                                            <div>
+
+                                                <p className="text-xs text-muted-foreground">
+                                                    {t("referenceFilesHint")}
+                                                </p>
+                                            </div>
+                                            <Label className="inline-flex items-center gap-2 cursor-pointer border border-border/60 rounded-lg px-4 mt-2 py-2.5 hover:bg-muted/20 transition-colors text-sm font-medium w-fit">
+                                                <Upload className="h-4 w-4 text-muted-foreground" />
+                                                {t("attachFiles")}
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept=".pdf,.jpg,.jpeg,.png,.dwg"
+                                                    onChange={handleFileChange}
+                                                    className="hidden"
+                                                />
+                                            </Label>
+                                            {uploadedFiles.length > 0 && (
+                                                <ul className="space-y-2">
+                                                    {uploadedFiles.map((file, idx) => (
+                                                        <li
+                                                            key={idx}
+                                                            className="flex items-center gap-3 bg-muted/20 border border-border/60 rounded-lg px-3 py-2"
+                                                        >
+                                                            <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                                            <span className="text-sm flex-1 truncate text-foreground">
+                                                                {file.name}
+                                                            </span>
+                                                            <span className="text-xs text-muted-foreground shrink-0">
+                                                                {(file.size / 1024).toFixed(1)} KB
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveFile(idx)}
+                                                                className="text-destructive hover:text-destructive/80 transition-colors shrink-0"
+                                                                aria-label={
+                                                                    t("removeFile")
+                                                                }
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
                                     </div>
-                                    <Label className="inline-flex items-center gap-2 cursor-pointer border border-border/60 rounded-lg px-4 py-2.5 hover:bg-muted/20 transition-colors text-sm font-medium w-fit">
-                                        <Upload className="h-4 w-4 text-muted-foreground" />
-                                        {t("attachFiles")}
-                                        <input
-                                            type="file"
-                                            multiple
-                                            accept=".pdf,.jpg,.jpeg,.png,.dwg"
-                                            onChange={handleFileChange}
-                                            className="hidden"
-                                        />
-                                    </Label>
-                                    {uploadedFiles.length > 0 && (
-                                        <ul className="space-y-2">
-                                            {uploadedFiles.map((file, idx) => (
-                                                <li
-                                                    key={idx}
-                                                    className="flex items-center gap-3 bg-muted/20 border border-border/60 rounded-lg px-3 py-2"
-                                                >
-                                                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                                                    <span className="text-sm flex-1 truncate text-foreground">
-                                                        {file.name}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground shrink-0">
-                                                        {(file.size / 1024).toFixed(1)} KB
-                                                    </span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveFile(idx)}
-                                                        className="text-destructive hover:text-destructive/80 transition-colors shrink-0"
-                                                        aria-label={
-                                                            t("removeFile")
-                                                        }
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
                                 </div>
 
                                 <div className="space-y-2">

@@ -33,6 +33,7 @@ export async function GET(request) {
                 productNumber: products.productNumber,
                 productType: products.productType,
                 pixelPitch: products.pixelPitch,
+                pricePerCabinetUsd: products.pricePerCabinetUsd,
             })
             .from(products)
             .where(whereClause)
@@ -41,7 +42,7 @@ export async function GET(request) {
             .offset(offset);
 
         // Fetch first image for each product
-        const productsWithImages = await Promise.all(
+        const items = await Promise.all(
             productsList.map(async (product) => {
                 const images = await db
                     .select({ imageUrl: productImages.imageUrl })
@@ -49,10 +50,11 @@ export async function GET(request) {
                     .where(eq(productImages.productId, product.id))
                     .orderBy(productImages.imageOrder)
                     .limit(1);
-                
+
                 return {
                     ...product,
                     imageUrl: images[0]?.imageUrl || null,
+                    sourceType: "product",
                 };
             })
         );
@@ -68,7 +70,7 @@ export async function GET(request) {
         const hasMore = page < totalPages;
 
         return successResponse("Products fetched successfully", {
-            products: productsWithImages,
+            items,
             pagination: {
                 page,
                 limit,

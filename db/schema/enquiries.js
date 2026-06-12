@@ -9,6 +9,7 @@ export const enquiries = pgTable("enquiries", {
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     message: text("message").notNull(),
+    projectName: text("project_name"),
     status: text("status").default("pending").notNull(), // pending, in_progress, completed, cancelled
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

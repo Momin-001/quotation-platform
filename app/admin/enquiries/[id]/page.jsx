@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft, Eye, Pencil, Monitor, Wrench, Package, Upload, Settings2 } from "lucide-react";
+import { FileText, ArrowLeft, Eye, Pencil, Monitor, Wrench, Package, Upload, Settings2, Save } from "lucide-react";
+import { getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
 import {
     Table,
     TableBody,
@@ -27,6 +30,8 @@ export default function EnquiryDetailPage() {
     const router = useRouter();
     const [enquiry, setEnquiry] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [projectNameInput, setProjectNameInput] = useState("");
+    const [savingProjectName, setSavingProjectName] = useState(false);
     const [datasheetLoadingId, setDatasheetLoadingId] = useState(null);
     const [referenceFileLoadingId, setReferenceFileLoadingId] = useState(null);
 
@@ -44,11 +49,46 @@ export default function EnquiryDetailPage() {
                 throw new Error(response.message || "Failed to fetch enquiry");
             }
             setEnquiry(response.data);
+            setProjectNameInput(response.data.projectName || "");
         } catch (error) {
             toast.error(error.message);
             router.push("/admin/enquiries");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSaveProjectName = async () => {
+        setSavingProjectName(true);
+        try {
+            const trimmed = projectNameInput.trim();
+            const res = await fetch(`/api/admin/enquiries/${params.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ projectName: trimmed || null }),
+            });
+            const response = await res.json();
+            if (!response.success) {
+                throw new Error(response.message || "Failed to update project name");
+            }
+
+            setEnquiry((prev) => {
+                if (!prev) return prev;
+                const nextProjectName = response.data.projectName || null;
+                const nextEnquiry = {
+                    ...prev,
+                    projectName: nextProjectName,
+                    updatedAt: response.data.updatedAt,
+                };
+                nextEnquiry.displayTitle = getEnquiryDisplayTitle(nextEnquiry);
+                return nextEnquiry;
+            });
+            setProjectNameInput(response.data.projectName || "");
+            toast.success("Project name saved");
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setSavingProjectName(false);
         }
     };
 
@@ -132,6 +172,13 @@ export default function EnquiryDetailPage() {
     }
 
     const items = enquiry.items || [];
+    const defaultEnquiryTitle = getEnquiryDisplayTitle({
+        ...enquiry,
+        projectName: null,
+    });
+    const displayTitle = enquiry.displayTitle || getEnquiryDisplayTitle(enquiry);
+    const projectNameDirty =
+        projectNameInput.trim() !== (enquiry.projectName || "").trim();
 
     let totalWidth = 0;
     let totalHeight = 0;
@@ -152,10 +199,55 @@ export default function EnquiryDetailPage() {
                 </Button>
 
                 <h1 className="text-2xl font-bold ">Enquiry Detail Page</h1>
+                <p className="text-xl font-semibold text-gray-900 mt-2">{displayTitle}</p>
                 <p className="text-lg text-gray-600 mt-1">{enquiry.enquiryId}</p>
             </div>
 
             <div className="bg-white rounded-lg border shadow-sm p-6 space-y-8">
+                <div>
+                    <h2 className="text-xl font-bold mb-2">Project name</h2>
+                    <p className="text-sm text-gray-500 mb-4">
+                        Used as the enquiry title when set. If empty, the title defaults to{" "}
+                        <span className="font-medium text-gray-700">{defaultEnquiryTitle}</span>.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 max-w-xl">
+                        <div className="flex-1 space-y-1.5">
+                            <Label htmlFor="admin-project-name" className="text-sm font-medium text-gray-700">
+                                Project name
+                            </Label>
+                            <Input
+                                id="admin-project-name"
+                                value={projectNameInput}
+                                onChange={(e) => setProjectNameInput(e.target.value)}
+                                placeholder={defaultEnquiryTitle}
+                                maxLength={200}
+                                className="h-11"
+                            />
+                        </div>
+                        <div className="sm:self-end">
+                            <Button
+                                type="button"
+                                variant="default"
+                                size="lg"
+                                onClick={handleSaveProjectName}
+                                disabled={savingProjectName || !projectNameDirty}
+                            >
+                                {savingProjectName ? (
+                                    <>
+                                        <Spinner className="h-4 w-4 mr-2" />
+                                        Saving…
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="h-4 w-4 mr-2" />
+                                        Save
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <h2 className="text-xl font-bold  mb-2">Customer Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import QuotationDropDown from "@/components/admin/Quotation/QuotationDropDown";
-import QuotationOptionalDropDown from "@/components/admin/Quotation/QuotationOptionalDropDown";
+import QuotationCatalogDropDown from "@/components/admin/Quotation/QuotationCatalogDropDown";
+import { getQuotationDefaultUnitPrice } from "@/lib/helpers/helpers";
 
 export default function QuotationForm({ 
     item, 
@@ -19,15 +19,15 @@ export default function QuotationForm({
         onUpdate({ ...item, [field]: value });
     };
 
-    // Optional = accessories; additional = controllers. Both contribute to offer net + quotation VAT.
-    const DropdownComponent = isOptionalItem || isAdditionalItem
-        ? QuotationOptionalDropDown
-        : QuotationDropDown;
-    const optionalProps = isOptionalItem
-        ? { searchType: "accessory", placeholder: "Select accessory" }
-        : isAdditionalItem
-            ? { searchType: "controller", placeholder: "Select controller" }
-            : {};
+    const handleProductChange = (product) => {
+        onUpdate({
+            ...item,
+            product,
+            unitPrice: getQuotationDefaultUnitPrice(product, { isOptionalItem, isAdditionalItem }),
+        });
+    };
+
+    const catalogType = isOptionalItem ? "accessory" : isAdditionalItem ? "controller" : "product";
 
     return (
         <div className="bg-white rounded-lg border shadow-sm p-6 space-y-4">
@@ -52,12 +52,11 @@ export default function QuotationForm({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                         Product
                     </label>
-                    <DropdownComponent
+                    <QuotationCatalogDropDown
+                        catalogType={catalogType}
                         value={item.product}
-                        onChange={(product) => handleChange("product", product)}
-                        placeholder={optionalProps.placeholder || "Select product"}
+                        onChange={handleProductChange}
                         disabled={productDisabled}
-                        {...(isOptionalItem || isAdditionalItem ? { searchType: optionalProps.searchType } : {})}
                     />
                 </div>
 

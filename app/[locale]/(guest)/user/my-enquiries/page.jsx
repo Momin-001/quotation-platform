@@ -12,6 +12,7 @@ import {
     formatDate,
     getStatusLabel,
     getEnquiryStatusColor,
+    getEnquiryDisplayTitle,
 } from "@/lib/helpers/helpers";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { fetchUserEnquiries } from "@/features/enquiries/user-enquiries";
@@ -23,14 +24,6 @@ const enquiryAccordionPanel =
 const enquiryAccordionTrigger =
     "hover:no-underline hover:bg-muted/20 px-4 sm:px-5 py-4 text-foreground data-[state=open]:bg-muted/10";
 const enquiryAccordionContent = "px-4 sm:px-5 pb-4 pt-0 border-t border-border/40 bg-muted/10";
-
-function getEnquiryTitle(enquiry, t) {
-    const first = enquiry.items?.[0];
-    if (first?.isCustom) {
-        return t("customLedSolution");
-    }
-    return first?.product?.productName || t("productEnquiry");
-}
 
 export default async function MyEnquiriesPage() {
     const t = await getTranslations("User.enquiries");
@@ -51,7 +44,9 @@ export default async function MyEnquiriesPage() {
         )
         .map((enquiry) => ({
             ...enquiry,
-            title: getEnquiryTitle(enquiry, t),
+            title: getEnquiryDisplayTitle(enquiry, {
+                productEnquiry: t("productEnquiry"),
+            }),
             hasCustomItems: enquiry.items?.some((item) => item.isCustom) ?? false,
         }));
 

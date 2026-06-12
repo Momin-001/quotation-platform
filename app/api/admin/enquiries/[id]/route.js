@@ -3,6 +3,7 @@ import { enquiries, enquiryItems, enquiryFiles, users, products, productImages, 
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
 function formatEnquiryId(enquiryId, createdAt) {
@@ -34,6 +35,7 @@ export async function GET(req, { params }) {
                 id: enquiries.id,
                 userId: enquiries.userId,
                 message: enquiries.message,
+                projectName: enquiries.projectName,
                 status: enquiries.status,
                 createdAt: enquiries.createdAt,
                 updatedAt: enquiries.updatedAt,
@@ -89,6 +91,7 @@ export async function GET(req, { params }) {
                 productName: products.productName,
                 productNumber: products.productNumber,
                 pixelPitch: products.pixelPitch,
+                pricePerCabinetUsd: products.pricePerCabinetUsd,
                 cabinetResolutionHorizontal: products.cabinetResolutionHorizontal,
                 cabinetResolutionVertical: products.cabinetResolutionVertical,
             })
@@ -114,6 +117,7 @@ export async function GET(req, { params }) {
                             id: controllers.id,
                             productName: controllers.interfaceName,
                             brandName: controllers.brandName,
+                            pricePerControllerUsd: controllers.pricePerControllerUsd,
                             imageUrl: productImages.imageUrl,
                         })
                         .from(controllers)
@@ -155,9 +159,15 @@ export async function GET(req, { params }) {
         // Format enquiry ID
         const enquiryId = formatEnquiryId(enquiry.id, enquiry.createdAt);
 
+        const displayTitle = getEnquiryDisplayTitle({
+            projectName: enquiry.projectName,
+            items,
+        });
+
         return successResponse("Enquiry fetched successfully", {
             ...enquiry,
             enquiryId,
+            displayTitle,
             items,
             files,
             quotations: enquiryQuotations,
@@ -165,5 +175,65 @@ export async function GET(req, { params }) {
     } catch (error) {
         console.error("GET /api/admin/enquiries/[id] error:", error);
         return errorResponse("Failed to fetch enquiry", 500);
+    }
+}
+
+export async function PATCH(req, { params }) {
+    try {
+        const { user, error } = await getCurrentUser();
+        if (error || !user) {
+            return errorResponse("Unauthorized", 401);
+        }
+        if (user.role !== "admin" && user.role !== "super_admin") {
+            return errorResponse("Forbidden: Admin access required", 403);
+        }
+
+        const { id } = await params;
+        if (!id) {
+            return errorResponse("Enquiry ID is required", 400);
+        }
+
+        const body = await req.json();
+        const rawProjectName = body.projectName;
+        if (rawProjectName !== null && rawProjectName !== undefined && typeof rawProjectName !== "string") {
+            return errorResponse("Project name must be a string or null", 400);
+        }
+
+        const trimmedProjectName =
+            typeof rawProjectName === "string" && rawProjectName.trim()
+                ? rawProjectName.trim()
+                : null;
+
+        if (trimmedProjectName && trimmedProjectName.length > 200) {
+            return errorResponse("Project name must be 200 characters or fewer", 400);
+        }
+
+        const existing = await db
+            .select({ id: enquiries.id })
+            .from(enquiries)
+            .where(eq(enquiries.id, id))
+            .limit(1);
+
+        if (existing.length === 0) {
+            return errorResponse("Enquiry not found", 404);
+        }
+
+        const [updated] = await db
+            .update(enquiries)
+            .set({
+                projectName: trimmedProjectName,
+                updatedAt: new Date(),
+            })
+            .where(eq(enquiries.id, id))
+            .returning({
+                id: enquiries.id,
+                projectName: enquiries.projectName,
+                updatedAt: enquiries.updatedAt,
+            });
+
+        return successResponse("Project name updated successfully", updated);
+    } catch (error) {
+        console.error("PATCH /api/admin/enquiries/[id] error:", error);
+        return errorResponse("Failed to update project name", 500);
     }
 }

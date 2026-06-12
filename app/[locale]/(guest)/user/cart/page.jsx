@@ -47,6 +47,7 @@ export default function CartPage() {
     const formSchema = useMemo(
         () =>
             z.object({
+                projectName: z.string().max(200).optional(),
                 message: z.string().min(10, tVal("messageTooShort")),
             }),
         [tVal]
@@ -77,6 +78,7 @@ export default function CartPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    projectName: data.projectName?.trim() || null,
                     message: data.message,
                     items: cartItems.map((item, index) => ({
                         productId: item.id,
@@ -380,6 +382,21 @@ export default function CartPage() {
                                         className={readOnlyInputClass}
                                     />
                                 </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <Label htmlFor="projectName" className="text-sm font-medium">
+                                    {t("projectName")}
+                                    <span className="text-muted-foreground font-normal ml-1">
+                                        ({t("optional")})
+                                    </span>
+                                </Label>
+                                <Input
+                                    id="projectName"
+                                    {...register("projectName")}
+                                    placeholder={t("projectNamePlaceholder")}
+                                    className="text-sm"
+                                />
                             </div>
 
                             <div className="space-y-1.5">

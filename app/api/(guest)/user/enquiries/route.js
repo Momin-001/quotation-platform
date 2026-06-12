@@ -17,7 +17,7 @@ export async function POST(req) {
         }
 
         const contentType = req.headers.get("content-type") || "";
-        let message, items, files = [];
+        let message, projectName, items, files = [];
 
         if (contentType.includes("multipart/form-data")) {
             const formData = await req.formData();
@@ -27,13 +27,18 @@ export async function POST(req) {
             }
             const payload = JSON.parse(payloadStr);
             message = payload.message;
+            projectName = payload.projectName;
             items = payload.items;
             files = formData.getAll("files") || [];
         } else {
             const body = await req.json();
             message = body.message;
+            projectName = body.projectName;
             items = body.items;
         }
+
+        const trimmedProjectName =
+            typeof projectName === "string" && projectName.trim() ? projectName.trim() : null;
 
         if (!message || !items || !Array.isArray(items) || items.length === 0) {
             return errorResponse("Message and at least one product item are required", 400);
@@ -45,6 +50,7 @@ export async function POST(req) {
             .values({
                 userId: user.id,
                 message: message.trim(),
+                projectName: trimmedProjectName,
                 status: "pending",
             })
             .returning();

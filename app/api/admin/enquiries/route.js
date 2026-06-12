@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, users } from "@/db/schema";
+import { enquiries, enquiryItems, users, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc, and, or, ilike, sql, inArray } from "drizzle-orm";
+import { getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
 function formatEnquiryId(enquiryId, createdAt) {
@@ -26,13 +27,15 @@ export async function GET(req) {
         if (search) {
             const searchPattern = `%${search}%`;
             const searchUpper = search.toUpperCase().trim();
-            
+
             // Build search conditions
             const searchConditions = [
                 // Search in customer name
                 ilike(users.fullName, searchPattern),
                 // Search in customer email
                 ilike(users.email, searchPattern),
+                // Search in project name
+                ilike(enquiries.projectName, searchPattern),
             ];
 
             // Search in enquiry ID (last 4 chars of UUID)
@@ -53,7 +56,7 @@ export async function GET(req) {
                     );
                 }
             }
-            
+
             // Always try to match last 4 chars for any search (handles partial UUID searches)
             if (searchUpper.length >= 1) {
                 const uuidPattern = `%${searchUpper}%`;
@@ -71,6 +74,7 @@ export async function GET(req) {
                 id: enquiries.id,
                 userId: enquiries.userId,
                 message: enquiries.message,
+                projectName: enquiries.projectName,
                 status: enquiries.status,
                 createdAt: enquiries.createdAt,
                 updatedAt: enquiries.updatedAt,
@@ -110,12 +114,43 @@ export async function GET(req) {
             : [];
         const customEnquiryIds = new Set(customItems.map((ci) => ci.enquiryId));
 
+        const firstItems = enquiryIds.length > 0 ? await db
+            .select({
+                enquiryId: enquiryItems.enquiryId,
+                isCustom: enquiryItems.isCustom,
+                productName: products.productName,
+            })
+            .from(enquiryItems)
+            .innerJoin(products, eq(enquiryItems.productId, products.id))
+            .where(
+                and(
+                    inArray(enquiryItems.enquiryId, enquiryIds),
+                    eq(enquiryItems.itemOrder, 0)
+                )
+            )
+            : [];
+
+        const firstItemByEnquiryId = Object.fromEntries(
+            firstItems.map((item) => [item.enquiryId, item])
+        );
+
         // Format the response with enquiry ID
-        const formattedEnquiries = allEnquiries.map((enquiry) => ({
-            ...enquiry,
-            enquiryId: formatEnquiryId(enquiry.id, enquiry.createdAt),
-            isCustom: customEnquiryIds.has(enquiry.id),
-        }));
+        const formattedEnquiries = allEnquiries.map((enquiry) => {
+            const firstItem = firstItemByEnquiryId[enquiry.id];
+            const displayTitle = getEnquiryDisplayTitle({
+                projectName: enquiry.projectName,
+                items: firstItem
+                    ? [{ isCustom: firstItem.isCustom, productName: firstItem.productName }]
+                    : [],
+            });
+
+            return {
+                ...enquiry,
+                enquiryId: formatEnquiryId(enquiry.id, enquiry.createdAt),
+                isCustom: customEnquiryIds.has(enquiry.id),
+                displayTitle,
+            };
+        });
 
         // Get total count for pagination (if needed in future)
         // For now, we'll use the length to determine if there are more pages
