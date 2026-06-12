@@ -3,6 +3,7 @@ import { products, productImages, productCertificates, productFeatures, productP
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, asc } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
+import { slugify, isProductSlugTaken } from "@/lib/helpers/product-slug";
 
 // GET /api/admin/products/[id] - Fetch a single product with all details
 export async function GET(request, { params }) {
@@ -181,6 +182,16 @@ export async function PUT(request, { params }) {
             notes: body.notes?.toString().trim() || null,
             updatedAt: new Date(),
         };
+
+        // Regenerate slug from product name (used for the SEO-friendly product URL)
+        const slug = slugify(productData.productName);
+        if (!slug) {
+            return errorResponse("Product name must contain at least one letter or number to generate a URL slug", 400);
+        }
+        if (await isProductSlugTaken(slug, id)) {
+            return errorResponse("A product with this name already exists (duplicate URL slug). Please choose a different product name.", 409);
+        }
+        productData.slug = slug;
 
         // Update product fields
         await db.update(products).set(productData).where(eq(products.id, id));

@@ -35,6 +35,7 @@ export async function GET(req, { params }) {
             limit: 4,
             columns: {
                 id: true,
+                slug: true,
                 productName: true,
                 productNumber: true,
                 design: true,
@@ -53,6 +54,7 @@ export async function GET(req, { params }) {
 
         const formatted = rows.map((p) => ({
             id: p.id,
+            slug: p.slug,
             productName: p.productName,
             productNumber: p.productNumber,
             areaOfUse: p.areaOfUse?.name ?? null,

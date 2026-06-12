@@ -3,6 +3,7 @@ import { products, productImages, productCertificates, productFeatures, productP
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, eq } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
+import { slugify, isProductSlugTaken } from "@/lib/helpers/product-slug";
 
 // GET /api/admin/products - Fetch all products
 export async function GET() {
@@ -125,6 +126,16 @@ export async function POST(request) {
         if (!productData.productName || !productData.productNumber) {
             return errorResponse("Product name and product number are required", 400);
         }
+
+        // Generate slug from product name (used for the SEO-friendly product URL)
+        const slug = slugify(productData.productName);
+        if (!slug) {
+            return errorResponse("Product name must contain at least one letter or number to generate a URL slug", 400);
+        }
+        if (await isProductSlugTaken(slug)) {
+            return errorResponse("A product with this name already exists (duplicate URL slug). Please choose a different product name.", 409);
+        }
+        productData.slug = slug;
 
         // Create product
         const newProduct = await db

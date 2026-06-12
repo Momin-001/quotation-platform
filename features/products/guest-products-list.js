@@ -5,6 +5,7 @@ import { desc, eq, and } from "drizzle-orm";
 /** Columns needed for guest product cards (listing grid). */
 const LISTING_COLUMNS = {
     id: true,
+    slug: true,
     productName: true,
     productNumber: true,
     productDescription: true,
@@ -31,6 +32,7 @@ const LISTING_RELATIONS = {
 export function formatGuestProductsListing(rows) {
     return rows.map((product) => ({
         id: product.id,
+        slug: product.slug,
         productName: product.productName,
         productNumber: product.productNumber,
         productDescription: product.productDescription,

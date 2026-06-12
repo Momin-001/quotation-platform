@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { generateUniqueProductSlug } from "@/lib/helpers/product-slug";
 import { eq, ilike } from "drizzle-orm";
 import * as XLSX from "xlsx";
 
@@ -494,9 +495,11 @@ export async function POST(req) {
 
         if (existing) {
           const { productNumber: _pn, isActive: _ia, ...updateData } = productData;
+          updateData.slug = await generateUniqueProductSlug(productName, { excludeProductId: existing.id });
           await db.update(products).set(updateData).where(eq(products.id, existing.id));
           results.updated++;
         } else {
+          productData.slug = await generateUniqueProductSlug(productName);
           await db.insert(products).values(productData);
           results.created++;
         }

@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
     const handleDownloadDatasheet = async () => {
         setDatasheetLoading(true);
         try {
-            const res = await fetch(`/api/products/${params.id}/datasheet`);
+            const res = await fetch(`/api/products/${product.id}/datasheet`);
             if (!res.ok) {
                 throw new Error("Failed to generate datasheet");
             }
@@ -113,7 +113,7 @@ export default function ProductDetailPage() {
     const handleDownloadPdf = async (type, filename) => {
         setPdfDownloading(type);
         try {
-            const res = await fetch(`/api/products/${params.id}/download-pdf?type=${type}`);
+            const res = await fetch(`/api/products/${product.id}/download-pdf?type=${type}`);
             if (!res.ok) {
                 throw new Error("Failed to download PDF");
             }

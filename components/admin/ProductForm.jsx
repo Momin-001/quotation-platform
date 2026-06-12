@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus, FileText } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { slugify } from "@/lib/helpers/slugify";
 
 // Build form default values from API product (handles decimals/numbers as string or number)
 function getDefaultValuesFromInitial(initialData) {
@@ -362,6 +363,10 @@ export default function ProductForm({
         setRemovedPdfs([]);
     }, [isEdit, initialData, initialImages, initialCertificateIds, initialIconIds, initialFeatures, reset]);
 
+    // Live slug preview derived from the product name (read-only, used for the product URL)
+    const productName = watch("productName");
+    const slugPreview = useMemo(() => slugify(productName), [productName]);
+
     // Watch for conditional fields
     const greyscaleProcessing = watch("greyscaleProcessing");
     const controlSystem = watch("controlSystem");
@@ -633,6 +638,22 @@ export default function ProductForm({
 
                     {/* Product Number */}
                     {renderInput("Product Number *", "productNumber", "text", { required: true, disabled: isEdit })}
+
+                    {/* URL Slug Preview */}
+                    <div className="space-y-2">
+                        <Label htmlFor="slugPreview">URL Slug</Label>
+                        <Input
+                            id="slugPreview"
+                            type="text"
+                            value={slugPreview}
+                            placeholder="Auto-generated from product name"
+                            disabled
+                            readOnly
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Automatically generated from the product name and used for the product&apos;s URL.
+                        </p>
+                    </div>
 
                     {/* Product Description */}
                     {renderTextarea("Product Description", "productDescription", { placeholder: "Enter product description" })}

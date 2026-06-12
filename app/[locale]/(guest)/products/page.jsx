@@ -40,7 +40,7 @@ export default async function ProductsPage({ params }) {
         name: "Certified LED Display Products",
         url: `${siteUrl}${canonicalPath}`,
         itemListElement: initialProducts.map((p, i) => {
-            const productUrl = `${siteUrl}${withLocalePrefix(locale, `/products/${p.id}`)}`;
+            const productUrl = `${siteUrl}${withLocalePrefix(locale, `/products/${p.slug}`)}`;
             const item = {
                 "@type": "Product",
                 name: p.productName,

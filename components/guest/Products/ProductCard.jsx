@@ -54,7 +54,7 @@ export default function ProductCard({ product, className = "", variant = "listin
                 )}
                 {isRelated ? (
                     <Link
-                        href={`/products/${product.id}`}
+                        href={`/products/${product.slug}`}
                         className="absolute top-2.5 right-2.5 z-10 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
                         aria-label="View product details"
                     >

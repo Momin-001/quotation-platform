@@ -982,7 +982,7 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
                                     return (
                                         <Link
                                             key={product.id}
-                                            href={`/products/${product.id}`}
+                                            href={`/products/${product.slug}`}
                                             ref={isLastElement ? lastProductElementRef : null}
                                             className="block group h-full"
                                         >

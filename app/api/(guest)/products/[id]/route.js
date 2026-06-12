@@ -5,15 +5,15 @@ import { eq } from "drizzle-orm";
 
 export async function GET(req, { params }) {
     try {
-        const { id } = await params;
+        const { id: slug } = await params;
 
-        if (!id) {
-            return errorResponse("Product ID is required", 400);
+        if (!slug) {
+            return errorResponse("Product slug is required", 400);
         }
 
-        // Fetch product
+        // Fetch product by its URL slug
         const product = await db.query.products.findFirst({
-            where: eq(products.id, id),
+            where: eq(products.slug, slug),
             with: {
                 areaOfUse: {
                     columns: {
