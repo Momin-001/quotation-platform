@@ -9,7 +9,6 @@ const PRODUCT_GROUPS = ["Mechanics", "Service", "Software", "Maintenance"];
 function matchProductGroup(value) {
     if (!value || !value.toString().trim()) return null;
     const raw = value.toString().trim().toLowerCase();
-    // German → English mapping
     const map = {
         mechanik: "Mechanics",
         mechanics: "Mechanics",
@@ -42,7 +41,6 @@ function parseDecimal(value) {
     return isNaN(num) ? null : num.toString();
 }
 
-/** Parse comma-separated string into array of non-empty trimmed strings */
 function parseCommaSeparated(value) {
     if (value === null || value === undefined || value === "") return [];
     return value
@@ -53,14 +51,22 @@ function parseCommaSeparated(value) {
 }
 
 /**
- * Accessory Excel layout (row-oriented):
- *   Row 1 = headers (ITEM_EN, ITEM_DE, unit, then product data columns)
- *   We search for column headers by matching known field names.
+ * Accessory Excel layout (column-oriented / transposed):
+ *   Column A = field labels (ITEM_EN), Column B = ITEM_DE, Column C = Example
+ *   Starting from Column D (index 3), each column is one accessory.
  *
- * Expected columns (case-insensitive matching):
- *   Product Name | Product Number | Short Text | Long Text |
- *   product group | Unit | Manufacturer | supplier |
- *   Price per unit (purchase price) | Price per unit (retail price) | Leadtime
+ *   Row 0  = header row (ITEM_EN, ITEM_DE, unit, Example...)
+ *   Row 1  = Product Name
+ *   Row 2  = Product Number
+ *   Row 3  = Short Text
+ *   Row 4  = Long Text
+ *   Row 5  = Product Group
+ *   Row 6  = Unit
+ *   Row 7  = Manufacturer
+ *   Row 8  = Supplier
+ *   Row 9  = Purchase Price
+ *   Row 10 = Retail Price
+ *   Row 11 = Leadtime
  */
 export async function POST(req) {
     try {
@@ -90,9 +96,7 @@ export async function POST(req) {
             return errorResponse("File has no data rows", 400);
         }
 
-        // Find header row: look for a row that contains "Product Name" or "ITEM_EN"
-        let headerRowIdx = 0;
-        // Order matters: price rows must be matched before "unit" (else "Price per unit (purchase price)" matches "unit")
+        // Field label → row index mapping (scan column A)
         const headerMappings = {
             productName: ["product name", "artikelbezeichnung", "item_en", "name"],
             productNumber: ["product number", "artikelnummer", "article number", "item number", "product_number"],
@@ -110,301 +114,121 @@ export async function POST(req) {
             leadTime: ["leadtime", "lieferzeit", "lead time", "lead_time"],
         };
 
-        // The file may be row-oriented where column A has field labels and remaining columns have data (like the screenshot)
-        // OR it may be a standard table with headers in row 1.
-        // Detect which format by checking if column A row 1 has "ITEM_EN" or "Product Name"
-        const firstCellA = str(data[0]?.[0])?.toLowerCase() || "";
-
-        let mode = "table"; // "table" = standard rows, "transposed" = labels in col A, data in cols after
-
-        if (firstCellA === "item_en" || firstCellA === "headings") {
-            // This looks like the screenshot format where col A has labels
-            // Check if row 1 (0-indexed) is "Product Name"
-            const secondCellA = str(data[1]?.[0])?.toLowerCase() || "";
-            if (secondCellA.includes("product name") || secondCellA.includes("artikelbezeichnung")) {
-                mode = "transposed";
-            }
-        }
-
-        const results = { created: 0, updated: 0, errors: [], total: 0 };
-
-        if (mode === "transposed") {
-            // ── Transposed format (like the screenshot) ──
-            // Column A = field labels, Columns D+ = accessory data (D is the Example/first data column)
-            // Row 0 = header row (ITEM_EN, ITEM_DE, unit, Example...)
-            // Row 1 = Product Name
-            // Row 2 = Product Number
-            // Row 3 = Short Text
-            // Row 4 = Long Text
-            // Row 5 = product group
-            // Row 6 = Unit
-            // Row 7 = Manufacturer
-            // Row 8 = supplier
-            // Row 9 = Purchase Price (Euro)
-            // Row 10 = Retail Price (Euro)
-            // Row 11 = Leadtime (Days)
-
-            // Build a mapping of field name → row index by scanning column A
-            const fieldRowMap = {};
-            for (let r = 1; r < data.length; r++) {
-                const label = str(data[r]?.[0])?.toLowerCase() || "";
-                for (const [field, aliases] of Object.entries(headerMappings)) {
-                    if (aliases.some((a) => label.includes(a))) {
-                        fieldRowMap[field] = r;
-                        break;
-                    }
-                }
-            }
-
-            // Find the data start column (skip label columns A, B, C)
-            const dataStartCol = 3;
-
-            // Count accessories by checking how many columns have data in the productName row
-            const nameRowIdx = fieldRowMap.productName;
-            if (nameRowIdx === undefined) {
-                return errorResponse("Could not find 'Product Name' field in the file", 400);
-            }
-
-            const nameRow = data[nameRowIdx] || [];
-            let numAccessories = 0;
-            for (let col = dataStartCol; col < Math.max(nameRow.length, 50); col++) {
-                if (nameRow[col] && nameRow[col].toString().trim()) {
-                    numAccessories = col - dataStartCol + 1;
-                }
-            }
-
-            results.total = numAccessories;
-
-            if (numAccessories === 0) {
-                return errorResponse("No accessory data found in the file.", 400);
-            }
-
-            function cell(field, accessoryCol) {
-                const rowIdx = fieldRowMap[field];
-                if (rowIdx === undefined) return null;
-                const row = data[rowIdx];
-                if (!row) return null;
-                const val = row[dataStartCol + accessoryCol];
-                if (val === undefined || val === null || val === "") return null;
-                return val;
-            }
-
-            for (let a = 0; a < numAccessories; a++) {
-                try {
-                    const productName = str(cell("productName", a));
-                    const productNumber = str(cell("productNumber", a));
-
-                    if (!productName || !productNumber) {
-                        results.errors.push(`Column ${a + 1}: Missing product name or number, skipped.`);
-                        continue;
-                    }
-
-                    const productGroup = matchProductGroup(cell("productGroup", a));
-                    if (!productGroup) {
-                        results.errors.push(
-                            `Accessory "${productName}": Invalid or missing product group "${cell("productGroup", a)}". Must be one of: ${PRODUCT_GROUPS.join(", ")}`
-                        );
-                        continue;
-                    }
-
-                    const featuresArray = parseCommaSeparated(cell("features", a));
-                    const optionalFieldArray = parseCommaSeparated(cell("optionalField", a));
-
-                    const accessoryData = {
-                        productName,
-                        productNumber,
-                        shortText: str(cell("shortText", a)),
-                        longText: str(cell("longText", a)),
-                        productGroup,
-                        unit: str(cell("unit", a)),
-                        manufacturer: str(cell("manufacturer", a)),
-                        supplier: str(cell("supplier", a)),
-                        productDatasheetUrl: str(cell("productDatasheetUrl", a)),
-                        purchasePrice: parseDecimal(cell("purchasePrice", a)),
-                        retailPrice: parseDecimal(cell("retailPrice", a)),
-                        leadTime: str(cell("leadTime", a)),
-                        optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
-                        isActive: true,
-                        updatedAt: new Date(),
-                    };
-
-                    const [existing] = await db
-                        .select({ id: accessories.id })
-                        .from(accessories)
-                        .where(eq(accessories.productNumber, productNumber))
-                        .limit(1);
-
-                    if (existing) {
-                        const { productNumber: _pn, isActive: _ia, ...updateData } = accessoryData;
-                        await db.update(accessories).set(updateData).where(eq(accessories.id, existing.id));
-                        await db.delete(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, existing.id));
-                        if (featuresArray.length > 0) {
-                            await Promise.all(
-                                featuresArray.map((feature) =>
-                                    db.insert(accessoryFeatures).values({
-                                        accessoryId: existing.id,
-                                        feature: feature.trim(),
-                                    })
-                                )
-                            );
-                        }
-                        results.updated++;
-                    } else {
-                        const [inserted] = await db.insert(accessories).values(accessoryData).returning();
-                        if (featuresArray.length > 0) {
-                            await Promise.all(
-                                featuresArray.map((feature) =>
-                                    db.insert(accessoryFeatures).values({
-                                        accessoryId: inserted.id,
-                                        feature: feature.trim(),
-                                    })
-                                )
-                            );
-                        }
-                        results.created++;
-                    }
-                } catch (accessoryErr) {
-                    const aName = str(cell("productName", a)) || `Column ${a + 1}`;
-                    results.errors.push(`Accessory "${aName}": ${accessoryErr.message}`);
-                }
-            }
-        } else {
-            // ── Standard table format ──
-            // Find header row by scanning first few rows for known column names
-            for (let r = 0; r < Math.min(data.length, 5); r++) {
-                const rowStr = (data[r] || []).map((v) => (v ? v.toString().toLowerCase() : "")).join(" ");
-                if (
-                    rowStr.includes("product name") ||
-                    rowStr.includes("artikelbezeichnung") ||
-                    rowStr.includes("product number")
-                ) {
-                    headerRowIdx = r;
+        const fieldRowMap = {};
+        for (let r = 1; r < data.length; r++) {
+            const label = str(data[r]?.[0])?.toLowerCase() || "";
+            for (const [field, aliases] of Object.entries(headerMappings)) {
+                if (aliases.some((a) => label.includes(a))) {
+                    fieldRowMap[field] = r;
                     break;
                 }
             }
+        }
 
-            const headers = (data[headerRowIdx] || []).map((h) =>
-                h ? h.toString().trim().toLowerCase() : ""
-            );
+        const nameRowIdx = fieldRowMap.productName;
+        if (nameRowIdx === undefined) {
+            return errorResponse("Could not find 'Product Name' field in the file", 400);
+        }
 
-            // Map column indices to fields
-            const colMap = {};
-            for (let col = 0; col < headers.length; col++) {
-                const h = headers[col];
-                for (const [field, aliases] of Object.entries(headerMappings)) {
-                    if (aliases.some((a) => h.includes(a) || a.includes(h))) {
-                        colMap[field] = col;
-                        break;
-                    }
-                }
+        // Data columns start at D (index 3), skipping label columns A, B, C
+        const dataStartCol = 3;
+
+        const nameRow = data[nameRowIdx] || [];
+        let numAccessories = 0;
+        for (let col = dataStartCol; col < Math.max(nameRow.length, 50); col++) {
+            if (nameRow[col] && nameRow[col].toString().trim()) {
+                numAccessories = col - dataStartCol + 1;
             }
+        }
 
-            if (colMap.productName === undefined && colMap.productNumber === undefined) {
-                return errorResponse(
-                    "Could not find 'Product Name' or 'Product Number' columns in the header row.",
-                    400
-                );
-            }
+        const results = { created: 0, skipped: 0, errors: [], total: numAccessories };
 
-            const dataRows = data.slice(headerRowIdx + 1).filter((row) => {
-                const nameCol = colMap.productName ?? colMap.productNumber;
-                return row[nameCol] && row[nameCol].toString().trim();
-            });
+        if (numAccessories === 0) {
+            return errorResponse("No accessory data found in the file.", 400);
+        }
 
-            results.total = dataRows.length;
+        function cell(field, accessoryCol) {
+            const rowIdx = fieldRowMap[field];
+            if (rowIdx === undefined) return null;
+            const row = data[rowIdx];
+            if (!row) return null;
+            const val = row[dataStartCol + accessoryCol];
+            if (val === undefined || val === null || val === "") return null;
+            return val;
+        }
 
-            for (let i = 0; i < dataRows.length; i++) {
-                try {
-                    const row = dataRows[i];
-                    const get = (field) => {
-                        const col = colMap[field];
-                        if (col === undefined) return null;
-                        const val = row[col];
-                        if (val === undefined || val === null || val === "") return null;
-                        return val;
-                    };
+        for (let a = 0; a < numAccessories; a++) {
+            try {
+                const productName = str(cell("productName", a));
+                const productNumber = str(cell("productNumber", a));
 
-                    const productName = str(get("productName"));
-                    const productNumber = str(get("productNumber"));
-
-                    if (!productName || !productNumber) {
-                        results.errors.push(`Row ${headerRowIdx + 2 + i}: Missing product name or number, skipped.`);
-                        continue;
-                    }
-
-                    const productGroup = matchProductGroup(get("productGroup"));
-                    if (!productGroup) {
-                        results.errors.push(
-                            `Accessory "${productName}": Invalid or missing product group "${get("productGroup")}". Must be one of: ${PRODUCT_GROUPS.join(", ")}`
-                        );
-                        continue;
-                    }
-
-                    const featuresArray = parseCommaSeparated(get("features"));
-                    const optionalFieldArray = parseCommaSeparated(get("optionalField"));
-
-                    const accessoryData = {
-                        productName,
-                        productNumber,
-                        shortText: str(get("shortText")),
-                        longText: str(get("longText")),
-                        productGroup,
-                        unit: str(get("unit")),
-                        manufacturer: str(get("manufacturer")),
-                        supplier: str(get("supplier")),
-                        productDatasheetUrl: str(get("productDatasheetUrl")),
-                        purchasePrice: parseDecimal(get("purchasePrice")),
-                        retailPrice: parseDecimal(get("retailPrice")),
-                        leadTime: str(get("leadTime")),
-                        optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
-                        isActive: true,
-                        updatedAt: new Date(),
-                    };
-
-                    const [existing] = await db
-                        .select({ id: accessories.id })
-                        .from(accessories)
-                        .where(eq(accessories.productNumber, productNumber))
-                        .limit(1);
-
-                    if (existing) {
-                        const { productNumber: _pn, isActive: _ia, ...updateData } = accessoryData;
-                        await db.update(accessories).set(updateData).where(eq(accessories.id, existing.id));
-                        await db.delete(accessoryFeatures).where(eq(accessoryFeatures.accessoryId, existing.id));
-                        if (featuresArray.length > 0) {
-                            await Promise.all(
-                                featuresArray.map((feature) =>
-                                    db.insert(accessoryFeatures).values({
-                                        accessoryId: existing.id,
-                                        feature: feature.trim(),
-                                    })
-                                )
-                            );
-                        }
-                        results.updated++;
-                    } else {
-                        const [inserted] = await db.insert(accessories).values(accessoryData).returning();
-                        if (featuresArray.length > 0) {
-                            await Promise.all(
-                                featuresArray.map((feature) =>
-                                    db.insert(accessoryFeatures).values({
-                                        accessoryId: inserted.id,
-                                        feature: feature.trim(),
-                                    })
-                                )
-                            );
-                        }
-                        results.created++;
-                    }
-                } catch (accessoryErr) {
-                    results.errors.push(`Row ${headerRowIdx + 2 + i}: ${accessoryErr.message}`);
+                if (!productName || !productNumber) {
+                    results.errors.push(`Column ${a + 1}: Missing product name or number, skipped.`);
+                    continue;
                 }
+
+                const productGroup = matchProductGroup(cell("productGroup", a));
+                if (!productGroup) {
+                    results.errors.push(
+                        `Accessory "${productName}": Invalid or missing product group "${cell("productGroup", a)}". Must be one of: ${PRODUCT_GROUPS.join(", ")}`
+                    );
+                    continue;
+                }
+
+                const featuresArray = parseCommaSeparated(cell("features", a));
+                const optionalFieldArray = parseCommaSeparated(cell("optionalField", a));
+
+                const accessoryData = {
+                    productName,
+                    productNumber,
+                    shortText: str(cell("shortText", a)),
+                    longText: str(cell("longText", a)),
+                    productGroup,
+                    unit: str(cell("unit", a)),
+                    manufacturer: str(cell("manufacturer", a)),
+                    supplier: str(cell("supplier", a)),
+                    productDatasheetUrl: str(cell("productDatasheetUrl", a)),
+                    purchasePrice: parseDecimal(cell("purchasePrice", a)),
+                    retailPrice: parseDecimal(cell("retailPrice", a)),
+                    leadTime: str(cell("leadTime", a)),
+                    optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
+                    isActive: true,
+                    updatedAt: new Date(),
+                };
+
+                // Insert only — skip if product number already exists
+                const [existing] = await db
+                    .select({ id: accessories.id })
+                    .from(accessories)
+                    .where(eq(accessories.productNumber, productNumber))
+                    .limit(1);
+
+                if (existing) {
+                    results.skipped++;
+                    continue;
+                }
+
+                const [inserted] = await db.insert(accessories).values(accessoryData).returning();
+                if (featuresArray.length > 0) {
+                    await Promise.all(
+                        featuresArray.map((feature) =>
+                            db.insert(accessoryFeatures).values({
+                                accessoryId: inserted.id,
+                                feature: feature.trim(),
+                            })
+                        )
+                    );
+                }
+                results.created++;
+            } catch (accessoryErr) {
+                const aName = str(cell("productName", a)) || `Column ${a + 1}`;
+                results.errors.push(`Accessory "${aName}": ${accessoryErr.message}`);
             }
         }
 
         const parts = [];
         if (results.created > 0) parts.push(`${results.created} created`);
-        if (results.updated > 0) parts.push(`${results.updated} updated`);
+        if (results.skipped > 0) parts.push(`${results.skipped} skipped (already exist)`);
         const successPart = parts.length > 0 ? parts.join(", ") : "0 accessories processed";
         const message =
             `Import complete: ${successPart} out of ${results.total} accessories.` +
@@ -412,12 +236,12 @@ export async function POST(req) {
 
         return successResponse(message, {
             created: results.created,
-            updated: results.updated,
+            skipped: results.skipped,
             total: results.total,
             errors: results.errors,
         });
     } catch (err) {
-        console.error("POST /api/admin/accessories/import error:", error);
+        console.error("POST /api/admin/accessories/import error:", err);
         return errorResponse("Import failed", 500);
     }
 }

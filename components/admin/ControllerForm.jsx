@@ -213,7 +213,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
             }
 
             toast.success(response.message || `Controller ${isEdit ? "updated" : "created"} successfully`);
-            router.push("/admin/products");
+            router.push("/admin/controllers");
         } catch (error) {
             toast.error(error.message);
         }
@@ -438,7 +438,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     type="button"
                     variant="outline"
                     size="lg"
-                    onClick={() => router.push("/admin/products")}
+                    onClick={() => router.push("/admin/controllers")}
                 >
                     Cancel
                 </Button>

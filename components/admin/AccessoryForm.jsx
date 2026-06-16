@@ -136,7 +136,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
             }
 
             toast.success(response.message || `Accessory ${isEdit ? "updated" : "created"} successfully`);
-            router.push("/admin/products");
+            router.push("/admin/accessories");
         } catch (error) {
             toast.error(error.message);
         }
@@ -385,7 +385,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                     type="button"
                     variant="outline"
                     size="lg"
-                    onClick={() => router.push("/admin/products")}
+                    onClick={() => router.push("/admin/accessories")}
                 >
                     Cancel
                 </Button>

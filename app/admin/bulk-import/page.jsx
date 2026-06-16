@@ -26,7 +26,7 @@ export default function BulkImportPage() {
                     <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-800">Import LED Products</h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Upload your LED product specification Excel file. The file should follow the column-oriented format with product data starting from column F.
+                            Upload your LED product specification Excel file. The file should follow the column-oriented format with each field as a row and each product as a column, starting from column F. Only new products will be created — products with an existing Product Number will be skipped.
                         </p>
                     </div>
                     <BulkImportUploader
@@ -39,7 +39,7 @@ export default function BulkImportPage() {
                     <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-800">Import Controllers</h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Upload your controller specification Excel file. The file should follow the column-oriented format with controller data starting from column C. Each column represents one controller.
+                            Upload your controller specification Excel file. Each field is a row and each controller is a column, starting from column C. Only new controllers will be created — existing Controller Numbers will be skipped.
                         </p>
                     </div>
                     <BulkImportUploader
@@ -52,7 +52,7 @@ export default function BulkImportPage() {
                     <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-800">Import Accessories</h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Upload your accessories Excel file. Supports both transposed format (field labels in column A, data in subsequent columns) and standard table format (headers in the first row, one accessory per row).
+                            Upload your accessories Excel file. Supports both transposed format (field labels in column A, data in subsequent columns) and standard table format (headers in first row, one accessory per row). Only new accessories will be created — existing Product Numbers will be skipped.
                         </p>
                     </div>
                     <BulkImportUploader

@@ -1,18 +1,17 @@
-import ProductForm from "@/components/admin/ProductForm";
+import ControllerForm from "@/components/admin/ControllerForm";
 
-export default function AddProductPage() {
+export default function AddControllerPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold ">Add New Product</h1>
+                    <h1 className="text-2xl font-bold ">Add New Controller </h1>
                     <p className="text-sm text-muted-foreground">
                         Choose a product type and fill in the details.
                     </p>
                 </div>
             </div>
-
-          <ProductForm mode="add" />
+            <ControllerForm mode="add" />
         </div>
     );
 }

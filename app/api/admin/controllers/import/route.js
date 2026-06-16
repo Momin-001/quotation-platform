@@ -113,7 +113,7 @@ export async function POST(req) {
             return val;
         }
 
-        const results = { created: 0, updated: 0, errors: [], total: numControllers };
+        const results = { created: 0, skipped: 0, errors: [], total: numControllers };
 
         for (let c = 0; c < numControllers; c++) {
             try {
@@ -193,22 +193,20 @@ export async function POST(req) {
                     updatedAt: new Date(),
                 };
 
-                // Upsert by interfaceName
+                // Insert only — skip if controller number already exists
                 const [existing] = await db
                     .select({ id: controllers.id })
                     .from(controllers)
                     .where(eq(controllers.controllerNumber, controllerNumber))
-                    .limit(1)
-                    
+                    .limit(1);
 
                 if (existing) {
-                    const { isActive: _ia, ...updateData } = controllerData;
-                    await db.update(controllers).set(updateData).where(eq(controllers.id, existing.id));
-                    results.updated++;
-                } else {
-                    await db.insert(controllers).values(controllerData);
-                    results.created++;
+                    results.skipped++;
+                    continue;
                 }
+
+                await db.insert(controllers).values(controllerData);
+                results.created++;
             } catch (controllerErr) {
                 const cName = str(cell(2, c)) || `Column ${c + 1}`;
                 results.errors.push(`Controller "${cName}": ${controllerErr.message}`);
@@ -217,7 +215,7 @@ export async function POST(req) {
 
         const parts = [];
         if (results.created > 0) parts.push(`${results.created} created`);
-        if (results.updated > 0) parts.push(`${results.updated} updated`);
+        if (results.skipped > 0) parts.push(`${results.skipped} skipped (already exist)`);
         const successPart = parts.length > 0 ? parts.join(", ") : "0 controllers processed";
         const message =
             `Import complete: ${successPart} out of ${results.total} controllers.` +
@@ -225,7 +223,7 @@ export async function POST(req) {
 
         return successResponse(message, {
             created: results.created,
-            updated: results.updated,
+            skipped: results.skipped,
             total: results.total,
             errors: results.errors,
         });

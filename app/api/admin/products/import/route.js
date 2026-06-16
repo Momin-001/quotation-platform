@@ -242,7 +242,7 @@ export async function POST(req) {
     for (const cat of allCategories)
       categoryMap[cat.name.toLowerCase()] = cat.id;
 
-    const results = { created: 0, updated: 0, errors: [], total: numProducts };
+    const results = { created: 0, skipped: 0, errors: [], total: numProducts };
 
     // ────────────────────────────
     // MAIN IMPORT LOOP
@@ -485,7 +485,7 @@ export async function POST(req) {
           isActive: false,
           updatedAt: new Date(),
         };
-        // ── UPSERT ──
+        // ── INSERT only — skip if product number already exists ──
         const existing = await db
           .select({ id: products.id })
           .from(products)
@@ -494,15 +494,13 @@ export async function POST(req) {
           .then((r) => r[0]);
 
         if (existing) {
-          const { productNumber: _pn, isActive: _ia, ...updateData } = productData;
-          updateData.slug = await generateUniqueProductSlug(productName, { excludeProductId: existing.id });
-          await db.update(products).set(updateData).where(eq(products.id, existing.id));
-          results.updated++;
-        } else {
-          productData.slug = await generateUniqueProductSlug(productName);
-          await db.insert(products).values(productData);
-          results.created++;
+          results.skipped++;
+          continue;
         }
+
+        productData.slug = await generateUniqueProductSlug(productName);
+        await db.insert(products).values(productData);
+        results.created++;
       } catch (productErr) {
         const pName = str(cell(1, p)) || `Column ${p + 1}`;
         results.errors.push(`Product "${pName}": ${productErr.message}`);
@@ -512,7 +510,7 @@ export async function POST(req) {
     // ── Final response ──
     const summary = [];
     if (results.created > 0) summary.push(`${results.created} created`);
-    if (results.updated > 0) summary.push(`${results.updated} updated`);
+    if (results.skipped > 0) summary.push(`${results.skipped} skipped (already exist)`);
     const summaryText = summary.length ? summary.join(", ") : "0 products processed";
     const message = `Import complete: ${summaryText} out of ${results.total} products.` +
       (results.errors.length ? ` ${results.errors.length} product(s) had errors.` : "");

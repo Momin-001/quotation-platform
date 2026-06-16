@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
     Table,
@@ -20,13 +20,11 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Plus, Trash2, Download } from "lucide-react";
+import { Search, Plus, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function ProductsPage() {
-    // LED Products state
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loadingProducts, setLoadingProducts] = useState(false);
@@ -34,27 +32,14 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
     const [exporting, setExporting] = useState(false);
-    // Controllers state
-    const [controllersList, setControllersList] = useState([]);
-    const [filteredControllers, setFilteredControllers] = useState([]);
-    const [loadingControllers, setLoadingControllers] = useState(false);
-    const [searchControllers, setSearchControllers] = useState("");
-
-    // Accessories state
-    const [accessoriesList, setAccessoriesList] = useState([]);
-    const [filteredAccessories, setFilteredAccessories] = useState([]);
-    const [loadingAccessories, setLoadingAccessories] = useState(false);
-    const [searchAccessories, setSearchAccessories] = useState("");
-    const [selectedGroup, setSelectedGroup] = useState("");
+    const [bulkUpdating, setBulkUpdating] = useState(false);
+    const bulkUpdateInputRef = useRef(null);
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
-        fetchControllers();
-        fetchAccessories();
     }, []);
 
-    // --- LED Products ---
     useEffect(() => {
         let filtered = [...products];
         if (searchProducts) {
@@ -136,74 +121,6 @@ export default function ProductsPage() {
         }
     };
 
-    // --- Controllers ---
-    useEffect(() => {
-        let filtered = [...controllersList];
-        if (searchControllers) {
-            filtered = filtered.filter(
-                (c) =>
-                    c.interfaceName?.toLowerCase().includes(searchControllers.toLowerCase()) ||
-                    c.brandName?.toLowerCase().includes(searchControllers.toLowerCase())
-            );
-        }
-        setFilteredControllers(filtered);
-    }, [searchControllers, controllersList]);
-
-    const fetchControllers = async () => {
-        setLoadingControllers(true);
-        try {
-            const res = await fetch("/api/admin/controllers");
-            const response = await res.json();
-            if (!response.success) throw new Error(response.message || "Failed to fetch controllers");
-            setControllersList(response.data);
-            setFilteredControllers(response.data);
-        } catch (error) {
-            toast.error(error.message);
-        } finally {
-            setLoadingControllers(false);
-        }
-    };
-
-    const toggleControllerStatus = async (id, currentStatus) => {
-        setControllersList((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, isActive: !currentStatus } : c))
-        );
-        try {
-            const res = await fetch(`/api/admin/controllers/${id}/toggle-status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ isActive: !currentStatus }),
-            });
-            const response = await res.json();
-            if (!response.success) {
-                setControllersList((prev) =>
-                    prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
-                );
-                toast.error(response.message || "Failed to update controller status");
-                return;
-            }
-            toast.success(response.message || "Controller status updated");
-        } catch (error) {
-            setControllersList((prev) =>
-                prev.map((c) => (c.id === id ? { ...c, isActive: currentStatus } : c))
-            );
-            toast.error(error.message);
-        }
-    };
-
-    const deleteController = async (id) => {
-        if (!confirm("Are you sure you want to delete this controller?")) return;
-        try {
-            const res = await fetch(`/api/admin/controllers/${id}`, { method: "DELETE" });
-            const response = await res.json();
-            if (!response.success) throw new Error(response.message);
-            toast.success("Controller deleted");
-            setControllersList((prev) => prev.filter((c) => c.id !== id));
-        } catch (error) {
-            toast.error(error.message);
-        }
-    };
-
     const deleteProduct = async (id) => {
         if (!confirm("Are you sure you want to delete this product?")) return;
         try {
@@ -216,49 +133,26 @@ export default function ProductsPage() {
             toast.error(error.message);
         }
     };
-    // --- Accessories ---
-    useEffect(() => {
-        let filtered = [...accessoriesList];
-        if (searchAccessories) {
-            filtered = filtered.filter(
-                (a) =>
-                    a.productName?.toLowerCase().includes(searchAccessories.toLowerCase()) ||
-                    a.productNumber?.toLowerCase().includes(searchAccessories.toLowerCase())
-            );
-        }
-        if (selectedGroup && selectedGroup !== "all") {
-            filtered = filtered.filter(
-                (a) => a.productGroup === selectedGroup
-            );
-        }
-        setFilteredAccessories(filtered);
-    }, [searchAccessories, selectedGroup, accessoriesList]);
 
-    const fetchAccessories = async () => {
-        setLoadingAccessories(true);
+    const bulkUpdateProducts = async (file) => {
+        if (!file) return;
+        setBulkUpdating(true);
         try {
-            const res = await fetch("/api/admin/accessories");
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/admin/products/bulk-update", {
+                method: "POST",
+                body: formData,
+            });
             const response = await res.json();
-            if (!response.success) throw new Error(response.message || "Failed to fetch accessories");
-            setAccessoriesList(response.data);
-            setFilteredAccessories(response.data);
+            if (!response.success) throw new Error(response.message || "Bulk update failed");
+            toast.success(response.message);
+            fetchProducts();
         } catch (error) {
             toast.error(error.message);
         } finally {
-            setLoadingAccessories(false);
-        }
-    };
-
-    const deleteAccessory = async (id) => {
-        if (!confirm("Are you sure you want to delete this accessory?")) return;
-        try {
-            const res = await fetch(`/api/admin/accessories/${id}`, { method: "DELETE" });
-            const response = await res.json();
-            if (!response.success) throw new Error(response.message);
-            toast.success("Accessory deleted");
-            setAccessoriesList((prev) => prev.filter((a) => a.id !== id));
-        } catch (error) {
-            toast.error(error.message);
+            setBulkUpdating(false);
+            if (bulkUpdateInputRef.current) bulkUpdateInputRef.current.value = "";
         }
     };
 
@@ -298,9 +192,9 @@ export default function ProductsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                    <h1 className="text-2xl font-bold ">Products Management</h1>
+                    <h1 className="text-2xl font-bold">LED Products</h1>
                     <p className="text-sm text-muted-foreground">
-                        View and manage all products, controllers, and accessories.
+                        View and manage all LED products.
                     </p>
                 </div>
                 <Link href="/admin/products/add">
@@ -311,326 +205,152 @@ export default function ProductsPage() {
                 </Link>
             </div>
 
-            <Tabs defaultValue="led" className="w-full">
-                <TabsList className="mb-4">
-                    <TabsTrigger value="led" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">LED Products ({products.length})</TabsTrigger>
-                    <TabsTrigger value="controllers" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">Controllers ({controllersList.length})</TabsTrigger>
-                    <TabsTrigger value="accessories" className="data-[state=active]:bg-primary data-[state=active]:text-white px-6">Accessories ({accessoriesList.length})</TabsTrigger>
-                </TabsList>
+            <div className="flex justify-end items-center gap-4 mb-4">
+                <div className="relative">
+                    <Search className="absolute left-2 top-4 h-4 w-4" />
+                    <Input
+                        placeholder="Search by name or product number..."
+                        value={searchProducts}
+                        onChange={(e) => setSearchProducts(e.target.value)}
+                        className="pl-8 placeholder:text-gray-800"
+                    />
+                </div>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Filter by category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={exportProducts}
+                    disabled={exporting}
+                >
+                    {exporting ? (
+                        <>
+                            <Spinner className="h-4 w-4" />
+                            Exporting...
+                        </>
+                    ) : (
+                        <>
+                            <Download className="h-4 w-4" />
+                            Export Products
+                        </>
+                    )}
+                </Button>
+                <input
+                    ref={bulkUpdateInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv,.xlsm"
+                    className="hidden"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) bulkUpdateProducts(file);
+                    }}
+                />
+                <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => bulkUpdateInputRef.current?.click()}
+                    disabled={bulkUpdating}
+                >
+                    {bulkUpdating ? (
+                        <>
+                            <Spinner className="h-4 w-4" />
+                            Updating...
+                        </>
+                    ) : (
+                        <>
+                            <Upload className="h-4 w-4" />
+                            Bulk Update
+                        </>
+                    )}
+                </Button>
+            </div>
 
-                {/* LED Products Tab */}
-                <TabsContent value="led">
-                    <div className="flex justify-end items-center gap-4 mb-4">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-4 h-4 w-4" />
-                            <Input
-                                placeholder="Search by name or product number..."
-                                value={searchProducts}
-                                onChange={(e) => setSearchProducts(e.target.value)}
-                                className="pl-8 placeholder:text-gray-800"
-                            />
-                        </div>
-                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                            <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Filter by category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Categories</SelectItem>
-                                {categories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                            <Button 
-                            variant="secondary" 
-                            size="lg" 
-                            onClick={exportProducts} 
-                            disabled={exporting}
-                            >
-                                {exporting ? (
-                                    <>
-                                        <Spinner className="h-4 w-4" />
-                                        Exporting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Download className="h-4 w-4" />
-                                        Export Products
-                                    </>
-                                )}
-                            </Button>
-                    </div>
-
-                    <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
-                        <Table className="min-w-full">
-                            <TableHeader className="bg-secondary ">
-                                <TableRow>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Type</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Category</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Pixel Pitch</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Brightness</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Last Updated</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
+            <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
+                <Table className="min-w-full">
+                    <TableHeader className="bg-secondary">
+                        <TableRow>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Type</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Category</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Pixel Pitch</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Brightness</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Last Updated</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {loadingProducts && filteredProducts.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={9} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Spinner className="h-5 w-5" />
+                                        <span>Loading products...</span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <TableRow key={product.id} className="even:bg-[#EAF6FF]">
+                                    <TableCell className="p-4 whitespace-nowrap">{product.productName}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">{product.productNumber}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">{product.productType}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">
+                                        {getCategoryName(product.areaOfUseId)}
+                                    </TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">{product.pixelPitch}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">{product.brightnessValue}</TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">
+                                        {new Date(product.updatedAt).toLocaleDateString()}
+                                    </TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">
+                                        <div className="flex gap-2 items-center">
+                                            <span className={`text-sm ${product.isActive ? "text-secondary" : "text-red-500"}`}>
+                                                {product.isActive ? "Active" : "Inactive"}
+                                            </span>
+                                            <Switch
+                                                checked={product.isActive}
+                                                onCheckedChange={() => toggleProductStatus(product.id, product.isActive)}
+                                                className="ml-2 data-[state=checked]:bg-secondary"
+                                            />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="p-4 whitespace-nowrap">
+                                        <Link href={`/admin/products/${product.id}/edit`}>
+                                            <Button variant="link">Edit</Button>
+                                        </Link>
+                                        <Button
+                                            variant="link"
+                                            className="text-red-500 hover:text-red-700"
+                                            onClick={() => deleteProduct(product.id)}
+                                        >
+                                            <Trash2 />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loadingProducts && filteredProducts.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <Spinner className="h-5 w-5" />
-                                                <span>Loading products...</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredProducts.length > 0 ? (
-                                    filteredProducts.map((product) => (
-                                        <TableRow key={product.id} className="even:bg-[#EAF6FF] ">
-                                            <TableCell className="p-4 whitespace-nowrap">{product.productName}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{product.productNumber}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{product.productType}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {getCategoryName(product.areaOfUseId)}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{product.pixelPitch}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{product.brightnessValue}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {new Date(product.updatedAt).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <div className="flex gap-2 items-center">
-                                                    <span className={`text-sm ${product.isActive ? 'text-secondary' : 'text-red-500'}`}>
-                                                        {product.isActive ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                    <Switch
-                                                        checked={product.isActive}
-                                                        onCheckedChange={() => toggleProductStatus(product.id, product.isActive)}
-                                                        className="ml-2 data-[state=checked]:bg-secondary"
-                                                    />
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <Link href={`/admin/products/${product.id}/edit`}>
-                                                    <Button variant="link" >
-                                                        Edit
-                                                    </Button>
-                                                </Link>
-                                                <Button
-                                                        variant="link"
-                                                        className="text-red-500 hover:text-red-700"
-                                                        onClick={() => deleteProduct(product.id)}
-                                                    >
-                                                        <Trash2/>
-                                                    </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
-                                            No products found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </TabsContent>
-
-                {/* Controllers Tab */}
-                <TabsContent value="controllers">
-                    <div className="flex justify-end items-center gap-4 mb-4">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-4 h-4 w-4" />
-                            <Input
-                                placeholder="Search by name, number, or brand..."
-                                value={searchControllers}
-                                onChange={(e) => setSearchControllers(e.target.value)}
-                                className="pl-8 placeholder:text-gray-800"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
-                        <Table className="min-w-full">
-                            <TableHeader className="bg-secondary ">
-                                <TableRow>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Brand</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Interface</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Pixel Capacity</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Last Updated</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Status</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loadingControllers && filteredControllers.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="h-24 text-center">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <Spinner className="h-5 w-5" />
-                                                <span>Loading controllers...</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredControllers.length > 0 ? (
-                                    filteredControllers.map((controller) => (
-                                        <TableRow key={controller.id} className="even:bg-[#EAF6FF] ">
-                                            <TableCell className="p-4 whitespace-nowrap">{controller.brandName || "N/A"}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{controller.interfaceName || "N/A"}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {controller.pixelCapacity ? controller.pixelCapacity.toLocaleString() : "N/A"}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {new Date(controller.updatedAt).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <div className="flex gap-2 items-center">
-                                                    <span className={`text-sm ${controller.isActive ? "text-secondary" : "text-red-500"}`}>
-                                                        {controller.isActive ? "Active" : "Inactive"}
-                                                    </span>
-                                                    <Switch
-                                                        checked={controller.isActive}
-                                                        onCheckedChange={() => toggleControllerStatus(controller.id, controller.isActive)}
-                                                        className="ml-2 data-[state=checked]:bg-secondary"
-                                                    />
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <div className="flex gap-2">
-                                                    <Link href={`/admin/controllers/${controller.id}/edit`}>
-                                                        <Button variant="link" >
-                                                            Edit
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="link"
-                                                        className=" text-red-500 hover:text-red-700"
-                                                        onClick={() => deleteController(controller.id)}
-                                                    >
-                                                        <Trash2/>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="h-24 text-center">
-                                            No controllers found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </TabsContent>
-
-                {/* Accessories Tab */}
-                <TabsContent value="accessories">
-                    <div className="flex justify-end items-center gap-4 mb-4">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-4 h-4 w-4" />
-                            <Input
-                                placeholder="Search by name or product number..."
-                                value={searchAccessories}
-                                onChange={(e) => setSearchAccessories(e.target.value)}
-                                className="pl-8 placeholder:text-gray-800"
-                            />
-                        </div>
-                        <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                            <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Filter by group" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Groups</SelectItem>
-                                <SelectItem value="Mechanics">Mechanics</SelectItem>
-                                <SelectItem value="Service">Service</SelectItem>
-                                <SelectItem value="Software">Software</SelectItem>
-                                <SelectItem value="Maintenance">Maintenance</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="bg-white rounded-lg border shadow-sm w-full overflow-x-auto">
-                        <Table className="min-w-full">
-                            <TableHeader className="bg-secondary ">
-                                <TableRow>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Name</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Product Number</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Group</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Short Text</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Manufacturer</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Purchase Price</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Retail Price</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Lead Time</TableHead>
-                                    <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loadingAccessories && filteredAccessories.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <Spinner className="h-5 w-5" />
-                                                <span>Loading accessories...</span>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredAccessories.length > 0 ? (
-                                    filteredAccessories.map((accessory) => (
-                                        <TableRow key={accessory.id} className="even:bg-[#EAF6FF] ">
-                                            <TableCell className="p-4 whitespace-nowrap">{accessory.productName}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{accessory.productNumber}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                                    {accessory.productGroup}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="p-4 max-w-[200px] truncate">{accessory.shortText || "N/A"}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{accessory.manufacturer || "N/A"}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {accessory.purchasePrice ? `€${accessory.purchasePrice}` : "N/A"}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                {accessory.retailPrice ? `€${accessory.retailPrice}` : "N/A"}
-                                            </TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">{accessory.leadTime || "N/A"}</TableCell>
-                                            <TableCell className="p-4 whitespace-nowrap">
-                                                <div className="flex gap-2">
-                                                    <Link href={`/admin/accessories/${accessory.id}/edit`}>
-                                                        <Button variant="link">
-                                                            Edit
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="link"
-                                                        className=" text-red-500 hover:text-red-700"
-                                                        onClick={() => deleteAccessory(accessory.id)}
-                                                    >
-                                                        <Trash2/>
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center">
-                                            No accessories found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </TabsContent>
-            </Tabs>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={9} className="h-24 text-center">
+                                    No products found.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     );
 }
