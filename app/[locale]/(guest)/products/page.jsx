@@ -47,6 +47,12 @@ export default async function ProductsPage({ params }) {
                 url: productUrl,
             };
 
+            if (p.images?.length) {
+                item.image = p.images[0];
+            }
+            if (p.productNumber) {
+                item.sku = p.productNumber;
+            }
             if (p.oemBrand) {
                 item.brand = { "@type": "Brand", name: p.oemBrand };
             }

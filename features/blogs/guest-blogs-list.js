@@ -6,6 +6,7 @@ import { desc } from "drizzle-orm";
 const LISTING_COLUMNS = {
     id: blogs.id,
     title: blogs.title,
+    slug: blogs.slug,
     authorName: blogs.authorName,
     mainImageUrl: blogs.mainImageUrl,
     createdAt: blogs.createdAt,

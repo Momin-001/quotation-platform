@@ -3,6 +3,7 @@ import { controllers } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq } from "drizzle-orm";
 import * as XLSX from "xlsx";
+import { generateUniqueControllerSlug } from "@/lib/helpers/controller-slug";
 
 // Brand enum values (without "Other" so unrecognised values fall through)
 const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN"];
@@ -204,6 +205,14 @@ export async function POST(req) {
                     results.skipped++;
                     continue;
                 }
+
+                // Generate a unique SEO-friendly slug from the interface name.
+                const slug = await generateUniqueControllerSlug(interfaceName);
+                if (!slug) {
+                    results.errors.push(`Column ${c + 1}: Could not generate a URL slug from the interface name, skipped.`);
+                    continue;
+                }
+                controllerData.slug = slug;
 
                 await db.insert(controllers).values(controllerData);
                 results.created++;

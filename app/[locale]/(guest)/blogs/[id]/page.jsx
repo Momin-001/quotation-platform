@@ -1,63 +1,68 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { notFound } from "next/navigation";
 import Image from "next/image";
+import { getLocale, getTranslations } from "next-intl/server";
 import BreadCrumb from "@/components/user/BreadCrumb";
-import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
+import SchemaScript from "@/components/guest/SchemaScript";
+import { BASE_URL } from "@/lib/constants";
+import { validateLocale, buildAlternates } from "@/lib/i18n/metadata";
+import { fetchGuestBlogBySlug } from "@/features/blogs/guest-blog-detail";
 
-export default function BlogDetailPage() {
-    const { id } = useParams();
-    const locale = useLocale();
-    const t = useTranslations("Blogs.detail");
-    const tBlogs = useTranslations("Blogs");
-    const tCommon = useTranslations("Common");
-    const [blog, setBlog] = useState(null);
-    const [loading, setLoading] = useState(true);
+const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
 
-    useEffect(() => {
-        const fetchBlog = async () => {
-            try {
-                const res = await fetch(`/api/blogs/${id}`);
-                const response = await res.json();
-                if (!response.success) throw new Error(response.message);
-                setBlog(response.data);
-            } catch (error) {
-                toast.error(error.message || t("fetchFailed"));
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (id) fetchBlog();
-    }, [id, t]);
+// Revalidate the cached page hourly (ISR) — blog content changes infrequently.
+export const revalidate = 3600;
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Spinner className="h-8 w-8" />
-            </div>
-        );
-    }
+function withLocalePrefix(locale, path) {
+    if (locale === "en") return path === "/" ? "/en" : `/en${path}`;
+    return path;
+}
 
-    if (!blog) {
-        return (
-            <div className="min-h-screen flex flex-col">
-                <BreadCrumb
-                    title={t("breadcrumb")}
-                    breadcrumbs={[
-                        { label: tCommon("home"), href: "/" },
-                        { label: tBlogs("breadcrumb"), href: "/blogs" },
-                        { label: t("notFound") },
-                    ]}
-                />
-                <div className="flex-1 flex items-center justify-center text-gray-500">
-                    {t("notFoundMessage")}
-                </div>
-            </div>
-        );
-    }
+/** Strip HTML tags and collapse whitespace into a plain-text excerpt. */
+function htmlToExcerpt(html, maxLength = 160) {
+    if (!html) return "";
+    const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    if (text.length <= maxLength) return text;
+    return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+export async function generateMetadata({ params }) {
+    const { locale, id } = await params;
+    const validLocale = validateLocale(locale);
+    const blog = await fetchGuestBlogBySlug(id);
+
+    if (!blog) return {};
+
+    const description = htmlToExcerpt(blog.mainContentHtml) || blog.title;
+    const path = `/blogs/${blog.slug}`;
+    const images = blog.mainImageUrl ? [{ url: blog.mainImageUrl }] : undefined;
+
+    return {
+        title: blog.title,
+        description,
+        alternates: buildAlternates(path, validLocale),
+        openGraph: {
+            type: "article",
+            title: blog.title,
+            description,
+            url: `${siteUrl}${withLocalePrefix(validLocale, path)}`,
+            publishedTime: blog.createdAt ? new Date(blog.createdAt).toISOString() : undefined,
+            modifiedTime: blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined,
+            authors: blog.authorName ? [blog.authorName] : undefined,
+            ...(images ? { images } : {}),
+        },
+    };
+}
+
+export default async function BlogDetailPage({ params }) {
+    const { id } = await params;
+    const blog = await fetchGuestBlogBySlug(id);
+
+    if (!blog) notFound();
+
+    const locale = await getLocale();
+    const t = await getTranslations("Blogs.detail");
+    const tBlogs = await getTranslations("Blogs");
+    const tCommon = await getTranslations("Common");
 
     const date = new Date(blog.createdAt);
     const formattedDate = date.toLocaleDateString(locale === "de" ? "de-DE" : "en-US", {
@@ -66,10 +71,30 @@ export default function BlogDetailPage() {
         year: "numeric",
     });
 
+    const blogUrl = `${siteUrl}${withLocalePrefix(validateLocale(locale), `/blogs/${blog.slug}`)}`;
+    const blogSchema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: blog.title,
+        description: htmlToExcerpt(blog.mainContentHtml) || blog.title,
+        datePublished: blog.createdAt ? new Date(blog.createdAt).toISOString() : undefined,
+        dateModified: blog.updatedAt ? new Date(blog.updatedAt).toISOString() : undefined,
+        author: { "@type": "Person", name: blog.authorName },
+        mainEntityOfPage: { "@type": "WebPage", "@id": blogUrl },
+        publisher: {
+            "@type": "Organization",
+            name: "ProLEDALL",
+            logo: { "@type": "ImageObject", url: `${siteUrl}/logo.svg` },
+        },
+        ...(blog.mainImageUrl ? { image: [blog.mainImageUrl] } : {}),
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
+            <SchemaScript data={blogSchema} />
             <BreadCrumb
                 title={t("breadcrumb")}
+                titleTag="p"
                 breadcrumbs={[
                     { label: tCommon("home"), href: "/" },
                     { label: tBlogs("breadcrumb"), href: "/blogs" },

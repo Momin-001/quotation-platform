@@ -30,6 +30,7 @@ export async function fetchGuestControllersListing({
     const list = await db
         .select({
             id: controllers.id,
+            slug: controllers.slug,
             interfaceName: controllers.interfaceName,
             controllerNumber: controllers.controllerNumber,
             brandName: controllers.brandName,

@@ -3,6 +3,7 @@ import { controllers, productImages } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc, eq } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
+import { generateUniqueControllerSlug } from "@/lib/helpers/controller-slug";
 
 // GET /api/admin/controllers - Fetch all controllers
 export async function GET() {
@@ -98,9 +99,15 @@ export async function POST(request) {
             return errorResponse("Interface name and brand name are required", 400);
         }
 
+        // Generate a unique SEO-friendly slug from the interface name.
+        const slug = await generateUniqueControllerSlug(body.interfaceName);
+        if (!slug) {
+            return errorResponse("Interface name must contain at least one letter or number to generate a URL slug", 400);
+        }
+
         const imageFiles = formData.getAll("images");
         const hasImages = imageFiles && imageFiles.length > 0;
-        const controllerData = { ...parseControllerBody(body), isActive: !!hasImages };
+        const controllerData = { ...parseControllerBody(body), slug, isActive: !!hasImages };
 
         const newController = await db
             .insert(controllers)

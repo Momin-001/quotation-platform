@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Fragment } from "react";
 
-export default function BreadCrumb({ title, breadcrumbs }) {
+export default function BreadCrumb({ title, breadcrumbs, titleTag: TitleTag = "h1" }) {
     const siteUrl = BASE_URL || "https://www.proledall.eu";
     const schema =
         breadcrumbs?.length > 0
@@ -38,9 +38,9 @@ export default function BreadCrumb({ title, breadcrumbs }) {
         <div className="bg-secondary text-primary-foreground">
             {schema ? <SchemaScript data={schema} /> : null}
             <div className="container mx-auto px-4 lg:px-6 py-1.5 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between">
-                <h1 className="text-base sm:text-lg md:text-xl  leading-tight tracking-tight">
+                <TitleTag className="text-base sm:text-lg md:text-xl  leading-tight tracking-tight">
                     {title}
-                </h1>
+                </TitleTag>
 
                 {breadcrumbs?.length > 0 && (
                     <div className="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2">

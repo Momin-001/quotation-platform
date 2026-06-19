@@ -205,7 +205,7 @@ export default function ControllersClient({
                             const isLast = controllers.length === index + 1;
                             return (
                                 <Link
-                                    href={`/controllers/${controller.id}`}
+                                    href={`/controllers/${controller.slug}`}
                                     key={controller.id}
                                     ref={isLast ? lastCardRef : null}
                                     className="block group h-full"

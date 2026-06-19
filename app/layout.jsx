@@ -1,4 +1,5 @@
 import { Geist } from "next/font/google";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/context/AuthContext";
@@ -10,6 +11,7 @@ const siteUrl = BASE_URL || "https://www.proledall.eu";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -27,14 +29,22 @@ export const metadata = {
     locale: "de_DE",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "ProLEDALL | B2B LED Display Marktplatz Europa",
+    description:
+      "Europas B2B-Marktplatz für geprüfte LED-Videowände. Anbieter vergleichen, transparente Angebote erhalten und LED-Projekte skalieren.",
+    images: ["/og-image.jpg"],
+  },
   icons: {
     icon: "/logo.svg",
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const locale = await getLocale();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} antialiased`}
       >

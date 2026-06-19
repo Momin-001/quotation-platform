@@ -13,7 +13,7 @@ function BlogCard({ blog, locale, labels }) {
     const day = date.getDate();
 
     return (
-        <Link href={`/blogs/${blog.id}`} className="block group h-full">
+        <Link href={`/blogs/${blog.slug}`} className="block group h-full">
             <article
                 className={cn(
                     "flex flex-col h-full bg-white border border-border/60 rounded-xl overflow-hidden",

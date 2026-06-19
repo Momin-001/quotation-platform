@@ -3,6 +3,7 @@ import { blogs, blogContentBlocks } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { desc } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
+import { generateUniqueBlogSlug } from "@/lib/helpers/blog-slug";
 
 export async function GET() {
     try {
@@ -35,6 +36,12 @@ export async function POST(request) {
             return errorResponse("Main image is required", 400);
         }
 
+        // Generate a unique SEO-friendly slug from the blog title.
+        const slug = await generateUniqueBlogSlug(title);
+        if (!slug) {
+            return errorResponse("Blog title must contain at least one letter or number to generate a URL slug", 400);
+        }
+
         const bytes = await mainImageFile.arrayBuffer();
         const buffer = Buffer.from(bytes);
         const base64 = `data:${mainImageFile.type};base64,${buffer.toString("base64")}`;
@@ -61,6 +68,7 @@ export async function POST(request) {
             .insert(blogs)
             .values({
                 title: title.trim(),
+                slug,
                 authorName: authorName.trim(),
                 mainImageUrl: mainUpload.secure_url,
                 mainImagePublicId: mainUpload.public_id,

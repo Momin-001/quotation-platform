@@ -78,6 +78,13 @@
       "when": 1781292335787,
       "tag": "0010_neat_scorpion",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1781835526660,
+      "tag": "0011_whole_talos",
+      "breakpoints": true
     }
   ]
 }

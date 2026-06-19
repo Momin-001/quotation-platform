@@ -9,7 +9,12 @@ import {
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
 import { cmsField } from "@/lib/i18n/cms";
-import { validateLocale } from "@/lib/i18n/metadata";
+import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
+
+export async function generateMetadata({ params }) {
+    const { locale } = await params;
+    return guestPageMetadata("/faqs", validateLocale(locale));
+}
 
 export default async function FAQsPage({ params }) {
     const { locale } = await params;

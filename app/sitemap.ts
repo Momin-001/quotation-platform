@@ -17,10 +17,46 @@
 // ============================================================
 
 import { MetadataRoute } from 'next'
+// import { db } from '@/lib/db'
+// import { products } from '@/db/schema'
+// import { eq } from 'drizzle-orm'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = 'https://www.proledall.eu'
   const now  = new Date()
+
+  // // ── Dynamic product detail URLs (active products only) ───────
+  // // Products are SEO-indexed via their slug, so each active product
+  // // gets a DE (root) and EN (/en) entry derived from the database.
+  // let productEntries: MetadataRoute.Sitemap = []
+  // try {
+  //   const rows = await db
+  //     .select({ slug: products.slug, updatedAt: products.updatedAt })
+  //     .from(products)
+  //     .where(eq(products.isActive, true))
+
+  //   productEntries = rows.flatMap((p) => {
+  //     const lastModified = p.updatedAt ?? now
+  //     return [
+  //       {
+  //         url:             `${base}/products/${p.slug}`,
+  //         lastModified,
+  //         changeFrequency: 'monthly' as const,
+  //         priority:        0.7,
+  //       },
+  //       {
+  //         url:             `${base}/en/products/${p.slug}`,
+  //         lastModified,
+  //         changeFrequency: 'monthly' as const,
+  //         priority:        0.7,
+  //       },
+  //     ]
+  //   })
+  // } catch {
+  //   // If the DB is unreachable at build/request time, fall back to the
+  //   // static URLs below rather than failing the whole sitemap.
+  //   productEntries = []
+  // }
 
   return [
 
@@ -123,6 +159,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // { url: `${base}/en/blogs`,          lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     // { url: `${base}/controllers`,       lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
     // { url: `${base}/en/controllers`,    lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
+
+    // ── DYNAMIC PRODUCT DETAIL PAGES (from database) ──────────
+    // ...productEntries,
 
   ]
 }

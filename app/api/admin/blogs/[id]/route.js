@@ -3,6 +3,7 @@ import { blogs, blogContentBlocks } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, asc } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
+import { generateUniqueBlogSlug } from "@/lib/helpers/blog-slug";
 
 export async function GET(request, { params }) {
     try {
@@ -41,8 +42,15 @@ export async function PATCH(request, { params }) {
         const existing = await db.select().from(blogs).where(eq(blogs.id, id)).then((r) => r[0]);
         if (!existing) return errorResponse("Blog not found", 404);
 
+        // Regenerate a unique SEO-friendly slug from the (possibly changed) title.
+        const slug = await generateUniqueBlogSlug(title, { excludeBlogId: id });
+        if (!slug) {
+            return errorResponse("Blog title must contain at least one letter or number to generate a URL slug", 400);
+        }
+
         const updateData = {
             title: title.trim(),
+            slug,
             authorName: authorName.trim(),
             mainContentHtml: mainContentHtml || "",
             partnerAdLinkUrl: partnerAdLinkUrl?.trim() || null,

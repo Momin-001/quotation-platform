@@ -1,7 +1,5 @@
-import { db } from "@/lib/db";
-import { products, productImages, productCertificates, productFeatures, certificates, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
-import { eq } from "drizzle-orm";
+import { fetchGuestProductBySlug } from "@/features/products/guest-product-detail";
 
 export async function GET(req, { params }) {
     try {
@@ -11,71 +9,13 @@ export async function GET(req, { params }) {
             return errorResponse("Product slug is required", 400);
         }
 
-        // Fetch product by its URL slug
-        const product = await db.query.products.findFirst({
-            where: eq(products.slug, slug),
-            with: {
-                areaOfUse: {
-                    columns: {
-                        name: true,
-                    },
-                },
-                images: {
-                    columns: {
-                        imageUrl: true,
-                    },
-                },
-                features: {
-                    columns: {
-                        feature: true,
-                    },
-                },
-                productCertificates: {
-                    columns: {},
-                    with: {
-                        certificate: {
-                            columns: {
-                                id: true,
-                                name: true,
-                                imageUrl: true,
-                            },
-                        },
-                    },
-                },
-                productProductIcons: {
-                    columns: {
-                        iconOrder: true,
-                    },
-                    with: {
-                        productIcon: {
-                            columns: {
-                                id: true,
-                                name: true,
-                                imageUrl: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+        const product = await fetchGuestProductBySlug(slug);
 
         if (!product) {
             return errorResponse("Product not found", 404);
         }
 
-        const productIconsSorted = (product.productProductIcons || [])
-            .sort((a, b) => (a.iconOrder ?? 0) - (b.iconOrder ?? 0))
-            .map((row) => ({ ...row.productIcon }));
-
-        const formattedProduct = {
-            ...product,
-            areaOfUse: product.areaOfUse?.name,
-            images: product.images?.map((image) => image.imageUrl) ?? [],
-            productCertificates: product.productCertificates?.map((cert) => cert.certificate) ?? [],
-            productIcons: productIconsSorted,
-            features: product.features?.map((feature) => feature.feature) ?? [],
-        };
-        return successResponse("Product fetched successfully", formattedProduct);
+        return successResponse("Product fetched successfully", product);
     } catch (error) {
         console.error("GET /api/products/[id] error:", error);
         return errorResponse("Failed to fetch product", 500);
