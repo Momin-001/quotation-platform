@@ -4,7 +4,7 @@ import { relations } from "drizzle-orm";
 export const blogs = pgTable("blogs", {
     id: uuid("id").defaultRandom().primaryKey(),
     title: text("title").notNull(),
-    slug: text("slug"),
+    slug: text("slug").notNull().unique(),
     authorName: text("author_name").notNull(),
     mainImageUrl: text("main_image_url"),
     mainImagePublicId: text("main_image_public_id"),

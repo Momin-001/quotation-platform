@@ -9,7 +9,7 @@ export const BrandSystemEnum = pgEnum("brand_system", ["Colorlight", "Novastar",
 export const controllers = pgTable("controllers", {
     id: uuid("id").defaultRandom().primaryKey(),
     interfaceName: text("interface_name"),
-    slug: text("slug"),
+    slug: text("slug").notNull().unique(),
     interfaceDescription: text("interface_description"),
     brandName: BrandSystemEnum("brand_name"),
     controllerNumber: text("controller_number").unique(),

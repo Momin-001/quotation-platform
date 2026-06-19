@@ -85,6 +85,13 @@
       "when": 1781835526660,
       "tag": "0011_whole_talos",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1781837953670,
+      "tag": "0012_premium_malice",
+      "breakpoints": true
     }
   ]
 }
