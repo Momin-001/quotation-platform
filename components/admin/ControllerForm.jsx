@@ -27,6 +27,10 @@ const controllerSchema = z.object({
     brandNameOther: z.string().optional(),
     interfaceName: z.string().optional(),
     interfaceDescription: z.string().optional(),
+    metaTitleDe: z.string().optional(),
+    metaTitleEn: z.string().optional(),
+    metaDescriptionDe: z.string().optional(),
+    metaDescriptionEn: z.string().optional(),
     controllerNumber: z.string().optional(),
     pixelCapacity: z.union([z.string(), z.number()]).optional(),
     maxWidthHeight: z.union([z.string(), z.number()]).optional(),
@@ -77,6 +81,10 @@ const defaultValues = {
     brandNameOther: "",
     interfaceName: "",
     interfaceDescription: "",
+    metaTitleDe: "",
+    metaTitleEn: "",
+    metaDescriptionDe: "",
+    metaDescriptionEn: "",
     controllerNumber: "",
     pixelCapacity: "",
     maxWidthHeight: "",
@@ -131,6 +139,10 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
         brandName: initialData.brandName || "",
         brandNameOther: initialData.brandNameOther || "",
         interfaceDescription: initialData.interfaceDescription || "",
+        metaTitleDe: initialData.metaTitleDe || "",
+        metaTitleEn: initialData.metaTitleEn || "",
+        metaDescriptionDe: initialData.metaDescriptionDe || "",
+        metaDescriptionEn: initialData.metaDescriptionEn || "",
         controllerNumber: initialData.controllerNumber || "",
         pixelCapacity: initialData.pixelCapacity?.toString() || "",
         maxWidthHeight: initialData.maxWidthHeight?.toString() || "",
@@ -286,6 +298,22 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     {renderInput("Controller Number", "controllerNumber", "text", { placeholder: "e.g. 1234567890" })}
                     {renderInput("Max. Pixel Capacity", "pixelCapacity", "number", { placeholder: "e.g. 13000000" })}
                     {renderInput("Max. Width/Height (px)", "maxWidthHeight", "number", { placeholder: "e.g. 10240" })}
+                </div>
+            </div>
+
+            {/* SEO / Meta Tags */}
+            <div>
+                <h3 className="text-lg font-semibold  mb-2">SEO / Meta Tags</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                    Optional. Overrides the search-result title and description for this controller.
+                    Leave English blank to reuse the German copy; leave both blank to fall back to
+                    the interface name and description.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {renderInput("Meta Title (DE)", "metaTitleDe", "text", { maxLength: 70, placeholder: "Titel für Suchmaschinen" })}
+                    {renderInput("Meta Title (EN)", "metaTitleEn", "text", { maxLength: 70, placeholder: "Title for search engines" })}
+                    {renderInput("Meta Description (DE)", "metaDescriptionDe", "text", { maxLength: 200, placeholder: "Beschreibung (~155 Zeichen)" })}
+                    {renderInput("Meta Description (EN)", "metaDescriptionEn", "text", { maxLength: 200, placeholder: "Description (~155 chars)" })}
                 </div>
             </div>
 

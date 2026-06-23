@@ -102,6 +102,11 @@ export async function PUT(request, { params }) {
         const productData = {
             productName: body.productName?.toString().trim() || "",
             productDescription: body.productDescription?.toString().trim() || null,
+            // SEO meta tags
+            metaTitleDe: body.metaTitleDe?.toString().trim() || null,
+            metaTitleEn: body.metaTitleEn?.toString().trim() || null,
+            metaDescriptionDe: body.metaDescriptionDe?.toString().trim() || null,
+            metaDescriptionEn: body.metaDescriptionEn?.toString().trim() || null,
             viewingAngleHorizontal: body.viewingAngleHorizontal?.toString().trim() || null,
             viewingAngleVertical: body.viewingAngleVertical?.toString().trim() || null,
             brightnessControl: body.brightnessControl?.toString().trim() || null,

@@ -11,6 +11,12 @@ export const controllers = pgTable("controllers", {
     interfaceName: text("interface_name"),
     slug: text("slug").notNull().unique(),
     interfaceDescription: text("interface_description"),
+
+    // SEO meta tags (bilingual, optional — fall back to interface name/description)
+    metaTitleEn: text("meta_title_en"),
+    metaTitleDe: text("meta_title_de"),
+    metaDescriptionEn: text("meta_description_en"),
+    metaDescriptionDe: text("meta_description_de"),
     brandName: BrandSystemEnum("brand_name"),
     controllerNumber: text("controller_number").unique(),
     brandNameOther: text("brand_name_other"),

@@ -102,6 +102,11 @@ function getDefaultValuesFromInitial(initialData) {
         stockPieces: initialData.stockPieces !== undefined && initialData.stockPieces !== null && initialData.stockPieces !== "" ? initialData.stockPieces : "",
         leadtimeDays: initialData.leadtimeDays !== undefined && initialData.leadtimeDays !== null && initialData.leadtimeDays !== "" ? initialData.leadtimeDays : "",
         notes: str(initialData.notes),
+        // SEO meta tags
+        metaTitleDe: str(initialData.metaTitleDe),
+        metaTitleEn: str(initialData.metaTitleEn),
+        metaDescriptionDe: str(initialData.metaDescriptionDe),
+        metaDescriptionEn: str(initialData.metaDescriptionEn),
     };
 }
 
@@ -131,7 +136,13 @@ const productSchema = z.object({
     safety: z.string().optional(),
     supportDuringWarrantyEn: z.string().optional(),
     supportAfterWarrantyEn: z.string().optional(),
-    
+
+    // SEO meta tags (optional, bilingual)
+    metaTitleDe: z.string().optional(),
+    metaTitleEn: z.string().optional(),
+    metaDescriptionDe: z.string().optional(),
+    metaDescriptionEn: z.string().optional(),
+
     // Dropdown fields (ENUMs - Point 2)
     productType: z.enum(["AIO Systems", "LED Display Single Cabinet"], {
         required_error: "Product type is required",
@@ -819,6 +830,22 @@ export default function ProductForm({
                     {renderTextarea("Safety", "safety", { required: true, placeholder: "Enter safety information" })}
                     {renderTextarea("Support During Warranty (EN)", "supportDuringWarrantyEn", { required: true, placeholder: "Enter support during warranty in English" })}
                     {renderTextarea("Support After Warranty (EN)", "supportAfterWarrantyEn", { required: true, placeholder: "Enter support after warranty in English" })}
+                </div>
+            </div>
+
+            {/* SEO / Meta Tags Section */}
+            <div className="space-y-4 py-4">
+                <h2 className="text-lg font-semibold ">SEO / Meta Tags</h2>
+                <p className="text-sm text-muted-foreground">
+                    Optional. Overrides the search-result title and description for this product.
+                    Leave English blank to reuse the German copy; leave both blank to fall back to
+                    the product name and description.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {renderInput("Meta Title (DE)", "metaTitleDe", "text", { placeholder: "z. B. Indoor LED-Videowand | … | ProLEDALL", maxLength: 70 })}
+                    {renderInput("Meta Title (EN)", "metaTitleEn", "text", { placeholder: "e.g. Indoor LED Video Wall | … | ProLEDALL", maxLength: 70 })}
+                    {renderTextarea("Meta Description (DE)", "metaDescriptionDe", { placeholder: "Beschreibung für Suchmaschinen (~155 Zeichen)", maxLength: 200 })}
+                    {renderTextarea("Meta Description (EN)", "metaDescriptionEn", { placeholder: "Description for search engines (~155 chars)", maxLength: 200 })}
                 </div>
             </div>
 

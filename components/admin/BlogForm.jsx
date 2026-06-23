@@ -3,6 +3,7 @@
 import { useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
@@ -25,6 +26,12 @@ export default function BlogForm({ initialData = null }) {
     const [authorName, setAuthorName] = useState(initialData?.authorName || "");
     const [mainContentHtml, setMainContentHtml] = useState(initialData?.mainContentHtml || "");
     const [partnerAdLinkUrl, setPartnerAdLinkUrl] = useState(initialData?.partnerAdLinkUrl || "");
+
+    // SEO meta tags
+    const [metaTitleDe, setMetaTitleDe] = useState(initialData?.metaTitleDe || "");
+    const [metaTitleEn, setMetaTitleEn] = useState(initialData?.metaTitleEn || "");
+    const [metaDescriptionDe, setMetaDescriptionDe] = useState(initialData?.metaDescriptionDe || "");
+    const [metaDescriptionEn, setMetaDescriptionEn] = useState(initialData?.metaDescriptionEn || "");
 
     // Main image
     const [mainImageFile, setMainImageFile] = useState(null);
@@ -124,6 +131,10 @@ export default function BlogForm({ initialData = null }) {
                 mainContentHtml,
                 partnerAdLinkUrl,
                 removePartnerAd,
+                metaTitleDe,
+                metaTitleEn,
+                metaDescriptionDe,
+                metaDescriptionEn,
                 contentBlocks: contentBlocks.map((b) => ({
                     textHtml: b.textHtml,
                     existingImageUrl: b.existingImageUrl,
@@ -367,6 +378,60 @@ export default function BlogForm({ initialData = null }) {
                             </div>
                         </div>
                     ))}
+                </div>
+            </div>
+
+            {/* SEO / Meta Tags */}
+            <div className="bg-white rounded-lg border p-6 space-y-4">
+                <h2 className="text-lg font-semibold ">SEO / Meta Tags</h2>
+                <p className="text-sm text-muted-foreground">
+                    Optional. Overrides the search-result title and description for this blog post.
+                    Leave English blank to reuse the German copy; leave both blank to fall back to
+                    the blog title and an excerpt.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="metaTitleDe">Meta Title (DE)</Label>
+                        <Input
+                            id="metaTitleDe"
+                            value={metaTitleDe}
+                            onChange={(e) => setMetaTitleDe(e.target.value)}
+                            maxLength={70}
+                            placeholder="Titel für Suchmaschinen"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="metaTitleEn">Meta Title (EN)</Label>
+                        <Input
+                            id="metaTitleEn"
+                            value={metaTitleEn}
+                            onChange={(e) => setMetaTitleEn(e.target.value)}
+                            maxLength={70}
+                            placeholder="Title for search engines"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="metaDescriptionDe">Meta Description (DE)</Label>
+                        <Textarea
+                            id="metaDescriptionDe"
+                            rows={3}
+                            value={metaDescriptionDe}
+                            onChange={(e) => setMetaDescriptionDe(e.target.value)}
+                            maxLength={200}
+                            placeholder="Beschreibung für Suchmaschinen (~155 Zeichen)"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="metaDescriptionEn">Meta Description (EN)</Label>
+                        <Textarea
+                            id="metaDescriptionEn"
+                            rows={3}
+                            value={metaDescriptionEn}
+                            onChange={(e) => setMetaDescriptionEn(e.target.value)}
+                            maxLength={200}
+                            placeholder="Description for search engines (~155 chars)"
+                        />
+                    </div>
                 </div>
             </div>
 

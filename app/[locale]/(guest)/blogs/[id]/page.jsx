@@ -5,6 +5,7 @@ import BreadCrumb from "@/components/user/BreadCrumb";
 import SchemaScript from "@/components/guest/SchemaScript";
 import { BASE_URL } from "@/lib/constants";
 import { validateLocale, buildAlternates } from "@/lib/i18n/metadata";
+import { cmsField } from "@/lib/i18n/cms";
 import { fetchGuestBlogBySlug } from "@/features/blogs/guest-blog-detail";
 
 const siteUrl = (BASE_URL || "https://www.proledall.eu").replace(/\/$/, "");
@@ -32,17 +33,21 @@ export async function generateMetadata({ params }) {
 
     if (!blog) return {};
 
-    const description = htmlToExcerpt(blog.mainContentHtml) || blog.title;
+    const title = cmsField(blog, "metaTitle", validLocale) || blog.title;
+    const description =
+        cmsField(blog, "metaDescription", validLocale) ||
+        htmlToExcerpt(blog.mainContentHtml) ||
+        blog.title;
     const path = `/blogs/${blog.slug}`;
     const images = blog.mainImageUrl ? [{ url: blog.mainImageUrl }] : undefined;
 
     return {
-        title: blog.title,
+        title,
         description,
         alternates: buildAlternates(path, validLocale),
         openGraph: {
             type: "article",
-            title: blog.title,
+            title,
             description,
             url: `${siteUrl}${withLocalePrefix(validLocale, path)}`,
             publishedTime: blog.createdAt ? new Date(blog.createdAt).toISOString() : undefined,

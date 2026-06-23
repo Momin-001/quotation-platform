@@ -26,7 +26,17 @@ export async function POST(request) {
         const mainImageFile = formData.get("mainImage");
         const partnerAdImageFile = formData.get("partnerAdImage");
 
-        const { title, authorName, mainContentHtml, partnerAdLinkUrl, contentBlocks } = payload;
+        const {
+            title,
+            authorName,
+            mainContentHtml,
+            partnerAdLinkUrl,
+            contentBlocks,
+            metaTitleDe,
+            metaTitleEn,
+            metaDescriptionDe,
+            metaDescriptionEn,
+        } = payload;
 
         if (!title?.trim() || !authorName?.trim()) {
             return errorResponse("Title and author name are required", 400);
@@ -76,6 +86,10 @@ export async function POST(request) {
                 partnerAdImageUrl,
                 partnerAdImagePublicId,
                 partnerAdLinkUrl: partnerAdLinkUrl?.trim() || null,
+                metaTitleDe: metaTitleDe?.trim() || null,
+                metaTitleEn: metaTitleEn?.trim() || null,
+                metaDescriptionDe: metaDescriptionDe?.trim() || null,
+                metaDescriptionEn: metaDescriptionEn?.trim() || null,
             })
             .returning();
 

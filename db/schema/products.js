@@ -54,6 +54,12 @@ export const products = pgTable("products", {
     productNumber: text("product_number").notNull(),
     slug: text("slug").notNull().unique(),
 
+    // SEO meta tags (bilingual, optional — fall back to product name/description)
+    metaTitleEn: text("meta_title_en"),
+    metaTitleDe: text("meta_title_de"),
+    metaDescriptionEn: text("meta_description_en"),
+    metaDescriptionDe: text("meta_description_de"),
+
     viewingAngleHorizontal: text("viewing_angle_horizontal"),
     viewingAngleVertical: text("viewing_angle_vertical"),
     brightnessControl: text("brightness_control"),

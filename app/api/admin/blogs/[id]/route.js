@@ -33,7 +33,18 @@ export async function PATCH(request, { params }) {
         const mainImageFile = formData.get("mainImage");
         const partnerAdImageFile = formData.get("partnerAdImage");
 
-        const { title, authorName, mainContentHtml, partnerAdLinkUrl, contentBlocks, removePartnerAd } = payload;
+        const {
+            title,
+            authorName,
+            mainContentHtml,
+            partnerAdLinkUrl,
+            contentBlocks,
+            removePartnerAd,
+            metaTitleDe,
+            metaTitleEn,
+            metaDescriptionDe,
+            metaDescriptionEn,
+        } = payload;
 
         if (!title?.trim() || !authorName?.trim()) {
             return errorResponse("Title and author name are required", 400);
@@ -54,6 +65,10 @@ export async function PATCH(request, { params }) {
             authorName: authorName.trim(),
             mainContentHtml: mainContentHtml || "",
             partnerAdLinkUrl: partnerAdLinkUrl?.trim() || null,
+            metaTitleDe: metaTitleDe?.trim() || null,
+            metaTitleEn: metaTitleEn?.trim() || null,
+            metaDescriptionDe: metaDescriptionDe?.trim() || null,
+            metaDescriptionEn: metaDescriptionEn?.trim() || null,
             updatedAt: new Date(),
         };
 

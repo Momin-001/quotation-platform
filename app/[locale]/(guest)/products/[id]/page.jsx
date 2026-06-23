@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { BASE_URL } from "@/lib/constants";
 import { validateLocale, buildAlternates } from "@/lib/i18n/metadata";
+import { cmsField } from "@/lib/i18n/cms";
 import { fetchGuestProductBySlug } from "@/features/products/guest-product-detail";
 import SchemaScript from "@/components/guest/SchemaScript";
 import ProductDetailClient from "./ProductDetailClient";
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }) {
 
     if (!product) return {};
 
-    const title = product.productName;
+    const title = cmsField(product, "metaTitle", validLocale) || product.productName;
     const description =
+        cmsField(product, "metaDescription", validLocale) ||
         product.productDescription ||
         `${product.productName}${product.areaOfUse ? ` – ${product.areaOfUse}` : ""} LED display from ProLEDALL.`;
     const path = `/products/${product.slug}`;

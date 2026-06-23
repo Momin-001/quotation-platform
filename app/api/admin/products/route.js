@@ -44,6 +44,11 @@ export async function POST(request) {
             productName: body.productName?.toString().trim() || "",
             productNumber: body.productNumber?.toString().trim() || "",
             productDescription: body.productDescription?.toString().trim() || null,
+            // SEO meta tags
+            metaTitleDe: body.metaTitleDe?.toString().trim() || null,
+            metaTitleEn: body.metaTitleEn?.toString().trim() || null,
+            metaDescriptionDe: body.metaDescriptionDe?.toString().trim() || null,
+            metaDescriptionEn: body.metaDescriptionEn?.toString().trim() || null,
             oemBrand: body.oemBrand?.toString().trim() || null,
             // Foreign Key
             areaOfUseId: body.areaOfUseId?.toString() || null,

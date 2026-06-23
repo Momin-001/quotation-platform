@@ -6,6 +6,12 @@ export const blogs = pgTable("blogs", {
     title: text("title").notNull(),
     slug: text("slug").notNull().unique(),
     authorName: text("author_name").notNull(),
+
+    // SEO meta tags (bilingual, optional — fall back to title/excerpt)
+    metaTitleEn: text("meta_title_en"),
+    metaTitleDe: text("meta_title_de"),
+    metaDescriptionEn: text("meta_description_en"),
+    metaDescriptionDe: text("meta_description_de"),
     mainImageUrl: text("main_image_url"),
     mainImagePublicId: text("main_image_public_id"),
     mainContentHtml: text("main_content_html").notNull().default(""),

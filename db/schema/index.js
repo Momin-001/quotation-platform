@@ -18,3 +18,4 @@ export * from "./productIcons";
 export * from "./productProductIcons";
 export * from "./blogs";
 export * from "./productFilterBounds";
+export * from "./pageSeo";

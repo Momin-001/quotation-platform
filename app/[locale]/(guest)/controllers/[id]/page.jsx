@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BASE_URL } from "@/lib/constants";
 import { validateLocale, buildAlternates } from "@/lib/i18n/metadata";
+import { cmsField } from "@/lib/i18n/cms";
 import { fetchGuestControllerBySlug } from "@/features/controllers/guest-controller-detail";
 import ControllerDetailClient from "./ControllerDetailClient";
 
@@ -24,8 +25,12 @@ export async function generateMetadata({ params }) {
 
     const t = await getTranslations({ locale: validLocale, namespace: "Controllers.detail" });
     const brand = controller.brandDisplay || controller.brandName || "";
-    const title = controller.interfaceName || t("titleFallback");
+    const title =
+        cmsField(controller, "metaTitle", validLocale) ||
+        controller.interfaceName ||
+        t("titleFallback");
     const description =
+        cmsField(controller, "metaDescription", validLocale) ||
         controller.interfaceDescription ||
         `${title}${brand ? ` (${brand})` : ""} LED controller available from ProLEDALL.`;
     const path = `/controllers/${controller.slug}`;

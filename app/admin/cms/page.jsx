@@ -9,6 +9,7 @@ import HomepageTab from "./components/HomepageTab";
 import FooterTab from "./components/FooterTab";
 import QuotationPdfTab from "./components/QuotationPdfTab";
 import ProductFilterBoundsTab from "./components/ProductFilterBoundsTab";
+import SeoMetaTab from "./components/SeoMetaTab";
 
 export default function CMSPage() {
     const [activeTab, setActiveTab] = useState("navbar");
@@ -20,6 +21,7 @@ export default function CMSPage() {
     const footerSaveHandlerRef = useRef(null);
     const quotationPdfSaveHandlerRef = useRef(null);
     const productFilterBoundsSaveHandlerRef = useRef(null);
+    const seoMetaSaveHandlerRef = useRef(null);
     // Handle data change from child components
     const handleDataChange = (data) => {
         // Store the data if needed, but validation is handled in child components
@@ -57,6 +59,12 @@ export default function CMSPage() {
             } else if (activeTab === "product-filters") {
                 if (productFilterBoundsSaveHandlerRef.current) {
                     result = await productFilterBoundsSaveHandlerRef.current();
+                } else {
+                    return;
+                }
+            } else if (activeTab === "seo-meta") {
+                if (seoMetaSaveHandlerRef.current) {
+                    result = await seoMetaSaveHandlerRef.current();
                 } else {
                     return;
                 }
@@ -114,6 +122,12 @@ export default function CMSPage() {
                         >
                             PRODUCT FILTERS
                         </TabsTrigger>
+                        <TabsTrigger
+                            value="seo-meta"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
+                        >
+                            SEO / META
+                        </TabsTrigger>
                     </TabsList>
 
                 </div>
@@ -157,6 +171,14 @@ export default function CMSPage() {
                     <ProductFilterBoundsTab
                         onSaveHandlerReady={(handler) => {
                             productFilterBoundsSaveHandlerRef.current = handler;
+                        }}
+                    />
+                </TabsContent>
+
+                <TabsContent value="seo-meta" className="space-y-6">
+                    <SeoMetaTab
+                        onSaveHandlerReady={(handler) => {
+                            seoMetaSaveHandlerRef.current = handler;
                         }}
                     />
                 </TabsContent>
