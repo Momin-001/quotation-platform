@@ -1,21 +1,19 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
-import { navbar, footer, homepage, partners, categories } from "@/db/schema";
+import { footer, homepage, partners, categories } from "@/db/schema";
 import { or, ilike } from "drizzle-orm";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
-import { defaultNavbarData, defaultFooterData, defaultHomepageData } from "@/lib/data/default_cms_data";
+import { defaultHomepageData } from "@/lib/data/default_cms_data";
 import { HOMEPAGE_SHOWCASE_CATEGORY_NAMES, orderShowcaseCategories } from "@/lib/helpers/category-helpers";
 const REVALIDATE_SECONDS = 900;
 
-async function fetchNavbarRow() {
-    const [row] = await db.select().from(navbar).limit(1);
-    return row ?? null;
-}
-
-async function fetchFooterRow() {
-    const [row] = await db.select().from(footer).limit(1);
-    return row ?? null;
+async function fetchPrivacyPolicyPdfUrl() {
+    const [row] = await db
+        .select({ privacyPolicyPdfUrl: footer.privacyPolicyPdfUrl })
+        .from(footer)
+        .limit(1);
+    return row?.privacyPolicyPdfUrl ?? null;
 }
 
 async function fetchHomepageRow() {
@@ -64,13 +62,11 @@ async function fetchShowcaseCategories() {
     return orderShowcaseCategories(rows);
 }
 
-const getCachedNavbarRow = unstable_cache(fetchNavbarRow, ["guest-navbar"], {
-    revalidate: REVALIDATE_SECONDS,
-});
-
-const getCachedFooterRow = unstable_cache(fetchFooterRow, ["guest-footer"], {
-    revalidate: REVALIDATE_SECONDS,
-});
+const getCachedPrivacyPolicyPdfUrl = unstable_cache(
+    fetchPrivacyPolicyPdfUrl,
+    ["guest-privacy-policy-pdf"],
+    { revalidate: REVALIDATE_SECONDS }
+);
 
 const getCachedHomepageRow = unstable_cache(fetchHomepageRow, ["guest-homepage"], {
     revalidate: REVALIDATE_SECONDS,
@@ -98,16 +94,8 @@ const getCachedShowcaseCategories = unstable_cache(
     { revalidate: REVALIDATE_SECONDS }
 );
 
-export async function getGuestLayoutData() {
-    const [navbarRow, footerRow] = await Promise.all([
-        getCachedNavbarRow(),
-        getCachedFooterRow(),
-    ]);
-
-    return {
-        navbarData: navbarRow ?? defaultNavbarData,
-        footerData: footerRow ?? defaultFooterData,
-    };
+export async function getPrivacyPolicyPdfUrl() {
+    return getCachedPrivacyPolicyPdfUrl();
 }
 
 export async function getGuestHomeData() {

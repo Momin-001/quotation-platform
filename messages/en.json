@@ -27,7 +27,13 @@
     "german": "German",
     "englishAlt": "English",
     "germanAlt": "German",
-    "menu": "Menu"
+    "menu": "Menu",
+    "home": "HOME",
+    "products": "PRODUCTS",
+    "controllers": "CONTROLLERS",
+    "leditor": "LEDITOR",
+    "blogs": "BLOGS",
+    "becomePartner": "BECOME PARTNERS"
   },
   "RelatedProducts": {
     "title": "Related Products"
@@ -125,7 +131,17 @@
   "Home": {
     "footer": {
       "emailPlaceholder": "Your Email Address",
-      "subscribe": "Subscribe"
+      "subscribe": "Subscribe",
+      "description": "PROLEDALL is a platform that allows you to get quotes for your LED products. We are a team of experts who are dedicated to providing the best possible service to our clients.",
+      "ourAddressTitle": "Our Address",
+      "quickLinksTitle": "Quick Links",
+      "quickLinkProducts": "Products",
+      "quickLinkImprint": "Imprint",
+      "quickLinkTerms": "Terms and Conditions",
+      "quickLinkBecomePartner": "Become a Partner",
+      "privacyPolicy": "Privacy Policy",
+      "newsletterTitle": "Newsletter",
+      "copyrightText": "© Copyright ProLedAll. All Rights Reserved"
     },
     "blogs": {
       "noImage": "No image",

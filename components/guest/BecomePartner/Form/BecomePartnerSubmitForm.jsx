@@ -15,14 +15,14 @@ import { toast } from "sonner";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { cn } from "@/lib/utils";
-import { useFooter } from "@/context/FooterContext";
+import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 import { AuthField, authInputClass, authInputErrorClass } from "@/components/guest/AuthPageShell";
 
 export default function BecomePartnerSubmitForm() {
     const t = useTranslations("BecomePartnerSubmit");
     const tVal = useTranslations("BecomePartnerSubmit.validation");
     const tCommon = useTranslations("Common");
-    const { privacyPolicyPdfUrl } = useFooter();
+    const { privacyPolicyPdfUrl } = usePrivacyPolicy();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
 

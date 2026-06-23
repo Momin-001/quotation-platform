@@ -1,21 +1,21 @@
 import Navbar from "@/components/guest/Navbar";
 import Footer from "@/components/guest/Footer";
-import { FooterProvider } from "@/context/FooterContext";
+import { PrivacyPolicyProvider } from "@/context/PrivacyPolicyContext";
 import { CartProvider } from "@/context/CartContext";
 import UserHeader from "@/components/user/UserHeader";
-import { getGuestLayoutData } from "@/features/cms/guest-cms-data";
+import { getPrivacyPolicyPdfUrl } from "@/features/cms/guest-cms-data";
 
 export default async function GuestLayout({ children }) {
-    const { navbarData, footerData } = await getGuestLayoutData();
+    const privacyPolicyPdfUrl = await getPrivacyPolicyPdfUrl();
 
     return (
         <CartProvider>
-                <Navbar navbarData={navbarData} />
-                <UserHeader />
-                <FooterProvider initialFooterData={footerData}>
-                    {children}
-                    <Footer footerData={footerData} />
-                </FooterProvider>
+            <Navbar />
+            <UserHeader />
+            <PrivacyPolicyProvider pdfUrl={privacyPolicyPdfUrl}>
+                {children}
+                <Footer />
+            </PrivacyPolicyProvider>
         </CartProvider>
     );
 }

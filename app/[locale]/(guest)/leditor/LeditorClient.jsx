@@ -44,7 +44,7 @@ import {
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useFooter } from "@/context/FooterContext";
+import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 import { cn } from "@/lib/utils";
 import {
     ADDITIONAL_SERVICES_OPTIONS,
@@ -210,7 +210,7 @@ export default function LeditorClient() {
     const tCommon = useTranslations("Common");
     const { user, isAuthenticated } = useAuth();
     const router = useRouter();
-    const { privacyPolicyPdfUrl } = useFooter();
+    const { privacyPolicyPdfUrl } = usePrivacyPolicy();
     const locale = useLocale();
 
     const siteUrl = BASE_URL || "https://www.proledall.eu";

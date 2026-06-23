@@ -6,7 +6,6 @@ export * from "./productCertificates";
 export * from "./productFeatures";
 export * from "./certificates";
 export * from "./faqs";
-export * from "./navbar";
 export * from "./homepage";
 export * from "./footer";
 export * from "./partners";

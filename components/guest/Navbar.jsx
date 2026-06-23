@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { cmsField } from "@/lib/i18n/cms";
 import UserAvatar from "@/components/UserAvatar";
 import {
     DropdownMenu,
@@ -20,7 +19,7 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const MobileNavSheet = dynamic(() => import("./NavbarMobileSheet"), { ssr: false });
 
-export default function Navbar({ navbarData }) {
+export default function Navbar() {
     const { isAuthenticated, loading } = useAuth();
     const locale = useLocale();
     const t = useTranslations("Navbar");
@@ -42,9 +41,6 @@ export default function Navbar({ navbarData }) {
     const navLinkClass = (href) =>
         `hover:text-primary transition-colors duration-200 ${isActive(href) ? "text-primary font-semibold" : "text-foreground/80"}`;
 
-    const getNavText = (itemNumber) =>
-        cmsField(navbarData, `navItem${itemNumber}`, locale);
-
     return (
         <nav className="w-full border-b border-border/60 bg-background/95 backdrop-blur-sm sticky top-0 left-0 right-0 z-50 ">
             <div className="container mx-auto px-4 lg:px-6 py-3.5 flex items-center justify-between">
@@ -62,22 +58,22 @@ export default function Navbar({ navbarData }) {
 
                 <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-[15px] tracking-wide">
                     <Link href="/" className={navLinkClass("/")}>
-                        {getNavText(1)}
+                        {t("home")}
                     </Link>
                     <Link href="/products" className={navLinkClass("/products")}>
-                        {getNavText(2)}
+                        {t("products")}
                     </Link>
                     <Link href="/controllers" className={navLinkClass("/controllers")}>
-                        {getNavText(3)}
+                        {t("controllers")}
                     </Link>
                     <Link href="/leditor" className={navLinkClass("/leditor")}>
-                        {getNavText(4)}
+                        {t("leditor")}
                     </Link>
                     <Link href="/blogs" className={navLinkClass("/blogs")}>
-                        {getNavText(5)}
+                        {t("blogs")}
                     </Link>
                     <Link href="/become-partner" className={navLinkClass("/become-partner")}>
-                        {getNavText(6)}
+                        {t("becomePartner")}
                     </Link>
                 </div>
 
@@ -141,7 +137,6 @@ export default function Navbar({ navbarData }) {
                             <MobileNavSheet
                                 open={mobileOpen}
                                 onOpenChange={setMobileOpen}
-                                navbarData={navbarData}
                                 locale={locale}
                                 isAuthenticated={isAuthenticated}
                                 loading={loading}

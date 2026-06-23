@@ -6,6 +6,24 @@ import cloudinary, { uploadFooterPrivacyPolicyPdf } from "@/lib/cloudinary";
 
 const MAX_BYTES = 15 * 1024 * 1024;
 
+// GET /api/admin/footer/privacy-policy-pdf — current stored PDF url (if any)
+export async function GET() {
+    try {
+        const existing = await db
+            .select({ privacyPolicyPdfUrl: footer.privacyPolicyPdfUrl })
+            .from(footer)
+            .limit(1)
+            .then((r) => r[0]);
+
+        return successResponse("Privacy policy PDF fetched", {
+            privacyPolicyPdfUrl: existing?.privacyPolicyPdfUrl || null,
+        });
+    } catch (error) {
+        console.error("GET /api/admin/footer/privacy-policy-pdf error:", error);
+        return errorResponse("Failed to fetch PDF", 500);
+    }
+}
+
 // POST /api/admin/footer/privacy-policy-pdf — multipart field `file` (PDF)
 export async function POST(req) {
     try {
@@ -29,9 +47,10 @@ export async function POST(req) {
             return errorResponse("Only PDF files are allowed", 400);
         }
 
-        const existing = await db.select().from(footer).limit(1).then((r) => r[0]);
+        let existing = await db.select().from(footer).limit(1).then((r) => r[0]);
         if (!existing) {
-            return errorResponse("Footer row not found. Save footer content once in CMS first.", 404);
+            // No footer row yet (footer content is now static) — create one to hold the PDF.
+            [existing] = await db.insert(footer).values({}).returning();
         }
 
         const bytes = await file.arrayBuffer();

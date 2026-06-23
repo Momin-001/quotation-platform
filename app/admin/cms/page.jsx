@@ -4,21 +4,19 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save } from "lucide-react";
-import NavbarTab from "./components/NavbarTab";
 import HomepageTab from "./components/HomepageTab";
-import FooterTab from "./components/FooterTab";
+import PrivacyPolicyTab from "./components/PrivacyPolicyTab";
 import QuotationPdfTab from "./components/QuotationPdfTab";
 import ProductFilterBoundsTab from "./components/ProductFilterBoundsTab";
 import SeoMetaTab from "./components/SeoMetaTab";
 
 export default function CMSPage() {
-    const [activeTab, setActiveTab] = useState("navbar");
+    const [activeTab, setActiveTab] = useState("homepage");
     const [saving, setSaving] = useState(false);
 
     // Refs to store save handlers from child components
-    const navbarSaveHandlerRef = useRef(null);
     const homepageSaveHandlerRef = useRef(null);
-    const footerSaveHandlerRef = useRef(null);
+    const privacyPolicySaveHandlerRef = useRef(null);
     const quotationPdfSaveHandlerRef = useRef(null);
     const productFilterBoundsSaveHandlerRef = useRef(null);
     const seoMetaSaveHandlerRef = useRef(null);
@@ -32,21 +30,15 @@ export default function CMSPage() {
         try {
             let result;
 
-            if (activeTab === "navbar") {
-                if (navbarSaveHandlerRef.current) {
-                    result = await navbarSaveHandlerRef.current();
-                } else {
-                    return;
-                }
-            } else if (activeTab === "homepage") {
+            if (activeTab === "homepage") {
                 if (homepageSaveHandlerRef.current) {
                     result = await homepageSaveHandlerRef.current();
                 } else {
                     return;
                 }
-            } else if (activeTab === "footer") {
-                if (footerSaveHandlerRef.current) {
-                    result = await footerSaveHandlerRef.current();
+            } else if (activeTab === "privacy-policy") {
+                if (privacyPolicySaveHandlerRef.current) {
+                    result = await privacyPolicySaveHandlerRef.current();
                 } else {
                     return;
                 }
@@ -93,22 +85,16 @@ export default function CMSPage() {
                 <div className="flex justify-between items-center mb-4">
                     <TabsList>
                         <TabsTrigger
-                            value="navbar"
-                            className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
-                        >
-                            NAVBAR
-                        </TabsTrigger>
-                        <TabsTrigger
                             value="homepage"
                             className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
                         >
                             HOMEPAGE
                         </TabsTrigger>
                         <TabsTrigger
-                            value="footer"
+                            value="privacy-policy"
                             className="data-[state=active]:bg-primary data-[state=active]:text-white px-6"
                         >
-                            FOOTER
+                            PRIVACY POLICY
                         </TabsTrigger>
                         <TabsTrigger
                             value="quotation-pdf"
@@ -132,15 +118,6 @@ export default function CMSPage() {
 
                 </div>
 
-                <TabsContent value="navbar" className="space-y-6">
-                    <NavbarTab
-                        onDataChange={handleDataChange}
-                        onSaveHandlerReady={(handler) => {
-                            navbarSaveHandlerRef.current = handler;
-                        }}
-                    />
-                </TabsContent>
-
                 <TabsContent value="homepage" className="space-y-6">
                     <HomepageTab
                         onDataChange={handleDataChange}
@@ -150,11 +127,10 @@ export default function CMSPage() {
                     />
                 </TabsContent>
 
-                <TabsContent value="footer" className="space-y-6">
-                    <FooterTab
-                        onDataChange={handleDataChange}
+                <TabsContent value="privacy-policy" className="space-y-6">
+                    <PrivacyPolicyTab
                         onSaveHandlerReady={(handler) => {
-                            footerSaveHandlerRef.current = handler;
+                            privacyPolicySaveHandlerRef.current = handler;
                         }}
                     />
                 </TabsContent>

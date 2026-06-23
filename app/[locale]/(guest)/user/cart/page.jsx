@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import BreadCrumb from "@/components/user/BreadCrumb";
 import { useTranslations } from "next-intl";
-import { useFooter } from "@/context/FooterContext";
+import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 import { cn } from "@/lib/utils";
 
 const readOnlyInputClass = "h-10 text-sm bg-muted/30 border-border/60";
@@ -42,7 +42,7 @@ export default function CartPage() {
     const router = useRouter();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-    const { privacyPolicyPdfUrl } = useFooter();
+    const { privacyPolicyPdfUrl } = usePrivacyPolicy();
 
     const formSchema = useMemo(
         () =>

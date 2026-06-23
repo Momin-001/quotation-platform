@@ -23,7 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useFooter } from "@/context/FooterContext";
+import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 import {
     AuthPageShell,
     AuthField,
@@ -37,7 +37,7 @@ export default function RegisterPage() {
     const t = useTranslations("Auth.register");
     const tCommon = useTranslations("Common");
     const tVal = useTranslations("Auth.validation");
-    const { privacyPolicyPdfUrl } = useFooter();
+    const { privacyPolicyPdfUrl } = usePrivacyPolicy();
     const [captchaVal, setCaptchaVal] = useState(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);

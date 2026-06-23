@@ -27,7 +27,13 @@
     "german": "Deutsch",
     "englishAlt": "Englisch",
     "germanAlt": "Deutsch",
-    "menu": "Menü"
+    "menu": "Menü",
+    "home": "STARTSEITE",
+    "products": "PRODUKTE",
+    "controllers": "CONTROLLER",
+    "leditor": "LEDITOR",
+    "blogs": "BLOGS",
+    "becomePartner": "PARTNER WERDEN"
   },
   "RelatedProducts": {
     "title": "Ähnliche Produkte"
@@ -125,7 +131,17 @@
   "Home": {
     "footer": {
       "emailPlaceholder": "Ihre E-Mail-Adresse",
-      "subscribe": "Abonnieren"
+      "subscribe": "Abonnieren",
+      "description": "PROLEDALL ist eine Plattform, auf der Sie Angebote für Ihre LED-Produkte einholen können. Unser Expertenteam ist bestrebt, unseren Kunden den bestmöglichen Service zu bieten.",
+      "ourAddressTitle": "Unsere Adresse",
+      "quickLinksTitle": "Quicklinks",
+      "quickLinkProducts": "Produkte",
+      "quickLinkImprint": "Impressum",
+      "quickLinkTerms": "AGB",
+      "quickLinkBecomePartner": "Werden Sie Partner",
+      "privacyPolicy": "Datenschutzerklärung",
+      "newsletterTitle": "Newsletter",
+      "copyrightText": "© Copyright ProLedAll. Alle Rechte vorbehalten."
     },
     "blogs": {
       "noImage": "Kein Bild",

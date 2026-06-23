@@ -5,42 +5,18 @@ import { Facebook, Linkedin, Send, Twitter, Youtube, Instagram, ArrowUp, Phone, 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
-import { getPdfPreviewUrl } from "@/lib/cloudinaryPdfUrls";
-import { useFooter } from "@/context/FooterContext";
-import { cmsField } from "@/lib/i18n/cms";
+import { useTranslations } from "next-intl";
+import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 
-export default function Footer({ footerData }) {
-    const locale = useLocale();
+export default function Footer() {
     const t = useTranslations("Home.footer");
-    const footerCtx = useFooter();
-    const effectiveFooterData = footerCtx?.footerData || footerData;
-
-    const getText = (field) => cmsField(effectiveFooterData, field, locale);
-
-    const getQuickLinks = () => {
-        if (!effectiveFooterData) return [];
-        const links = [];
-        for (let i = 1; i <= 5; i++) {
-            const linkText = getText(`quickLink${i}`);
-            if (linkText) {
-                links.push(linkText);
-            }
-        }
-        return links;
-    };
+    const { privacyPolicyPdfUrl } = usePrivacyPolicy();
 
     const handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const hasCmsQuickLinks = getQuickLinks().length > 0;
-    const privacyPdfPreviewUrl =
-        footerCtx?.privacyPolicyPdfUrl ||
-        (effectiveFooterData?.privacyPolicyPdfUrl ? getPdfPreviewUrl(effectiveFooterData.privacyPolicyPdfUrl) : null);
-    const privacyLabel = hasCmsQuickLinks
-        ? getText("quickLink5") || "Privacy Policy"
-        : "Privacy Policy";
+    const privacyLabel = t("privacyPolicy");
 
     return (
         <footer className="bg-[#0f2e4a] text-primary-foreground pt-14 md:pt-16 lg:pt-20 pb-8">
@@ -49,7 +25,7 @@ export default function Footer({ footerData }) {
                     <div className="space-y-4">
                         <Image src="/logo-name-white.png" alt="Logo" width={150} height={150} />
                         <p className="text-sm sm:text-[15px] font-normal leading-relaxed text-gray-300 max-w-sm">
-                            {getText("description") || "PROLEDALL is a platform that allows you to get quotes for your LED products. We are a team of experts who are dedicated to providing the best possible service to our clients."}
+                            {t("description")}
                         </p>
                         <div className="flex items-center gap-3 pt-2">
                             <div className="bg-white/90 hover:bg-white p-2 rounded-full h-8 w-8 flex items-center justify-center cursor-pointer transition-colors">
@@ -69,7 +45,7 @@ export default function Footer({ footerData }) {
 
                     <div>
                         <h3 className="font-semibold  text-lg mb-5">
-                            {getText("ourAddressTitle") || "Our Address"}
+                            {t("ourAddressTitle")}
                         </h3>
                         <ul className="space-y-3 text-sm sm:text-[15px] text-gray-300">
                             <li className="flex items-center gap-2.5">
@@ -89,35 +65,33 @@ export default function Footer({ footerData }) {
 
                     <div>
                         <h3 className="font-semibold  text-lg mb-5">
-                            {getText("quickLinksTitle") || "Quick Links"}
+                            {t("quickLinksTitle")}
                         </h3>
                         <ul className="space-y-2.5 text-sm sm:text-[15px] text-gray-300">
                             <li>
                                 <Link href="/products" className="hover:text-secondary transition-colors">
-                                    {hasCmsQuickLinks ? getText("quickLink1") || "Products" : "Products"}
+                                    {t("quickLinkProducts")}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/imprint" className="hover:text-secondary transition-colors">
-                                    {hasCmsQuickLinks ? getText("quickLink2") || "Imprint" : "Imprint"}
+                                    {t("quickLinkImprint")}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/terms-and-conditions" className="hover:text-secondary transition-colors">
-                                    {hasCmsQuickLinks
-                                        ? getText("quickLink3") || "Terms and Conditions"
-                                        : "Terms and Conditions"}
+                                    {t("quickLinkTerms")}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/become-partner" className="hover:text-secondary transition-colors">
-                                    {hasCmsQuickLinks ? getText("quickLink4") || "Become a Partner" : "Become a Partner"}
+                                    {t("quickLinkBecomePartner")}
                                 </Link>
                             </li>
                             <li>
-                                {privacyPdfPreviewUrl ? (
+                                {privacyPolicyPdfUrl ? (
                                     <a
-                                        href={privacyPdfPreviewUrl}
+                                        href={privacyPolicyPdfUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:text-secondary transition-colors"
@@ -133,7 +107,7 @@ export default function Footer({ footerData }) {
 
                     <div>
                         <h3 className="font-semibold  text-lg mb-5">
-                            {getText("newsletterTitle") || "Newsletter"}
+                            {t("newsletterTitle")}
                         </h3>
                         <div className="flex flex-col gap-3">
                             <Input
@@ -149,7 +123,7 @@ export default function Footer({ footerData }) {
                 <div className="border-t border-white/10 pt-6 flex items-center justify-between">
                     <p></p>
                     <p className="text-xs sm:text-sm text-gray-400">
-                        {getText("copyrightText") || "© Copyright Quotation Platform. All Right Reserved"}
+                        {t("copyrightText")}
                     </p>
                     <div
                         className="bg-secondary hover:bg-secondary/90 p-2 rounded-full cursor-pointer transition-colors"
