@@ -14,6 +14,7 @@ import {
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { getRefurbishedQuotationDetails } from "@/features/refurbished-products/refurbished-quotation";
 
 // Helper to get first product image
 async function getProductImage(productId) {
@@ -236,7 +237,10 @@ export async function GET(req, { params }) {
         // Build items with product details, optional items, and additional items
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
-                const baseProduct = await getProductDetails(item.productId);
+                const baseProduct =
+                    item.productSourceType === "refurbished"
+                        ? await getRefurbishedQuotationDetails(item.refurbishedProductId)
+                        : await getProductDetails(item.productId);
                 const matchingEnquiryItem =
                     enquiryItemByKey.get(`${item.productId}|${item.itemType}`) ||
                     enquiryItemByProductId.get(item.productId) ||

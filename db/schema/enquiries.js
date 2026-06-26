@@ -2,6 +2,7 @@ import { pgTable, uuid, text, timestamp, integer, decimal, boolean, jsonb } from
 import { users, products, controllers } from "./index";
 import { relations } from "drizzle-orm";
 import { quotations } from "./quotations";
+import { refurbishedProducts } from "./refurbishedProducts";
 
 export const enquiries = pgTable("enquiries", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -20,9 +21,12 @@ export const enquiryItems = pgTable("enquiry_items", {
     enquiryId: uuid("enquiry_id")
         .notNull()
         .references(() => enquiries.id, { onDelete: "cascade" }),
+    // Source product — exactly one of productId / refurbishedProductId is set, per productSourceType
     productId: uuid("product_id")
-        .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
+    refurbishedProductId: uuid("refurbished_product_id")
+        .references(() => refurbishedProducts.id, { onDelete: "cascade" }),
+    productSourceType: text("product_source_type").default("product").notNull(), // "product" | "refurbished"
     quantity: integer("quantity").notNull().default(1),
     itemType: text("item_type").default("main").notNull(),
     itemOrder: integer("item_order").default(0),
@@ -102,6 +106,10 @@ export const enquiryItemsRelations = relations(enquiryItems, ({ one }) => ({
     product: one(products, {
         fields: [enquiryItems.productId],
         references: [products.id],
+    }),
+    refurbishedProduct: one(refurbishedProducts, {
+        fields: [enquiryItems.refurbishedProductId],
+        references: [refurbishedProducts.id],
     }),
     controller: one(controllers, {
         fields: [enquiryItems.controllerId],

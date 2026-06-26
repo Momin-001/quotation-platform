@@ -58,7 +58,10 @@ export async function POST(req) {
         // Create enquiry items
         const itemsToInsert = items.map((item, index) => ({
             enquiryId: enquiry.id,
-            productId: item.productId,
+            productSourceType: item.productSourceType || "product",
+            productId: item.productSourceType === "refurbished" ? null : (item.productId ?? null),
+            refurbishedProductId:
+                item.productSourceType === "refurbished" ? (item.refurbishedProductId ?? item.productId ?? null) : null,
             quantity: item.quantity || 1,
             itemType: item.itemType || (index === 0 ? "main" : "alternative"),
             itemOrder: index,

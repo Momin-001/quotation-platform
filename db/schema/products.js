@@ -1,4 +1,7 @@
 import { pgTable, uuid, text, timestamp, integer, decimal, pgEnum, boolean, jsonb } from "drizzle-orm/pg-core";
+// Shared enums live in a leaf module to avoid circular-import issues; re-exported here for compatibility.
+import { designEnum, chipBondingEnum, controlSystemEnum } from "./enums";
+export { designEnum, chipBondingEnum, controlSystemEnum };
 import { categories } from "./categories";
 import { productImages } from "./productImages";
 import { productCertificates } from "./productCertificates";
@@ -10,7 +13,6 @@ import { quotationItems, quotationOptionalItems } from "./quotations";
 
 // ENUM definitions
 export const productTypeEnum = pgEnum("product_type", ["AIO Systems", "LED Display Single Cabinet"]);
-export const designEnum = pgEnum("design", ["Fix", "Mobil"]);
 export const specialTypesEnum = pgEnum("special_types", ["Transparent", "Curved", "Floor", "Other"]);
 export const applicationEnum = pgEnum("application", [
     "DOOH",
@@ -27,7 +29,6 @@ export const applicationEnum = pgEnum("application", [
 export const pixelConfigurationEnum = pgEnum("pixel_configuration", ["1R1G1B", "2R1G1B"]);
 export const pixelTechnologyEnum = pgEnum("pixel_technology", ["Real", "Virtual (Quadruple)", "Virtual (Triple)"]);
 export const ledTechnologyEnum = pgEnum("led_technology", ["SMD", "SMD+GOB", "IMD", "COB", "DIP", "LOB", "Other"]);
-export const chipBondingEnum = pgEnum("chip_bonding", ["Gold Wire", "Copper Wire", "Flip-Chip"]);
 export const colourDepthEnum = pgEnum("colour_depth", ["8", "10", "12"]);
 export const currentGainControlEnum = pgEnum("current_gain_control", ["4", "8"]);
 export const videoRateEnum = pgEnum("video_rate", ["50/60", "120", "240"]);
@@ -40,7 +41,6 @@ export const calibrationMethodEnum = pgEnum("calibration_method", [
     "Other"
 ]);
 export const drivingMethodEnum = pgEnum("driving_method", ["Common Anode", "Common Cathode"]);
-export const controlSystemEnum = pgEnum("control_system", ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"]);
 export const greyscaleProcessingEnum = pgEnum("greyscale_processing", ["<16", "16", "18+", "22+", "Other"]);
 export const coolingEnum = pgEnum("cooling", ["Convection", "Fan"]);
 export const optionalNoEnum = pgEnum("optional_no", ["Optional", "No"]);

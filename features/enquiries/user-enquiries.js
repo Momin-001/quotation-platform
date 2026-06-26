@@ -34,6 +34,12 @@ export async function fetchUserEnquiries(userId, { status } = {}) {
                             productNumber: true,
                         },
                     },
+                    refurbishedProduct: {
+                        columns: {
+                            serie: true,
+                            productNumber: true,
+                        },
+                    },
                 },
             },
         },

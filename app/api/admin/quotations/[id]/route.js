@@ -14,6 +14,7 @@ import {
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, and, ne, or } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
+import { getRefurbishedQuotationDetails } from "@/features/refurbished-products/refurbished-quotation";
 
 const allowedEnquiryStatuses = ["pending", "in_progress", "expired"];
 async function getProductImage(productId) {
@@ -198,7 +199,11 @@ export async function GET(req, { params }) {
         // Build items with product details, optional items, and additional items
         const itemsWithDetails = await Promise.all(
             items.map(async (item) => {
-                const product = await getProductDetails(item.productId);
+                let product =
+                    item.productSourceType === "refurbished"
+                        ? await getRefurbishedQuotationDetails(item.refurbishedProductId)
+                        : await getProductDetails(item.productId);
+                if (product) product = { ...product, productSourceType: item.productSourceType || "product" };
 
                 // Fetch optional items
                 const optionalItemsData = await db
@@ -375,11 +380,14 @@ export async function PUT(req, { params }) {
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
 
+            const isRefurbished = item.productSourceType === "refurbished";
             const newItem = await db
                 .insert(quotationItems)
                 .values({
                     quotationId: id,
-                    productId: item.productId,
+                    productSourceType: isRefurbished ? "refurbished" : "product",
+                    productId: isRefurbished ? null : item.productId,
+                    refurbishedProductId: isRefurbished ? item.productId : null,
                     quantity: item.quantity || 1,
                     unitPrice: item.unitPrice.toString(),
                     discountPercentage: (item.discountPercentage || 0).toString(),

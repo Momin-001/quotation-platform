@@ -80,12 +80,17 @@ export default function CartPage() {
                 body: JSON.stringify({
                     projectName: data.projectName?.trim() || null,
                     message: data.message,
-                    items: cartItems.map((item, index) => ({
-                        productId: item.id,
-                        quantity: item.quantity,
-                        itemType: item.itemType || (index === 0 ? "main" : "alternative"),
-                        additionalController: item.additionalController || null,
-                    })),
+                    items: cartItems.map((item, index) => {
+                        const isRefurbished = item.productSourceType === "refurbished";
+                        return {
+                            productId: isRefurbished ? null : item.id,
+                            refurbishedProductId: isRefurbished ? item.id : null,
+                            productSourceType: isRefurbished ? "refurbished" : "product",
+                            quantity: item.quantity,
+                            itemType: item.itemType || (index === 0 ? "main" : "alternative"),
+                            additionalController: isRefurbished ? null : item.additionalController || null,
+                        };
+                    }),
                 }),
             });
 
@@ -119,6 +124,9 @@ export default function CartPage() {
             borderClass: "border-secondary/40",
         };
     };
+
+    // A refurbished product owns the cart alone: no controller, no alternative.
+    const isRefurbishedCart = cartItems.some((item) => item.productSourceType === "refurbished");
 
     const breadcrumbs = [
         { label: t("breadcrumbHome"), href: "/" },
@@ -331,13 +339,15 @@ export default function CartPage() {
                             );
                         })}
 
-                        <Link
-                            href="/controllers"
-                            className="w-full border-2 border-dashed border-primary/40 rounded-xl py-3.5 text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                        >
-                            <Cpu className="h-5 w-5" />
-                            {t("addController")}
-                        </Link>
+                        {!isRefurbishedCart && (
+                            <Link
+                                href="/controllers"
+                                className="w-full border-2 border-dashed border-primary/40 rounded-xl py-3.5 text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                            >
+                                <Cpu className="h-5 w-5" />
+                                {t("addController")}
+                            </Link>
+                        )}
 
                         {canAddToCart() && (
                             <button

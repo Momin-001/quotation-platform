@@ -48,37 +48,59 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem("cart", JSON.stringify(cartItems));
     }, [cartItems]);
 
-    // Check if can add more items to cart
+    // Whether the cart currently holds a refurbished product (it owns the cart alone)
+    const hasRefurbishedItem = () =>
+        cartItems.some((item) => item.productSourceType === "refurbished");
+
+    // Check if can add more items to cart (no alternatives allowed with a refurbished product)
     const canAddToCart = () => {
+        if (hasRefurbishedItem()) return false;
         return cartItems.length < MAX_CART_ITEMS;
     };
 
-    const addToCart = (product) => {
-        setCartItems((prevItems) => {
-            // Check if product already exists in cart
-            const existingItem = prevItems.find((item) => item.id === product.id);
-            
-            if (existingItem) {
-                // If product already exists, just increase quantity
-                return prevItems.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
+    // Add a product to the cart. `sourceType` is "product" (default) or "refurbished".
+    // A refurbished product is exclusive: it must be the only item, with no controller/alternative.
+    // Returns true when added, false when blocked.
+    const addToCart = (product, sourceType = "product") => {
+        if (sourceType === "refurbished") {
+            // Refurbished products own the cart by themselves
+            if (cartItems.length > 0) {
+                toast.error("Clear your cart to add a refurbished product");
+                return false;
             }
-            
-            // Check if cart is full (max 2 items)
-            if (prevItems.length >= MAX_CART_ITEMS) {
-                toast.error("Cart can only contain 2 products: Main Product and Alternative Product");
-                return prevItems;
-            }
+            setCartItems([
+                { ...product, quantity: 1, itemType: "main", additionalController: null, productSourceType: "refurbished" },
+            ]);
+            return true;
+        }
 
-            // Determine item type based on position
-            const itemType = prevItems.length === 0 ? "main" : "alternative";
-            
-            // Add new product with quantity 1, item type, no additional controller yet
-            return [...prevItems, { ...product, quantity: 1, itemType, additionalController: null }];
-        });
+        // Normal product: cannot be mixed with a refurbished product
+        if (hasRefurbishedItem()) {
+            toast.error("Remove the refurbished product to add other products");
+            return false;
+        }
+
+        const existingItem = cartItems.find((item) => item.id === product.id);
+        if (existingItem) {
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                )
+            );
+            return true;
+        }
+
+        if (cartItems.length >= MAX_CART_ITEMS) {
+            toast.error("Cart can only contain 2 products: Main Product and Alternative Product");
+            return false;
+        }
+
+        const itemType = cartItems.length === 0 ? "main" : "alternative";
+        setCartItems((prevItems) => [
+            ...prevItems,
+            { ...product, quantity: 1, itemType, additionalController: null, productSourceType: "product" },
+        ]);
+        return true;
     };
 
     const removeFromCart = (productId) => {
@@ -125,11 +147,12 @@ export const CartProvider = ({ children }) => {
         return cartItems.find((item) => item.itemType === "alternative") || cartItems[1] || null;
     };
 
-    // Add controller as additional product to a specific LED (max 1 per LED)
+    // Add controller as additional product to a specific LED (max 1 per LED).
+    // Refurbished products cannot have controllers.
     const addControllerToProduct = (controller, productId) => {
         setCartItems((prevItems) => {
             return prevItems.map((item) => {
-                if (item.id === productId) {
+                if (item.id === productId && item.productSourceType !== "refurbished") {
                     return { ...item, additionalController: controller };
                 }
                 return item;

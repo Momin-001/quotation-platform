@@ -76,7 +76,8 @@ export default function QuotationBuilderPage() {
                     }]
                     : [];
                 const mainProductData = {
-                    id: items[0].productId,
+                    id: items[0].productSourceType === "refurbished" ? items[0].refurbishedProductId : items[0].productId,
+                    productSourceType: items[0].productSourceType || "product",
                     productName: items[0].productName,
                     productNumber: items[0].productNumber,
                     pixelPitch: items[0].pixelPitch,
@@ -108,7 +109,8 @@ export default function QuotationBuilderPage() {
                     }]
                     : [];
                 const altProductData = {
-                    id: items[1].productId,
+                    id: items[1].productSourceType === "refurbished" ? items[1].refurbishedProductId : items[1].productId,
+                    productSourceType: items[1].productSourceType || "product",
                     productName: items[1].productName,
                     productNumber: items[1].productNumber,
                     pixelPitch: items[1].pixelPitch,
@@ -445,6 +447,7 @@ export default function QuotationBuilderPage() {
             // Main product
             items.push({
                 productId: mainProduct.product.id,
+                productSourceType: mainProduct.product.productSourceType || "product",
                 quantity: mainProduct.product.isCustom ? mainProduct.product.customTotalCabinets : mainProduct.quantity,
                 unitPrice: parseFloat(mainProduct.unitPrice),
                 discountPercentage: parseFloat(mainProduct.discountPercentage) || 0,
@@ -471,6 +474,7 @@ export default function QuotationBuilderPage() {
             if (alternativeProduct && alternativeProduct.product) {
                 items.push({
                     productId: alternativeProduct.product.id,
+                    productSourceType: alternativeProduct.product.productSourceType || "product",
                     quantity: alternativeProduct.product.isCustom ? alternativeProduct.product.customTotalCabinets : alternativeProduct.quantity,
                     unitPrice: parseFloat(alternativeProduct.unitPrice),
                     discountPercentage: parseFloat(alternativeProduct.discountPercentage) || 0,

@@ -12,11 +12,17 @@ import {
 
 Font.registerHyphenationCallback((word) => [word]);
 
-const BLUE_BG = "#dbeafe";
-const GRAY_BG = "#f3f4f6";
-const TEXT = "#111827";
-const TEXT_MED = "#1f2937";
-const TEXT_LIGHT = "#374151";
+// Theme colors mirrored from the web app (app/globals.css) so the PDF matches the detail page.
+const PAGE_BG = "#F9FAFB";       // gray-50 page background
+const CARD_BG = "#FFFFFF";       // white cards
+const BORDER = "#E5E7EB";        // border / border-border/60
+const PRIMARY = "#1A73E8";       // --primary (brand blue)
+const PRIMARY_TINT = "#E8F1FD";  // bg-primary/10 (accordion / section header)
+const SECONDARY = "#019C94";     // --secondary (teal, area-of-use badge)
+const CHIP_BG = "#F1F2F4";       // bg-muted/40 (stock / lead-time chips)
+const TEXT = "#2C2C2C";          // --foreground
+const TEXT_MED = "#374151";
+const TEXT_LIGHT = "#737373";    // --muted-foreground
 
 const styles = StyleSheet.create({
     page: {
@@ -24,6 +30,7 @@ const styles = StyleSheet.create({
         fontSize: 8,
         lineHeight: 1.35,
         color: TEXT,
+        backgroundColor: PAGE_BG,
         paddingTop: 54,
         paddingBottom: 34,
         paddingHorizontal: 24,
@@ -49,7 +56,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingTop: 3,
         borderTopWidth: 0.4,
-        borderTopColor: TEXT_LIGHT,
+        borderTopColor: BORDER,
     },
     footerText: { fontSize: 6, color: TEXT_LIGHT, maxWidth: "86%" },
     footerDate: { fontSize: 6, fontFamily: "Helvetica-Bold", color: TEXT_LIGHT },
@@ -61,39 +68,53 @@ const styles = StyleSheet.create({
     noImage: {
         width: "100%",
         height: 100,
-        backgroundColor: GRAY_BG,
+        backgroundColor: "#F3F4F6",
         borderRadius: 4,
         alignItems: "center",
         justifyContent: "center",
     },
     noImageText: { fontSize: 9, color: TEXT_LIGHT },
 
-    productName: { fontSize: 14, fontFamily: "Helvetica-Bold", marginBottom: 1, lineHeight: 1.15 },
-    productNumber: { fontSize: 9, fontFamily: "Helvetica-Bold", color: TEXT_MED, marginBottom: 4 },
+    // White info card around the hero details (mirrors the detail-page card)
+    infoCard: {
+        backgroundColor: CARD_BG,
+        borderWidth: 0.5,
+        borderColor: BORDER,
+        borderRadius: 6,
+        padding: 10,
+    },
+    productName: { fontSize: 14, fontFamily: "Helvetica-Bold", marginBottom: 1, lineHeight: 1.15, color: TEXT },
+    productNumber: { fontSize: 9, color: TEXT_LIGHT, marginBottom: 5 },
     areaOfUseBadge: {
         alignSelf: "flex-start",
-        backgroundColor: TEXT_MED,
+        backgroundColor: SECONDARY,
         color: "#ffffff",
         fontSize: 7,
         fontFamily: "Helvetica-Bold",
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 2,
-        marginBottom: 4,
+        borderRadius: 3,
+        marginBottom: 5,
+        textTransform: "uppercase",
     },
-    description: { fontSize: 7.5, lineHeight: 1.4, marginBottom: 5, color: TEXT },
-    featuresHeading: { fontSize: 9, fontFamily: "Helvetica-Bold", marginBottom: 2, color: TEXT },
+    description: { fontSize: 7.5, lineHeight: 1.4, marginBottom: 5, color: TEXT_MED },
+    featuresHeading: { fontSize: 8.5, fontFamily: "Helvetica-Bold", marginBottom: 2, color: TEXT, textTransform: "uppercase" },
     featureRow: { flexDirection: "row", marginBottom: 1, paddingLeft: 1 },
-    featureBullet: { fontSize: 8, marginRight: 4, color: TEXT_LIGHT },
-    featureText: { fontSize: 7.5, flex: 1, lineHeight: 1.3 },
+    featureBullet: { fontSize: 8, marginRight: 4, color: PRIMARY },
+    featureText: { fontSize: 7.5, flex: 1, lineHeight: 1.3, color: TEXT_MED },
 
-    iconsGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 5 },
+    chipRow: { flexDirection: "row", marginTop: 5, gap: 6 },
+    chip: { backgroundColor: CHIP_BG, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3 },
+    chipLabel: { fontSize: 6, color: TEXT_LIGHT, marginBottom: 1 },
+    chipValue: { fontSize: 8, fontFamily: "Helvetica-Bold", color: TEXT },
+
+    iconsGrid: { flexDirection: "row", flexWrap: "wrap", marginTop: 6 },
     iconCard: { width: 52, alignItems: "center", marginRight: 4, marginBottom: 4 },
     iconFrame: {
         width: 46,
         height: 36,
         borderWidth: 0.5,
-        borderColor: TEXT_MED,
+        borderColor: BORDER,
         borderRadius: 4,
         backgroundColor: "#ffffff",
         alignItems: "center",
@@ -102,7 +123,7 @@ const styles = StyleSheet.create({
     },
     iconImg: { width: 28, height: 28, objectFit: "contain" },
     iconFallback: { fontSize: 5, textAlign: "center", color: TEXT_LIGHT },
-    iconDivider: { width: "100%", borderTopWidth: 0.5, borderTopColor: TEXT_MED, marginTop: 2 },
+    iconDivider: { width: "100%", borderTopWidth: 0.5, borderTopColor: BORDER, marginTop: 2 },
     iconLabel: {
         fontSize: 5.5,
         fontFamily: "Helvetica-Bold",
@@ -112,14 +133,22 @@ const styles = StyleSheet.create({
         color: TEXT,
     },
 
-    specsColumns: { flexDirection: "row", marginTop: 6, gap: 10 },
+    specsColumns: { flexDirection: "row", marginTop: 4, gap: 10 },
     specCol: { flex: 1 },
     specColLeft: { flex: 1, marginRight: 10 },
 
-    section: { marginBottom: 5, borderRadius: 4, overflow: "hidden" },
-    sectionHeader: { backgroundColor: BLUE_BG, paddingHorizontal: 8, paddingVertical: 3 },
+    // Each section is a white card (blue header strip + bordered white body) like the detail-page accordions
+    section: {
+        marginBottom: 6,
+        borderRadius: 6,
+        borderWidth: 0.5,
+        borderColor: BORDER,
+        backgroundColor: CARD_BG,
+        overflow: "hidden",
+    },
+    sectionHeader: { backgroundColor: PRIMARY_TINT, paddingHorizontal: 8, paddingVertical: 3.5 },
     sectionTitle: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: TEXT },
-    sectionContent: { backgroundColor: GRAY_BG, paddingHorizontal: 8, paddingVertical: 3 },
+    sectionContent: { backgroundColor: CARD_BG, paddingHorizontal: 8, paddingVertical: 3.5 },
 
     specRow: {
         flexDirection: "row",
@@ -132,7 +161,7 @@ const styles = StyleSheet.create({
         flexShrink: 0,
         paddingRight: 4,
     },
-    specLabel: { fontSize: 7.5, color: TEXT_MED, lineHeight: 1.35 },
+    specLabel: { fontSize: 7.5, color: TEXT_LIGHT, lineHeight: 1.35 },
     specValueOuter: {
         flex: 1,
         minWidth: 0,
@@ -174,7 +203,6 @@ function formatEnum(value) {
 
 const SpecRow = ({ label, value, unit }) => {
     const display = value != null && value !== "" ? String(value) : "N/A";
-    const hasUnit = unit != null && String(unit).trim() !== "";
     return (
         <View style={styles.specRow}>
             <View style={styles.specLabelCol}>
@@ -226,6 +254,9 @@ const ProductDatasheet = ({ product, logoDataUrl }) => {
         ? `${p.contrastRatioNumerator}:${p.contrastRatioDenominator || 1}`
         : null;
 
+    const hasStock = p.stockPieces != null && Number(p.stockPieces) > 0;
+    const hasLeadtime = p.leadtimeDays != null && Number(p.leadtimeDays) > 0;
+
     const hasCerts =
         certs.length > 0 ||
         (p.additionalCertification && String(p.additionalCertification).trim()) ||
@@ -255,7 +286,7 @@ const ProductDatasheet = ({ product, logoDataUrl }) => {
                     <Text style={styles.footerDate}>{date}</Text>
                 </View>
 
-                {/* Hero Section */}
+                {/* Hero Section: image + white info card */}
                 <View style={styles.topSection}>
                     <View style={styles.topLeft}>
                         {mainImg ? (
@@ -268,45 +299,64 @@ const ProductDatasheet = ({ product, logoDataUrl }) => {
                     </View>
 
                     <View style={styles.topRight}>
-                        <Text style={styles.productName}>{p.productName || "Product"}</Text>
-                        <Text style={styles.productNumber}>{p.productNumber || ""}</Text>
+                        <View style={styles.infoCard}>
+                            <Text style={styles.productName}>{p.productName || "Product"}</Text>
+                            <Text style={styles.productNumber}>{p.productNumber || ""}</Text>
 
-                        {areaOfUse ? <Text style={styles.areaOfUseBadge}>{areaOfUse.toUpperCase()}</Text> : null}
+                            {areaOfUse ? <Text style={styles.areaOfUseBadge}>{areaOfUse}</Text> : null}
 
-                        {p.productDescription ? <Text style={styles.description}>{p.productDescription}</Text> : null}
+                            {p.productDescription ? <Text style={styles.description}>{p.productDescription}</Text> : null}
 
-                        {features.length > 0 ? (
-                            <View>
-                                <Text style={styles.featuresHeading}>Features</Text>
-                                {features.map((f, i) => (
-                                    <View key={`f-${i}`} style={styles.featureRow}>
-                                        <Text style={styles.featureBullet}>•</Text>
-                                        <Text style={styles.featureText}>{f}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        ) : null}
-
-                        {icons.length > 0 ? (
-                            <View style={styles.iconsGrid}>
-                                {icons.map((icon, i) => {
-                                    const src = icon.imageDataUrl || icon.imageUrl || null;
-                                    return (
-                                        <View key={`ic-${i}`} style={styles.iconCard}>
-                                            <View style={styles.iconFrame}>
-                                                {src ? (
-                                                    <Image src={src} style={styles.iconImg} />
-                                                ) : (
-                                                    <Text style={styles.iconFallback}>{icon.name || "—"}</Text>
-                                                )}
-                                            </View>
-                                            <View style={styles.iconDivider} />
-                                            <Text style={styles.iconLabel}>{icon.name || ""}</Text>
+                            {features.length > 0 ? (
+                                <View>
+                                    <Text style={styles.featuresHeading}>Features</Text>
+                                    {features.map((f, i) => (
+                                        <View key={`f-${i}`} style={styles.featureRow}>
+                                            <Text style={styles.featureBullet}>•</Text>
+                                            <Text style={styles.featureText}>{f}</Text>
                                         </View>
-                                    );
-                                })}
-                            </View>
-                        ) : null}
+                                    ))}
+                                </View>
+                            ) : null}
+
+                            {/* {hasStock || hasLeadtime ? (
+                                <View style={styles.chipRow}>
+                                    {hasStock ? (
+                                        <View style={styles.chip}>
+                                            <Text style={styles.chipLabel}>Stock</Text>
+                                            <Text style={styles.chipValue}>{p.stockPieces} pieces</Text>
+                                        </View>
+                                    ) : null}
+                                    {hasLeadtime ? (
+                                        <View style={styles.chip}>
+                                            <Text style={styles.chipLabel}>Lead Time</Text>
+                                            <Text style={styles.chipValue}>{p.leadtimeDays} days</Text>
+                                        </View>
+                                    ) : null}
+                                </View>
+                            ) : null} */}
+
+                            {icons.length > 0 ? (
+                                <View style={styles.iconsGrid}>
+                                    {icons.map((icon, i) => {
+                                        const src = icon.imageDataUrl || icon.imageUrl || null;
+                                        return (
+                                            <View key={`ic-${i}`} style={styles.iconCard}>
+                                                <View style={styles.iconFrame}>
+                                                    {src ? (
+                                                        <Image src={src} style={styles.iconImg} />
+                                                    ) : (
+                                                        <Text style={styles.iconFallback}>{icon.name || "—"}</Text>
+                                                    )}
+                                                </View>
+                                                <View style={styles.iconDivider} />
+                                                <Text style={styles.iconLabel}>{icon.name || ""}</Text>
+                                            </View>
+                                        );
+                                    })}
+                                </View>
+                            ) : null}
+                        </View>
                     </View>
                 </View>
 

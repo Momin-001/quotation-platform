@@ -21,6 +21,8 @@ import {
     enquiries,
     enquiryItems,
     users,
+    refurbishedProducts,
+    refurbishedProductImages,
 } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 
@@ -40,6 +42,22 @@ const productSelectFields = {
     powerConsumptionTypical: products.powerConsumptionTypical,
     powerConsumptionMax: products.powerConsumptionMax,
     weightWithoutPackaging: products.weightWithoutPackaging,
+};
+
+const refurbishedSelectFields = {
+    id: refurbishedProducts.id,
+    productName: refurbishedProducts.serie,
+    productNumber: refurbishedProducts.productNumber,
+    pixelPitch: refurbishedProducts.pixelPitch,
+    cabinetWidth: refurbishedProducts.cabinetWidth,
+    cabinetHeight: refurbishedProducts.cabinetHeight,
+    cabinetResolutionHorizontal: refurbishedProducts.cabinetResolutionHorizontal,
+    cabinetResolutionVertical: refurbishedProducts.cabinetResolutionVertical,
+    brightnessValue: refurbishedProducts.brightnessValue,
+    refreshRate: refurbishedProducts.refreshRate,
+    powerConsumptionTypical: refurbishedProducts.powerConsumptionTypical,
+    powerConsumptionMax: refurbishedProducts.powerConsumptionMax,
+    weightWithoutPackaging: refurbishedProducts.weightWithoutPackaging,
 };
 
 function pickFirstImagePerId(rows, idKey) {
@@ -177,6 +195,14 @@ export async function getQuotationDataForPDF(quotationId, options = {}) {
     const productIdList = [...productIds];
     const controllerIdList = [...controllerIds];
     const accessoryIdList = [...accessoryIds];
+    const refurbishedIdList = [
+        ...new Set(
+            items
+                .filter((i) => i.productSourceType === "refurbished")
+                .map((i) => i.refurbishedProductId)
+                .filter(Boolean)
+        ),
+    ];
 
     const [
         productRows,
@@ -261,6 +287,34 @@ export async function getQuotationDataForPDF(quotationId, options = {}) {
         };
     }
 
+    // Refurbished main/alternative products (separate table)
+    const [refurbishedRows, refurbishedImageRows] = await Promise.all([
+        refurbishedIdList.length > 0
+            ? db.select(refurbishedSelectFields).from(refurbishedProducts).where(inArray(refurbishedProducts.id, refurbishedIdList))
+            : [],
+        refurbishedIdList.length > 0
+            ? db
+                .select({
+                    refurbishedProductId: refurbishedProductImages.refurbishedProductId,
+                    imageUrl: refurbishedProductImages.imageUrl,
+                    imageOrder: refurbishedProductImages.imageOrder,
+                })
+                .from(refurbishedProductImages)
+                .where(inArray(refurbishedProductImages.refurbishedProductId, refurbishedIdList))
+                .orderBy(refurbishedProductImages.refurbishedProductId, refurbishedProductImages.imageOrder)
+            : [],
+    ]);
+    const refurbishedImageById = pickFirstImagePerId(refurbishedImageRows, "refurbishedProductId");
+    const refurbishedById = {};
+    for (const r of refurbishedRows) {
+        refurbishedById[r.id] = {
+            ...r,
+            imageUrl: refurbishedImageById[r.id] || null,
+            sourceType: "refurbished",
+            features: [],
+        };
+    }
+
     const controllersById = {};
     for (const c of controllerRows) {
         controllersById[c.id] = {
@@ -300,7 +354,10 @@ export async function getQuotationDataForPDF(quotationId, options = {}) {
     }
 
     const itemsWithDetails = items.map((item) => {
-        const baseProduct = productsById[item.productId] ?? null;
+        const baseProduct =
+            item.productSourceType === "refurbished"
+                ? refurbishedById[item.refurbishedProductId] ?? null
+                : productsById[item.productId] ?? null;
         const matchingEnquiryItem =
             enquiryItemByCompositeKey.get(`${item.productId}|${item.itemType}`) ||
             enquiryItemByProductId.get(item.productId) ||

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen, Recycle, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import UserAvatar from "@/components/UserAvatar";
@@ -20,11 +20,13 @@ const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "User Management", icon: Users },
     { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/refurbished-products", label: "Refurbished Products", icon: Recycle },
     { href: "/admin/controllers", label: "Controllers", icon: Package },
     { href: "/admin/accessories", label: "Accessories", icon: Package },
     { href: "/admin/bulk-import", label: "Bulk Product Import", icon: Upload },
     { href: "/admin/categories", label: "Categories", icon: FolderOpen },
     { href: "/admin/partners", label: "Partners", icon: Handshake },
+    { href: "/admin/advertisements", label: "Advertisements", icon: Megaphone },
     { href: "/admin/enquiries", label: "Customer Enquiries", icon: MessageSquare },
     { href: "/admin/quotations", label: "Quotations", icon: FileText },
     { href: "/admin/cms", label: "CMS Pages", icon: NotebookText, isSuperAdminOnly: true },

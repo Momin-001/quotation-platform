@@ -209,11 +209,14 @@ export async function POST(request) {
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             
+            const isRefurbished = item.productSourceType === "refurbished";
             const newItem = await db
                 .insert(quotationItems)
                 .values({
                     quotationId,
-                    productId: item.productId,
+                    productSourceType: isRefurbished ? "refurbished" : "product",
+                    productId: isRefurbished ? null : item.productId,
+                    refurbishedProductId: isRefurbished ? item.productId : null,
                     quantity: item.quantity || 1,
                     unitPrice: item.unitPrice.toString(),
                     discountPercentage: (item.discountPercentage || 0).toString(),

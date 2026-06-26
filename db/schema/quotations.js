@@ -3,6 +3,7 @@ import { enquiries } from "./enquiries";
 import { products } from "./products";
 import { controllers } from "./controllers";
 import { accessories } from "./accessories";
+import { refurbishedProducts } from "./refurbishedProducts";
 import { relations } from "drizzle-orm";
 
 export const quotations = pgTable("quotations", {
@@ -34,9 +35,12 @@ export const quotationItems = pgTable("quotation_items", {
     quotationId: uuid("quotation_id")
         .notNull()
         .references(() => quotations.id, { onDelete: "cascade" }),
+    // Source product — exactly one of productId / refurbishedProductId is set, per productSourceType
     productId: uuid("product_id")
-        .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
+    refurbishedProductId: uuid("refurbished_product_id")
+        .references(() => refurbishedProducts.id, { onDelete: "cascade" }),
+    productSourceType: text("product_source_type").default("product").notNull(), // "product" | "refurbished"
     quantity: integer("quantity").notNull().default(1),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
     discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"),
@@ -106,6 +110,10 @@ export const quotationItemsRelations = relations(quotationItems, ({ one, many })
     product: one(products, {
         fields: [quotationItems.productId],
         references: [products.id],
+    }),
+    refurbishedProduct: one(refurbishedProducts, {
+        fields: [quotationItems.refurbishedProductId],
+        references: [refurbishedProducts.id],
     }),
     optionalItems: many(quotationOptionalItems),
     additionalItems: many(quotationAdditionalItems),

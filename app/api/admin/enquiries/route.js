@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { enquiries, enquiryItems, users, products } from "@/db/schema";
+import { enquiries, enquiryItems, users, products, refurbishedProducts } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc, and, or, ilike, sql, inArray } from "drizzle-orm";
 import { getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
@@ -118,10 +118,11 @@ export async function GET(req) {
             .select({
                 enquiryId: enquiryItems.enquiryId,
                 isCustom: enquiryItems.isCustom,
-                productName: products.productName,
+                productName: sql`COALESCE(${products.productName}, ${refurbishedProducts.serie})`,
             })
             .from(enquiryItems)
-            .innerJoin(products, eq(enquiryItems.productId, products.id))
+            .leftJoin(products, eq(enquiryItems.productId, products.id))
+            .leftJoin(refurbishedProducts, eq(enquiryItems.refurbishedProductId, refurbishedProducts.id))
             .where(
                 and(
                     inArray(enquiryItems.enquiryId, enquiryIds),

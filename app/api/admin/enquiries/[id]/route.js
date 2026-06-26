@@ -4,6 +4,7 @@ import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, desc, asc } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/helpers/auth-helpers";
 import { getEnquiryDisplayTitle } from "@/lib/helpers/helpers";
+import { getRefurbishedQuotationDetails } from "@/features/refurbished-products/refurbished-quotation";
 
 // Format enquiry ID: Enquiry #YYYY-XXXX (last 4 chars of UUID)
 function formatEnquiryId(enquiryId, createdAt) {
@@ -59,6 +60,8 @@ export async function GET(req, { params }) {
             .select({
                 id: enquiryItems.id,
                 productId: enquiryItems.productId,
+                refurbishedProductId: enquiryItems.refurbishedProductId,
+                productSourceType: enquiryItems.productSourceType,
                 quantity: enquiryItems.quantity,
                 itemType: enquiryItems.itemType,
                 itemOrder: enquiryItems.itemOrder,
@@ -88,28 +91,60 @@ export async function GET(req, { params }) {
                 customNetworkConnection: enquiryItems.customNetworkConnection,
                 customSignalSourceInputs: enquiryItems.customSignalSourceInputs,
                 customAdditionalServices: enquiryItems.customAdditionalServices,
-                productName: products.productName,
-                productNumber: products.productNumber,
-                pixelPitch: products.pixelPitch,
-                pricePerCabinetUsd: products.pricePerCabinetUsd,
-                cabinetResolutionHorizontal: products.cabinetResolutionHorizontal,
-                cabinetResolutionVertical: products.cabinetResolutionVertical,
             })
             .from(enquiryItems)
-            .innerJoin(products, eq(enquiryItems.productId, products.id))
             .where(eq(enquiryItems.enquiryId, id))
             .orderBy(asc(enquiryItems.itemOrder));
 
-        // Fetch first image and controller details for each product
+        // Resolve product details per item from the right table (product vs refurbished)
         const items = await Promise.all(
             itemsData.map(async (item) => {
-                const images = await db
-                    .select({ imageUrl: productImages.imageUrl })
-                    .from(productImages)
-                    .where(eq(productImages.productId, item.productId))
-                    .orderBy(productImages.imageOrder)
-                    .limit(1);
-                
+                let details = {
+                    productName: null,
+                    productNumber: null,
+                    pixelPitch: null,
+                    pricePerCabinetUsd: null,
+                    cabinetResolutionHorizontal: null,
+                    cabinetResolutionVertical: null,
+                };
+                let imageUrl = null;
+
+                if (item.productSourceType === "refurbished" && item.refurbishedProductId) {
+                    const rp = await getRefurbishedQuotationDetails(item.refurbishedProductId);
+                    if (rp) {
+                        details = {
+                            productName: rp.productName,
+                            productNumber: rp.productNumber,
+                            pixelPitch: rp.pixelPitch,
+                            pricePerCabinetUsd: rp.pricePerCabinetUsd,
+                            cabinetResolutionHorizontal: rp.cabinetResolutionHorizontal,
+                            cabinetResolutionVertical: rp.cabinetResolutionVertical,
+                        };
+                        imageUrl = rp.imageUrl;
+                    }
+                } else if (item.productId) {
+                    const [p] = await db
+                        .select({
+                            productName: products.productName,
+                            productNumber: products.productNumber,
+                            pixelPitch: products.pixelPitch,
+                            pricePerCabinetUsd: products.pricePerCabinetUsd,
+                            cabinetResolutionHorizontal: products.cabinetResolutionHorizontal,
+                            cabinetResolutionVertical: products.cabinetResolutionVertical,
+                        })
+                        .from(products)
+                        .where(eq(products.id, item.productId))
+                        .limit(1);
+                    if (p) details = p;
+                    const images = await db
+                        .select({ imageUrl: productImages.imageUrl })
+                        .from(productImages)
+                        .where(eq(productImages.productId, item.productId))
+                        .orderBy(productImages.imageOrder)
+                        .limit(1);
+                    imageUrl = images[0]?.imageUrl || null;
+                }
+
                 let controller = null;
                 if (item.controllerId) {
                     const [ctrl] = await db
@@ -136,7 +171,8 @@ export async function GET(req, { params }) {
 
                 return {
                     ...item,
-                    imageUrl: images[0]?.imageUrl || null,
+                    ...details,
+                    imageUrl,
                     controller,
                 };
             })

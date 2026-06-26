@@ -92,10 +92,20 @@ export default function EnquiryDetailPage() {
         }
     };
 
-    const handleDownloadDatasheet = async (productId, productNumber) => {
-        setDatasheetLoadingId(productId);
+    const handleDownloadDatasheet = async (item) => {
+        const isRefurbished = item.productSourceType === "refurbished";
+        const datasheetId = isRefurbished ? item.refurbishedProductId : item.productId;
+        if (!datasheetId) {
+            toast.error("Datasheet not available for this item");
+            return;
+        }
+        const productNumber = item.productNumber || "datasheet";
+        setDatasheetLoadingId(item.id);
         try {
-            const res = await fetch(`/api/products/${productId}/datasheet`);
+            const endpoint = isRefurbished
+                ? `/api/refurbished-products/${datasheetId}/datasheet`
+                : `/api/products/${datasheetId}/datasheet`;
+            const res = await fetch(endpoint);
             if (!res.ok) {
                 throw new Error("Failed to generate datasheet");
             }
@@ -321,14 +331,11 @@ export default function EnquiryDetailPage() {
                                         </TableCell>
                                         <TableCell className="p-4">
                                             <button
-                                                onClick={() => handleDownloadDatasheet(
-                                                    item.productId,
-                                                    item.productNumber
-                                                )}
+                                                onClick={() => handleDownloadDatasheet(item)}
                                                 disabled={datasheetLoadingId !== null}
                                                 className="flex items-center gap-2 cursor-pointer text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                             >
-                                                {datasheetLoadingId === item.productId ? (
+                                                {datasheetLoadingId === item.id ? (
                                                     <>
                                                         <Spinner className="h-4 w-4 text-blue-600" />
                                                         <span className="text-sm">Generating…</span>
