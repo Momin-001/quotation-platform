@@ -400,9 +400,8 @@ export default function ProductDetailClient({ product }) {
                     </div>
 
                     <div className="space-y-4">
-
-                        <div className="bg-white rounded-xl border border-border/60 p-3 shadow-sm space-y-5">
-                            {product.productIcons && product.productIcons.length > 0 && (
+                        {product.productIcons && product.productIcons.length > 0 && (
+                            <div className="bg-white rounded-xl border border-border/60 p-3 shadow-sm space-y-5">
                                 <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-2">
                                     {product.productIcons.map((icon) => (
                                         <div key={icon.id} className="flex flex-col items-center text-center pb-2">
@@ -423,316 +422,315 @@ export default function ProductDetailClient({ product }) {
                                         </div>
                                     ))}
                                 </div>
-                            )}
-                                </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                        {/* Left Column */}
-                        <div className="space-y-4">
-                            {/* Basic Information */}
-                            <Accordion type="single" defaultValue="basic-info" collapsible className={accordionPanel}>
-                                <AccordionItem value="basic-info" className="border-0">
-                                    <AccordionTrigger className={accordionTriggerClass}>
-                                        {t("sections.basicInformation")}
-                                    </AccordionTrigger>
-                                    <AccordionContent className={accordionContentClass}>
-                                        <div>
-                                            <SpecRow label={t("specs.productType")} value={product.productType} />
-                                            <SpecRow label={t("specs.design")} value={product.design} />
-                                            <SpecRow label={t("specs.specialTypes")} value={product.specialTypes} />
-                                            <SpecRow label={t("specs.application")} value={Array.isArray(product.application) ? product.application.join(", ") : product.application} />
-                                            <SpecRow label={t("specs.category")} value={product.areaOfUse} />
-                                            <SpecRow label={t("specs.service")} value={product.support} />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            {/* Physical Specifications */}
-                            <Accordion type="single" defaultValue="physical-specs" collapsible className={accordionPanel}>
-                                <AccordionItem value="physical-specs" className="border-0">
-                                    <AccordionTrigger className={accordionTriggerClass}>
-                                        {t("sections.physicalSpecifications")}
-                                    </AccordionTrigger>
-                                    <AccordionContent className={accordionContentClass}>
-                                        <div>
-                                            <SpecRow label={t("specs.pixelPitch")} value={product.pixelPitch} unit="mm" />
-                                            <SpecRow label={t("specs.pixelTechnology")} value={product.pixelTechnology} />
-                                            <SpecRow label={t("specs.cabinetWidth")} value={product.cabinetWidth} unit="mm" />
-                                            <SpecRow label={t("specs.cabinetHeight")} value={product.cabinetHeight} unit="mm" />
-                                            <SpecRow label={t("specs.cabinetResolutionHorizontal")} value={product.cabinetResolutionHorizontal} unit="px" />
-                                            <SpecRow label={t("specs.cabinetResolutionVertical")} value={product.cabinetResolutionVertical} unit="px" />
-                                            <SpecRow label={t("specs.pixelDensity")} value={product.pixelDensity} unit="px/m²" />
-                                            <SpecRow label={t("specs.weightWithoutPackaging")} value={product.weightWithoutPackaging} unit="kg" />
-                                            <SpecRow label={t("specs.ipRating")} value={product.ipRating} />
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-
-                                {/* Electrical Specifications */}
-                                <Accordion type="single" defaultValue="electrical-specs" collapsible className={accordionPanel}>
-                                    <AccordionItem value="electrical-specs" className="border-0">
+                            </div>
+                        )}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                            {/* Left Column */}
+                            <div className="space-y-4">
+                                {/* Basic Information */}
+                                <Accordion type="single" defaultValue="basic-info" collapsible className={accordionPanel}>
+                                    <AccordionItem value="basic-info" className="border-0">
                                         <AccordionTrigger className={accordionTriggerClass}>
-                                            {t("sections.electricalSpecifications")}
+                                            {t("sections.basicInformation")}
                                         </AccordionTrigger>
                                         <AccordionContent className={accordionContentClass}>
                                             <div>
-                                                <SpecRow label={t("specs.inputVoltage")} value={product.inputVoltage} unit="V(AC)" />
-                                                <SpecRow label={t("specs.powerConsumptionMax")} value={product.powerConsumptionMax} unit="W" />
-                                                <SpecRow label={t("specs.powerConsumptionTypical")} value={product.powerConsumptionTypical} unit="W" />
-                                                <SpecRow label={t("specs.drivingMethod")} value={formatEnum(product.drivingMethod)} />
-                                                <SpecRow label={t("specs.currentGainControl")} value={product.currentGainControl} />
-                                                <SpecRow label={t("specs.powerRedundancy")} value={formatEnum(product.powerRedundancy)} />
-                                                <SpecRow label={t("specs.memoryOnModule")} value={formatEnum(product.memoryOnModule)} />
-                                                <SpecRow label={t("specs.smartModule")} value={formatEnum(product.smartModule)} />
-                                                <SpecRow label={t("specs.mtbfPowerSupply")} value={product.mtbfPowerSupply} unit="hours" />
-                                                <SpecRow
-                                                    label={t("specs.controlSystem")}
-                                                    value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
-                                                />
-                                                <SpecRow label={t("specs.receivingCard")} value={product.receivingCard} />
+                                                <SpecRow label={t("specs.productType")} value={product.productType} />
+                                                <SpecRow label={t("specs.design")} value={product.design} />
+                                                <SpecRow label={t("specs.specialTypes")} value={product.specialTypes} />
+                                                <SpecRow label={t("specs.application")} value={Array.isArray(product.application) ? product.application.join(", ") : product.application} />
+                                                <SpecRow label={t("specs.category")} value={product.areaOfUse} />
+                                                <SpecRow label={t("specs.service")} value={product.support} />
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
 
-                                {/* Operating Conditions */}
-                                <Accordion type="single" defaultValue="operating-conditions" collapsible className={accordionPanel}>
-                                    <AccordionItem value="operating-conditions" className="border-0">
+                                {/* Physical Specifications */}
+                                <Accordion type="single" defaultValue="physical-specs" collapsible className={accordionPanel}>
+                                    <AccordionItem value="physical-specs" className="border-0">
                                         <AccordionTrigger className={accordionTriggerClass}>
-                                            {t("sections.operatingConditions")}
+                                            {t("sections.physicalSpecifications")}
                                         </AccordionTrigger>
                                         <AccordionContent className={accordionContentClass}>
                                             <div>
-                                                <SpecRow label={t("specs.operatingTemperature")} value={product.operatingTemperature} unit="°C" />
-                                                <SpecRow label={t("specs.operatingHumidity")} value={product.operatingHumidity} unit="%" />
-                                                <SpecRow label={t("specs.cooling")} value={formatEnum(product.cooling)} />
-                                                <SpecRow label={t("specs.heatDissipation")} value={product.heatDissipation} unit="W" />
-                                                <SpecRow label={t("specs.monitoringFunction")} value={cmsField(product, "monitoringFunction", locale)} />
+                                                <SpecRow label={t("specs.pixelPitch")} value={product.pixelPitch} unit="mm" />
+                                                <SpecRow label={t("specs.pixelTechnology")} value={product.pixelTechnology} />
+                                                <SpecRow label={t("specs.cabinetWidth")} value={product.cabinetWidth} unit="mm" />
+                                                <SpecRow label={t("specs.cabinetHeight")} value={product.cabinetHeight} unit="mm" />
+                                                <SpecRow label={t("specs.cabinetResolutionHorizontal")} value={product.cabinetResolutionHorizontal} unit="px" />
+                                                <SpecRow label={t("specs.cabinetResolutionVertical")} value={product.cabinetResolutionVertical} unit="px" />
+                                                <SpecRow label={t("specs.pixelDensity")} value={product.pixelDensity} unit="px/m²" />
+                                                <SpecRow label={t("specs.weightWithoutPackaging")} value={product.weightWithoutPackaging} unit="kg" />
+                                                <SpecRow label={t("specs.ipRating")} value={product.ipRating} />
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
+                                <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
 
-                                {/* Downloads */}
-                                <Accordion type="single" defaultValue="downloads" collapsible className={accordionPanel}>
-                                    <AccordionItem value="downloads" className="border-0">
-                                        <AccordionTrigger className={accordionTriggerClass}>
-                                            {t("sections.downloads")}
-                                        </AccordionTrigger>
-                                        <AccordionContent className={accordionContentClass}>
-                                            <div className="space-y-3 divide-y divide-border/30">
-                                                <div className="flex items-center justify-between gap-4 py-2 first:pt-0">
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {t("productDatasheet")}
-                                                    </p>
-                                                    <DownloadButton
-                                                        onClick={handleDownloadDatasheet}
-                                                        disabled={datasheetLoading}
-                                                        loading={datasheetLoading}
-                                                        label={t("download")}
-                                                    />
-                                                </div>
-                                                {product.installationManualUrl && (
-                                                    <div className="flex items-center justify-between gap-4 py-2">
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {t("installationManual")}
-                                                        </p>
-                                                        <DownloadButton
-                                                            onClick={() =>
-                                                                handleDownloadPdf("installationManual", "Installation_Manual.pdf")
-                                                            }
-                                                            disabled={pdfDownloading !== null}
-                                                            loading={pdfDownloading === "installationManual"}
-                                                            label={t("download")}
-                                                        />
-                                                    </div>
-                                                )}
-                                                {product.maintenanceGuideUrl && (
-                                                    <div className="flex items-center justify-between gap-4 py-2">
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {t("maintenanceGuide")}
-                                                        </p>
-                                                        <DownloadButton
-                                                            onClick={() =>
-                                                                handleDownloadPdf("maintenanceGuide", "Maintenance_Guide.pdf")
-                                                            }
-                                                            disabled={pdfDownloading !== null}
-                                                            loading={pdfDownloading === "maintenanceGuide"}
-                                                            label={t("download")}
-                                                        />
-                                                    </div>
-                                                )}
-                                                {product.certificatesPdfUrl && (
-                                                    <div className="flex items-center justify-between gap-4 py-2">
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {t("certificatesPdf")}
-                                                        </p>
-                                                        <DownloadButton
-                                                            onClick={() =>
-                                                                handleDownloadPdf("certificatesPdf", "Certificates.pdf")
-                                                            }
-                                                            disabled={pdfDownloading !== null}
-                                                            loading={pdfDownloading === "certificatesPdf"}
-                                                            label={t("download")}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-
-                            </RestrictedContentOverlay>
-
-                        </div>
-
-                        {/* Right Column */}
-                        <div className="space-y-4">
-                            {/* LED Specifications */}
-                            <Accordion type="single" defaultValue="led-specs" collapsible className={accordionPanel}>
-                                <AccordionItem value="led-specs" className="border-0">
-                                    <AccordionTrigger className={accordionTriggerClass}>
-                                        {t("sections.ledSpecifications")}
-                                    </AccordionTrigger>
-                                    <AccordionContent className={accordionContentClass}>
-                                        <div>
-                                            <SpecRow label={t("specs.ledTechnology")} value={formatEnum(product.ledTechnology)} />
-                                            <SpecRow label={t("specs.pixelConfiguration")} value={product.pixelConfiguration} />
-                                            <SpecRow label={t("specs.ledLifespan")} value={product.ledLifespan} unit="hours" />
-
-                                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-                                                <SpecRow label={t("specs.chipBonding")} value={formatEnum(product.chipBonding)} />
-                                                <SpecRow label={t("specs.ledChipManufacturer")} value={product.ledChipManufacturer} />
-                                                <SpecRow label={t("specs.ledModulesPerCabinet")} value={product.ledModulesPerCabinet} />
-                                            </RestrictedContentOverlay>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            {/* Display Performance */}
-                            <Accordion type="single" defaultValue="display-performance" collapsible className={accordionPanel}>
-                                <AccordionItem value="display-performance" className="border-0">
-                                    <AccordionTrigger className={accordionTriggerClass}>
-                                        {t("sections.displayPerformance")}
-                                    </AccordionTrigger>
-                                    <AccordionContent className={accordionContentClass}>
-                                        <div>
-                                            <SpecRow label={t("specs.refreshRate")} value={product.refreshRate} unit="Hz" />
-                                            <SpecRow label={t("specs.brightnessValue")} value={product.brightnessValue} unit="cd/m²" />
-
-                                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-                                                <SpecRow label={t("specs.scanRate")} value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null} />
-                                                <SpecRow label={t("specs.videoRate")} value={product.videoRate} />
-                                                <SpecRow label={t("specs.colourDepth")} value={product.colourDepth} unit="bit" />
-                                                <SpecRow
-                                                    label={t("specs.greyscaleProcessing")}
-                                                    value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
-                                                />
-                                                <SpecRow
-                                                    label={t("specs.numberOfColours")}
-                                                    value={product.numberOfColours ? t("specs.numberOfColoursBillion", { count: product.numberOfColours }) : null}
-                                                />
-                                                <SpecRow label={t("specs.viewingAngleHorizontal")} value={product.viewingAngleHorizontal} />
-                                                <SpecRow label={t("specs.viewingAngleVertical")} value={product.viewingAngleVertical} />
-                                                <SpecRow
-                                                    label={t("specs.contrastRatio")}
-                                                    value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
-                                                />
-                                            </RestrictedContentOverlay>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
-
-                                {/* Calibration */}
-                                <Accordion type="single" defaultValue="calibration" collapsible className={accordionPanel}>
-                                    <AccordionItem value="calibration" className="border-0">
-                                        <AccordionTrigger className={accordionTriggerClass}>
-                                            {t("sections.calibration")}
-                                        </AccordionTrigger>
-                                        <AccordionContent className={accordionContentClass}>
-                                            <div>
-                                                <SpecRow label={t("specs.calibrationMethod")} value={formatEnum(product.calibrationMethod)} />
-                                                <SpecRow label={t("specs.whitePointCalibration")} value={product.whitePointCalibration} />
-                                                <SpecRow label={t("specs.dciP3Coverage")} value={product.dciP3Coverage} unit="%" />
-
-                                            </div>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-
-                                {/* Certifications & Standards */}
-                                {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
-                                    <Accordion type="single" defaultValue="certifications" collapsible className={accordionPanel}>
-                                        <AccordionItem value="certifications" className="border-0">
+                                    {/* Electrical Specifications */}
+                                    <Accordion type="single" defaultValue="electrical-specs" collapsible className={accordionPanel}>
+                                        <AccordionItem value="electrical-specs" className="border-0">
                                             <AccordionTrigger className={accordionTriggerClass}>
-                                                {t("sections.certificationsStandards")}
+                                                {t("sections.electricalSpecifications")}
                                             </AccordionTrigger>
                                             <AccordionContent className={accordionContentClass}>
-                                                {product.productCertificates && product.productCertificates.length > 0 && (
-                                                    <div className="mb-4 pb-3 border-b border-border/30">
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {product.productCertificates.map((cert) => (
-                                                                <div
-                                                                    key={cert.id}
-                                                                    className="flex items-center gap-2 bg-white border border-border/50 p-2 px-3 rounded-lg shadow-sm"
-                                                                >
-                                                                    <Image
-                                                                        src={cert.imageUrl}
-                                                                        alt={cert.name}
-                                                                        width={36}
-                                                                        height={36}
-                                                                        className="object-contain"
-                                                                    />
-                                                                    <span className="text-xs sm:text-sm font-medium text-foreground">
-                                                                        {cert.name}
-                                                                    </span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
                                                 <div>
-                                                    <SpecRow label={t("specs.additionalCertification")} value={product.additionalCertification} />
-                                                    <SpecRow label={t("specs.emc")} value={product.emc} />
-                                                    <SpecRow label={t("specs.safety")} value={product.safety} />
+                                                    <SpecRow label={t("specs.inputVoltage")} value={product.inputVoltage} unit="V(AC)" />
+                                                    <SpecRow label={t("specs.powerConsumptionMax")} value={product.powerConsumptionMax} unit="W" />
+                                                    <SpecRow label={t("specs.powerConsumptionTypical")} value={product.powerConsumptionTypical} unit="W" />
+                                                    <SpecRow label={t("specs.drivingMethod")} value={formatEnum(product.drivingMethod)} />
+                                                    <SpecRow label={t("specs.currentGainControl")} value={product.currentGainControl} />
+                                                    <SpecRow label={t("specs.powerRedundancy")} value={formatEnum(product.powerRedundancy)} />
+                                                    <SpecRow label={t("specs.memoryOnModule")} value={formatEnum(product.memoryOnModule)} />
+                                                    <SpecRow label={t("specs.smartModule")} value={formatEnum(product.smartModule)} />
+                                                    <SpecRow label={t("specs.mtbfPowerSupply")} value={product.mtbfPowerSupply} unit="hours" />
+                                                    <SpecRow
+                                                        label={t("specs.controlSystem")}
+                                                        value={product.controlSystem === "other" && product.controlSystemOther ? product.controlSystemOther : formatEnum(product.controlSystem)}
+                                                    />
+                                                    <SpecRow label={t("specs.receivingCard")} value={product.receivingCard} />
                                                 </div>
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>
-                                )}
 
-                                {/* Warranty & Support */}
-                                <Accordion type="single" defaultValue="warranty" collapsible className={accordionPanel}>
-                                    <AccordionItem value="warranty" className="border-0">
+                                    {/* Operating Conditions */}
+                                    <Accordion type="single" defaultValue="operating-conditions" collapsible className={accordionPanel}>
+                                        <AccordionItem value="operating-conditions" className="border-0">
+                                            <AccordionTrigger className={accordionTriggerClass}>
+                                                {t("sections.operatingConditions")}
+                                            </AccordionTrigger>
+                                            <AccordionContent className={accordionContentClass}>
+                                                <div>
+                                                    <SpecRow label={t("specs.operatingTemperature")} value={product.operatingTemperature} unit="°C" />
+                                                    <SpecRow label={t("specs.operatingHumidity")} value={product.operatingHumidity} unit="%" />
+                                                    <SpecRow label={t("specs.cooling")} value={formatEnum(product.cooling)} />
+                                                    <SpecRow label={t("specs.heatDissipation")} value={product.heatDissipation} unit="W" />
+                                                    <SpecRow label={t("specs.monitoringFunction")} value={cmsField(product, "monitoringFunction", locale)} />
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+
+                                    {/* Downloads */}
+                                    <Accordion type="single" defaultValue="downloads" collapsible className={accordionPanel}>
+                                        <AccordionItem value="downloads" className="border-0">
+                                            <AccordionTrigger className={accordionTriggerClass}>
+                                                {t("sections.downloads")}
+                                            </AccordionTrigger>
+                                            <AccordionContent className={accordionContentClass}>
+                                                <div className="space-y-3 divide-y divide-border/30">
+                                                    <div className="flex items-center justify-between gap-4 py-2 first:pt-0">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {t("productDatasheet")}
+                                                        </p>
+                                                        <DownloadButton
+                                                            onClick={handleDownloadDatasheet}
+                                                            disabled={datasheetLoading}
+                                                            loading={datasheetLoading}
+                                                            label={t("download")}
+                                                        />
+                                                    </div>
+                                                    {product.installationManualUrl && (
+                                                        <div className="flex items-center justify-between gap-4 py-2">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {t("installationManual")}
+                                                            </p>
+                                                            <DownloadButton
+                                                                onClick={() =>
+                                                                    handleDownloadPdf("installationManual", "Installation_Manual.pdf")
+                                                                }
+                                                                disabled={pdfDownloading !== null}
+                                                                loading={pdfDownloading === "installationManual"}
+                                                                label={t("download")}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    {product.maintenanceGuideUrl && (
+                                                        <div className="flex items-center justify-between gap-4 py-2">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {t("maintenanceGuide")}
+                                                            </p>
+                                                            <DownloadButton
+                                                                onClick={() =>
+                                                                    handleDownloadPdf("maintenanceGuide", "Maintenance_Guide.pdf")
+                                                                }
+                                                                disabled={pdfDownloading !== null}
+                                                                loading={pdfDownloading === "maintenanceGuide"}
+                                                                label={t("download")}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    {product.certificatesPdfUrl && (
+                                                        <div className="flex items-center justify-between gap-4 py-2">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {t("certificatesPdf")}
+                                                            </p>
+                                                            <DownloadButton
+                                                                onClick={() =>
+                                                                    handleDownloadPdf("certificatesPdf", "Certificates.pdf")
+                                                                }
+                                                                disabled={pdfDownloading !== null}
+                                                                loading={pdfDownloading === "certificatesPdf"}
+                                                                label={t("download")}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+
+                                </RestrictedContentOverlay>
+
+                            </div>
+
+                            {/* Right Column */}
+                            <div className="space-y-4">
+                                {/* LED Specifications */}
+                                <Accordion type="single" defaultValue="led-specs" collapsible className={accordionPanel}>
+                                    <AccordionItem value="led-specs" className="border-0">
                                         <AccordionTrigger className={accordionTriggerClass}>
-                                            {t("sections.warrantySupport")}
+                                            {t("sections.ledSpecifications")}
                                         </AccordionTrigger>
                                         <AccordionContent className={accordionContentClass}>
                                             <div>
-                                                <SpecRow label={t("specs.warrantyPeriod")} value={product.warrantyPeriod} unit="months" />
-                                                <SpecRow
-                                                    label={t("supportDuringWarranty", { tag: localeTag })}
-                                                    value={cmsField(product, "supportDuringWarranty", locale)}
-                                                />
-                                                <SpecRow
-                                                    label={t("supportAfterWarranty", { tag: localeTag })}
-                                                    value={cmsField(product, "supportAfterWarranty", locale)}
-                                                />
+                                                <SpecRow label={t("specs.ledTechnology")} value={formatEnum(product.ledTechnology)} />
+                                                <SpecRow label={t("specs.pixelConfiguration")} value={product.pixelConfiguration} />
+                                                <SpecRow label={t("specs.ledLifespan")} value={product.ledLifespan} unit="hours" />
+
+                                                <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
+                                                    <SpecRow label={t("specs.chipBonding")} value={formatEnum(product.chipBonding)} />
+                                                    <SpecRow label={t("specs.ledChipManufacturer")} value={product.ledChipManufacturer} />
+                                                    <SpecRow label={t("specs.ledModulesPerCabinet")} value={product.ledModulesPerCabinet} />
+                                                </RestrictedContentOverlay>
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
 
-                            </RestrictedContentOverlay>
+                                {/* Display Performance */}
+                                <Accordion type="single" defaultValue="display-performance" collapsible className={accordionPanel}>
+                                    <AccordionItem value="display-performance" className="border-0">
+                                        <AccordionTrigger className={accordionTriggerClass}>
+                                            {t("sections.displayPerformance")}
+                                        </AccordionTrigger>
+                                        <AccordionContent className={accordionContentClass}>
+                                            <div>
+                                                <SpecRow label={t("specs.refreshRate")} value={product.refreshRate} unit="Hz" />
+                                                <SpecRow label={t("specs.brightnessValue")} value={product.brightnessValue} unit="cd/m²" />
+
+                                                <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
+                                                    <SpecRow label={t("specs.scanRate")} value={product.scanRateDenominator ? `1/${product.scanRateDenominator}${product.scanRateNumerator && product.scanRateNumerator !== 1 ? ` (${product.scanRateNumerator}/${product.scanRateDenominator})` : ""}` : null} />
+                                                    <SpecRow label={t("specs.videoRate")} value={product.videoRate} />
+                                                    <SpecRow label={t("specs.colourDepth")} value={product.colourDepth} unit="bit" />
+                                                    <SpecRow
+                                                        label={t("specs.greyscaleProcessing")}
+                                                        value={product.greyscaleProcessing === "other" && product.greyscaleProcessingOther ? product.greyscaleProcessingOther : product.greyscaleProcessing}
+                                                    />
+                                                    <SpecRow
+                                                        label={t("specs.numberOfColours")}
+                                                        value={product.numberOfColours ? t("specs.numberOfColoursBillion", { count: product.numberOfColours }) : null}
+                                                    />
+                                                    <SpecRow label={t("specs.viewingAngleHorizontal")} value={product.viewingAngleHorizontal} />
+                                                    <SpecRow label={t("specs.viewingAngleVertical")} value={product.viewingAngleVertical} />
+                                                    <SpecRow
+                                                        label={t("specs.contrastRatio")}
+                                                        value={product.contrastRatioNumerator ? `${product.contrastRatioNumerator}:${product.contrastRatioDenominator || 1}` : null}
+                                                    />
+                                                </RestrictedContentOverlay>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+
+                                <RestrictedContentOverlay isAuthenticated={isAuthenticated} register={false}>
+
+                                    {/* Calibration */}
+                                    <Accordion type="single" defaultValue="calibration" collapsible className={accordionPanel}>
+                                        <AccordionItem value="calibration" className="border-0">
+                                            <AccordionTrigger className={accordionTriggerClass}>
+                                                {t("sections.calibration")}
+                                            </AccordionTrigger>
+                                            <AccordionContent className={accordionContentClass}>
+                                                <div>
+                                                    <SpecRow label={t("specs.calibrationMethod")} value={formatEnum(product.calibrationMethod)} />
+                                                    <SpecRow label={t("specs.whitePointCalibration")} value={product.whitePointCalibration} />
+                                                    <SpecRow label={t("specs.dciP3Coverage")} value={product.dciP3Coverage} unit="%" />
+
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+
+                                    {/* Certifications & Standards */}
+                                    {(product.productCertificates?.length > 0 || product.additionalCertification || product.emc || product.safety) && (
+                                        <Accordion type="single" defaultValue="certifications" collapsible className={accordionPanel}>
+                                            <AccordionItem value="certifications" className="border-0">
+                                                <AccordionTrigger className={accordionTriggerClass}>
+                                                    {t("sections.certificationsStandards")}
+                                                </AccordionTrigger>
+                                                <AccordionContent className={accordionContentClass}>
+                                                    {product.productCertificates && product.productCertificates.length > 0 && (
+                                                        <div className="mb-4 pb-3 border-b border-border/30">
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {product.productCertificates.map((cert) => (
+                                                                    <div
+                                                                        key={cert.id}
+                                                                        className="flex items-center gap-2 bg-white border border-border/50 p-2 px-3 rounded-lg shadow-sm"
+                                                                    >
+                                                                        <Image
+                                                                            src={cert.imageUrl}
+                                                                            alt={cert.name}
+                                                                            width={36}
+                                                                            height={36}
+                                                                            className="object-contain"
+                                                                        />
+                                                                        <span className="text-xs sm:text-sm font-medium text-foreground">
+                                                                            {cert.name}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <SpecRow label={t("specs.additionalCertification")} value={product.additionalCertification} />
+                                                        <SpecRow label={t("specs.emc")} value={product.emc} />
+                                                        <SpecRow label={t("specs.safety")} value={product.safety} />
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        </Accordion>
+                                    )}
+
+                                    {/* Warranty & Support */}
+                                    <Accordion type="single" defaultValue="warranty" collapsible className={accordionPanel}>
+                                        <AccordionItem value="warranty" className="border-0">
+                                            <AccordionTrigger className={accordionTriggerClass}>
+                                                {t("sections.warrantySupport")}
+                                            </AccordionTrigger>
+                                            <AccordionContent className={accordionContentClass}>
+                                                <div>
+                                                    <SpecRow label={t("specs.warrantyPeriod")} value={product.warrantyPeriod} unit="months" />
+                                                    <SpecRow
+                                                        label={t("supportDuringWarranty", { tag: localeTag })}
+                                                        value={cmsField(product, "supportDuringWarranty", locale)}
+                                                    />
+                                                    <SpecRow
+                                                        label={t("supportAfterWarranty", { tag: localeTag })}
+                                                        value={cmsField(product, "supportAfterWarranty", locale)}
+                                                    />
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+
+                                </RestrictedContentOverlay>
+                            </div>
                         </div>
-                    </div>
                     </div>
                     <RelatedProductsSection productId={product.id} />
                 </div>

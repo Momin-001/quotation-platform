@@ -16,8 +16,9 @@ export default function BulkImportPage() {
             </div>
 
             <Tabs defaultValue="products" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 max-w-md">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 max-w-2xl">
                     <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="products">LED Products</TabsTrigger>
+                    <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="refurbished">Refurbished</TabsTrigger>
                     <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="controllers">Controllers</TabsTrigger>
                     <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="accessories">Accessories</TabsTrigger>
                 </TabsList>
@@ -32,6 +33,19 @@ export default function BulkImportPage() {
                     <BulkImportUploader
                         apiEndpoint="/api/admin/products/import"
                         entityLabel="LED products"
+                    />
+                </TabsContent>
+
+                <TabsContent value="refurbished" className="mt-6">
+                    <div className="mb-4">
+                        <h2 className="text-lg font-semibold text-gray-800">Import Refurbished Products</h2>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Upload your refurbished product specification Excel file. Each field is a row (English label in column A, German in column B, unit in column C) and each refurbished product is a column starting after the Example column. Only new products will be created — products with an existing Product Number will be skipped.
+                        </p>
+                    </div>
+                    <BulkImportUploader
+                        apiEndpoint="/api/admin/refurbished-products/import"
+                        entityLabel="refurbished products"
                     />
                 </TabsContent>
 
