@@ -66,7 +66,7 @@ export default function BreadCrumb({ title, breadcrumbs, titleTag: TitleTag = "h
                                                 )}
                                             </BreadcrumbItem>
                                             {!isLast && (
-                                                <BreadcrumbSeparator className="text-primary-foreground/50 [&>span]:text-primary-foreground/50" />
+                                                <BreadcrumbSeparator className="text-primary-foreground/50 mr-2 [&>span]:text-primary-foreground/50" />
                                             )}
                                         </Fragment>
                                     );

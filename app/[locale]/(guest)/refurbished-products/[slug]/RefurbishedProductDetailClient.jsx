@@ -15,7 +15,7 @@ import { ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import {
     Carousel,
     CarouselContent,

@@ -1,4 +1,5 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { blogs } from "./blogs";
 
 export const homepage = pgTable("homepage", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -23,6 +24,8 @@ export const homepage = pgTable("homepage", {
     heroHotlineCtaDe: text("hero_hotline_cta_de").notNull().default(""),
     heroRequestButtonEn: text("hero_request_button_en").notNull().default(""),
     heroRequestButtonDe: text("hero_request_button_de").notNull().default(""),
+    // Request button redirects to this blog (null = button hidden on homepage)
+    heroBlogId: uuid("hero_blog_id").references(() => blogs.id, { onDelete: "set null" }),
     // Value Blocks Section - Section 2
     valueBlocksTitleEn: text("value_blocks_title_en").notNull().default(""),
     valueBlocksTitleDe: text("value_blocks_title_de").notNull().default(""),

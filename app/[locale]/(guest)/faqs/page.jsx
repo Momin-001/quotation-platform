@@ -6,7 +6,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
 import { cmsField } from "@/lib/i18n/cms";
 import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";

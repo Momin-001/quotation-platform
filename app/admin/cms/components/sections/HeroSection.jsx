@@ -5,10 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X } from "lucide-react";
 import Image from "next/image";
+import BlogSelect from "./BlogSelect";
 
 export default function HeroSection({
     register,
     errors,
+    selectedBlogId,
+    onSelectBlog,
     heroImageUrl,
     pendingHeroImageFile,
     pendingHeroImagePreviewUrl,
@@ -368,6 +371,20 @@ export default function HeroSection({
                             <p className="text-sm text-red-500">{errors.heroRequestButtonDe.message}</p>
                         )}
                     </div>
+                </div>
+
+                {/* Request Button — linked blog */}
+                <div className="space-y-2">
+                    <Label>Request Button — Linked Blog</Label>
+                    <BlogSelect
+                        value={selectedBlogId}
+                        onChange={onSelectBlog}
+                        disabled={disabled}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                        The Request Button on the hero image links to this blog. If no blog is
+                        selected, the button is hidden on the homepage.
+                    </p>
                 </div>
             </div>
         </div>

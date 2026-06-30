@@ -1,4 +1,4 @@
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { cn } from "@/lib/utils";
 
 function slugifySectionId(title, index) {

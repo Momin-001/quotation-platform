@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import SchemaScript from "@/components/guest/SchemaScript";
 import { BASE_URL } from "@/lib/constants";
 import { validateLocale, buildAlternates } from "@/lib/i18n/metadata";

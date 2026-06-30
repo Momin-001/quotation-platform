@@ -7,7 +7,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { FileText, ArrowLeft } from "lucide-react";

@@ -4,7 +4,7 @@ import BecomePartnerValueBlocksSection from "@/components/guest/BecomePartner/Be
 import BecomePartnerOpportunitiesSection from "@/components/guest/BecomePartner/BecomePartnerOpportunitiesSection";
 import BecomePartnerInquirySection from "@/components/guest/BecomePartner/BecomePartnerInquirySection";
 import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 
 export async function generateMetadata({ params }) {
     const { locale } = await params;

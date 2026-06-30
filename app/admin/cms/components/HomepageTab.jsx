@@ -35,6 +35,7 @@ const homepageSchema = z.object({
     heroHotlineCtaDe: z.string().min(1, "Hotline CTA DE is required"),
     heroRequestButtonEn: z.string().min(1, "Request Button EN is required"),
     heroRequestButtonDe: z.string().min(1, "Request Button DE is required"),
+    heroBlogId: z.string().uuid().nullable().optional(),
     // Value Blocks Section
     valueBlocksTitleEn: z.string().min(1, "Value Blocks Title EN is required"),
     valueBlocksTitleDe: z.string().min(1, "Value Blocks Title DE is required"),
@@ -135,6 +136,7 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
         reset,
         watch,
         trigger,
+        setValue,
         formState: { errors, isValid },
     } = useForm({
         resolver: zodResolver(homepageSchema),
@@ -159,6 +161,7 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             heroHotlineCtaDe: "",
             heroRequestButtonEn: "",
             heroRequestButtonDe: "",
+            heroBlogId: null,
             // Value Blocks Section
             valueBlocksTitleEn: "",
             valueBlocksTitleDe: "",
@@ -294,6 +297,7 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
                     heroHotlineCtaDe: data.data.heroHotlineCtaDe || "",
                     heroRequestButtonEn: data.data.heroRequestButtonEn || "",
                     heroRequestButtonDe: data.data.heroRequestButtonDe || "",
+                    heroBlogId: data.data.heroBlogId || null,
                     // Value Blocks Section
                     valueBlocksTitleEn: data.data.valueBlocksTitleEn || "",
                     valueBlocksTitleDe: data.data.valueBlocksTitleDe || "",
@@ -493,6 +497,10 @@ export default function HomepageTab({ onDataChange, onValidationChange, onSaveHa
             <HeroSection
                 register={register}
                 errors={errors}
+                selectedBlogId={formValues.heroBlogId || null}
+                onSelectBlog={(blogId) =>
+                    setValue("heroBlogId", blogId, { shouldValidate: true, shouldDirty: true })
+                }
                 heroImageUrl={heroImageUrl}
                 pendingHeroImageFile={pendingHeroImageFile}
                 pendingHeroImagePreviewUrl={pendingHeroImagePreviewUrl}

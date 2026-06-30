@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 

@@ -18,7 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 import RefurbishedProductCard from "@/components/guest/RefurbishedProducts/RefurbishedProductCard";
 import AdvertisementBanner from "@/components/guest/RefurbishedProducts/AdvertisementBanner";
 import { ProductsRangeFilter } from "@/components/guest/Products/ProductsRangeFilter";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 
 const PAGE_SIZE = 10;
 const PRODUCT_TYPES = ["Complete System", "LED Display Single Cabinet"];

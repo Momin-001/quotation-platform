@@ -21,7 +21,7 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";

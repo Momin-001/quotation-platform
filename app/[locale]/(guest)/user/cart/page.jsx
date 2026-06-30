@@ -18,7 +18,7 @@ import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { useTranslations } from "next-intl";
 import { usePrivacyPolicy } from "@/context/PrivacyPolicyContext";
 import { cn } from "@/lib/utils";

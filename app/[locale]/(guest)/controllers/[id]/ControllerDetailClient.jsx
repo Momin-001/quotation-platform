@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/accordion";
 import { Spinner } from "@/components/ui/spinner";
 import { FileText, ShoppingCart } from "lucide-react";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import {

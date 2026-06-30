@@ -1,0 +1,2 @@
+ALTER TABLE "homepage" ADD COLUMN "hero_blog_id" uuid;--> statement-breakpoint
+ALTER TABLE "homepage" ADD CONSTRAINT "homepage_hero_blog_id_blogs_id_fk" FOREIGN KEY ("hero_blog_id") REFERENCES "public"."blogs"("id") ON DELETE set null ON UPDATE no action;

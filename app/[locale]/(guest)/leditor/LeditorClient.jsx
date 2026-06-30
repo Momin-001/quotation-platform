@@ -24,7 +24,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
 import ReCAPTCHA from "react-google-recaptcha";
 import { NEXT_PUBLIC_RECAPTCHA_SITE_KEY } from "@/lib/constants";

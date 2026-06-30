@@ -16,7 +16,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { cmsField } from "@/lib/i18n/cms";
 import { useCart } from "@/context/CartContext";
 import { ShoppingCart, FileText, Wrench } from "lucide-react";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import {

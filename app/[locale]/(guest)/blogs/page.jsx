@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Newspaper } from "lucide-react";
 import { guestPageMetadata, validateLocale } from "@/lib/i18n/metadata";
-import BreadCrumb from "@/components/user/BreadCrumb";
+import BreadCrumb from "@/components/guest/BreadCrumb";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 import { cn } from "@/lib/utils";
 

@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
-import { footer, homepage, partners, categories } from "@/db/schema";
-import { or, ilike } from "drizzle-orm";
+import { footer, homepage, partners, categories, blogs } from "@/db/schema";
+import { or, ilike, eq } from "drizzle-orm";
 import { fetchGuestBlogsListing } from "@/features/blogs/guest-blogs-list";
 import { fetchGuestFaqsListing } from "@/features/faqs/guest-faqs-list";
 import { defaultHomepageData } from "@/lib/data/default_cms_data";
@@ -18,7 +18,21 @@ async function fetchPrivacyPolicyPdfUrl() {
 
 async function fetchHomepageRow() {
     const [row] = await db.select().from(homepage).limit(1);
-    return row ?? null;
+    if (!row) return null;
+
+    // Resolve the slug of the blog the hero request button links to.
+    // Stored as an id so the link survives blog title/slug changes.
+    let heroBlogSlug = null;
+    if (row.heroBlogId) {
+        const [blog] = await db
+            .select({ slug: blogs.slug })
+            .from(blogs)
+            .where(eq(blogs.id, row.heroBlogId))
+            .limit(1);
+        heroBlogSlug = blog?.slug ?? null;
+    }
+
+    return { ...row, heroBlogSlug };
 }
 
 async function fetchPartnersRows() {

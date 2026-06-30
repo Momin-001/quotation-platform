@@ -70,16 +70,17 @@ export default function HeroSection({ homepageData, locale }) {
                             </p>
                         </div>
 
-                        <Link href="/products">
-                            <Button
-                                variant="secondary"
-                                size="lg"
-                                className="sm:mr-12 sm:mb-5  font-bold rounded-full px-6"
-                            >
-                                <Pencil className="h-4 w-4 shrink-0" />
-                                {getText("heroRequestButton")}
-                            </Button>
-                        </Link>
+                        {homepageData?.heroBlogSlug && (
+                            <Link href={`/blogs/${homepageData.heroBlogSlug}`}>
+                                <Button
+                                    variant="secondary"
+                                    size="lg"
+                                    className="sm:mr-12 sm:mb-5 font-bold rounded-lg px-6"
+                                >
+                                    {getText("heroRequestButton")}
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
