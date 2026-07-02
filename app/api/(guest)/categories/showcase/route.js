@@ -17,6 +17,7 @@ export async function GET() {
             .select({
                 id: categories.id,
                 name: categories.name,
+                slug: categories.slug,
                 titleEn: categories.titleEn,
                 titleDe: categories.titleDe,
                 descriptionEn: categories.descriptionEn,

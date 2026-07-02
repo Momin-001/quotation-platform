@@ -395,7 +395,9 @@
       "all": "Alle",
       "loading": "Controller werden geladen…",
       "loadingMore": "Weitere werden geladen…",
-      "empty": "Keine Controller gefunden. Passen Sie Suche oder Markenfilter an."
+      "empty": "Keine Controller gefunden. Passen Sie Suche oder Markenfilter an.",
+      "brandTitle": "{brand} LED-Controller",
+      "brandDescription": "Entdecken Sie {brand} LED-Display-Controller und -Prozessoren mit Datenblättern, Handbüchern und Spezifikationen."
     },
     "detail": {
       "titleFallback": "Controller",

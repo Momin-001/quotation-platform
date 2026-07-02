@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { categories, products } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { parseCategoryFeatures } from "@/lib/helpers/category-helpers";
+import { generateUniqueCategorySlug } from "@/lib/helpers/category-slug";
 import { eq, sql, ilike } from "drizzle-orm";
 import cloudinary from "@/lib/cloudinary";
 
@@ -24,6 +25,7 @@ export async function GET() {
             .select({
                 id: categories.id,
                 name: categories.name,
+                slug: categories.slug,
                 titleEn: categories.titleEn,
                 titleDe: categories.titleDe,
                 descriptionEn: categories.descriptionEn,
@@ -77,6 +79,7 @@ export async function POST(request) {
 
         const values = {
             name: trimmedName,
+            slug: await generateUniqueCategorySlug(trimmedName),
             titleEn: titleEn ? String(titleEn).trim() : null,
             titleDe: titleDe ? String(titleDe).trim() : null,
             descriptionEn: descriptionEn ? String(descriptionEn).trim() : null,

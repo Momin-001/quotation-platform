@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, getPathname } from "@/i18n/navigation";
 import { Suspense, useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -23,7 +23,8 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { cmsField } from "@/lib/i18n/cms";
 import { useAuth } from "@/context/AuthContext";
 import { RestrictedContentOverlay } from "@/components/guest/Products/RestrictedContentOverlay";
 import ProductCard from "@/components/guest/Products/ProductCard";
@@ -425,19 +426,27 @@ function FiltersAccordion({
     );
 }
 
-function isDefaultListingQuery(query) {
+function isDefaultListingQuery(query, initialCategoryId = "") {
     if (!query) return true;
     const params = new URLSearchParams(query);
     if (params.get("page") !== "1") return false;
     if (params.get("limit") !== "10") return false;
+    if (initialCategoryId && params.get("categoryId") !== initialCategoryId) return false;
     for (const [key] of params.entries()) {
-        if (key !== "page" && key !== "limit") return false;
+        if (key === "page" || key === "limit") continue;
+        if (key === "categoryId" && initialCategoryId) continue;
+        return false;
     }
     return true;
 }
 
-function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
+function ProductsPageContent({
+    initialProducts = [],
+    initialHasMore = false,
+    initialCategory = null,
+}) {
     const searchParams = useSearchParams();
+    const locale = useLocale();
     const urlCategoryAppliedRef = useRef(false);
     const lastQueryRef = useRef("");
     const hasInitialListing =
@@ -456,9 +465,12 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
         hasInitialListing ? initialHasMore : true
     );
     const [search, setSearch] = useState("");
-    // Initialize directly from URL to avoid the "All" fetch + second filtered fetch.
+    // Initialize from the category route (SSR) or URL query to avoid the
+    // "All" fetch + second filtered fetch.
     const initialUrlCategoryId = searchParams.get("categoryId") || "";
-    const [selectedCategory, setSelectedCategory] = useState(initialUrlCategoryId);
+    const [selectedCategory, setSelectedCategory] = useState(
+        initialCategory?.id || initialUrlCategoryId
+    );
 
     // ---------------------------------------------------------------------------
     // Raw filter states  (bound to inputs – update immediately for a responsive UI)
@@ -582,8 +594,11 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
         loadBounds();
     }, []);
 
-    // Apply `categoryId` from URL query params to the existing category filter UI/API.
+    // Legacy support: apply `categoryId` from URL query params, then normalize
+    // the URL to the canonical /products/category/[slug] route.
+    // On category routes the category comes from `initialCategory` instead.
     useEffect(() => {
+        if (initialCategory) return;
         if (categories.length === 0) return;
         if (urlCategoryAppliedRef.current) return;
 
@@ -595,15 +610,20 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
             return;
         }
 
-        const exists = categories.some((c) => c.id === urlCategoryId);
-        if (exists) {
+        const urlCategory = categories.find((c) => c.id === urlCategoryId);
+        if (urlCategory) {
             if (selectedCategory !== urlCategoryId) setSelectedCategory(urlCategoryId);
+            window.history.replaceState(
+                null,
+                "",
+                getPathname({ locale, href: `/products/category/${urlCategory.slug}` })
+            );
             urlCategoryAppliedRef.current = true;
         } else {
             if (selectedCategory !== "") setSelectedCategory("");
             urlCategoryAppliedRef.current = true;
         }
-    }, [searchParams, categories]);
+    }, [searchParams, categories, initialCategory, locale]);
 
     // Build query params – uses the DEBOUNCED values
     const buildQueryParams = useCallback((pageNum = page) => {
@@ -732,7 +752,7 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
         if (
             hasInitialListing &&
             !initialListingConsumedRef.current &&
-            isDefaultListingQuery(query)
+            isDefaultListingQuery(query, initialCategory?.id)
         ) {
             initialListingConsumedRef.current = true;
             setPage(1);
@@ -809,14 +829,64 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
         setFiltersMountKey((k) => k + 1);
     };
 
+    // Pills are real links to /products/category/[slug] so crawlers can
+    // discover the category pages, but a plain click filters in place
+    // (keeping search + filters) and only updates the URL shallowly.
+    const categoryHref = (category) =>
+        category ? `/products/category/${category.slug}` : "/products";
+
+    const handleCategoryClick = (event, category) => {
+        if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+        ) {
+            return;
+        }
+        event.preventDefault();
+        setSelectedCategory(category ? category.id : "");
+        window.history.pushState(
+            null,
+            "",
+            getPathname({ locale, href: categoryHref(category) })
+        );
+    };
+
+    const activeCategory = selectedCategory
+        ? categories.find((c) => c.id === selectedCategory) ||
+          (initialCategory?.id === selectedCategory ? initialCategory : null)
+        : null;
+    const pageHeading = activeCategory
+        ? cmsField(activeCategory, "title", locale) || activeCategory.name
+        : t("breadcrumb");
+    const categoryDescription = activeCategory
+        ? cmsField(activeCategory, "description", locale)
+        : "";
+
     return (
         <div className="min-h-screen flex flex-col">
-            <BreadCrumb title={t("breadcrumb")}
-                breadcrumbs={[
-                    { label: tCommon("home"), href: "/" },
-                    { label: t("breadcrumb") }
-                ]} />
+            <BreadCrumb title={pageHeading}
+                breadcrumbs={
+                    activeCategory
+                        ? [
+                              { label: tCommon("home"), href: "/" },
+                              { label: t("breadcrumb"), href: "/products" },
+                              { label: pageHeading },
+                          ]
+                        : [
+                              { label: tCommon("home"), href: "/" },
+                              { label: t("breadcrumb") },
+                          ]
+                } />
             <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
+                {categoryDescription ? (
+                    <p className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
+                        {categoryDescription}
+                    </p>
+                ) : null}
                 <div className="mb-6 sm:mb-8">
                     <div className="relative">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
@@ -831,6 +901,7 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
 
                 <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
                     <Button
+                        asChild
                         variant={selectedCategory === "" ? "default" : "outline"}
                         size="sm"
                         className={`${
@@ -838,23 +909,32 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
                                 ? ""
                                 : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
                         }`}
-                        onClick={() => setSelectedCategory("")}
                     >
-                        {t("all")}
+                        <Link
+                            href="/products"
+                            onClick={(e) => handleCategoryClick(e, null)}
+                        >
+                            {t("all")}
+                        </Link>
                     </Button>
                     {categories.map((category) => (
                         <Button
                             key={category.id}
+                            asChild
                             variant={selectedCategory === category.id ? "default" : "outline"}
                             size="sm"
-                            onClick={() => setSelectedCategory(category.id)}
                             className={`${
                                 category.id === selectedCategory
                                     ? ""
                                     : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
                             }`}
                         >
-                            {category.name}
+                            <Link
+                                href={categoryHref(category)}
+                                onClick={(e) => handleCategoryClick(e, category)}
+                            >
+                                {category.name}
+                            </Link>
                         </Button>
                     ))}
                 </div>
@@ -1018,6 +1098,7 @@ function ProductsPageContent({ initialProducts = [], initialHasMore = false }) {
 export default function ProductsClient({
     initialProducts = [],
     initialHasMore = false,
+    initialCategory = null,
 }) {
     return (
         <Suspense
@@ -1030,6 +1111,7 @@ export default function ProductsClient({
             <ProductsPageContent
                 initialProducts={initialProducts}
                 initialHasMore={initialHasMore}
+                initialCategory={initialCategory}
             />
         </Suspense>
     );

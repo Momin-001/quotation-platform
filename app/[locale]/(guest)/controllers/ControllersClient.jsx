@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, getPathname } from "@/i18n/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import BreadCrumb from "@/components/guest/BreadCrumb";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import ControllerCard from "@/components/guest/Controllers/ControllerCard";
-
-const BRANDS = ["Colorlight", "Novastar", "Brompton", "LINSN", "Other"];
+import {
+    CONTROLLER_BRANDS,
+    controllerBrandSlug,
+} from "@/lib/helpers/controller-brands";
 
 function useDebounce(value, delay = 400) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -25,13 +27,16 @@ function useDebounce(value, delay = 400) {
     return debouncedValue;
 }
 
-function isDefaultListingQuery(query) {
+function isDefaultListingQuery(query, initialBrand = "") {
     if (!query) return true;
     const params = new URLSearchParams(query);
     if (params.get("page") !== "1") return false;
     if (params.get("limit") !== "10") return false;
+    if (initialBrand && params.get("brand") !== initialBrand) return false;
     for (const [key] of params.entries()) {
-        if (key !== "page" && key !== "limit") return false;
+        if (key === "page" || key === "limit") continue;
+        if (key === "brand" && initialBrand) continue;
+        return false;
     }
     return true;
 }
@@ -39,9 +44,11 @@ function isDefaultListingQuery(query) {
 export default function ControllersClient({
     initialControllers = [],
     initialHasMore = false,
+    initialBrand = "",
 }) {
     const t = useTranslations("Controllers.list");
     const tCommon = useTranslations("Common");
+    const locale = useLocale();
     const hasInitialListing = initialControllers.length > 0;
     const initialListingConsumedRef = useRef(false);
     const lastQueryRef = useRef("");
@@ -54,7 +61,7 @@ export default function ControllersClient({
         hasInitialListing ? initialHasMore : true
     );
     const [search, setSearch] = useState("");
-    const [selectedBrand, setSelectedBrand] = useState("");
+    const [selectedBrand, setSelectedBrand] = useState(initialBrand);
 
     const debouncedSearch = useDebounce(search, 400);
     const debouncedSelectedBrand = useDebounce(selectedBrand, 150);
@@ -107,7 +114,7 @@ export default function ControllersClient({
         if (
             hasInitialListing &&
             !initialListingConsumedRef.current &&
-            isDefaultListingQuery(query)
+            isDefaultListingQuery(query, initialBrand)
         ) {
             initialListingConsumedRef.current = true;
             setPage(1);
@@ -117,7 +124,7 @@ export default function ControllersClient({
         setPage(1);
         setControllers([]);
         fetchControllers(1, true);
-    }, [debouncedSearch, debouncedSelectedBrand, buildQueryParams, fetchControllers, hasInitialListing]);
+    }, [debouncedSearch, debouncedSelectedBrand, buildQueryParams, fetchControllers, hasInitialListing, initialBrand]);
 
     const loadMore = useCallback(() => {
         if (loading || !hasMore) return;
@@ -140,14 +147,52 @@ export default function ControllersClient({
         [loading, hasMore, loadMore]
     );
 
+    // Pills are real links to /controllers/brand/[slug] so crawlers can
+    // discover the brand pages, but a plain click filters in place and only
+    // updates the URL shallowly.
+    const brandHref = (brand) =>
+        brand ? `/controllers/brand/${controllerBrandSlug(brand)}` : "/controllers";
+
+    const handleBrandClick = (event, brand) => {
+        if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+        ) {
+            return;
+        }
+        event.preventDefault();
+        setSelectedBrand(brand || "");
+        window.history.pushState(
+            null,
+            "",
+            getPathname({ locale, href: brandHref(brand) })
+        );
+    };
+
+    const pageHeading = selectedBrand
+        ? t("brandTitle", { brand: selectedBrand })
+        : t("breadcrumb");
+
     return (
         <div className="min-h-screen flex flex-col">
             <BreadCrumb
-                title={t("breadcrumb")}
-                breadcrumbs={[
-                    { label: tCommon("home"), href: "/" },
-                    { label: t("breadcrumb") },
-                ]}
+                title={pageHeading}
+                breadcrumbs={
+                    selectedBrand
+                        ? [
+                              { label: tCommon("home"), href: "/" },
+                              { label: t("breadcrumb"), href: "/controllers" },
+                              { label: selectedBrand },
+                          ]
+                        : [
+                              { label: tCommon("home"), href: "/" },
+                              { label: t("breadcrumb") },
+                          ]
+                }
             />
             <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
                 <div className="mb-6 sm:mb-8">
@@ -164,6 +209,7 @@ export default function ControllersClient({
 
                 <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
                     <Button
+                        asChild
                         variant={selectedBrand === "" ? "default" : "outline"}
                         size="sm"
                         className={cn(
@@ -171,23 +217,32 @@ export default function ControllersClient({
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90"
                                 : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
                         )}
-                        onClick={() => setSelectedBrand("")}
                     >
-                        {t("all")}
+                        <Link
+                            href="/controllers"
+                            onClick={(e) => handleBrandClick(e, null)}
+                        >
+                            {t("all")}
+                        </Link>
                     </Button>
-                    {BRANDS.map((brand) => (
+                    {CONTROLLER_BRANDS.map((brand) => (
                         <Button
                             key={brand}
+                            asChild
                             variant={selectedBrand === brand ? "default" : "outline"}
                             size="sm"
-                            onClick={() => setSelectedBrand(brand)}
                             className={cn(
                                 selectedBrand === brand
                                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                                     : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
                             )}
                         >
-                            {brand}
+                            <Link
+                                href={brandHref(brand)}
+                                onClick={(e) => handleBrandClick(e, brand)}
+                            >
+                                {brand}
+                            </Link>
                         </Button>
                     ))}
                 </div>

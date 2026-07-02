@@ -18,10 +18,8 @@ import { cmsField } from "@/lib/i18n/cms";
 
 // categories prop is passed from server; fallback to client fetch for backward compat
 
-function CategoryCard({ card, presetLabel, categoryId }) {
-    const href = categoryId
-        ? `/products?categoryId=${encodeURIComponent(categoryId)}`
-        : "/products";
+function CategoryCard({ card, presetLabel }) {
+    const href = `/products/category/${card.slug}`;
 
     return (
         <div className="relative h-full min-h-[520px] lg:min-h-[620px] rounded-xl overflow-hidden shadow-lg flex flex-col">
@@ -70,7 +68,6 @@ function CategoryCard({ card, presetLabel, categoryId }) {
                             size="lg"
                             variant="secondary"
                             className=""
-                            disabled={!categoryId}
                         >
                             <Link href={href}>
                                 {presetLabel} →
@@ -191,7 +188,6 @@ export default function PreSelectedFiltersSection({ homepageData, categories: se
                                             <CategoryCard
                                                 card={card}
                                                 presetLabel={presetLabel}
-                                                categoryId={card.id}
                                             />
                                         </CarouselItem>
                                     );

@@ -395,7 +395,9 @@
       "all": "All",
       "loading": "Loading controllers…",
       "loadingMore": "Loading more…",
-      "empty": "No controllers found. Try adjusting your search or brand filter."
+      "empty": "No controllers found. Try adjusting your search or brand filter.",
+      "brandTitle": "{brand} LED Controllers",
+      "brandDescription": "Browse {brand} LED display controllers and processors with datasheets, manuals and specifications."
     },
     "detail": {
       "titleFallback": "Controller",

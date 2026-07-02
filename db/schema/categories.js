@@ -5,6 +5,7 @@ import { products } from "./products";
 export const categories = pgTable("categories", {
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull().unique(),
+    slug: text("slug").unique(),
     titleEn: text("title_en"),
     titleDe: text("title_de"),
     descriptionEn: text("description_en"),

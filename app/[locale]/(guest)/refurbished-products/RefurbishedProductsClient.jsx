@@ -1,7 +1,9 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, getPathname } from "@/i18n/navigation";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useLocale } from "next-intl";
+import { cmsField } from "@/lib/i18n/cms";
 import { Search, FilterIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -110,8 +112,14 @@ function FiltersAccordion({
     );
 }
 
-export default function RefurbishedProductsClient({ initialProducts = [], initialHasMore = false, filterBounds }) {
+export default function RefurbishedProductsClient({
+    initialProducts = [],
+    initialHasMore = false,
+    filterBounds,
+    initialCategory = null,
+}) {
     const bounds = filterBounds || { pixelPitchMin: "0.10", pixelPitchMax: "30.00" };
+    const locale = useLocale();
 
     const [products, setProducts] = useState(initialProducts);
     const [hasMore, setHasMore] = useState(initialHasMore);
@@ -124,7 +132,7 @@ export default function RefurbishedProductsClient({ initialProducts = [], initia
     // Filter state
     const [search, setSearch] = useState("");
     const [productType, setProductType] = useState("");
-    const [areaOfUse, setAreaOfUse] = useState(""); // categoryId; driven by the pill row
+    const [areaOfUse, setAreaOfUse] = useState(initialCategory?.id || ""); // categoryId; driven by the pill row
     const [design, setDesign] = useState("");
     const [hangingBrackets, setHangingBrackets] = useState("");
     const [stackingSystem, setStackingSystem] = useState("");
@@ -239,17 +247,70 @@ export default function RefurbishedProductsClient({ initialProducts = [], initia
         pixelPitchRange, setPixelPitchRange,
     };
 
+    // Pills are real links to /refurbished-products/category/[slug] so crawlers
+    // can discover the category pages, but a plain click filters in place and
+    // only updates the URL shallowly.
+    const categoryHref = (category) =>
+        category
+            ? `/refurbished-products/category/${category.slug}`
+            : "/refurbished-products";
+
+    const handleCategoryClick = (event, category) => {
+        if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+        ) {
+            return;
+        }
+        event.preventDefault();
+        setAreaOfUse(category ? category.id : "");
+        window.history.pushState(
+            null,
+            "",
+            getPathname({ locale, href: categoryHref(category) })
+        );
+    };
+
+    const activeCategory = areaOfUse
+        ? categories.find((c) => c.id === areaOfUse) ||
+          (initialCategory?.id === areaOfUse ? initialCategory : null)
+        : null;
+    const pageHeading = activeCategory
+        ? `Refurbished ${cmsField(activeCategory, "title", locale) || activeCategory.name}`
+        : "Refurbished Products";
+    const categoryDescription = activeCategory
+        ? cmsField(activeCategory, "description", locale)
+        : "";
+
     return (
         <div className="min-h-screen flex flex-col">
             <BreadCrumb
-                title="Refurbished Products"
-                breadcrumbs={[{ label: "Home", href: "/" }, { label: "Refurbished Products" }]}
+                title={pageHeading}
+                breadcrumbs={
+                    activeCategory
+                        ? [
+                              { label: "Home", href: "/" },
+                              { label: "Refurbished Products", href: "/refurbished-products" },
+                              { label: pageHeading },
+                          ]
+                        : [{ label: "Home", href: "/" }, { label: "Refurbished Products" }]
+                }
             />
             <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
                 {/* Advertisement banner (hidden when no active ads) */}
                 <div className="mb-6 sm:mb-8">
                     <AdvertisementBanner />
                 </div>
+
+                {categoryDescription ? (
+                    <p className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
+                        {categoryDescription}
+                    </p>
+                ) : null}
 
                 <div className="mb-6 sm:mb-8">
                     <div className="relative">
@@ -266,22 +327,32 @@ export default function RefurbishedProductsClient({ initialProducts = [], initia
                 {/* Area of Use pills */}
                 <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
                     <Button
+                        asChild
                         variant={areaOfUse === "" ? "default" : "outline"}
                         size="sm"
                         className={areaOfUse === "" ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
-                        onClick={() => setAreaOfUse("")}
                     >
-                        All
+                        <Link
+                            href="/refurbished-products"
+                            onClick={(e) => handleCategoryClick(e, null)}
+                        >
+                            All
+                        </Link>
                     </Button>
                     {categories.map((category) => (
                         <Button
                             key={category.id}
+                            asChild
                             variant={areaOfUse === category.id ? "default" : "outline"}
                             size="sm"
-                            onClick={() => setAreaOfUse(category.id)}
                             className={areaOfUse === category.id ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
                         >
-                            {category.name}
+                            <Link
+                                href={categoryHref(category)}
+                                onClick={(e) => handleCategoryClick(e, category)}
+                            >
+                                {category.name}
+                            </Link>
                         </Button>
                     ))}
                 </div>

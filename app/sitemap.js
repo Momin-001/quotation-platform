@@ -16,14 +16,76 @@
 //   - Re-submit sitemap.xml fresh
 // ============================================================
 
-import { MetadataRoute } from 'next'
+import { fetchCategorySlugsForSitemap } from '@/features/categories/guest-category'
+import { CONTROLLER_BRANDS, controllerBrandSlug } from '@/lib/helpers/controller-brands'
 // import { db } from '@/lib/db'
 // import { products } from '@/db/schema'
 // import { eq } from 'drizzle-orm'
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap() {
   const base = 'https://www.proledall.eu'
   const now  = new Date()
+
+  // ── Dynamic category listing URLs (products + refurbished) ──
+  // Each category gets a DE (root) and EN (/en) entry for both
+  // the products and refurbished-products listings.
+  let categoryEntries = []
+  try {
+    const rows = await fetchCategorySlugsForSitemap()
+
+    categoryEntries = rows.flatMap((c) => {
+      const lastModified = c.updatedAt ?? now
+      return [
+        {
+          url:             `${base}/products/category/${c.slug}`,
+          lastModified,
+          changeFrequency: 'weekly',
+          priority:        0.8,
+        },
+        {
+          url:             `${base}/en/products/category/${c.slug}`,
+          lastModified,
+          changeFrequency: 'weekly',
+          priority:        0.8,
+        },
+        {
+          url:             `${base}/refurbished-products/category/${c.slug}`,
+          lastModified,
+          changeFrequency: 'weekly',
+          priority:        0.7,
+        },
+        {
+          url:             `${base}/en/refurbished-products/category/${c.slug}`,
+          lastModified,
+          changeFrequency: 'weekly',
+          priority:        0.7,
+        },
+      ]
+    })
+  } catch {
+    // If the DB is unreachable at build/request time, fall back to the
+    // static URLs below rather than failing the whole sitemap.
+    categoryEntries = []
+  }
+
+  // ── Controller brand listing URLs (static brand list) ───────
+  const controllerBrandEntries = CONTROLLER_BRANDS.flatMap((brand) => {
+    const slug = controllerBrandSlug(brand)
+    return [
+      {
+        url:             `${base}/controllers/brand/${slug}`,
+        lastModified:    now,
+        changeFrequency: 'weekly',
+        priority:        0.7,
+      },
+      {
+        url:             `${base}/en/controllers/brand/${slug}`,
+        lastModified:    now,
+        changeFrequency: 'weekly',
+        priority:        0.7,
+      },
+    ]
+  })
 
   // // ── Dynamic product detail URLs (active products only) ───────
   // // Products are SEO-indexed via their slug, so each active product
@@ -76,6 +138,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority:        0.9,
     },
     {
+      url:             `${base}/refurbished-products`,
+      lastModified:    now,
+      changeFrequency: 'weekly',
+      priority:        0.85,
+    },
+    {
+      url:             `${base}/controllers`,
+      lastModified:    now,
+      changeFrequency: 'weekly',
+      priority:        0.75,
+    },
+    {
       url:             `${base}/leditor`,
       lastModified:    now,
       changeFrequency: 'monthly',
@@ -122,6 +196,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority:        0.9,
     },
     {
+      url:             `${base}/en/refurbished-products`,
+      lastModified:    now,
+      changeFrequency: 'weekly',
+      priority:        0.85,
+    },
+    {
+      url:             `${base}/en/controllers`,
+      lastModified:    now,
+      changeFrequency: 'weekly',
+      priority:        0.75,
+    },
+    {
       url:             `${base}/en/leditor`,
       lastModified:    now,
       changeFrequency: 'monthly',
@@ -157,11 +243,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // { url: `${base}/blogs`,             lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
     // { url: `${base}/en/blogs`,          lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    // { url: `${base}/controllers`,       lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
-    // { url: `${base}/en/controllers`,    lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
 
     // ── DYNAMIC PRODUCT DETAIL PAGES (from database) ──────────
     // ...productEntries,
+
+    // ── DYNAMIC CATEGORY LISTING PAGES (from database) ────────
+    ...categoryEntries,
+
+    // ── CONTROLLER BRAND LISTING PAGES (static brand list) ────
+    ...controllerBrandEntries,
 
   ]
 }
