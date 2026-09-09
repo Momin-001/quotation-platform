@@ -29,7 +29,8 @@ export async function GET(request) {
                 productName: accessories.productName,
                 productNumber: accessories.productNumber,
                 productGroup: accessories.productGroup,
-                retailPrice: accessories.retailPrice,
+                purchasePrice: accessories.purchasePrice,
+                profitMargin: accessories.profitMargin,
             })
             .from(accessories)
             .where(whereClause)

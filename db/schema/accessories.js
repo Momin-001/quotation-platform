@@ -18,7 +18,8 @@ export const accessories = pgTable("accessories", {
     supplier: text("supplier"),
     productDatasheetUrl: text("product_datasheet_url"), // direct link to accessory datasheet
     purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 }),
-    retailPrice: decimal("retail_price", { precision: 10, scale: 2 }),
+    // Margin factor applied to the purchase price when quoting, e.g. 0.5 => price + price * 0.5
+    profitMargin: decimal("profit_margin", { precision: 12, scale: 2 }),
     leadTime: text("lead_time"), // e.g. "20 Days"
     optionalField: text("optional_field").array(), // multi-valued text, like application in products
 

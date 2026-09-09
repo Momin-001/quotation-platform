@@ -811,7 +811,7 @@ export default function ProductForm({
                     {renderInput("Power Supply", "powerSupply", "text", { placeholder: "e.g., Meanwell UHP200-5v" })}
                     {renderInput("Price Per Cabinet (USD)", "pricePerCabinetUsd", "number", { step: "0.01", placeholder: "e.g., 1500.00" })}
                     {renderInput("Price Per Metre Square (USD)", "pricePerMetreSquareUsd", "number", { step: "0.01", placeholder: "e.g., 2500.00" })}
-                    {renderInput("Profit Margin (%)", "profitMargin", "number", { step: "0.01", placeholder: "e.g., 10.00" })}
+                    {renderInput("Profit Margin", "profitMargin", "number", { step: "0.01", placeholder: "e.g. 0.5 for +50%" })}
                     {renderInput("Stock (pieces)", "stockPieces", "number", { step: "1", placeholder: "e.g., 10" })}
                     {renderInput("Leadtime (days)", "leadtimeDays", "number", { step: "1", placeholder: "e.g., 14" })}
                     {renderTextarea("Notes", "notes", { placeholder: "Optional notes" })}

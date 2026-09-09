@@ -91,7 +91,7 @@ function formatExportRow(p) {
         "Support After Warranty (EN)": p.supportAfterWarrantyEn ?? "",
         "Price Per Cabinet (USD)": p.pricePerCabinetUsd ?? "",
         "Price Per Metre Square (USD)": p.pricePerMetreSquareUsd ?? "",
-        "Profit Margin (%)": p.profitMargin ?? "",
+        "Profit Margin": p.profitMargin ?? "",
         "Stock Pieces": p.stockPieces ?? "",
         "Leadtime (Days)": p.leadtimeDays ?? "",
         "Notes": p.notes ?? "",

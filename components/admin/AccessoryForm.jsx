@@ -36,7 +36,7 @@ const accessorySchema = z.object({
     supplier: z.string().optional(),
     productDatasheetUrl: z.string().optional(),
     purchasePrice: z.union([z.string(), z.number()]).optional(),
-    retailPrice: z.union([z.string(), z.number()]).optional(),
+    profitMargin: z.union([z.string(), z.number()]).optional(),
     leadTime: z.string().optional(),
 });
 
@@ -51,7 +51,7 @@ const defaultValues = {
     supplier: "",
     productDatasheetUrl: "",
     purchasePrice: "",
-    retailPrice: "",
+    profitMargin: "",
     leadTime: "",
 };
 
@@ -79,7 +79,7 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
         supplier: initialData.supplier || "",
         productDatasheetUrl: initialData.productDatasheetUrl || "",
         purchasePrice: initialData.purchasePrice?.toString() || "",
-        retailPrice: initialData.retailPrice?.toString() || "",
+        profitMargin: initialData.profitMargin?.toString() || "",
         leadTime: initialData.leadTime || "",
     } : defaultValues;
 
@@ -356,13 +356,13 @@ export default function AccessoryForm({ mode = "add", initialData = null }) {
                         />
                     </div>
                     <div className="space-y-1">
-                        <Label>Retail Price (€)</Label>
+                        <Label>Profit Margin</Label>
                         <Input
                             type="number"
                             min="0"
                             step="0.01"
-                            placeholder="0.00"
-                            {...register("retailPrice")}
+                            placeholder="e.g. 0.5 for +50%"
+                            {...register("profitMargin")}
                         />
                     </div>
                     <div className="space-y-1">

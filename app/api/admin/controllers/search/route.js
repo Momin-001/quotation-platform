@@ -31,6 +31,7 @@ export async function GET(request) {
                 brandName: controllers.brandName,
                 controllerNumber: controllers.controllerNumber,
                 pricePerControllerUsd: controllers.pricePerControllerUsd,
+                profitMargin: controllers.profitMargin,
             })
             .from(controllers)
             .where(whereClause)

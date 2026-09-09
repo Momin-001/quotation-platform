@@ -26,6 +26,15 @@ function parseInteger(value) {
     return isNaN(num) ? null : num;
 }
 
+function parseDecimal(value) {
+    if (value === null || value === undefined || value === "") return null;
+    const s = value.toString().trim().replace(/,/g, "");
+    const match = s.match(/-?[\d.]+/);
+    if (!match) return null;
+    const num = parseFloat(match[0]);
+    return isNaN(num) ? null : num.toString();
+}
+
 function str(value) {
     if (value === null || value === undefined) return null;
     const s = value.toString().trim();
@@ -185,9 +194,10 @@ export async function POST(req) {
                     usbPlayback: matchYesNo(cell(40, c)),
                     support3d: matchYesNo(cell(41, c)),
                     downloadUrl: str(cell(42, c)),
-                    pricePerControllerUsd: parseFloat(cell(43, c)) ?? 0,
-                    stockPieces: parseInteger(cell(44, c)) ?? 0,
-                    leadtimeDays: parseInteger(cell(45, c)) ?? 0,
+                    pricePerControllerUsd: parseDecimal(cell(43, c)),
+                    profitMargin: parseDecimal(cell(44, c)),
+                    stockPieces: parseInteger(cell(45, c)) ?? 0,
+                    leadtimeDays: parseInteger(cell(46, c)) ?? 0,
 
                     // Excel-imported controllers are inactive until they have images
                     isActive: false,

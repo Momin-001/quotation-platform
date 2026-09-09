@@ -128,7 +128,7 @@ export default function AccessoriesPage() {
                             <TableHead className="p-4 text-white whitespace-nowrap">Short Text</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Manufacturer</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Purchase Price</TableHead>
-                            <TableHead className="p-4 text-white whitespace-nowrap">Retail Price</TableHead>
+                            <TableHead className="p-4 text-white whitespace-nowrap">Profit Margin</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Lead Time</TableHead>
                             <TableHead className="p-4 text-white whitespace-nowrap">Actions</TableHead>
                         </TableRow>
@@ -159,7 +159,7 @@ export default function AccessoriesPage() {
                                         {accessory.purchasePrice ? `€${accessory.purchasePrice}` : "N/A"}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">
-                                        {accessory.retailPrice ? `€${accessory.retailPrice}` : "N/A"}
+                                        {accessory.profitMargin != null && accessory.profitMargin !== "" ? accessory.profitMargin : "N/A"}
                                     </TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">{accessory.leadTime || "N/A"}</TableCell>
                                     <TableCell className="p-4 whitespace-nowrap">

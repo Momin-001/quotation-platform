@@ -73,7 +73,7 @@ export async function PUT(request, { params }) {
             supplier: body.supplier?.trim() || null,
             productDatasheetUrl: body.productDatasheetUrl?.trim() || null,
             purchasePrice: body.purchasePrice?.toString() || null,
-            retailPrice: body.retailPrice?.toString() || null,
+            profitMargin: body.profitMargin?.toString() || null,
             leadTime: body.leadTime?.trim() || null,
             optionalField: Array.isArray(body.optionalField) ? body.optionalField.filter(Boolean).map((s) => String(s).trim()) : (body.optionalField != null && body.optionalField !== "" ? [String(body.optionalField).trim()] : []),
             updatedAt: new Date(),

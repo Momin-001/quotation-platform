@@ -358,6 +358,8 @@ function applyColumn(header, rawValue, update, categoryMap) {
         case "price per metre square (usd)":
             update.pricePerMetreSquareUsd = parseDecimal(v);
             break;
+        case "profit margin":
+        // Header used by exports generated before the margin became a factor
         case "profit margin (%)":
             update.profitMargin = parseDecimal(v);
             break;

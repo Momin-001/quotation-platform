@@ -104,6 +104,7 @@ export async function GET(req, { params }) {
                     productNumber: null,
                     pixelPitch: null,
                     pricePerCabinetUsd: null,
+                    profitMargin: null,
                     cabinetResolutionHorizontal: null,
                     cabinetResolutionVertical: null,
                 };
@@ -117,6 +118,8 @@ export async function GET(req, { params }) {
                             productNumber: rp.productNumber,
                             pixelPitch: rp.pixelPitch,
                             pricePerCabinetUsd: rp.pricePerCabinetUsd,
+                            // Refurbished stock is quoted at its selling price, no margin uplift
+                            profitMargin: null,
                             cabinetResolutionHorizontal: rp.cabinetResolutionHorizontal,
                             cabinetResolutionVertical: rp.cabinetResolutionVertical,
                         };
@@ -129,6 +132,7 @@ export async function GET(req, { params }) {
                             productNumber: products.productNumber,
                             pixelPitch: products.pixelPitch,
                             pricePerCabinetUsd: products.pricePerCabinetUsd,
+                            profitMargin: products.profitMargin,
                             cabinetResolutionHorizontal: products.cabinetResolutionHorizontal,
                             cabinetResolutionVertical: products.cabinetResolutionVertical,
                         })
@@ -153,6 +157,7 @@ export async function GET(req, { params }) {
                             productName: controllers.interfaceName,
                             brandName: controllers.brandName,
                             pricePerControllerUsd: controllers.pricePerControllerUsd,
+                            profitMargin: controllers.profitMargin,
                             imageUrl: productImages.imageUrl,
                         })
                         .from(controllers)

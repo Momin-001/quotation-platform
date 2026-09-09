@@ -134,6 +134,13 @@
       "when": 1782988264512,
       "tag": "0018_overjoyed_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788957080986,
+      "tag": "0019_majestic_guardian",
+      "breakpoints": true
     }
   ]
 }

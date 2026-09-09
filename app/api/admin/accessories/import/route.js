@@ -65,7 +65,7 @@ function parseCommaSeparated(value) {
  *   Row 7  = Manufacturer
  *   Row 8  = Supplier
  *   Row 9  = Purchase Price
- *   Row 10 = Retail Price
+ *   Row 10 = Profit Margin (EN) / Gewinnspanne (DE)
  *   Row 11 = Leadtime
  */
 export async function POST(req) {
@@ -96,7 +96,7 @@ export async function POST(req) {
             return errorResponse("File has no data rows", 400);
         }
 
-        // Field label → row index mapping (scan column A)
+        // Field label → row index mapping (scanned against the label columns)
         const headerMappings = {
             productName: ["product name", "artikelbezeichnung", "item_en", "name"],
             productNumber: ["product number", "artikelnummer", "article number", "item number", "product_number"],
@@ -109,15 +109,19 @@ export async function POST(req) {
             supplier: ["supplier", "lieferant"],
             productDatasheetUrl: ["product datasheet", "datasheet", "product_datasheet_url", "product datasheet url"],
             purchasePrice: ["price per unit (purchase price)", "preis pro einheit ek", "purchase price", "purchase_price", "ek"],
-            retailPrice: ["price per unit (retail price)", "preis pro einheit vk", "retail price", "retail_price", "vk"],
+            profitMargin: ["profit margin", "gewinnspanne", "profit_margin", "margin"],
             unit: ["unit", "einheit"],
             leadTime: ["leadtime", "lieferzeit", "lead time", "lead_time"],
         };
 
+        // Scan both label columns (A = English, B = German) so either wording matches.
+        // First matching row wins, so the canonical label is not clobbered by a later row.
         const fieldRowMap = {};
         for (let r = 1; r < data.length; r++) {
-            const label = str(data[r]?.[0])?.toLowerCase() || "";
+            const label = [str(data[r]?.[0]), str(data[r]?.[1])].filter(Boolean).join(" ").toLowerCase();
+            if (!label) continue;
             for (const [field, aliases] of Object.entries(headerMappings)) {
+                if (fieldRowMap[field] !== undefined) continue;
                 if (aliases.some((a) => label.includes(a))) {
                     fieldRowMap[field] = r;
                     break;
@@ -189,7 +193,7 @@ export async function POST(req) {
                     supplier: str(cell("supplier", a)),
                     productDatasheetUrl: str(cell("productDatasheetUrl", a)),
                     purchasePrice: parseDecimal(cell("purchasePrice", a)),
-                    retailPrice: parseDecimal(cell("retailPrice", a)),
+                    profitMargin: parseDecimal(cell("profitMargin", a)),
                     leadTime: str(cell("leadTime", a)),
                     optionalField: optionalFieldArray.length > 0 ? optionalFieldArray : [],
                     isActive: true,

@@ -48,7 +48,7 @@ export async function POST(request) {
             supplier: body.supplier?.trim() || null,
             productDatasheetUrl: body.productDatasheetUrl?.trim() || null,
             purchasePrice: body.purchasePrice?.toString() || null,
-            retailPrice: body.retailPrice?.toString() || null,
+            profitMargin: body.profitMargin?.toString() || null,
             leadTime: body.leadTime?.trim() || null,
             optionalField: Array.isArray(body.optionalField) ? body.optionalField.filter(Boolean).map((s) => String(s).trim()) : (body.optionalField ? [String(body.optionalField).trim()] : []),
             isActive: true,

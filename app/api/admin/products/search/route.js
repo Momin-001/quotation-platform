@@ -34,6 +34,7 @@ export async function GET(request) {
                 productType: products.productType,
                 pixelPitch: products.pixelPitch,
                 pricePerCabinetUsd: products.pricePerCabinetUsd,
+                profitMargin: products.profitMargin,
             })
             .from(products)
             .where(whereClause)

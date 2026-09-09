@@ -20,6 +20,13 @@ export async function GET() {
     }
 }
 
+// Decimal columns take strings; blank/invalid input becomes null rather than NaN.
+function num(value) {
+    if (value === undefined || value === null || value === "") return null;
+    const n = parseFloat(value);
+    return isNaN(n) ? null : n.toString();
+}
+
 function parseControllerBody(body) {
     return {
         brandName: body.brandName?.trim() || null,
@@ -68,6 +75,11 @@ function parseControllerBody(body) {
         multiViewerMvr: body.multiViewerMvr?.trim() || null,
         usbPlayback: body.usbPlayback?.trim() || null,
         support3d: body.support3d?.trim() || null,
+        downloadUrl: body.downloadUrl?.trim() || null,
+        pricePerControllerUsd: num(body.pricePerControllerUsd),
+        profitMargin: num(body.profitMargin),
+        stockPieces: body.stockPieces !== undefined && body.stockPieces !== null && body.stockPieces !== "" ? parseInt(body.stockPieces) : null,
+        leadtimeDays: body.leadtimeDays !== undefined && body.leadtimeDays !== null && body.leadtimeDays !== "" ? parseInt(body.leadtimeDays) : null,
     };
 }
 

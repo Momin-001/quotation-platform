@@ -67,6 +67,8 @@ export const controllers = pgTable("controllers", {
     support3d: text("support_3d"), // "Yes" / "No"
     downloadUrl: text("download_url"),
     pricePerControllerUsd: decimal("price_per_controller_usd", { precision: 12, scale: 2 }),
+    // Margin factor applied to the price when quoting, e.g. 0.5 => price + price * 0.5
+    profitMargin: decimal("profit_margin", { precision: 12, scale: 2 }),
     stockPieces: integer("stock_pieces"),
     leadtimeDays: integer("leadtime_days"),
     isActive: boolean("is_active").default(true).notNull(),

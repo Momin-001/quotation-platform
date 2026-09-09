@@ -72,6 +72,7 @@ const controllerSchema = z.object({
     support3d: z.string().optional(),
     downloadUrl: z.string().optional(),
     pricePerControllerUsd: z.union([z.string(), z.number()]).optional(),
+    profitMargin: z.union([z.string(), z.number()]).optional(),
     stockPieces: z.union([z.string(), z.number()]).optional(),
     leadtimeDays: z.union([z.string(), z.number()]).optional(),
 });
@@ -184,6 +185,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
         support3d: initialData.support3d || "",
         downloadUrl: initialData.downloadUrl || "",
         pricePerControllerUsd: initialData.pricePerControllerUsd?.toString() || "",
+        profitMargin: initialData.profitMargin?.toString() || "",
         stockPieces: initialData.stockPieces?.toString() || "",
         leadtimeDays: initialData.leadtimeDays?.toString() || "",
     } : defaultValues;
@@ -394,6 +396,7 @@ export default function ControllerForm({ mode = "add", initialData = null, initi
                     {renderSelect("3D Support", "support3d", yesNoOptions)}
                     {renderInput("Download URL", "downloadUrl", "text", { placeholder: "e.g. https://www.example.com/controller.pdf" })}
                     {renderInput("Price Per Controller (USD)", "pricePerControllerUsd", "number", { step: "0.01", placeholder: "e.g. 1000.00" })}
+                    {renderInput("Profit Margin", "profitMargin", "number", { step: "0.01", placeholder: "e.g. 0.5 for +50%" })}
                     {renderInput("Stock Pieces", "stockPieces", "number", { step: "1", placeholder: "e.g. 10" })}
                     {renderInput("Leadtime (days)", "leadtimeDays", "number", { step: "1", placeholder: "e.g. 14" })}
                 </div>
