@@ -288,6 +288,12 @@
           "gt_3840_le_7680": "> 3.840 Hz (Professional)",
           "gt_7680": "> 7.680 Hz (Broadcast)"
         }
+      },
+      "refurbishedPromo": {
+        "badge": "Zertifiziert Gebraucht",
+        "title": "Refurbished LED-Systeme",
+        "body": "Geprüfte, zertifizierte gebrauchte Displays aus unserem Lager. Der günstigere Weg zur gleichen Spezifikation.",
+        "cta": "Refurbished ansehen"
       }
     },
     "detail": {

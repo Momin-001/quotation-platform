@@ -301,74 +301,11 @@ export default function RefurbishedProductsClient({
                 }
             />
             <main className="flex-1 container mx-auto px-4 lg:px-6 py-6 sm:py-8">
-                {/* Advertisement banner (hidden when no active ads) */}
-                <div className="mb-6 sm:mb-8">
-                    <AdvertisementBanner />
-                </div>
-
                 {categoryDescription ? (
                     <p className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
                         {categoryDescription}
                     </p>
                 ) : null}
-
-                <div className="mb-6 sm:mb-8">
-                    <div className="relative">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <Input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search by serie or product number..."
-                            className="pl-10 h-10 sm:h-11 text-sm rounded-lg border-border/80 shadow-sm placeholder:text-muted-foreground"
-                        />
-                    </div>
-                </div>
-
-                {/* Area of Use pills */}
-                <div className="mb-6 sm:mb-8 flex flex-wrap gap-2">
-                    <Button
-                        asChild
-                        variant={areaOfUse === "" ? "default" : "outline"}
-                        size="sm"
-                        className={areaOfUse === "" ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
-                    >
-                        <Link
-                            href="/refurbished-products"
-                            onClick={(e) => handleCategoryClick(e, null)}
-                        >
-                            All
-                        </Link>
-                    </Button>
-                    {categories.map((category) => (
-                        <Button
-                            key={category.id}
-                            asChild
-                            variant={areaOfUse === category.id ? "default" : "outline"}
-                            size="sm"
-                            className={areaOfUse === category.id ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
-                        >
-                            <Link
-                                href={categoryHref(category)}
-                                onClick={(e) => handleCategoryClick(e, category)}
-                            >
-                                {category.name}
-                            </Link>
-                        </Button>
-                    ))}
-                </div>
-
-                {/* Mobile filter trigger */}
-                <div className="lg:hidden mb-5">
-                    <Button
-                        variant="outline"
-                        size="default"
-                        onClick={() => setSheetOpen(true)}
-                        className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
-                    >
-                        <FilterIcon className="w-4 h-4 mr-2" />
-                        Filters
-                    </Button>
-                </div>
 
                 {/* Mobile Filter Sheet */}
                 <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -395,9 +332,72 @@ export default function RefurbishedProductsClient({
                     </SheetContent>
                 </Sheet>
 
+                {/* Left rail carries the banner, search, categories and filters. The grid
+                    fills the right column and starts level with the top of the rail. */}
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                    {/* Desktop filter sidebar */}
-                    <aside className="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col sticky top-24 self-start">
+                    <div className="w-full lg:w-72 xl:w-80 lg:shrink-0">
+                        <div className="space-y-4">
+                            {/* Rotating ads (renders nothing when none are active) */}
+                            <AdvertisementBanner />
+
+                            <div className="relative">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                                <Input
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search by serie or product number..."
+                                    className="pl-10 h-10 sm:h-11 text-sm rounded-lg border-border/80 shadow-sm placeholder:text-muted-foreground"
+                                />
+                            </div>
+
+                            {/* Area of Use pills */}
+                            <div className="flex flex-wrap gap-2">
+                                <Button
+                                    asChild
+                                    variant={areaOfUse === "" ? "default" : "outline"}
+                                    size="sm"
+                                    className={areaOfUse === "" ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
+                                >
+                                    <Link
+                                        href="/refurbished-products"
+                                        onClick={(e) => handleCategoryClick(e, null)}
+                                    >
+                                        All
+                                    </Link>
+                                </Button>
+                                {categories.map((category) => (
+                                    <Button
+                                        key={category.id}
+                                        asChild
+                                        variant={areaOfUse === category.id ? "default" : "outline"}
+                                        size="sm"
+                                        className={areaOfUse === category.id ? "" : "border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"}
+                                    >
+                                        <Link
+                                            href={categoryHref(category)}
+                                            onClick={(e) => handleCategoryClick(e, category)}
+                                        >
+                                            {category.name}
+                                        </Link>
+                                    </Button>
+                                ))}
+                            </div>
+
+                            {/* Mobile filter trigger — the panel below is desktop only */}
+                            <div className="lg:hidden">
+                                <Button
+                                    variant="outline"
+                                    size="default"
+                                    onClick={() => setSheetOpen(true)}
+                                    className="w-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground"
+                                >
+                                    <FilterIcon className="w-4 h-4 mr-2" />
+                                    Filters
+                                </Button>
+                            </div>
+                        </div>
+
+                        <aside className="hidden lg:block mt-4 sticky top-24">
                         <div className="rounded-xl border border-border/60 bg-gray-50/80 p-5 shadow-sm">
                             <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/60">
                                 <h3 className="text-sm font-semibold  uppercase tracking-wide flex items-center gap-2 text-foreground">
@@ -408,11 +408,12 @@ export default function RefurbishedProductsClient({
                                     Clear
                                 </Button>
                             </div>
-                            <div className="overflow-y-auto pr-1 max-h-[calc(100vh-11rem)]">
+                            <div className="overflow-y-auto pr-1 max-h-[calc(100vh-14rem)]">
                                 <FiltersAccordion key={filtersMountKey} {...filterProps} />
                             </div>
                         </div>
-                    </aside>
+                        </aside>
+                    </div>
 
                     {/* Results */}
                     <div className="flex-1 min-w-0">
