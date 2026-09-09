@@ -9,6 +9,7 @@ import {
     Font,
     renderToBuffer,
 } from "@react-pdf/renderer";
+import { Watermark } from "@/features/pdf/pdf-watermark";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -225,7 +226,7 @@ const Section = ({ title, children }) => (
     </View>
 );
 
-const ProductDatasheet = ({ product, logoDataUrl }) => {
+const ProductDatasheet = ({ product, logoDataUrl, watermarkDataUrl }) => {
     const p = product || {};
     const mainImg = p.mainImageDataUrl || p.images?.[0] || null;
     const areaOfUse = p.areaOfUse || p.categoryName || "";
@@ -478,6 +479,8 @@ const ProductDatasheet = ({ product, logoDataUrl }) => {
                         </Section>
                     </View>
                 </View>
+
+                <Watermark src={watermarkDataUrl} />
             </Page>
         </Document>
     );
@@ -485,7 +488,11 @@ const ProductDatasheet = ({ product, logoDataUrl }) => {
 
 export async function generateProductDatasheetReactPDF(product, options = {}) {
     const buffer = await renderToBuffer(
-        <ProductDatasheet product={product} logoDataUrl={options.logoDataUrl} />
+        <ProductDatasheet
+            product={product}
+            logoDataUrl={options.logoDataUrl}
+            watermarkDataUrl={options.watermarkDataUrl}
+        />
     );
     return Buffer.from(buffer);
 }

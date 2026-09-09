@@ -26,6 +26,7 @@ import {
     calculateOfferTotalWithQuotationTax,
     collectOfferLinesFromQuotationItem,
 } from "@/lib/helpers/helpers";
+import { Watermark } from "@/features/pdf/pdf-watermark";
 import fs from "fs";
 import path from "path";
 
@@ -634,6 +635,7 @@ function QuotationPage({ pageIndex, children }) {
                     </View>
                 </View>
             </View>
+            <Watermark />
         </Page>
     );
 }

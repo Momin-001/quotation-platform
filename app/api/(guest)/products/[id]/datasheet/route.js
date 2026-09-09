@@ -158,7 +158,7 @@ export async function GET(req, { params }) {
             mainImageDataUrl,
         };
 
-        const pdfBuffer = await generateProductDatasheetReactPDF(formattedProduct, { baseUrl, logoDataUrl });
+        const pdfBuffer = await generateProductDatasheetReactPDF(formattedProduct, { baseUrl, logoDataUrl, watermarkDataUrl });
 
         const safeName = String(formattedProduct.productNumber || "datasheet")
             .replace(/[/\\:*?"<>|]/g, "_")
