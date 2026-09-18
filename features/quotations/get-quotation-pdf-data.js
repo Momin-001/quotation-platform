@@ -10,6 +10,7 @@
 import { db } from "@/lib/db";
 import {
     quotations,
+    quotationImages,
     quotationItems,
     quotationOptionalItems,
     quotationAdditionalItems,
@@ -24,7 +25,7 @@ import {
     refurbishedProducts,
     refurbishedProductImages,
 } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, asc } from "drizzle-orm";
 
 const productSelectFields = {
     id: products.id,
@@ -402,10 +403,18 @@ export async function getQuotationDataForPDF(quotationId, options = {}) {
     const alternativeProduct =
         itemsWithDetails.find((i) => i.itemType === "alternative") || null;
 
+    // Images for the PDF's trailing image section, in admin-defined order.
+    const images = await db
+        .select({ id: quotationImages.id, imageUrl: quotationImages.imageUrl })
+        .from(quotationImages)
+        .where(eq(quotationImages.quotationId, quotationId))
+        .orderBy(asc(quotationImages.imageOrder), asc(quotationImages.createdAt));
+
     return {
         quotation,
         enquiry,
         mainProduct,
         alternativeProduct,
+        images,
     };
 }

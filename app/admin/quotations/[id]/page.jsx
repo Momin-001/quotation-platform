@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, ArrowLeft, ChevronDown, ChevronUp, Save } from "lucide-react";
+import { FileText, ArrowLeft, ChevronDown, ChevronUp, Save, X, ImagePlus } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { calculateQuotationOfferTotals, formatCurrency } from "@/lib/helpers/helpers";
 import AdminQuotationChat from "@/components/admin/Quotation/AdminQuotationChat";
@@ -29,6 +30,11 @@ export default function AdminQuotationDetailPage() {
     });
     const [sectionsLoading, setSectionsLoading] = useState(false);
     const [sectionsSaving, setSectionsSaving] = useState(false);
+
+    // Images appended as the PDF's final section (2 per page)
+    const [pdfImages, setPdfImages] = useState([]);
+    const [imagesUploading, setImagesUploading] = useState(false);
+    const [deletingImageId, setDeletingImageId] = useState(null);
 
     useEffect(() => {
         if (params.id) {
@@ -72,6 +78,59 @@ export default function AdminQuotationDetailPage() {
             } finally {
                 setSectionsLoading(false);
             }
+        }
+        if (opening) fetchPdfImages();
+    };
+
+    const fetchPdfImages = async () => {
+        try {
+            const res = await fetch(`/api/admin/quotations/${params.id}/images`);
+            const response = await res.json();
+            if (response.success) setPdfImages(response.data || []);
+        } catch {
+            // Non-fatal: the editor still works without the image list
+        }
+    };
+
+    const handleUploadImages = async (event) => {
+        const files = Array.from(event.target.files || []);
+        event.target.value = "";
+        if (files.length === 0) return;
+
+        setImagesUploading(true);
+        try {
+            const formData = new FormData();
+            files.forEach((file) => formData.append("images", file));
+            const res = await fetch(`/api/admin/quotations/${params.id}/images`, {
+                method: "POST",
+                body: formData,
+            });
+            const response = await res.json();
+            if (!response.success) throw new Error(response.message);
+            toast.success(response.message || "Images uploaded");
+            await fetchPdfImages();
+        } catch (err) {
+            toast.error(err.message || "Failed to upload images");
+        } finally {
+            setImagesUploading(false);
+        }
+    };
+
+    const handleDeleteImage = async (imageId) => {
+        setDeletingImageId(imageId);
+        try {
+            const res = await fetch(
+                `/api/admin/quotations/${params.id}/images?imageId=${imageId}`,
+                { method: "DELETE" }
+            );
+            const response = await res.json();
+            if (!response.success) throw new Error(response.message);
+            setPdfImages((prev) => prev.filter((img) => img.id !== imageId));
+            toast.success("Image deleted");
+        } catch (err) {
+            toast.error(err.message || "Failed to delete image");
+        } finally {
+            setDeletingImageId(null);
         }
     };
 
@@ -464,6 +523,79 @@ export default function AdminQuotationDetailPage() {
                                         />
                                     </Suspense>
                                 </div>
+                                {/* Section 6 - images appended to the end of the PDF */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        6. Bilder / Images
+                                    </label>
+                                    <p className="text-xs text-gray-500 mb-3">
+                                        Added after the Options section. Two images per PDF page; the
+                                        first two sit below the Options text and any further pairs get
+                                        their own page. Saved with the quotation, so customers see them
+                                        in their own download.
+                                    </p>
+
+                                    <div className="flex flex-wrap items-start gap-3">
+                                        {pdfImages.map((img, index) => (
+                                            <div
+                                                key={img.id}
+                                                className="relative h-28 w-28 rounded-lg border bg-white overflow-hidden shadow-xs"
+                                            >
+                                                <Image
+                                                    src={img.imageUrl}
+                                                    alt={`PDF image ${index + 1}`}
+                                                    fill
+                                                    sizes="112px"
+                                                    className="object-contain p-1"
+                                                />
+                                                <span className="absolute bottom-0.5 left-0.5 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                                                    {index + 1}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteImage(img.id)}
+                                                    disabled={deletingImageId === img.id}
+                                                    aria-label="Remove image"
+                                                    className="absolute top-0.5 right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
+                                                >
+                                                    {deletingImageId === img.id ? (
+                                                        <Spinner className="h-3 w-3" />
+                                                    ) : (
+                                                        <X className="h-3 w-3" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        <label className="flex h-28 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed bg-white text-gray-400 transition-colors hover:bg-gray-50">
+                                            {imagesUploading ? (
+                                                <Spinner className="h-5 w-5" />
+                                            ) : (
+                                                <>
+                                                    <ImagePlus className="h-6 w-6" />
+                                                    <span className="text-xs">Add images</span>
+                                                </>
+                                            )}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                disabled={imagesUploading}
+                                                onChange={handleUploadImages}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    {pdfImages.length > 0 ? (
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            {pdfImages.length} image{pdfImages.length === 1 ? "" : "s"} across{" "}
+                                            {Math.ceil(pdfImages.length / 2)} PDF page
+                                            {Math.ceil(pdfImages.length / 2) === 1 ? "" : "s"}.
+                                        </p>
+                                    ) : null}
+                                </div>
+
                                 <div className="flex justify-end">
                                     <Button
                                         onClick={handleSaveSections}

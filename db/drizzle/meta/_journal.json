@@ -141,6 +141,13 @@
       "when": 1788957080986,
       "tag": "0019_majestic_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1789762614127,
+      "tag": "0020_silent_klaw",
+      "breakpoints": true
     }
   ]
 }

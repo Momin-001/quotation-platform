@@ -29,6 +29,20 @@ export const quotationSectionDefaults = pgTable("quotation_section_defaults", {
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Images appended to the quotation PDF as a final section. Stored so the same
+// images appear whenever the PDF is regenerated, including on the customer side.
+export const quotationImages = pgTable("quotation_images", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    quotationId: uuid("quotation_id")
+        .notNull()
+        .references(() => quotations.id, { onDelete: "cascade" }),
+    imageUrl: text("image_url").notNull(),
+    publicId: text("public_id").notNull(),
+    imageOrder: integer("image_order").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Main quotation items (products from enquiry)
 export const quotationItems = pgTable("quotation_items", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -96,9 +110,17 @@ export const quotationOptionalItems = pgTable("quotation_optional_items", {
 // Relations
 export const quotationsRelations = relations(quotations, ({ many, one }) => ({
     items: many(quotationItems),
+    images: many(quotationImages),
     enquiry: one(enquiries, {
         fields: [quotations.enquiryId],
         references: [enquiries.id],
+    }),
+}));
+
+export const quotationImagesRelations = relations(quotationImages, ({ one }) => ({
+    quotation: one(quotations, {
+        fields: [quotationImages.quotationId],
+        references: [quotations.id],
     }),
 }));
 

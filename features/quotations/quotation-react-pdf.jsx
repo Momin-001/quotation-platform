@@ -205,6 +205,17 @@ const s = StyleSheet.create({
     liText: { flex: 1, fontSize: 10 },
 
     linkText: { color: "#2563eb", fontSize: 10 },
+
+    // Image section (section 6)
+    imageBlock: { marginBottom: 10 },
+    imageFrame: {
+        borderWidth: 0.5,
+        borderColor: "#ccc",
+        padding: 4,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    imageItem: { width: "100%", height: 230, objectFit: "contain" },
 });
 
 // ─── Lightweight HTML-to-ReactPDF parser ────────────────────────────────────
@@ -769,10 +780,34 @@ const PositionBlock = ({ item, label, datasheetBaseUrl }) => {
     );
 };
 
+/** Two images per page, as requested; each block never splits across pages. */
+const IMAGES_PER_PAGE = 2;
+
+function chunkImages(images) {
+    const chunks = [];
+    for (let i = 0; i < images.length; i += IMAGES_PER_PAGE) {
+        chunks.push(images.slice(i, i + IMAGES_PER_PAGE));
+    }
+    return chunks;
+}
+
+const ImageGroup = ({ images }) => (
+    <>
+        {images.map((img, i) => (
+            <View key={img.id ?? i} style={s.imageBlock} wrap={false}>
+                <View style={s.imageFrame}>
+                    <Image src={img.dataUrl || img.imageUrl} style={s.imageItem} />
+                </View>
+            </View>
+        ))}
+    </>
+);
+
 // ─── Main Document ──────────────────────────────────────────────────────────
 
 const QuotationDocument = ({ data }) => {
     const { quotation, enquiry, mainProduct, alternativeProduct } = data;
+    const images = Array.isArray(data.images) ? data.images : [];
     const quotationDate = formatDate(quotation?.createdAt);
     const offerHtml = quotation?.sectionOfferHtml || DEFAULT_OFFER_HTML;
     const conditionsHtml = quotation?.sectionConditionsHtml || DEFAULT_CONDITIONS_HTML;
@@ -791,6 +826,11 @@ const QuotationDocument = ({ data }) => {
     const taxPct = parseFloat(quotation?.taxPercentage ?? 19);
 
     const datasheetBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+    // First pair sits under the Options text on page 5; each further pair gets its
+    // own page so the logo and footer repeat.
+    const imageChunks = chunkImages(images);
+    const [firstImageChunk, ...overflowImageChunks] = imageChunks;
 
     return (
         <Document title={`Angebot ${quotation?.quotationNumber || ""}`}>
@@ -823,6 +863,7 @@ const QuotationDocument = ({ data }) => {
                 <TocRow text="3. Konditionen / conditions" page="3" />
                 <TocRow text="4. Positionsbeschreibungen / Position descriptions" page="4" />
                 <TocRow text="5. Optionen / options" page="5" />
+                {images.length > 0 ? <TocRow text="6. Bilder / images" page="5" /> : null}
 
                 <View style={{ marginTop: 24 }} />
                 <Text style={s.sectionTitle}>1. Unser Angebot / our offer</Text>
@@ -863,16 +904,61 @@ const QuotationDocument = ({ data }) => {
                 <PositionBlock item={alternativeProduct} label="Alternativangebot" datasheetBaseUrl={datasheetBaseUrl} />
             </QuotationPage>
 
-            {/* Page 5: Optionen */}
+            {/* Page 5: Optionen, followed by the first pair of images */}
             <QuotationPage pageIndex={5}>
                 <Text style={s.sectionTitleUnderline}>5. Optionen / options</Text>
                 <HtmlContent html={optionsHtml} />
+
+                {firstImageChunk ? (
+                    <>
+                        <Text style={[s.sectionTitleUnderline, { marginTop: 18 }]}>
+                            6. Bilder / images
+                        </Text>
+                        <ImageGroup images={firstImageChunk} />
+                    </>
+                ) : null}
             </QuotationPage>
+
+            {/* Remaining image pages, two per page */}
+            {overflowImageChunks.map((chunk, i) => (
+                <QuotationPage key={`images-${i}`} pageIndex={6 + i}>
+                    <ImageGroup images={chunk} />
+                </QuotationPage>
+            ))}
         </Document>
     );
 };
 
+/**
+ * Inline the section-6 images as data URLs before rendering. react-pdf can fetch
+ * remote sources itself, but a slow or failing request would reject the whole
+ * render; this way a broken image is skipped and the rest of the PDF survives.
+ */
+async function withInlinedImages(images) {
+    if (!Array.isArray(images) || images.length === 0) return [];
+
+    const resolved = await Promise.all(
+        images.map(async (img) => {
+            if (!img?.imageUrl) return null;
+            // Already inline — nothing to fetch.
+            if (img.imageUrl.startsWith("data:")) return { ...img, dataUrl: img.imageUrl };
+            try {
+                const res = await fetch(img.imageUrl);
+                if (!res.ok) return null;
+                const buf = Buffer.from(await res.arrayBuffer());
+                const mime = res.headers.get("content-type") || "image/jpeg";
+                return { ...img, dataUrl: `data:${mime};base64,${buf.toString("base64")}` };
+            } catch {
+                return null;
+            }
+        })
+    );
+
+    return resolved.filter(Boolean);
+}
+
 export async function generateQuotationReactPDF(data) {
-    const buffer = await renderToBuffer(<QuotationDocument data={data} />);
+    const images = await withInlinedImages(data?.images);
+    const buffer = await renderToBuffer(<QuotationDocument data={{ ...data, images }} />);
     return Buffer.from(buffer);
 }
