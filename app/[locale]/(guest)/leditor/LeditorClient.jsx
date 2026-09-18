@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import SchemaScript from "@/components/guest/SchemaScript";
 import { BASE_URL } from "@/lib/constants";
 
@@ -463,6 +464,41 @@ export default function LeditorClient() {
             screenHeight: initialScreenH,
         });
     };
+
+    // Pre-select a product when arriving with ?product=<slug> (e.g. the "Custom
+    // Solution" button on a product detail page). Applied once; the visitor is
+    // free to pick a different product afterwards.
+    const searchParams = useSearchParams();
+    const preselectSlug = searchParams.get("product");
+    const preselectApplied = useRef(false);
+
+    useEffect(() => {
+        if (!preselectSlug) return;
+
+        // The guard is checked at apply time, not entry time: React StrictMode
+        // runs effects twice in dev, and an entry-time guard would let the second
+        // run skip the fetch while the first run's result is discarded as stale.
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch(
+                    `/api/leditor?limit=1&product=${encodeURIComponent(preselectSlug)}`
+                );
+                const response = await res.json();
+                const product = response?.data?.selectedProduct;
+                if (cancelled || !product || preselectApplied.current) return;
+                preselectApplied.current = true;
+                handleSelectProduct(product);
+            } catch {
+                // Leave the picker untouched; the visitor can still choose a product.
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preselectSlug]);
 
     // Calculate cabinets count
     const getCabinetsInfo = useCallback(() => {

@@ -3,6 +3,26 @@ import { products, categories } from "@/db/schema";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { eq, ilike, or, and, desc } from "drizzle-orm";
 
+// Fields the Leditor needs to configure a screen from a product.
+const LEDITOR_PRODUCT_COLUMNS = {
+    id: true,
+    productName: true,
+    pixelPitch: true,
+    refreshRate: true,
+    cabinetResolutionHorizontal: true,
+    cabinetResolutionVertical: true,
+    cabinetWidth: true,
+    cabinetHeight: true,
+    ledTechnology: true,
+    ledTechnologyOther: true,
+    brightnessValue: true,
+    weightWithoutPackaging: true,
+    powerConsumptionMax: true,
+    powerConsumptionTypical: true,
+    areaOfUseId: true,
+    design: true,
+};
+
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
@@ -47,24 +67,7 @@ export async function GET(req) {
 
         // Fetch products with needed fields for Leditor
         const productList = await db.query.products.findMany({
-            columns: {
-                id: true,
-                productName: true,
-                pixelPitch: true,
-                refreshRate: true,
-                cabinetResolutionHorizontal: true,
-                cabinetResolutionVertical: true,
-                cabinetWidth: true,
-                cabinetHeight: true,
-                ledTechnology: true,
-                ledTechnologyOther: true,
-                brightnessValue: true,
-                weightWithoutPackaging: true,
-                powerConsumptionMax: true,
-                powerConsumptionTypical: true,
-                areaOfUseId: true,
-                design: true,
-            },
+            columns: LEDITOR_PRODUCT_COLUMNS,
             where: whereClause,
             orderBy: desc(products.createdAt),
             limit: limit,
@@ -80,9 +83,27 @@ export async function GET(req) {
         const totalCount = allMatching.length;
         const totalPages = Math.ceil(totalCount / limit);
 
+        // Optional pre-selection by slug, e.g. arriving from a product page's "Custom
+        // Solution" button. Resolved separately from the list so it survives paging
+        // and filters.
+        const preselectSlug = searchParams.get("product");
+        let selectedProduct = null;
+        if (preselectSlug) {
+            selectedProduct =
+                (await db.query.products.findFirst({
+                    columns: LEDITOR_PRODUCT_COLUMNS,
+                    where: and(
+                        eq(products.slug, preselectSlug),
+                        eq(products.isActive, true),
+                        eq(products.productType, "LED Display Single Cabinet")
+                    ),
+                })) || null;
+        }
+
         return successResponse("Leditor products fetched successfully", {
             categories: allCategories,
             products: productList,
+            selectedProduct,
             pagination: {
                 page,
                 limit,

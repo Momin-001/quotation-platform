@@ -362,29 +362,12 @@ export default function ProductDetailClient({ product }) {
                                         <ShoppingCart className="h-4 w-4 mr-2" />
                                         {t("addToCart")}
                                     </Button>
-                                    <Button
-                                        size="lg"
-                                        className="flex-1 sm:flex-none min-w-[140px]"
-                                        onClick={() =>
-                                            requireAuthForCta(() => {
-                                                addToCart({
-                                                    id: product.id,
-                                                    productName: product.productName,
-                                                    productNumber: product.productNumber,
-                                                    imageUrl: product.images?.[0] || null,
-                                                    categoryName: product.categoryName,
-                                                });
-                                                router.push("/user/cart");
-                                            })
-                                        }
-                                    >
-                                        <FileText className="h-4 w-4 mr-2" />
-                                        {t("getQuote")}
-                                    </Button>
                                     {product.productType === "LED Display Single Cabinet" && (
                                         <Button
                                             onClick={() =>
-                                                requireAuthForCta(() => router.push("/leditor"))
+                                                // Open to everyone: the Leditor pre-selects this
+                                                // product, and sign-in is only needed to submit.
+                                                router.push(`/leditor?product=${product.slug}`)
                                             }
                                             size="lg"
                                             variant="outline"

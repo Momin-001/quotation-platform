@@ -594,7 +594,13 @@ export default function ProductForm({
                 render={({ field: f }) => (
                     <Select onValueChange={f.onChange} value={f.value ?? ""}>
                         <SelectTrigger>
-                            <SelectValue placeholder={`Select ${label}`} />
+                            {/* Render the selected label ourselves. Given no children, Radix
+                                portals the active SelectItemText into this same node, so two
+                                React trees own its children and React 19 throws removeChild
+                                when the value changes (e.g. reset() in edit mode). */}
+                            <SelectValue placeholder={`Select ${label}`}>
+                                {f.value ?? ""}
+                            </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                             {(options || []).map((opt) => (
@@ -620,7 +626,11 @@ export default function ProductForm({
                 render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value ?? ""}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
+                            {/* Children must always be defined, otherwise Radix falls back to
+                                portalling SelectItemText into this node (see renderSelect). */}
+                            <SelectValue placeholder="Select category">
+                                {categories.find((c) => c.id === field.value)?.name ?? ""}
+                            </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                             {(categories || []).map((cat) => (

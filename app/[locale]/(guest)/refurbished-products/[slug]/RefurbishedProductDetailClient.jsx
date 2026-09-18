@@ -67,14 +67,10 @@ export default function RefurbishedProductDetailClient({ product }) {
         action();
     };
 
-    const handleAddToCart = (goToCart = false) => {
+    const handleAddToCart = () => {
         const added = addToCart(cartPayload, "refurbished");
         if (added === false) return; // blocked (cart not empty)
-        if (goToCart) {
-            router.push("/user/cart");
-        } else {
-            toast.success("Added to cart");
-        }
+        toast.success("Added to cart");
     };
 
     const handleDownloadDatasheet = async () => {
@@ -348,18 +344,10 @@ export default function RefurbishedProductDetailClient({ product }) {
                                         variant="secondary"
                                         size="lg"
                                         className="flex-1 sm:flex-none min-w-[140px]"
-                                        onClick={() => requireAuthForCta(() => handleAddToCart(false))}
+                                        onClick={() => requireAuthForCta(handleAddToCart)}
                                     >
                                         <ShoppingCart className="h-4 w-4 mr-2" />
                                         Add to Cart
-                                    </Button>
-                                    <Button
-                                        size="lg"
-                                        className="flex-1 sm:flex-none min-w-[140px]"
-                                        onClick={() => requireAuthForCta(() => handleAddToCart(true))}
-                                    >
-                                        <FileText className="h-4 w-4 mr-2" />
-                                        Get Quote
                                     </Button>
                                 </div>
                             </div>
