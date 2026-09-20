@@ -64,7 +64,18 @@ const leditorAccordionContent =
     "bg-muted/20 px-4 sm:px-6 pt-4 pb-6 border-t border-border/40";
 const readOnlyInputClass = "h-10 text-sm bg-muted/30 border-border/60";
 
-function LeditorSectionAccordion({ value, title, children, className }) {
+function LeditorSectionAccordion({ value, title, children, className, collapsible = true }) {
+    // Some sections are always shown. Rendering them as a plain panel rather than a
+    // locked accordion avoids a chevron that looks interactive but does nothing.
+    if (!collapsible) {
+        return (
+            <div className={cn(leditorAccordionPanel, className)}>
+                <div className={cn(leditorAccordionTrigger, "flex items-center")}>{title}</div>
+                <div className={leditorAccordionContent}>{children}</div>
+            </div>
+        );
+    }
+
     return (
         <Accordion
             type="single"
@@ -904,6 +915,7 @@ export default function LeditorWorkspace({
                 <LeditorSectionAccordion
                     value="preview"
                     title={t("preview")}
+                    collapsible={false}
                 >
                     <div className="flex flex-col lg:flex-row gap-6 items-start">
                         <div className="flex-1 w-full flex items-center justify-center rounded-lg bg-muted/20 border border-border/60 p-4 min-h-[320px] sm:min-h-[360px]">

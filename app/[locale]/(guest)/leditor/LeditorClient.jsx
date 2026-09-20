@@ -146,17 +146,24 @@ export default function LeditorClient() {
                     </div>
 
                     {Array.from({ length: DISPLAY_COUNT }, (_, i) => (
-                        // forceMount keeps each display's configuration alive across switches.
-                        <TabsContent key={i} value={String(i)} forceMount className="mt-4">
-                            <div hidden={activeIndex !== i}>
-                                <LeditorWorkspace
-                                    displayIndex={i}
-                                    isActive={activeIndex === i}
-                                    preselectSlug={i === 0 ? preselectSlug : null}
-                                    onSnapshotChange={handleSnapshotChange}
-                                    copyPayload={copyPayloads[i]}
-                                />
-                            </div>
+                        // forceMount keeps each display's configuration alive across
+                        // switches, but it also stops Radix hiding inactive panels. Hide
+                        // the panel itself rather than a child: the Tabs root is a flex
+                        // column with a gap, so a zero-height panel would still add its
+                        // gap and margin and push the active one further down per tab.
+                        <TabsContent
+                            key={i}
+                            value={String(i)}
+                            forceMount
+                            className={activeIndex === i ? "mt-4" : "hidden"}
+                        >
+                            <LeditorWorkspace
+                                displayIndex={i}
+                                isActive={activeIndex === i}
+                                preselectSlug={i === 0 ? preselectSlug : null}
+                                onSnapshotChange={handleSnapshotChange}
+                                copyPayload={copyPayloads[i]}
+                            />
                         </TabsContent>
                     ))}
                 </Tabs>
