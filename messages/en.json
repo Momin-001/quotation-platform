@@ -30,7 +30,6 @@
     "menu": "Menu",
     "home": "HOME",
     "products": "PRODUCTS",
-    "refurbished": "REFURBISHED",
     "controllers": "CONTROLLERS",
     "leditor": "LEDITOR",
     "blogs": "BLOGS",
@@ -749,7 +748,15 @@
       "messageTooShort": "Please enter a message (at least 10 characters)",
       "privacyRequired": "Please agree to the Privacy Policy and Terms & Conditions",
       "captchaRequired": "Please complete the captcha"
-    }
+    },
+    "display": "Display {number}",
+    "compare": "Compare",
+    "comparisonTitle": "Display comparison",
+    "comparisonSubtitle": "Cabinet specifications and configured screen totals, side by side.",
+    "comparisonHint": "Configure at least two displays to compare them.",
+    "copyFromFirst": "Copy from Display 1",
+    "noProductSelected": "No product selected",
+    "relativeSize": "Relative size"
   },
   "BecomePartnerSubmit": {
     "breadcrumbTitle": "Become a partner",

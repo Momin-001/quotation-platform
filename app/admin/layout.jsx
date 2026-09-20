@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen, Recycle, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, Menu, FolderOpen, Package, Upload, Handshake, PenLine, NotebookText, TicketCheck, HelpCircle, MessageSquare, FileText, ImageIcon, BookOpen, Recycle, Megaphone, Boxes } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import UserAvatar from "@/components/UserAvatar";
@@ -24,6 +24,7 @@ const navItems = [
     { href: "/admin/controllers", label: "Controllers", icon: Package },
     { href: "/admin/accessories", label: "Accessories", icon: Package },
     { href: "/admin/bulk-import", label: "Bulk Product Import", icon: Upload },
+    { href: "/admin/product-groups", label: "Related Products Groups", icon: Boxes },
     { href: "/admin/categories", label: "Categories", icon: FolderOpen },
     { href: "/admin/partners", label: "Partners", icon: Handshake },
     { href: "/admin/advertisements", label: "Advertisements", icon: Megaphone },

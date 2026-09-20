@@ -3,6 +3,7 @@ import { pgTable, uuid, text, timestamp, integer, decimal, pgEnum, boolean, json
 import { designEnum, chipBondingEnum, controlSystemEnum } from "./enums";
 export { designEnum, chipBondingEnum, controlSystemEnum };
 import { categories } from "./categories";
+import { productGroups } from "./productGroups";
 import { productImages } from "./productImages";
 import { productCertificates } from "./productCertificates";
 import { productProductIcons } from "./productProductIcons";
@@ -109,6 +110,11 @@ export const products = pgTable("products", {
     
     // Foreign Key
     areaOfUseId: uuid("area_of_use_id").references(() => categories.id, { onDelete: "cascade" }),
+
+    // Related-products family. Products in a group share every spec except cabinet
+    // size, chip bonding, brightness, contrast, driving method, media and naming.
+    // Deleting a group only unlinks its products.
+    groupId: uuid("group_id").references(() => productGroups.id, { onDelete: "set null" }),
     
     // Decimal fields
     cabinetWidth: decimal("cabinet_width", { precision: 10, scale: 2 }),
@@ -164,6 +170,10 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     areaOfUse: one(categories, {
         fields: [products.areaOfUseId],
         references: [categories.id],
+    }),
+    group: one(productGroups, {
+        fields: [products.groupId],
+        references: [productGroups.id],
     }),
     images: many(productImages),
     productCertificates: many(productCertificates),

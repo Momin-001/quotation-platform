@@ -21,6 +21,7 @@ import { X, Plus, FileText } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { slugify } from "@/lib/helpers/slugify";
+import { GROUP_VARIANT_FIELDS } from "@/features/products/group-template";
 
 // Build form default values from API product (handles decimals/numbers as string or number)
 function getDefaultValuesFromInitial(initialData) {
@@ -76,6 +77,7 @@ function getDefaultValuesFromInitial(initialData) {
         smartModule: optStr(initialData.smartModule),
         support: optStr(initialData.support),
         areaOfUseId: str(initialData.areaOfUseId),
+        groupId: str(initialData.groupId),
         cabinetWidth: initialData.cabinetWidth !== undefined && initialData.cabinetWidth !== null && initialData.cabinetWidth !== "" ? initialData.cabinetWidth : "",
         cabinetHeight: initialData.cabinetHeight !== undefined && initialData.cabinetHeight !== null && initialData.cabinetHeight !== "" ? initialData.cabinetHeight : "",
         weightWithoutPackaging: initialData.weightWithoutPackaging !== undefined && initialData.weightWithoutPackaging !== null && initialData.weightWithoutPackaging !== "" ? initialData.weightWithoutPackaging : "",
@@ -211,6 +213,8 @@ const productSchema = z.object({
     
     // Foreign Key
     areaOfUseId: z.string().min(1, "Area of use is required"),
+    // Optional related-products family; seeds the form from an existing sibling.
+    groupId: z.string().optional(),
     
     // Decimal fields
     cabinetWidth: z.coerce.number().optional(),
@@ -302,6 +306,8 @@ export default function ProductForm({
     const [certificates, setCertificates] = useState([]);
     const [productIcons, setProductIcons] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [productGroups, setProductGroups] = useState([]);
+    const [groupSeeding, setGroupSeeding] = useState(false);
     
     // File states
     const [productImages, setProductImages] = useState([]); // new File objects
@@ -345,6 +351,7 @@ export default function ProductForm({
         control,
         watch,
         reset,
+        getValues,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(productSchema),
@@ -389,6 +396,7 @@ export default function ProductForm({
         fetchCategories();
         fetchCertificates();
         fetchProductIcons();
+        fetchProductGroups();
     }, []);
 
     const fetchCategories = async () => {
@@ -427,6 +435,65 @@ export default function ProductForm({
             setProductIcons(response.data);
         } catch (error) {
             toast.error(error.message);
+        }
+    };
+
+    const fetchProductGroups = async () => {
+        try {
+            const res = await fetch("/api/admin/product-groups");
+            const response = await res.json();
+            if (response.success) setProductGroups(response.data || []);
+        } catch {
+            // Non-fatal: the form still works without grouping.
+        }
+    };
+
+    /**
+     * Seed the form from an existing member of the chosen group.
+     *
+     * Only the shared specification is copied. The fields that genuinely differ
+     * between siblings, and all media, are deliberately left for the admin.
+     */
+    const handleGroupChange = async (groupId, onChange) => {
+        onChange(groupId);
+        if (!groupId || isEdit) return;
+
+        setGroupSeeding(true);
+        try {
+            const res = await fetch(`/api/admin/product-groups/${groupId}/template`);
+            const response = await res.json();
+            if (!response.success) throw new Error(response.message);
+
+            const { template } = response.data;
+            if (!template) {
+                toast.info("This is the first product in the group, so there is nothing to prefill.");
+                return;
+            }
+
+            const current = getValues();
+            const seeded = { ...current };
+            for (const [key, value] of Object.entries(template.fields || {})) {
+                // `application` is multi-select state, not a form field.
+                if (key === "application") continue;
+                seeded[key] = value === null || value === undefined ? "" : String(value);
+            }
+            // Keep what the admin already typed into the per-variant fields.
+            for (const key of GROUP_VARIANT_FIELDS) {
+                if (key in current) seeded[key] = current[key];
+            }
+            seeded.groupId = groupId;
+
+            reset(seeded, { keepDefaultValues: true });
+            setSelectedApplications(Array.isArray(template.fields?.application) ? [...template.fields.application] : []);
+            setFeatures(Array.isArray(template.features) ? [...template.features] : []);
+            setSelectedCertificates(Array.isArray(template.certificateIds) ? [...template.certificateIds] : []);
+            setSelectedIcons(Array.isArray(template.iconIds) ? [...template.iconIds] : []);
+
+            toast.success(`Prefilled from "${template.sourceProductName}". Fill in the fields that differ and upload this product's media.`);
+        } catch (error) {
+            toast.error(error.message || "Failed to load the group template");
+        } finally {
+            setGroupSeeding(false);
         }
     };
 
@@ -648,12 +715,54 @@ export default function ProductForm({
         </div>
     );
 
+    // Related-products group: choosing one on a new product seeds the shared spec.
+    const renderGroupSelect = () => (
+        <div className="space-y-2">
+            <Label htmlFor="groupId">Related Products Group</Label>
+            <Controller
+                name="groupId"
+                control={control}
+                render={({ field }) => (
+                    <Select
+                        onValueChange={(v) => handleGroupChange(v, field.onChange)}
+                        value={field.value ?? ""}
+                        disabled={groupSeeding}
+                    >
+                        <SelectTrigger>
+                            {/* Children must always be defined, otherwise Radix portals
+                                SelectItemText into this node (see renderSelect). */}
+                            <SelectValue placeholder="Select group (optional)">
+                                {productGroups.find((g) => g.id === field.value)?.name ?? ""}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {productGroups.map((group) => (
+                                <SelectItem key={group.id} value={group.id}>
+                                    {group.name}
+                                    {group.productCount ? ` (${group.productCount})` : " (empty)"}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
+            />
+            <p className="text-xs text-muted-foreground">
+                {isEdit
+                    ? "Moving this product to another group does not change its values."
+                    : "Picking a group fills in everything the group shares. You still enter product name and number, cabinet width and height, chip bonding, brightness, contrast ratio, driving method, SEO tags and all media."}
+            </p>
+        </div>
+    );
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information Section */}
             <div className="space-y-4 py-4">
                 <h2 className="text-lg font-semibold ">Basic Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Related products group — seeds the shared spec on new products */}
+                    <div className="md:col-span-2">{renderGroupSelect()}</div>
+
                     {/* Product Name */}
                     {renderInput("Product Name *", "productName", "text", { required: true })}
 

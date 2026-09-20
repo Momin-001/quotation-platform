@@ -148,6 +148,13 @@
       "when": 1789762614127,
       "tag": "0020_silent_klaw",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1789944685569,
+      "tag": "0021_dapper_natasha_romanoff",
+      "breakpoints": true
     }
   ]
 }

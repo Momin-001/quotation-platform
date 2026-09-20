@@ -52,6 +52,7 @@ export async function POST(request) {
             oemBrand: body.oemBrand?.toString().trim() || null,
             // Foreign Key
             areaOfUseId: body.areaOfUseId?.toString() || null,
+            groupId: body.groupId?.toString() || null,
             // ENUM fields
             productType: body.productType?.toString() || "",
             design: body.design?.toString() || "",

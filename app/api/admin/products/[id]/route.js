@@ -156,6 +156,7 @@ export async function PUT(request, { params }) {
             support: body.support?.toString() || null,
             
             areaOfUseId: body.areaOfUseId?.toString() || null,
+            groupId: body.groupId?.toString() || null,
             
             pixelPitch: body.pixelPitch?.toString() || "",
             cabinetWidth: body.cabinetWidth?.toString() || null,

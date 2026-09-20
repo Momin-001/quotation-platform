@@ -30,7 +30,6 @@
     "menu": "Menü",
     "home": "STARTSEITE",
     "products": "PRODUKTE",
-    "refurbished": "REFURBISHED",
     "controllers": "CONTROLLER",
     "leditor": "LEDITOR",
     "blogs": "BLOGS",
@@ -749,7 +748,15 @@
       "messageTooShort": "Bitte geben Sie eine Nachricht ein (mindestens 10 Zeichen)",
       "privacyRequired": "Bitte stimmen Sie der Datenschutzerklärung und den AGB zu",
       "captchaRequired": "Bitte lösen Sie das Captcha"
-    }
+    },
+    "display": "Display {number}",
+    "compare": "Vergleichen",
+    "comparisonTitle": "Display-Vergleich",
+    "comparisonSubtitle": "Cabinet-Spezifikationen und konfigurierte Gesamtwerte im direkten Vergleich.",
+    "comparisonHint": "Konfigurieren Sie mindestens zwei Displays für einen Vergleich.",
+    "copyFromFirst": "Von Display 1 übernehmen",
+    "noProductSelected": "Kein Produkt ausgewählt",
+    "relativeSize": "Größenvergleich"
   },
   "BecomePartnerSubmit": {
     "breadcrumbTitle": "Partner werden",

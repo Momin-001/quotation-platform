@@ -51,9 +51,7 @@ export default function NavbarMobileSheet({ open, onOpenChange, locale, isAuthen
                         <Link href="/products" onClick={() => onOpenChange(false)} className={mobileNavLinkClass("/products")}>
                             {t("products")}
                         </Link>
-                        <Link href="/refurbished-products" onClick={() => onOpenChange(false)} className={mobileNavLinkClass("/refurbished-products")}>
-                            {t("refurbished")}
-                        </Link>
+                        {/* Refurbished is reached from the products listing, not the main nav. */}
                         <Link href="/controllers" onClick={() => onOpenChange(false)} className={mobileNavLinkClass("/controllers")}>
                             {t("controllers")}
                         </Link>

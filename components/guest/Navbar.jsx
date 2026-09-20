@@ -63,9 +63,7 @@ export default function Navbar() {
                     <Link href="/products" className={navLinkClass("/products")}>
                         {t("products")}
                     </Link>
-                    <Link href="/refurbished-products" className={navLinkClass("/refurbished-products")}>
-                        {t("refurbished")}
-                    </Link>
+                    {/* Refurbished is reached from the products listing, not the main nav. */}
                     <Link href="/controllers" className={navLinkClass("/controllers")}>
                         {t("controllers")}
                     </Link>
